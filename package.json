@@ -1,0 +1,19 @@
+{
+    "name": "components",
+    "version": "0.1.0",
+    "description": "A set of reusable describo UI components",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/describo/components.git"
+    },
+    "author": "Marco La Rosa",
+    "license": "GPLV3",
+    "bugs": {
+        "url": "https://github.com/describo/components/issues"
+    },
+    "homepage": "https://github.com/describo/components#readme"
+}
