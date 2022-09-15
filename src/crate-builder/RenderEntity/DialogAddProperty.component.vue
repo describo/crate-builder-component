@@ -44,7 +44,6 @@
 <script setup>
 import AddComponent from "./Add.component.vue";
 import { reactive, computed, watch } from "vue";
-import { flattenDeep } from "lodash";
 import { ProfileManager } from "../profile-manager";
 
 const props = defineProps({

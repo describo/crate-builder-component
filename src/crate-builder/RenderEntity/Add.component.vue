@@ -121,7 +121,7 @@ import SelectUrlComponent from "../base-components/SelectUrl.component.vue";
 import SelectObjectComponent from "../base-components/SelectObject.component.vue";
 import GeoComponent from "../base-components/Geo.component.vue";
 import AutocompleteComponent from "./AutoComplete.component.vue";
-import { reactive, computed, onMounted } from "vue";
+import { reactive, computed } from "vue";
 
 const props = defineProps({
     crateManager: {

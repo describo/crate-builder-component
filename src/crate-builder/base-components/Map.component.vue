@@ -6,7 +6,7 @@
 import "leaflet/dist/leaflet.css";
 import Leaflet from "leaflet";
 import { groupBy } from "lodash";
-import { reactive, onMounted, nextTick } from "vue";
+import { reactive, onMounted } from "vue";
 
 const props = defineProps({
     crateManager: {

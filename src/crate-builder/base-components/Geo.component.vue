@@ -72,8 +72,6 @@
 
 <script setup>
 import "leaflet/dist/leaflet.css";
-// import { ElMessage } from "element-plus";
-// import SelectArea from "leaflet-area-select";
 import Leaflet from "leaflet";
 import { reactive, onMounted } from "vue";
 

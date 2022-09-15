@@ -22,8 +22,7 @@
 
 <script>
 import validatorPkg from "validator";
-const { isURL, isDataURI } = validatorPkg;
-import { ElMessage } from "element-plus";
+const { isURL } = validatorPkg;
 
 export default {
     props: {
