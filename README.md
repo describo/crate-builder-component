@@ -4,13 +4,14 @@
 - [Developing the plugin](#developing-the-plugin)
 - [Repo structure](#repo-structure)
 - [Using the component in your app](#using-the-component-in-your-app)
-  - [Installation and setup](#installation-and-setup)
-    - [Setting up for tailwind css](#setting-up-for-tailwind-css)
-  - [Component Dependencies](#component-dependencies)
-  - [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
-  - [Full Usage - configuration and events](#full-usage---configuration-and-events)
-    - [Configuration](#configuration)
-    - [Events](#events)
+  - [Tailwind CSS dependency](#tailwind-css-dependency)
+  - [Vue Router Dependency](#vue-router-dependency)
+  - [Install the package](#install-the-package)
+  - [Wire it up](#wire-it-up)
+- [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
+- [Full Usage - configuration and events](#full-usage---configuration-and-events)
+  - [Configuration](#configuration)
+  - [Events](#events)
 
 This is the core UI component for assembling an RO-Crate inside Describo. It is a self container
 VueJS component that can be used inside your app. If you use this component, your app is responsible
@@ -36,9 +37,7 @@ npm run develop
 
 # Using the component in your app
 
-## Installation and setup
-
-### Setting up for tailwind css
+## Tailwind CSS dependency
 
 The component uses [tailwindcss](https://tailwindcss.com/) and the
 [Element Plus](https://element-plus.org/en-US/) component library. The library plugs in Element Plus
@@ -62,11 +61,19 @@ module.exports = {
 ```
 
 The last line in the config (`"./node_modules/@describo/\**/*.vue",`) is the important part. Here
-we're telling tailwind to process css in the component classes. Without that, t styling in the
-component. Other than this, ensure you set up tailwind for your environment as per _their_
-documentation.
+we're telling tailwind to process css in the component .vue files. Without that, the styling in the
+component won't be used. Other than this, ensure you set up tailwind for your environment as per
+_their_ documentation.
+
+## Vue Router Dependency
+
+The app requires a functioning vue router setup in your app as shown following.
+
+## Install the package
 
 -   `npm install --save @describo/crate-builder-component`
+
+## Wire it up
 
 -   Plug it into your Vue app. It will look something like:
 
@@ -93,11 +100,7 @@ app.use(DescriboCrateBuilder);
 app.mount("#app");
 ```
 
-## Component Dependencies
-
-The app requires a functioning vue router setup to be installed into your app as shown above.
-
-## Basic Usage - pass in crate and profile
+# Basic Usage - pass in crate and profile
 
 In it's most basic form, the component is plugged in as:
 
@@ -110,7 +113,7 @@ In it's most basic form, the component is plugged in as:
 
 Pass in the crate file and optionally a profile.
 
-## Full Usage - configuration and events
+# Full Usage - configuration and events
 
 ```
     <describo-crate-builder
@@ -126,7 +129,7 @@ Pass in the crate file and optionally a profile.
     </describo-crate-builder>
 ```
 
-### Configuration
+## Configuration
 
 -   `lookup`: Pass in an instance of a class the component can use to lookup entity templates. The
     signature of the class must be:
@@ -148,7 +151,7 @@ export class Lookup {
 -   `enable-crate-preview`: true | false: enable / disable the crate preview control
 -   `enable-browse-entities`: true | false: enable / disable the browse entities control
 
-### Events
+## Events
 
 -   `@save:crate`: whenever the crate changes internally, this event will be emitted with the full
     crate for your app to save or handle in some way
