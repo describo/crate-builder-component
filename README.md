@@ -5,6 +5,7 @@
 - [Repo structure](#repo-structure)
 - [Using the component in your app](#using-the-component-in-your-app)
   - [Installation and setup](#installation-and-setup)
+    - [Setting up for tailwind css](#setting-up-for-tailwind-css)
   - [Component Dependencies](#component-dependencies)
   - [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
   - [Full Usage - configuration and events](#full-usage---configuration-and-events)
@@ -37,7 +38,36 @@ npm run develop
 
 ## Installation and setup
 
+### Setting up for tailwind css
+
+The component uses [tailwindcss](https://tailwindcss.com/) and the
+[Element Plus](https://element-plus.org/en-US/) component library. The library plugs in Element Plus
+when it is instantiated but in order for the CSS to be processed correctly, you need to
+`setup your app for tailwind` and add a `tailwind.config.js` that looks like:
+
+```
+module.exports = {
+    future: {},
+    content: [
+        "./src/**/*.html",
+        "./src/**/*.{js,jsx,ts,tsx,vue}",
+        "./node_modules/@describo/**/*.vue",
+    ],
+    theme: {
+        extend: {},
+    },
+    variants: {},
+    plugins: [],
+};
+```
+
+The last line in the config (`"./node_modules/@describo/\**/*.vue",`) is the important part. Here
+we're telling tailwind to process css in the component classes. Without that, t styling in the
+component. Other than this, ensure you set up tailwind for your environment as per _their_
+documentation.
+
 -   `npm install --save @describo/crate-builder-component`
+
 -   Plug it into your Vue app. It will look something like:
 
 ```
