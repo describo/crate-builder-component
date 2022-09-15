@@ -1,5 +1,5 @@
 {
-    "name": "describo/crate-builder-component",
+    "name": "@describo/crate-builder-component",
     "version": "0.1.0",
     "description": "A VusJS component for assembling an RO-Crate",
     "source": "./src/crate-builder/index.js",
