@@ -6,8 +6,14 @@
     "main": "./dist/main.js",
     "module": "./dist/module.js",
     "files": [
-        "./dist/*"
+        "dist"
     ],
+    "exports": {
+        ".": {
+            "import": "./dist/module.js",
+            "require": "./dist/main.js"
+        }
+    },
     "scripts": {
         "develop": "npm install && webpack serve -c webpack-development.js",
         "build": "./node_modules/.bin/parcel build --no-cache",
