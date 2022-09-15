@@ -55,7 +55,7 @@ export default {
 
                 this.$emit("save:property", {
                     property: this.property,
-                    value: this.internalValue,
+                    value: this.internalValue.trim(),
                 });
             }
         },
