@@ -37,13 +37,13 @@ npm run develop
 
 ## Installation and setup
 
--   `npm install --save describo/crate-builder-component`
+-   `npm install --save @describo/crate-builder-component`
 -   Plug it into your Vue app. It will look something like:
 
 ```
 import { createApp } from "vue";
 import App from "./App.vue";
-import DescriboCrateBuilder from "describo/crate-builder-component";
+import DescriboCrateBuilder from "@describo/crate-builder-component";
 import { createRouter, createWebHistory } from "vue-router";
 
 const router = createRouter({
