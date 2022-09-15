@@ -4,7 +4,7 @@
     "description": "A VueJS component for assembling an RO-Crate",
     "main": "./src/index.js",
     "files": [
-        "src/crate-builder"
+        "src/crate-builder/*"
     ],
     "scripts": {
         "develop": "npm install && webpack serve -c webpack-development.js",
