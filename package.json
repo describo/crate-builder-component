@@ -2,9 +2,9 @@
     "name": "@describo/crate-builder-component",
     "version": "0.1.4",
     "description": "A VueJS component for assembling an RO-Crate",
-    "main": "./src/crate-builder/index.js",
+    "main": "index.js",
     "files": [
-        "src"
+        "src/crate-builder"
     ],
     "scripts": {
         "develop": "npm install && webpack serve -c webpack-development.js",

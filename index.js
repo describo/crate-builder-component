@@ -1,4 +1,4 @@
-import DescriboCrateBuilder from "./Shell.component.vue";
+import DescriboCrateBuilder from "./src/crate-builder/Shell.component.vue";
 import "./tailwind.css";
 import "@element-plus/theme-chalk/dist/index.css";
 import ElementPlus from "element-plus";
