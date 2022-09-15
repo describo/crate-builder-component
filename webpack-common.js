@@ -18,7 +18,7 @@ module.exports = {
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             title: "Describo Components",
-            template: "./index.html",
+            template: "./src/app/index.html",
         }),
         new VueLoaderPlugin(),
         new MiniCssExtractPlugin({ filename: "[contenthash].css" }),
