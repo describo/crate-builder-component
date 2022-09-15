@@ -1,19 +1,69 @@
 {
-    "name": "components",
+    "name": "describo/crate-builder-component",
     "version": "0.1.0",
-    "description": "A set of reusable describo UI components",
-    "main": "index.js",
+    "description": "A VusJS component for assembling an RO-Crate",
+    "source": "./src/crate-builder/index.js",
+    "main": "./dist/main.js",
+    "module": "./dist/module.js",
+    "files": [
+        "./dist"
+    ],
     "scripts": {
+        "develop": "npm install && webpack serve -c webpack-development.js",
+        "build": "./node_modules/.bin/parcel build --no-cache",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/describo/components.git"
+        "url": "git+https://github.com/describo/crate-builder-component.git"
     },
     "author": "Marco La Rosa",
-    "license": "GPLV3",
+    "license": "GPL-3.0",
     "bugs": {
-        "url": "https://github.com/describo/components/issues"
+        "url": "https://github.com/describo/crate-builder-component/issues"
     },
-    "homepage": "https://github.com/describo/components#readme"
+    "homepage": "https://github.com/describo/crate-builder-component#readme",
+    "dependencies": {
+        "@codemirror/lang-javascript": "^6.0.2",
+        "@codemirror/state": "^6.1.1",
+        "@codemirror/theme-one-dark": "^6.1.0",
+        "@fortawesome/fontawesome-free": "^6.2.0",
+        "@fortawesome/fontawesome-svg-core": "^6.2.0",
+        "codemirror": "^6.0.1",
+        "date-fns": "^2.29.3",
+        "element-plus": "^2.2.16",
+        "leaflet": "^1.8.0",
+        "leaflet-area-select": "^1.0.5",
+        "lodash": "^4.17.21",
+        "tailwindcss": "^3.1.8",
+        "uuid": "^9.0.0",
+        "validator": "^13.7.0",
+        "vue": "^3.2.39",
+        "vue-router": "^4.1.5",
+        "vuex": "^4.0.2"
+    },
+    "devDependencies": {
+        "@parcel/transformer-vue": "^2.7.0",
+        "@vitejs/plugin-vue": "^3.1.0",
+        "autoprefixer": "^10.4.5",
+        "babel-loader": "^8.2.5",
+        "clean-webpack-plugin": "^4.0.0",
+        "copy-webpack-plugin": "^11.0.0",
+        "css-loader": "^6.7.1",
+        "css-minimizer-webpack-plugin": "^4.1.0",
+        "file-loader": "^6.2.0",
+        "html-webpack-plugin": "^5.5.0",
+        "mini-css-extract-plugin": "^2.6.1",
+        "parcel": "^2.7.0",
+        "postcss": "^8.4.16",
+        "postcss-loader": "^7.0.1",
+        "process": "^0.11.10",
+        "sass": "^1.54.9",
+        "sass-loader": "^13.0.2",
+        "vue-loader": "^17.0.0",
+        "webpack": "^5.74.0",
+        "webpack-cli": "^4.10.0",
+        "webpack-dev-server": "^4.11.0",
+        "webpack-merge": "^5.8.0"
+    }
 }
