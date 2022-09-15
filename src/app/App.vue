@@ -59,10 +59,10 @@ const data = reactive({
                 inputs: [
                     {
                         id: "https://schema.org/data",
-                        name: "data",
+                        name: "",
                         label: "Attach a data",
                         help: "",
-                        type: ["Date"],
+                        type: ["Geo"],
                         required: true,
                         multiple: false,
                     },
