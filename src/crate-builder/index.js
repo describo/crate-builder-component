@@ -1,6 +1,6 @@
 import DescriboCrateBuilder from "./Shell.component.vue";
 import "./tailwind.css";
-import "element-plus/theme-chalk/index.css";
+import "@element-plus/theme-chalk/dist/index.css";
 import ElementPlus from "element-plus";
 import "@fortawesome/fontawesome-free/js/all";
 import { config } from "@fortawesome/fontawesome-svg-core";
