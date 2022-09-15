@@ -43,7 +43,7 @@ npm run develop
 ```
 import { createApp } from "vue";
 import App from "./App.vue";
-import DescriboCrateBuilder from "../crate-builder/index.js";
+import DescriboCrateBuilder from "describo/crate-builder-component";
 import { createRouter, createWebHistory } from "vue-router";
 
 const router = createRouter({
