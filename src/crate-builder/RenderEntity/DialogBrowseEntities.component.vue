@@ -40,18 +40,14 @@
                                 <i class="fas fa-edit"></i>
                             </el-button>
                         </div>
-                        <div>
+                        <div v-if="scope.row.describoLabel !== 'RootDataset'">
                             <el-popconfirm
                                 title="Are you sure? This can't be undone."
                                 width="300px"
                                 @confirm="deleteEntity(scope.row.describoId)"
                             >
                                 <template #reference>
-                                    <el-button
-                                        size="small"
-                                        type="danger"
-                                        v-if="scope.row.describoLabel !== 'RootDataset'"
-                                    >
+                                    <el-button size="small" type="danger">
                                         <i class="fas fa-trash"></i>
                                     </el-button>
                                 </template>
