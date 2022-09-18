@@ -42,26 +42,26 @@ const data = reactive({
             version: 0.1,
             warnMissingProperty: true,
         },
-        // hide: {
-        //     Dataset: ["date"],
-        // },
-        // layouts: {
-        //     Dataset: [
-        //         { name: "group1", description: "", inputs: ["author"] },
-        //         // { name: "group2", description: "", inputs: ["TextArea", "text", "url"] },
-        //     ],
-        //     // Place: [{ name: "important", description: "", inputs: ["geojson"] }],
-        // },
+        hide: {
+            Dataset: ["date"],
+        },
+        layouts: {
+            Dataset: [
+                { name: "Metadata About", description: "", inputs: ["author"] },
+                // { name: "group2", description: "", inputs: ["TextArea", "text", "url"] },
+            ],
+            // Place: [{ name: "important", description: "", inputs: ["geojson"] }],
+        },
         classes: {
             Dataset: {
                 definition: "override",
                 subClassOf: [],
                 inputs: [
                     {
-                        id: "https://schema.org/data",
-                        name: "",
-                        label: "Attach a data",
-                        help: "",
+                        id: "https://schema.org/date",
+                        name: "date",
+                        label: "Date",
+                        help: "Attach a date",
                         type: ["Geo"],
                         required: true,
                         multiple: false,
