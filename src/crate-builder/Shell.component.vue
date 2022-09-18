@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col">
         <render-entity-component
-            v-if="data.entity.describoId"
+            v-if="data.ready"
             :crate-manager="data.crateManager"
             :entity="data.entity"
             :mode="props.mode"
@@ -18,7 +18,7 @@
 
 <script setup>
 import RenderEntityComponent from "./RenderEntity/Shell.component.vue";
-import { onMounted, reactive, watch, provide } from "vue";
+import { onMounted, onBeforeMount, reactive, watch, provide } from "vue";
 import { cloneDeep, isEmpty, debounce, isFunction } from "lodash";
 import { CrateManager } from "./crate-manager.js";
 import { useRouter, useRoute } from "vue-router";
@@ -60,6 +60,7 @@ const props = defineProps({
 const emit = defineEmits(["save:crate", "save:crate:template"]);
 
 const data = reactive({
+    ready: false,
     error: false,
     crate: [],
     profile: {},
@@ -69,6 +70,7 @@ const data = reactive({
 });
 
 watch([() => props.crate, () => props.profile], () => {
+    data.ready = false;
     data.debouncedInit();
 });
 watch(
@@ -77,14 +79,17 @@ watch(
         if (n !== data.entity.describoId) setCurrentEntity({ describoId: $route.query.id });
     }
 );
-onMounted(() => {
+onBeforeMount(() => {
     const configuration = {
         enableContextEditor: props.enableContextEditor,
         enableCratePreview: props.enableCratePreview,
         enableBrowseEntities: props.enableBrowseEntities,
     };
     provide("configuration", configuration);
+});
+onMounted(() => {
     data.debouncedInit();
+    data.ready = true;
 });
 
 function init() {
