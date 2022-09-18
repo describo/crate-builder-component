@@ -78,7 +78,7 @@
                 <el-tabs tab-position="left" v-model="data.activeTab">
                     <el-tab-pane label="About" name="about">
                         <template #label>
-                            <span class="cursor-pointerspace text-gray-600"> About </span>
+                            <span class="cursor-pointerspace text-gray-600 text-lg"> About </span>
                         </template>
 
                         <!-- render entity id -->
@@ -118,7 +118,7 @@
                         :key="idx"
                     >
                         <template #label>
-                            <span class="cursor-pointer text-gray-600">{{ tab.name }}</span>
+                            <span class="cursor-pointer text-gray-600 text-lg">{{ tab.name }}</span>
                         </template>
                         <!-- render entity properties -->
                         <div v-for="(values, property) of tab.entity.properties" :key="property">
