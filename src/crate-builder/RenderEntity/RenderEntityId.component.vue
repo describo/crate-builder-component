@@ -6,12 +6,12 @@
             <div v-if="['Dataset', 'File'].includes(entity['@type'])" class="">
                 {{ entity["@id"] }}
             </div>
-            <div v-else>
+            <div v-else class="flex-grow">
                 <text-component
                     class="w-full"
                     type="text"
-                    property="@id"
-                    :value.sync="entity.name"
+                    :property="data.property"
+                    :value="entity.name"
                     @save:property="save"
                 />
             </div>
@@ -22,7 +22,6 @@
 <script setup>
 import TextComponent from "../base-components/Text.component.vue";
 import { reactive, watch } from "vue";
-import { debounce } from "lodash";
 
 const props = defineProps({
     entity: {
@@ -30,10 +29,10 @@ const props = defineProps({
         required: true,
     },
 });
-const emit = defineEmits(["save:property"]);
+const emit = defineEmits(["update:entity"]);
 
 let data = reactive({
-    property: "name",
+    property: "@id",
     value: props.entity.value,
 });
 
@@ -45,9 +44,6 @@ watch(
 );
 
 async function save(data) {
-    emit("save:property", {
-        property: "@id",
-        value: data.value,
-    });
+    emit("update:entity", data);
 }
 </script>

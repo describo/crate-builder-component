@@ -7,7 +7,7 @@
                     class="w-full"
                     type="text"
                     :property="data.property"
-                    :value.sync="entity.name"
+                    :value="entity.name"
                     @save:property="save"
                 />
             </div>
@@ -25,7 +25,7 @@ let props = defineProps({
         required: true,
     },
 });
-const emit = defineEmits(["save:property"]);
+const emit = defineEmits(["update:entity"]);
 
 let data = reactive({
     property: "name",
@@ -39,9 +39,6 @@ watch(
 );
 
 async function save(data) {
-    emit("save:property", {
-        property: data.property,
-        value: data.value,
-    });
+    emit("update:entity", data);
 }
 </script>
