@@ -235,9 +235,10 @@ export class CrateManager {
         this.__index();
     }
 
-    updateEntityName({ describoId, value }) {
+    updateEntity({ describoId, property, value }) {
+        describoId = describoId ? describoId : this.currentEntity;
         this.entities = this.entities.map((e) => {
-            return e.describoId === describoId ? { ...e, name: value } : e;
+            return e.describoId === describoId ? { ...e, [property]: value } : e;
         });
         this.__index();
     }

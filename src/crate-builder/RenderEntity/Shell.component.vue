@@ -15,16 +15,20 @@
             />
 
             <!-- render entity id -->
-            <render-entity-id-component :entity="data.entity" class="my-2" />
+            <render-entity-id-component
+                class="my-2"
+                :entity="data.entity"
+                @update:entity="updateEntity"
+            />
 
             <!-- render entity type -->
             <render-entity-type-component :entity="data.entity" class="my-2" />
 
             <!-- render entity name -->
             <render-entity-name-component
-                :entity="data.entity"
-                @save:property="saveProperty"
                 class="my-2"
+                :entity="data.entity"
+                @update:entity="updateEntity"
             />
 
             <!-- render entity properties -->
@@ -82,10 +86,18 @@
                         </template>
 
                         <!-- render entity id -->
-                        <render-entity-id-component :entity="data.tabs[0].entity" class="my-2" />
+                        <render-entity-id-component
+                            class="my-2"
+                            :entity="data.tabs[0].entity"
+                            @update:entity="updateEntity"
+                        />
 
                         <!-- render entity type -->
-                        <render-entity-type-component :entity="data.tabs[0].entity" class="my-2" />
+                        <render-entity-type-component
+                            class="my-2"
+                            :entity="data.tabs[0].entity"
+                            @update:entity="updateEntity"
+                        />
 
                         <!-- render entity name -->
                         <render-entity-name-component
@@ -291,6 +303,7 @@ function applyLayout({ layouts, hide = [], entity }) {
 
     return { tabs };
 }
+function updateEntityId(data) {}
 function addPropertyPlaceholder({ property }) {
     data.extraProperties.push(property);
     init();
@@ -338,6 +351,15 @@ function createEntity(data) {
     if (props.mode === "embedded") {
         let entity = props.crateManager.addEntity({ entity: data });
         props.crateManager.linkEntity({ property, tgtEntityId: entity.describoId });
+        saveCrate();
+    } else {
+    }
+    init();
+}
+function updateEntity(data) {
+    console.debug("Render Entity component: emit(update:entity)", data);
+    props.crateManager.updateEntity(data);
+    if (props.mode === "embedded") {
         saveCrate();
     } else {
     }
