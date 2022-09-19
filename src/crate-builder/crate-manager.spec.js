@@ -11,11 +11,57 @@ describe("Test loading / exporting crate files", () => {
     });
     test("a simple crate file", async () => {
         let crate = getBaseCrate();
+        crate = addRootDataset({ crate });
 
-        let crateManager = new CrateManager({ crate });
+        let crateManager = new CrateManager();
+        crateManager.load({ crate });
 
-        let exportedCrate = crateManager.exportCrate();
-        expect(crate).toEqual(exportedCrate);
+        let exportedCrate = crateManager.exportCrate({});
+        expect(crate["@graph"].length).toEqual(exportedCrate["@graph"].length);
+    });
+
+    test("should fail on a crate file without @context", async () => {
+        let crateManager = new CrateManager();
+        try {
+            crateManager.load({ crate: {} });
+        } catch (error) {
+            expect(error.message).toEqual(`The crate file does not have '@context'.`);
+        }
+    });
+    test("should fail on a crate file without @graph", async () => {
+        let crateManager = new CrateManager();
+        try {
+            crateManager.load({ crate: { "@context": {} } });
+        } catch (error) {
+            expect(error.message).toEqual(
+                `The crate file does not have '@graph' or it's not an array.`
+            );
+        }
+    });
+    test("should fail on a crate file without @graph as array", async () => {
+        let crateManager = new CrateManager();
+        try {
+            crateManager.load({ crate: { "@context": {}, "@graph": {} } });
+        } catch (error) {
+            expect(error.message).toEqual(
+                `The crate file does not have '@graph' or it's not an array.`
+            );
+        }
+    });
+    test("should fail on a crate where root dataset can't be identified", async () => {
+        let crate = getBaseCrate();
+        crate["@graph"].push({
+            "@id": "not expected",
+            "@type": ["Dataset"],
+            name: "Dataset",
+        });
+
+        let crateManager = new CrateManager();
+        try {
+            crateManager.load({ crate });
+        } catch (error) {
+            expect(error.message).toEqual(`A root dataset cannot be identified in the crate.`);
+        }
     });
     test("with root dataset, one type", async () => {
         let crate = getBaseCrate();
@@ -25,9 +71,10 @@ describe("Test loading / exporting crate files", () => {
             name: "Dataset",
         });
 
-        let crateManager = new CrateManager({ crate });
+        let crateManager = new CrateManager();
+        crateManager.load({ crate });
 
-        let exportedCrate = crateManager.exportCrate();
+        let exportedCrate = crateManager.exportCrate({});
         exportedCrate["@graph"] = exportedCrate["@graph"].map((e) => {
             delete e["@reverse"];
             return e;
@@ -42,9 +89,10 @@ describe("Test loading / exporting crate files", () => {
             name: "Dataset",
         });
 
-        let crateManager = new CrateManager({ crate });
+        let crateManager = new CrateManager();
+        crateManager.load({ crate });
 
-        let exportedCrate = crateManager.exportCrate();
+        let exportedCrate = crateManager.exportCrate({});
         exportedCrate["@graph"] = exportedCrate["@graph"].map((e) => {
             delete e["@reverse"];
             return e;
@@ -60,9 +108,10 @@ describe("Test loading / exporting crate files", () => {
             text: "some text",
         });
 
-        let crateManager = new CrateManager({ crate });
+        let crateManager = new CrateManager();
+        crateManager.load({ crate });
 
-        let exportedCrate = crateManager.exportCrate();
+        let exportedCrate = crateManager.exportCrate({});
         exportedCrate["@graph"] = exportedCrate["@graph"].map((e) => {
             delete e["@reverse"];
             return e;
@@ -78,9 +127,10 @@ describe("Test loading / exporting crate files", () => {
             text: ["some text"],
         });
 
-        let crateManager = new CrateManager({ crate });
+        let crateManager = new CrateManager();
+        crateManager.load({ crate });
 
-        let exportedCrate = crateManager.exportCrate();
+        let exportedCrate = crateManager.exportCrate({});
         let rootDataset = exportedCrate["@graph"].filter((e) => e["@id"] === "./");
         expect(rootDataset).toEqual([
             {
@@ -106,9 +156,10 @@ describe("Test loading / exporting crate files", () => {
             name: "Person",
         });
 
-        let crateManager = new CrateManager({ crate });
+        let crateManager = new CrateManager();
+        crateManager.load({ crate });
 
-        let exportedCrate = crateManager.exportCrate();
+        let exportedCrate = crateManager.exportCrate({});
         let rootDataset = exportedCrate["@graph"].filter((e) => e["@id"] === "./");
         expect(rootDataset).toEqual([
             {
@@ -141,9 +192,10 @@ describe("Test loading / exporting crate files", () => {
             author: { "@id": "http://entity.com/something" },
         });
 
-        let crateManager = new CrateManager({ crate });
+        let crateManager = new CrateManager();
+        crateManager.load({ crate });
 
-        let exportedCrate = crateManager.exportCrate();
+        let exportedCrate = crateManager.exportCrate({});
         let rootDataset = exportedCrate["@graph"].filter((e) => e["@id"] === "./");
         expect(rootDataset).toEqual([
             {
@@ -174,9 +226,10 @@ describe("Test loading / exporting crate files", () => {
             name: "Person",
         });
 
-        let crateManager = new CrateManager({ crate });
+        let crateManager = new CrateManager();
+        crateManager.load({ crate });
 
-        let exportedCrate = crateManager.exportCrate();
+        let exportedCrate = crateManager.exportCrate({});
         let rootDataset = exportedCrate["@graph"].filter((e) => e["@id"] === "./");
         expect(rootDataset[0].author).toEqual([
             {
@@ -195,7 +248,8 @@ describe("Test interacting with the crate", () => {
     beforeEach(() => {
         crate = getBaseCrate();
         crate = addRootDataset({ crate });
-        crateManager = new CrateManager({ crate });
+        crateManager = new CrateManager();
+        crateManager.load({ crate });
     });
     test("get root dataset", () => {
         let rootDataset = crateManager.getRootDataset();
@@ -219,6 +273,56 @@ describe("Test interacting with the crate", () => {
         expect(e.name).toEqual(entity.name);
         expect(e.describoId).toBeDefined();
     });
+    test("add a simple entity to the crate and setCurrentEntity", () => {
+        let entity = {
+            "@id": chance.url(),
+            "@type": "Person",
+            name: chance.sentence(),
+        };
+        let e = crateManager.addEntity({ entity });
+
+        crateManager.setCurrentEntity({ describoId: e.describoId });
+        expect(crateManager.currentEntity).toEqual(e.describoId);
+    });
+    test("add a simple entity to the crate and export as a template", () => {
+        let entity = {
+            "@id": chance.url(),
+            "@type": "Person",
+            name: chance.sentence(),
+        };
+        let e = crateManager.addEntity({ entity });
+
+        let template = crateManager.exportEntityTemplate({ describoId: e.describoId });
+        expect(template).toEqual(entity);
+    });
+    test("add a simple entity to the crate and get browse list", () => {
+        let entity = {
+            "@id": chance.url(),
+            "@type": "Person",
+            name: chance.sentence(),
+        };
+        let e = crateManager.addEntity({ entity });
+
+        let list = crateManager.getEntitiesBrowseList();
+        expect(list.length).toEqual(2);
+    });
+    test("add a complex entity to the crate and export as a template", () => {
+        let rootDataset = crateManager.getRootDataset();
+        let entity = {
+            "@id": chance.url(),
+            "@type": "Person",
+            name: chance.sentence(),
+        };
+        let e = crateManager.addEntity({ entity });
+        crateManager.linkEntity({
+            srcEntityId: rootDataset.describoId,
+            property: "author",
+            tgtEntityId: e.describoId,
+        });
+
+        let template = crateManager.exportEntityTemplate({ describoId: e.describoId });
+        expect(template).toEqual(entity);
+    });
     test("add a complex entity to the crate", () => {
         let entity = {
             "@id": chance.url(),
@@ -241,9 +345,30 @@ describe("Test interacting with the crate", () => {
         };
         let e = crateManager.addEntity({ entity });
 
-        crateManager.updateEntityName({ describoId: e.describoId, value: "something else" });
+        crateManager.updateEntity({
+            describoId: e.describoId,
+            property: "name",
+            value: "something else",
+        });
         e = crateManager.getEntity({ describoId: e.describoId });
         expect(e.name).toEqual("something else");
+    });
+    test("update entity '@id'", () => {
+        const url = chance.url();
+        let entity = {
+            "@id": url,
+            "@type": "Person",
+            name: chance.sentence(),
+        };
+        let e = crateManager.addEntity({ entity });
+
+        crateManager.updateEntity({
+            describoId: e.describoId,
+            property: "@id",
+            value: "something else",
+        });
+        e = crateManager.getEntity({ describoId: e.describoId });
+        expect(e["@id"]).toEqual("something else");
     });
     test("adding a property to an entity", () => {
         const url = chance.url();
@@ -280,7 +405,7 @@ describe("Test interacting with the crate", () => {
             tgtEntityId: e.describoId,
         });
 
-        let exportedCrate = crateManager.exportCrate();
+        let exportedCrate = crateManager.exportCrate({});
 
         e = exportedCrate["@graph"].filter((e) => e["@id"] === "./")[0];
         expect(e).toHaveProperty("author");
@@ -312,7 +437,7 @@ describe("Test interacting with the crate", () => {
             tgtEntityId: e.describoId,
         });
 
-        let exportedCrate = crateManager.exportCrate();
+        let exportedCrate = crateManager.exportCrate({});
         e = exportedCrate["@graph"].filter((e) => e["@id"] === "./")[0];
         expect(e).not.toHaveProperty("author");
 
@@ -424,6 +549,38 @@ describe("Test interacting with the crate", () => {
         match = crateManager.getEntity({ describoId: entity.describoId });
         expect(match).toBeUndefined;
     });
+    test("exporting a simple crate file without unlinked entities", async () => {
+        let crate = getBaseCrate();
+        crate = addRootDataset({ crate });
+
+        let crateManager = new CrateManager();
+        crateManager.load({ crate });
+        let entity = {
+            "@id": chance.url(),
+            "@type": "Person",
+            name: chance.sentence(),
+        };
+        let e = crateManager.addEntity({ entity });
+
+        let exportedCrate = crateManager.exportCrate({});
+        expect(exportedCrate["@graph"].length).toEqual(2);
+    });
+    test("exporting a simple crate file with unlinked entities", async () => {
+        let crate = getBaseCrate();
+        crate = addRootDataset({ crate });
+
+        let crateManager = new CrateManager();
+        crateManager.load({ crate });
+        let entity = {
+            "@id": chance.url(),
+            "@type": "Person",
+            name: chance.sentence(),
+        };
+        let e = crateManager.addEntity({ entity });
+
+        let exportedCrate = crateManager.exportCrate({});
+        expect(exportedCrate["@graph"].length).toEqual(2);
+    });
 });
 
 describe("Test working with a complex crate", () => {
@@ -454,10 +611,11 @@ describe("Test working with a complex crate", () => {
                 },
             ]
         );
-        crateManager = new CrateManager({ crate });
+        crateManager = new CrateManager();
+        crateManager.load({ crate });
     });
     test("it should successfully load a complex crate and look correct", () => {
-        let crate = crateManager.exportCrate();
+        let crate = crateManager.exportCrate({});
 
         // confirm person reverse linked to root dataset as author
         let person = crate["@graph"].filter((e) => e["@id"] === "http://some.person.com")[0];

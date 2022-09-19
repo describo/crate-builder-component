@@ -67,14 +67,31 @@ export class CrateManager {
         this.currentEntity = describoId;
     }
 
-    exportCrate() {
+    exportCrate({ purgeUnlinkedEntities = true }) {
+        let propertiesGroupedBySrcId, propertiesGroupedByTgtId;
+        if (purgeUnlinkedEntities) {
+            propertiesGroupedBySrcId = groupBy(this.properties, "srcEntityId");
+            propertiesGroupedByTgtId = groupBy(this.properties, "tgtEntityId");
+        }
         let crate = {
             "@context": cloneDeep(this.context),
             "@graph": [cloneDeep(this.rootDescriptor)],
         };
         this.entities.forEach((entity) => {
-            entity = this.rehydrateEntity({ entity });
-            crate["@graph"].push(entity);
+            if (purgeUnlinkedEntities) {
+                let rootDataset = this.getRootDataset();
+                if (
+                    propertiesGroupedBySrcId[entity.describoId]?.length ||
+                    propertiesGroupedByTgtId[entity.describoId]?.length ||
+                    entity.describoId === rootDataset.describoId
+                ) {
+                    entity = this.rehydrateEntity({ entity });
+                    crate["@graph"].push(entity);
+                }
+            } else {
+                entity = this.rehydrateEntity({ entity });
+                crate["@graph"].push(entity);
+            }
         });
         return crate;
     }
