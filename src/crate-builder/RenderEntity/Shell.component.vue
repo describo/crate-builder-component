@@ -63,7 +63,7 @@
             </div>
 
             <!--render entities it links to  -->
-            <div class="flex flex-row flex-wrap">
+            <div class="flex flex-row space-x-2 flex-wrap">
                 <div v-for="(entities, property) of data.entity.reverseConnections" :key="property">
                     <div v-for="entity of entities" :key="entity.tgtEntityId">
                         <render-entity-reverse-item-link-component
@@ -124,7 +124,7 @@
                         />
 
                         <!--render entities it links to  -->
-                        <div class="flex flex-row flex-wrap">
+                        <div class="flex flex-row space-x-2 flex-wrap">
                             <div
                                 v-for="(entities, property) of data.entity.reverseConnections"
                                 :key="property"
