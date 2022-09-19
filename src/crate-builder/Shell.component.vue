@@ -11,7 +11,7 @@
             @save:entity:template="saveEntityAsTemplate"
         />
         <div v-if="data.error" class="bg-red-100 p-4 text-center">
-            This component requires you to pass in a crate file.
+            {{ data.error }}
         </div>
     </div>
 </template>
@@ -93,7 +93,7 @@ onMounted(() => {
 
 function init() {
     if (!props.crate || isEmpty(props.crate)) {
-        data.error = true;
+        data.error = `This component requires you to pass in a crate file.`;
         return;
     }
     data.error = false;
@@ -101,7 +101,13 @@ function init() {
     data.profile = isEmpty(props.profile) ? {} : cloneDeep(props.profile);
     data.crate = cloneDeep(props.crate);
 
-    data.crateManager = new CrateManager({ crate: data.crate, profile: data.profile });
+    data.crateManager = new CrateManager();
+    try {
+        data.crateManager.load({ crate: data.crate, profile: data.profile });
+    } catch (error) {
+        data.error = error.message;
+        return;
+    }
 
     if (props.lookup) {
         if (isFunction(props.lookup.entityTemplates) && isFunction(props.lookup.crateTemplates)) {

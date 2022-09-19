@@ -10,14 +10,16 @@ const urlProtocols = ["http", "https", "ftp", "ftps", "arcp"];
 // }
 
 export class CrateManager {
-    constructor({ crate, profile }) {
+    constructor() {
         this.describoProperties = ["describoId", "describoLabel"];
         this.coreProperties = ["describoId", "describoLabel", "@id", "@type", "name"];
         this.entities = [];
         this.properties = [];
         this.currentEntity = undefined;
+    }
+    load({ crate, profile }) {
+        this.verify({ crate });
         this.profile = profile;
-
         this.context = crate["@context"];
 
         // store root descriptor as found
@@ -45,6 +47,20 @@ export class CrateManager {
         entities.forEach((entity) => {
             this.__processProperties({ entity });
         });
+        try {
+            this.getRootDataset();
+        } catch (error) {
+            throw new Error(`A root dataset cannot be identified in the crate.`);
+        }
+    }
+
+    verify({ crate }) {
+        if (!crate["@context"]) {
+            throw new Error(`The crate file does not have '@context'.`);
+        }
+        if (!crate["@graph"] || !isArray(crate["@graph"])) {
+            throw new Error(`The crate file does not have '@graph' or it's not an array.`);
+        }
     }
 
     setCurrentEntity({ describoId }) {
