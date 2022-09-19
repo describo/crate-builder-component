@@ -50,19 +50,24 @@ export default {
     },
     methods: {
         save() {
-            if (
-                !isURL(this.internalValue, { protocols: ["http", "https", "ftp", "ftps", "arcp"] })
-            ) {
-                this.error = `The entry needs to be a valid url. The accepted protocols are: http, https, ftp, ftps and arcp.`;
-            } else {
-                this.error = false;
-
-                this.$emit("create:entity", {
-                    property: this.property,
-                    "@id": this.internalValue,
-                    "@type": "URL",
-                    name: this.internalValue,
+            let isurl;
+            try {
+                isurl = !isURL(this.internalValue, {
+                    protocols: ["http", "https", "ftp", "ftps", "arcp"],
                 });
+                if (isurl) {
+                } else {
+                    this.error = false;
+
+                    this.$emit("create:entity", {
+                        property: this.property,
+                        "@id": this.internalValue,
+                        "@type": "URL",
+                        name: this.internalValue,
+                    });
+                }
+            } catch (error) {
+                this.error = `The entry needs to be a valid url. The accepted protocols are: http, https, ftp, ftps and arcp.`;
             }
         },
     },
