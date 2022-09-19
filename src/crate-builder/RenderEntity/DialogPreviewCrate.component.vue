@@ -35,7 +35,7 @@ const props = defineProps({
 });
 const emit = defineEmits(["close"]);
 const data = reactive({
-    crate: props.crateManager.exportCrate(),
+    crate: props.crateManager.exportCrate({}),
     visible: false,
 });
 onMounted(() => {
