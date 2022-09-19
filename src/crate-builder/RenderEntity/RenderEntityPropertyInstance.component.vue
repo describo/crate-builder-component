@@ -3,25 +3,25 @@
         <div v-if="!data.tgtEntityId" class="w-full">
             <date-component
                 :property="data.property"
-                :value.sync="data.value"
+                :value="data.value"
                 @save:property="savePropertyValue"
                 v-if="isDate(data.value)"
             />
             <date-time-component
                 :property="data.property"
-                :value.sync="data.value"
+                :value="data.value"
                 @save:property="savePropertyValue"
                 v-if="isDateTime(data.value)"
             />
             <time-component
                 :property="data.property"
-                :value.sync="data.value"
+                :value="data.value"
                 @save:property="savePropertyValue"
                 v-if="isTime(data.value)"
             />
             <number-component
                 :property="data.property"
-                :value.sync="data.value"
+                :value="data.value"
                 @save:property="savePropertyValue"
                 v-if="isNumber(data.value)"
             />
@@ -30,7 +30,7 @@
                 :style="inputElementWidth"
                 :type="type"
                 :property="data.property"
-                :value.sync="data.value"
+                :value="data.value"
                 :definition="props.definition"
                 @save:property="savePropertyValue"
             />
@@ -39,7 +39,7 @@
                 v-if="isSelect()"
                 :style="inputElementWidth"
                 :property="data.property"
-                :value.sync="data.value"
+                :value="data.value"
                 :definition="props.definition"
                 @save:property="savePropertyValue"
             />
