@@ -89,7 +89,6 @@ onBeforeMount(() => {
 });
 onMounted(() => {
     data.debouncedInit();
-    data.ready = true;
 });
 
 function init() {
@@ -116,6 +115,7 @@ function init() {
         data.crateManager.lookup = undefined;
     }
     setCurrentEntity({ name: "RootDataset" });
+    data.ready = true;
 }
 async function setCurrentEntity({ describoId = undefined, name = undefined, id = undefined }) {
     if (!data.crateManager.getEntity) return;
