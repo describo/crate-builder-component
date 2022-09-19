@@ -123,6 +123,7 @@ Pass in the crate file and optionally a profile.
         :enable-context-editor="true"
         :enable-crate-preview="true"
         :enable-browse-entities="true"
+        :purge-unlinked-entities-before-save="true
         @save:crate="saveCrate"
         @save:crate:template="saveTemplate"
         @save:entity:template="saveTemplate">
@@ -147,9 +148,13 @@ export class Lookup {
 }
 ```
 
--   `enable-context-editor`: true | false: enable / disable the context editor control
--   `enable-crate-preview`: true | false: enable / disable the crate preview control
--   `enable-browse-entities`: true | false: enable / disable the browse entities control
+-   `enable-context-editor`: true | false: default(true) : enable / disable the context editor
+    control
+-   `enable-crate-preview`: true | false: default(true) : enable / disable the crate preview control
+-   `enable-browse-entities`: true | false: default(true) : enable / disable the browse entities
+    control
+-   `purge-unlinked-entities-before-save`: true | false: default(true) : purge unlinked entities
+    from the crate before emitting the save event
 
 ## Events
 
