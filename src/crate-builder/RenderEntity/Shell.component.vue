@@ -17,6 +17,9 @@
             <!-- render entity id -->
             <render-entity-id-component
                 class="my-2"
+                :class="{
+                    'bg-green-200 rounded p-1 my-1': data.savedProperty === '@id',
+                }"
                 :entity="data.entity"
                 @update:entity="updateEntity"
             />
@@ -27,13 +30,21 @@
             <!-- render entity name -->
             <render-entity-name-component
                 class="my-2"
+                :class="{
+                    'bg-green-200 rounded p-1 my-1': data.savedProperty === 'name',
+                }"
                 :entity="data.entity"
                 @update:entity="updateEntity"
             />
 
             <!-- render entity properties -->
             <div v-for="(values, property) of data.entity.properties" :key="property">
-                <div v-if="showProperty(property)">
+                <div
+                    v-if="showProperty(property)"
+                    :class="{
+                        'bg-green-200 rounded p-1 my-1': data.savedProperty === property,
+                    }"
+                >
                     <render-entity-property-component
                         class="my-2"
                         :crate-manager="props.crateManager"
@@ -88,6 +99,9 @@
                         <!-- render entity id -->
                         <render-entity-id-component
                             class="my-2"
+                            :class="{
+                                'bg-green-200 rounded p-1 my-1': data.savedProperty === '@id',
+                            }"
                             :entity="data.tabs[0].entity"
                             @update:entity="updateEntity"
                         />
@@ -101,6 +115,9 @@
 
                         <!-- render entity name -->
                         <render-entity-name-component
+                            :class="{
+                                'bg-green-200 rounded p-1 my-1': data.savedProperty === 'name',
+                            }"
                             :entity="data.tabs[0].entity"
                             @save:property="saveProperty"
                             class="my-2"
@@ -134,20 +151,28 @@
                         </template>
                         <!-- render entity properties -->
                         <div v-for="(values, property) of tab.entity.properties" :key="property">
-                            <render-entity-property-component
-                                class="my-2"
-                                :crate-manager="props.crateManager"
-                                :entity="tab.entity"
-                                :property="property"
-                                :values="values"
-                                @load:entity="loadEntity"
-                                @create:property="createProperty"
-                                @save:property="saveProperty"
-                                @delete:property="deleteProperty"
-                                @create:entity="createEntity"
-                                @link:entity="linkEntity"
-                                @add:template="addTemplate"
-                            />
+                            <div
+                                v-if="showProperty(property)"
+                                :class="{
+                                    'bg-green-200 rounded p-1 my-1':
+                                        data.savedProperty === property,
+                                }"
+                            >
+                                <render-entity-property-component
+                                    class="my-2"
+                                    :crate-manager="props.crateManager"
+                                    :entity="tab.entity"
+                                    :property="property"
+                                    :values="values"
+                                    @load:entity="loadEntity"
+                                    @create:property="createProperty"
+                                    @save:property="saveProperty"
+                                    @delete:property="deleteProperty"
+                                    @create:entity="createEntity"
+                                    @link:entity="linkEntity"
+                                    @add:template="addTemplate"
+                                />
+                            </div>
                         </div>
                     </el-tab-pane>
                 </el-tabs>
@@ -191,6 +216,8 @@ const data = reactive({
     tabs: [],
     debouncedInit: debounce(init, 400),
     extraProperties: [],
+    savedProperty: undefined,
+    savedPropertyTimeout: 1000,
 });
 
 const emit = defineEmits([
@@ -317,20 +344,24 @@ function loadEntity(data) {
 function saveCrate() {
     emit("save:crate");
 }
-function createProperty(data) {
-    console.debug("Render Entity component: emit(create:property)", data);
+function createProperty(patch) {
+    console.debug("Render Entity component: emit(create:property)", patch);
     if (props.mode === "embedded") {
-        props.crateManager.addProperty({ ...data });
+        props.crateManager.addProperty({ ...patch });
         saveCrate();
+        data.savedProperty = patch.property;
+        setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
     } else {
     }
     init();
 }
-function saveProperty(data) {
-    console.debug("Render Entity component: emit(save:property)", data);
+function saveProperty(patch) {
+    console.debug("Render Entity component: emit(save:property)", patch);
     if (props.mode === "embedded") {
-        props.crateManager.updateProperty(data);
+        props.crateManager.updateProperty({ ...patch });
         saveCrate();
+        data.savedProperty = patch.property;
+        setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
     } else {
     }
     init();
@@ -356,11 +387,13 @@ function createEntity(data) {
     }
     init();
 }
-function updateEntity(data) {
-    console.debug("Render Entity component: emit(update:entity)", data);
-    props.crateManager.updateEntity(data);
+function updateEntity(patch) {
+    console.debug("Render Entity component: emit(update:entity)", patch);
+    props.crateManager.updateEntity({ ...patch });
     if (props.mode === "embedded") {
         saveCrate();
+        data.savedProperty = patch.property;
+        setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
     } else {
     }
     init();
