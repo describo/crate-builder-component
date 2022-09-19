@@ -42,16 +42,16 @@ const data = reactive({
             version: 0.1,
             warnMissingProperty: true,
         },
-        hide: {
-            Dataset: ["date"],
-        },
-        layouts: {
-            Dataset: [
-                { name: "Metadata About", description: "", inputs: ["author"] },
-                // { name: "group2", description: "", inputs: ["TextArea", "text", "url"] },
-            ],
-            // Place: [{ name: "important", description: "", inputs: ["geojson"] }],
-        },
+        // hide: {
+        //     Dataset: ["date"],
+        // },
+        // layouts: {
+        //     Dataset: [
+        //         { name: "Metadata About", description: "", inputs: ["author"] },
+        //         // { name: "group2", description: "", inputs: ["TextArea", "text", "url"] },
+        //     ],
+        //     // Place: [{ name: "important", description: "", inputs: ["geojson"] }],
+        // },
         classes: {
             Dataset: {
                 definition: "override",
