@@ -9,7 +9,20 @@ import { reactive } from "vue";
 
 const data = reactive({
     crate: {
-        "@context": ["https://w3id.org/ro/crate/1.1/context"],
+        "@context": [
+            "https://w3id.org/ro/crate/1.1/context",
+            {
+                "@vocab": "http://schema.org/",
+            },
+            {
+                txc: {
+                    "@id": "http://purl.archive.org/textcommons/terms#",
+                },
+            },
+            {
+                "@base": null,
+            },
+        ],
         "@graph": [
             {
                 "@id": "ro-crate-metadata.json",
@@ -24,13 +37,17 @@ const data = reactive({
             {
                 "@id": "./",
                 "@type": "Dataset",
-                name: "root dataset",
-                author: { "@id": "https://some.one.com" },
-            },
-            {
-                "@id": "https://some.one.com",
-                "@type": "Person",
-                name: "some one",
+                name: "SLNSW_FL814 something or other",
+                date: "2022-09-05T14:00:00.000Z",
+                memberOf: [
+                    {
+                        "@id": "https://catalog.nyingarn.net/view/collection/Collection1",
+                    },
+                    {
+                        "@id": "https://catalog.nyingarn.net/view/collection/Collection2",
+                    },
+                ],
+                "@reverse": {},
             },
         ],
     },
