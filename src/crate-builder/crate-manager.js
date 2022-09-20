@@ -370,6 +370,24 @@ export class CrateManager {
                                     property: prop,
                                     tgtEntityId: targetEntity?.describoId,
                                 });
+                            } else if (
+                                !targetEntity &&
+                                isURL(instance["@id"], {
+                                    protocols: ["http", "https", "ftp", "ftps"],
+                                })
+                            ) {
+                                targetEntity = this.addEntity({
+                                    entity: {
+                                        "@id": instance["@id"],
+                                        "@type": "URL",
+                                        name: instance["@id"],
+                                    },
+                                });
+                                pushProperty({
+                                    srcEntityId: entity.describoId,
+                                    property: prop,
+                                    tgtEntityId: targetEntity.describoId,
+                                });
                             } else {
                                 pushProperty({
                                     srcEntityId: entity.describoId,
