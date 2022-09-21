@@ -107,20 +107,17 @@
                         />
 
                         <!-- render entity type -->
-                        <render-entity-type-component
-                            class="my-2"
-                            :entity="data.tabs[0].entity"
-                            @update:entity="updateEntity"
-                        />
+                        <render-entity-type-component class="my-2" :entity="data.tabs[0].entity" />
 
                         <!-- render entity name -->
                         <render-entity-name-component
+                            class="my-2"
                             :class="{
                                 'bg-green-200 rounded p-1 my-1': data.savedProperty === 'name',
                             }"
                             :entity="data.tabs[0].entity"
                             @save:property="saveProperty"
-                            class="my-2"
+                            @update:entity="updateEntity"
                         />
 
                         <!--render entities it links to  -->
