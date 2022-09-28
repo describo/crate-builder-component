@@ -3,7 +3,13 @@
         <div class="w-1/3 xl:w-1/5 flex flex-col">Identifier</div>
 
         <div class="w-2/3 xl:w-4/5 flex flex-row">
-            <div v-if="['Dataset', 'File'].includes(entity['@type'])" class="">
+            <div
+                v-if="
+                    entity.describoLabel === 'RootDataset' ||
+                    ['Dataset', 'File'].includes(entity['@type'])
+                "
+                class=""
+            >
                 {{ entity["@id"] }}
             </div>
             <div v-else class="flex-grow">
