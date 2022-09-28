@@ -18,45 +18,47 @@
                 </div>
             </div>
         </template>
-        <el-table :data="data.entities" class="w-full">
-            <el-table-column prop="@id" label="@id" width="400" />
-            <el-table-column prop="@type" label="@type" width="250" />
-            <el-table-column prop="name" label="Name" />
-            <el-table-column prop="isConnected" label="Connected" width="180">
-                <template #default="scope">
-                    <div v-show="scope.row.isConnected" class="text-green-600">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <div v-show="!scope.row.isConnected" class="text-red-600">
-                        <i class="fas fa-times"></i>
-                    </div>
-                </template>
-            </el-table-column>
-            <el-table-column label="Actions" width="100">
-                <template #default="scope">
-                    <div class="flex flex-row space-x-2">
-                        <div>
-                            <el-button @click="loadEntity(scope.row.describoId)" size="small">
-                                <i class="fas fa-edit"></i>
-                            </el-button>
+        <div class="crate-entity-display overflow-scroll pr-2">
+            <el-table :data="data.entities">
+                <el-table-column prop="@id" label="@id" width="400" />
+                <el-table-column prop="@type" label="@type" width="250" />
+                <el-table-column prop="name" label="Name" />
+                <el-table-column prop="isConnected" label="Connected" width="180">
+                    <template #default="scope">
+                        <div v-show="scope.row.isConnected" class="text-green-600">
+                            <i class="fas fa-check"></i>
                         </div>
-                        <div v-if="scope.row.describoLabel !== 'RootDataset'">
-                            <el-popconfirm
-                                title="Are you sure? This can't be undone."
-                                width="300px"
-                                @confirm="deleteEntity(scope.row.describoId)"
-                            >
-                                <template #reference>
-                                    <el-button size="small" type="danger">
-                                        <i class="fas fa-trash"></i>
-                                    </el-button>
-                                </template>
-                            </el-popconfirm>
+                        <div v-show="!scope.row.isConnected" class="text-red-600">
+                            <i class="fas fa-times"></i>
                         </div>
-                    </div>
-                </template>
-            </el-table-column>
-        </el-table>
+                    </template>
+                </el-table-column>
+                <el-table-column label="Actions" width="100">
+                    <template #default="scope">
+                        <div class="flex flex-row space-x-2">
+                            <div>
+                                <el-button @click="loadEntity(scope.row.describoId)" size="small">
+                                    <i class="fas fa-edit"></i>
+                                </el-button>
+                            </div>
+                            <div v-if="scope.row.describoLabel !== 'RootDataset'">
+                                <el-popconfirm
+                                    title="Are you sure? This can't be undone."
+                                    width="300px"
+                                    @confirm="deleteEntity(scope.row.describoId)"
+                                >
+                                    <template #reference>
+                                        <el-button size="small" type="danger">
+                                            <i class="fas fa-trash"></i>
+                                        </el-button>
+                                    </template>
+                                </el-popconfirm>
+                            </div>
+                        </div>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
     </el-dialog>
 </template>
 
@@ -96,3 +98,9 @@ function deleteEntity(describoId) {
     emit("delete:entity", { describoId });
 }
 </script>
+
+<style scoped>
+.crate-entity-display {
+    height: 70vh;
+}
+</style>
