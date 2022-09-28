@@ -27,13 +27,12 @@ export class ProfileManager {
         if (isArray(type)) type = type.join(", ");
 
         // do we have a definition in the profile?
-        let typeDefinitionInProfile = this.profile?.classes[type];
+        let typeDefinitionInProfile = this.profile?.classes?.[type];
         if (typeDefinitionInProfile) {
             //   yes - get it
             typeDefinition = cloneDeep(typeDefinitionInProfile);
         } else {
             //   no  - find it in schema.org
-
             typeDefinition = this.profile?.classes?.[type];
             if (isEmpty(typeDefinition)) {
                 typeDefinition = {
