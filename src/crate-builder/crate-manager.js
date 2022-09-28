@@ -34,9 +34,10 @@ export class CrateManager {
             .map((e) => {
                 // mark root dataset
                 return e["@id"] === this.rootDescriptor.about["@id"]
-                    ? { describoLabel: "RootDataset", ...e }
+                    ? { describoLabel: "RootDataset", ...e, "@id": "./" }
                     : e;
             });
+        this.rootDescriptor.about["@id"] = "./";
 
         // for each entity, populate entities and properties structs
         let entities = graph.map((entity) => {
