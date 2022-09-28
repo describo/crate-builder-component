@@ -38,11 +38,6 @@ async function init() {
         ext: "jpg",
         noWrap: true,
     }).addTo(data.map);
-    // data.properties = (
-    //     await props.crateManager.getEntityProperties({
-    //         describoId: data.entity.id,
-    //     })
-    // ).properties.forwardProperties;
     let properties = groupBy(props.entity.properties, "property");
 
     let fg;
@@ -91,9 +86,12 @@ function addFeatureGroup({ geoJSON, type }) {
             }),
         ]);
     }
-    fg.setStyle({ color: "#37474F" });
+    fg.setStyle({ color: "#fff000" });
     fg.addTo(data.map);
     data.layers.push(fg);
+    setTimeout(() => {
+        data.map.fitBounds(fg.getBounds(), { maxZoom: 5 });
+    }, 500);
 
     return fg;
 }
