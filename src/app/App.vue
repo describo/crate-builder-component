@@ -1,122 +1,48 @@
 <template>
-    <div class="p-4">
-        <describo-crate-builder :crate="data.crate" :profile="data.profile" />
+    <div class="p-4 flex flex-col space-y-2">
+        <div class="flex flex-row space-x-4">
+            <el-select v-model="data.selectedCrate" placeholder="Select a crate">
+                <el-option
+                    v-for="item in data.crates"
+                    :key="item.value"
+                    :label="item.name"
+                    :value="item.value"
+                />
+            </el-select>
+            <el-select v-model="data.selectedProfile" placeholder="Select a profile">
+                <el-option
+                    v-for="item in data.profiles"
+                    :key="item.value"
+                    :label="item.name"
+                    :value="item.value"
+                />
+            </el-select>
+        </div>
+        <describo-crate-builder :crate="data.selectedCrate" :profile="data.selectedProfile" />
     </div>
 </template>
 
 <script setup>
-import { reactive } from "vue";
+import { reactive, onMounted } from "vue";
+import crateFile1 from "../examples/collection/NT5/ro-crate-metadata.json";
+import crateFile2 from "../examples/item/NT1-98007/ro-crate-metadata.json";
+import profile1 from "../examples/profile/test-profile-without-groups.json";
+import profile2 from "../examples/profile/test-profile-with-groups.json";
 
 const data = reactive({
-    crate: {
-        "@context": [
-            "https://w3id.org/ro/crate/1.1/context",
-            {
-                "@vocab": "http://schema.org/",
-            },
-            {
-                txc: {
-                    "@id": "http://purl.archive.org/textcommons/terms#",
-                },
-            },
-            {
-                "@base": null,
-            },
-        ],
-        "@graph": [
-            {
-                "@id": "ro-crate-metadata.json",
-                "@type": "CreativeWork",
-                conformsTo: {
-                    "@id": "https://w3id.org/ro/crate/1.1/context",
-                },
-                about: {
-                    "@id": "./",
-                },
-            },
-            {
-                "@id": "./",
-                "@type": "Dataset",
-                name: "SLNSW_FL814 something or other",
-                date: "2022-09-05T14:00:00.000Z",
-                memberOf: [
-                    {
-                        "@id": "https://catalog.nyingarn.net/view/collection/Collection1",
-                    },
-                    {
-                        "@id": "https://catalog.nyingarn.net/view/collection/Collection2",
-                    },
-                ],
-                "@reverse": {},
-            },
-        ],
-    },
-
-    profile: {
-        metadata: {
-            name: "Describo Test Profile",
-            description: "A profile with entries for each of the supported datatypes",
-            version: 0.1,
-            warnMissingProperty: true,
-        },
-        // hide: {
-        //     Dataset: ["date"],
-        // },
-        // layouts: {
-        //     Dataset: [
-        //         { name: "Metadata About", description: "", inputs: ["author"] },
-        //         // { name: "group2", description: "", inputs: ["TextArea", "text", "url"] },
-        //     ],
-        //     // Place: [{ name: "important", description: "", inputs: ["geojson"] }],
-        // },
-        classes: {
-            Dataset: {
-                definition: "override",
-                subClassOf: [],
-                inputs: [
-                    {
-                        id: "https://schema.org/date",
-                        name: "date",
-                        label: "Date",
-                        help: "Attach a date",
-                        type: ["Geo"],
-                        required: true,
-                        multiple: false,
-                    },
-                ],
-            },
-            Person: {
-                definition: "inherit",
-                subClassOf: [],
-                inputs: [
-                    {
-                        id: "https://schema.org/name",
-                        name: "name",
-                        label: "name",
-                        help: "The name the person",
-                        required: true,
-                        multiple: false,
-                        type: ["Text"],
-                    },
-                ],
-            },
-            Organisation: {
-                definition: "override",
-                subClassOf: [],
-                inputs: [
-                    {
-                        id: "https://schema.org/name",
-                        name: "name",
-                        label: "name",
-                        help: "The name of the organisation",
-                        required: true,
-                        multiple: false,
-                        type: ["Text"],
-                    },
-                ],
-            },
-        },
-        enabledClasses: ["Dataset", "Person", "Organisation"],
-    },
+    crates: [
+        { name: "NT5", value: crateFile1 },
+        { name: "NT1-98007", value: crateFile2 },
+    ],
+    profiles: [
+        { name: "Profile without groups", value: profile1 },
+        { name: "Profile with groups", value: profile2 },
+    ],
+    selectedCrate: undefined,
+    selectedProfile: undefined,
 });
+onMounted(async () => {
+    await init();
+});
+async function init() {}
 </script>
