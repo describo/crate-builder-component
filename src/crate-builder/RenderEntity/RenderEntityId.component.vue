@@ -11,7 +11,7 @@
                     class="w-full"
                     type="text"
                     :property="data.property"
-                    :value="entity.name"
+                    :value="entity['@id']"
                     @save:property="save"
                 />
             </div>
