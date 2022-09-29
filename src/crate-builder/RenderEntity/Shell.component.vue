@@ -330,8 +330,6 @@ function applyLayout({ layouts, hide = [], entity }) {
 
     return { tabs };
 }
-// TODO: not yet implemented
-function updateEntityId(data) {}
 function addPropertyPlaceholder({ property }) {
     data.extraProperties.push(property);
     init();
