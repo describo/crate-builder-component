@@ -38,6 +38,7 @@ import crateFile1 from "../examples/collection/NT5/ro-crate-metadata.json";
 import crateFile2 from "../examples/item/NT1-98007/ro-crate-metadata.json";
 import profile1 from "../examples/profile/test-profile-without-groups.json";
 import profile2 from "../examples/profile/test-profile-with-groups.json";
+import profile3 from "../examples/profile/test-profile-with-datapacks-and-without-groups.json";
 
 const data = reactive({
     select: {
@@ -49,8 +50,9 @@ const data = reactive({
         { name: "NT1-98007", value: crateFile2 },
     ],
     profiles: [
-        { name: "Profile without groups", value: profile1 },
-        { name: "Profile with groups", value: profile2 },
+        { name: "Profile -groups", value: profile1 },
+        { name: "Profile +groups", value: profile2 },
+        { name: "Profile +datapacks, -groups", value: profile3 },
     ],
     selectedCrate: undefined,
     selectedProfile: undefined,
