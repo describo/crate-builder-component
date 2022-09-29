@@ -1,63 +1,50 @@
 <template>
     <div>
-        <div v-if="!data.tgtEntityId" class="w-full">
-            <date-component
-                :property="data.property"
-                :value="data.value"
-                @save:property="savePropertyValue"
-                v-if="isDate(data.value)"
-            />
-            <date-time-component
-                :property="data.property"
-                :value="data.value"
-                @save:property="savePropertyValue"
-                v-if="isDateTime(data.value)"
-            />
-            <time-component
-                :property="data.property"
-                :value="data.value"
-                @save:property="savePropertyValue"
-                v-if="isTime(data.value)"
-            />
-            <number-component
-                :property="data.property"
-                :value="data.value"
-                @save:property="savePropertyValue"
-                v-if="isNumber(data.value)"
-            />
-            <text-component
-                v-if="isText(data.value) && !isValue() && !isSelect()"
-                :style="inputElementWidth"
-                :type="type"
-                :property="data.property"
-                :value="data.value"
-                :definition="props.definition"
-                @save:property="savePropertyValue"
-            />
-            <value-component v-if="isValue()" :definition="props.definition" />
-            <select-component
-                v-if="isSelect()"
-                :style="inputElementWidth"
-                :property="data.property"
-                :value="data.value"
-                :definition="props.definition"
-                @save:property="savePropertyValue"
-            />
-        </div>
-        <div v-else-if="data.tgtEntityId">
-            <render-linked-item-component
-                :crate-manager="crateManager"
-                :entity="data"
-                @load:entity="loadEntity"
-                @save:property="savePropertyValue"
-                @delete:property="deleteProperty"
-            />
-        </div>
+        <date-component
+            :property="data.property"
+            :value="data.value"
+            @save:property="savePropertyValue"
+            v-if="isDate(data.value)"
+        />
+        <date-time-component
+            :property="data.property"
+            :value="data.value"
+            @save:property="savePropertyValue"
+            v-if="isDateTime(data.value)"
+        />
+        <time-component
+            :property="data.property"
+            :value="data.value"
+            @save:property="savePropertyValue"
+            v-if="isTime(data.value)"
+        />
+        <number-component
+            :property="data.property"
+            :value="data.value"
+            @save:property="savePropertyValue"
+            v-if="isNumber(data.value)"
+        />
+        <text-component
+            v-if="isText(data.value) && !isValue() && !isSelect()"
+            :type="type"
+            :property="data.property"
+            :value="data.value"
+            :definition="props.definition"
+            @save:property="savePropertyValue"
+        />
+        <value-component v-if="isValue()" :definition="props.definition" />
+        <select-component
+            v-if="isSelect()"
+            :style="inputElementWidth"
+            :property="data.property"
+            :value="data.value"
+            :definition="props.definition"
+            @save:property="savePropertyValue"
+        />
     </div>
 </template>
 
 <script setup>
-import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";
 import TextComponent from "../base-components/Text.component.vue";
 import DateComponent from "../base-components/Date.component.vue";
 import DateTimeComponent from "../base-components/DateTime.component.vue";

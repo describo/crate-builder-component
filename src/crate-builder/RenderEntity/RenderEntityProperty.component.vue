@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-row flex-grow">
+    <div class="flex flex-row flex-grow p-2 hover:bg-blue-100">
         <div class="w-1/3 xl:w-1/5 flex flex-col">
             <div>
                 <display-property-name-component
@@ -31,13 +31,15 @@
                 @link:entity="linkEntity"
             />
 
-            <div class="flex flex-row flex-wrap items-center" v-if="props.values.length">
+            <!-- render all of the simple things (text, textarea, date etc) in a column -->
+            <div class="flex flex-col space-y-1" v-if="data.simpleInstances.length">
                 <div
-                    v-for="instance of props.values"
+                    v-for="instance of data.simpleInstances"
                     :key="instance.propertyId"
-                    class="flex flex-row m-1"
+                    class="flex flex-row"
                 >
                     <render-entity-property-instance-component
+                        class="flex-grow"
                         :crate-manager="props.crateManager"
                         :data="instance"
                         :definition="data.propertyDefinition"
@@ -55,16 +57,33 @@
                     />
                 </div>
             </div>
+            <!-- render all the links in a wrapping row -->
+            <div class="flex flex-row flex-wrap items-center mt-2" v-if="data.linkInstances.length">
+                <div
+                    v-for="instance of data.linkInstances"
+                    :key="instance.propertyId"
+                    class="flex flex-row m-1"
+                >
+                    <render-linked-item-component
+                        :crate-manager="props.crateManager"
+                        :entity="instance"
+                        @load:entity="loadEntity"
+                        @save:property="saveProperty"
+                        @delete:property="deleteProperty"
+                    />
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup>
 import RenderEntityPropertyInstanceComponent from "./RenderEntityPropertyInstance.component.vue";
+import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";
 import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import AddComponent from "./Add.component.vue";
 import DisplayPropertyNameComponent from "./DisplayPropertyName.component.vue";
-import { ref, reactive, computed, onMounted, watch } from "vue";
+import { ref, reactive, computed, onMounted, onBeforeMount, watch } from "vue";
 import { cloneDeep } from "lodash";
 import { ProfileManager } from "../profile-manager.js";
 
@@ -89,6 +108,8 @@ const props = defineProps({
 
 const data = reactive({
     propertyDefinition: {},
+    simpleInstances: [],
+    linkInstances: [],
 });
 
 watch(
@@ -97,6 +118,15 @@ watch(
         getProfileDefinitionForProperty();
     }
 );
+watch(
+    () => props.values.length,
+    () => {
+        sortInstances();
+    }
+);
+onBeforeMount(() => {
+    sortInstances();
+});
 onMounted(() => {
     getProfileDefinitionForProperty();
 });
@@ -138,6 +168,10 @@ const showAddControl = computed(() => {
     return data?.propertyDefinition?.multiple || !props?.values?.length;
 });
 
+function sortInstances() {
+    data.simpleInstances = props.values.filter((v) => v.value);
+    data.linkInstances = props.values.filter((v) => !v.value);
+}
 function refresh() {
     console.debug("Render Entity Property component: emit(refresh)");
     emit("refresh");
