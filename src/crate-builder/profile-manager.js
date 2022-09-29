@@ -19,7 +19,11 @@ export class ProfileManager {
     }
 
     getLayout({ type }) {
-        return { layouts: this.profile?.layouts?.[type], hide: this.profile?.hide?.[type] };
+        if (isArray(type)) type = type.join(", ");
+        return {
+            layouts: this.profile?.layouts?.[type],
+            hide: this.profile?.hide?.[type],
+        };
     }
 
     getTypeDefinition({ type }) {
