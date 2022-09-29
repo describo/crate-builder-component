@@ -339,9 +339,9 @@ function addPropertyPlaceholder({ property }) {
 function showProperty(property) {
     return !data.hideProperty.includes(property);
 }
-function loadEntity(data) {
+function loadEntity(entity) {
     data.activeTab = "about";
-    emit("load:entity", data);
+    emit("load:entity", entity);
 }
 function saveCrate() {
     emit("save:crate");
