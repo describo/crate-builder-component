@@ -1,7 +1,12 @@
 <template>
     <div class="p-4 flex flex-col space-y-2">
         <div class="flex flex-row space-x-4">
-            <el-select v-model="data.select.crate" @change="setCrate" placeholder="Select a crate">
+            <el-select
+                v-model="data.select.crate"
+                @change="setCrate"
+                placeholder="Select a crate"
+                clearable
+            >
                 <el-option
                     v-for="item in data.crates"
                     :key="item.name"
@@ -13,6 +18,7 @@
                 v-model="data.select.profile"
                 @change="setProfile"
                 placeholder="Select a profile"
+                clearable
             >
                 <el-option
                     v-for="item in data.profiles"
@@ -51,9 +57,9 @@ const data = reactive({
 });
 
 function setCrate(name) {
-    data.selectedCrate = data.crates.filter((c) => c.name === name)[0].value;
+    data.selectedCrate = name ? data.crates.filter((c) => c.name === name)[0].value : undefined;
 }
 function setProfile(name) {
-    data.selectedProfile = data.profiles.filter((p) => p.name === name)[0].value;
+    data.selectedProfile = name ? data.profiles.filter((p) => p.name === name)[0].value : undefined;
 }
 </script>
