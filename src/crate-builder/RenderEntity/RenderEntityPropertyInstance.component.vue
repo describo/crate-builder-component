@@ -55,6 +55,7 @@ import SelectComponent from "../base-components/Select.component.vue";
 import { parseISO, startOfDay } from "date-fns";
 import { isDate as validatorIsDate, isDecimal, isInt, isFloat, isNumeric } from "validator";
 import { computed } from "vue";
+import { isEmpty } from "lodash";
 
 const props = defineProps({
     crateManager: {
@@ -75,7 +76,11 @@ let inputElementWidth = computed(() => {
     return `width: 500px;`;
 });
 let type = computed(() => {
-    return props?.definition?.type?.[0].toLowerCase();
+    if (!isEmpty(props.crateManager.profile)) {
+        return "textarea";
+    } else {
+        return props?.definition?.type?.[0].toLowerCase();
+    }
 });
 async function savePropertyValue(data) {
     if (!data.propertyId) {

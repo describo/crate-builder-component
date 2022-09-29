@@ -3,6 +3,7 @@
         <div class="flex flex-row space-x-1" v-if="props.definition.type">
             <add-control-component
                 v-if="props.definition && props.definition.type !== 'Value'"
+                :crate-manager="props.crateManager"
                 :types="props.definition.type"
                 @add="add"
             />
@@ -194,11 +195,4 @@ function linkEntity({ entity }) {
     emit("link:entity", data);
     close();
 }
-// function addTemplate({ template }) {
-//     emit("add:template", {
-//         property: props.property,
-//         templateId: template.id,
-//     });
-//     close();
-// }
 </script>

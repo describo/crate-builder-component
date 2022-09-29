@@ -32,11 +32,15 @@
 </template>
 
 <script setup>
-import { isArray } from "lodash";
+import { isArray, uniq, isEmpty } from "lodash";
 import { reactive, onMounted, watch } from "vue";
 const props = defineProps({
     types: {
         type: [String, Array],
+        required: true,
+    },
+    crateManager: {
+        type: Object,
         required: true,
     },
 });
@@ -55,7 +59,15 @@ onMounted(() => {
 });
 function init() {
     if (isArray(props.types)) {
-        data.allowedTypes = props.types.filter((type) => !data.typeExclusions.includes(type));
+        let allowedTypes = props.types
+            .map((type) => {
+                if (isEmpty(props.crateManager.profile) && type.match(/Text$/)) {
+                    return "TextArea";
+                }
+                return type;
+            })
+            .filter((type) => !data.typeExclusions.includes(type));
+        data.allowedTypes = allowedTypes;
     }
 }
 function add(type) {
