@@ -1,20 +1,24 @@
 <template>
     <div class="p-4 flex flex-col space-y-2">
         <div class="flex flex-row space-x-4">
-            <el-select v-model="data.selectedCrate" placeholder="Select a crate">
+            <el-select v-model="data.select.crate" @change="setCrate" placeholder="Select a crate">
                 <el-option
                     v-for="item in data.crates"
-                    :key="item.value"
+                    :key="item.name"
                     :label="item.name"
-                    :value="item.value"
+                    :value="item.name"
                 />
             </el-select>
-            <el-select v-model="data.selectedProfile" placeholder="Select a profile">
+            <el-select
+                v-model="data.select.profile"
+                @change="setProfile"
+                placeholder="Select a profile"
+            >
                 <el-option
                     v-for="item in data.profiles"
-                    :key="item.value"
+                    :key="item.name"
                     :label="item.name"
-                    :value="item.value"
+                    :value="item.name"
                 />
             </el-select>
         </div>
@@ -23,13 +27,17 @@
 </template>
 
 <script setup>
-import { reactive, onMounted } from "vue";
+import { reactive } from "vue";
 import crateFile1 from "../examples/collection/NT5/ro-crate-metadata.json";
 import crateFile2 from "../examples/item/NT1-98007/ro-crate-metadata.json";
 import profile1 from "../examples/profile/test-profile-without-groups.json";
 import profile2 from "../examples/profile/test-profile-with-groups.json";
 
 const data = reactive({
+    select: {
+        crate: undefined,
+        profile: undefined,
+    },
     crates: [
         { name: "NT5", value: crateFile1 },
         { name: "NT1-98007", value: crateFile2 },
@@ -41,8 +49,11 @@ const data = reactive({
     selectedCrate: undefined,
     selectedProfile: undefined,
 });
-onMounted(async () => {
-    await init();
-});
-async function init() {}
+
+function setCrate(name) {
+    data.selectedCrate = data.crates.filter((c) => c.name === name)[0].value;
+}
+function setProfile(name) {
+    data.selectedProfile = data.profiles.filter((p) => p.name === name)[0].value;
+}
 </script>
