@@ -23,7 +23,7 @@
                 <el-table-column prop="@id" label="@id" width="400" />
                 <el-table-column prop="@type" label="@type" width="250" />
                 <el-table-column prop="name" label="Name" />
-                <el-table-column prop="isConnected" label="Connected" width="180">
+                <el-table-column prop="isConnected" label="Linked" width="100" align="center">
                     <template #default="scope">
                         <div v-show="scope.row.isConnected" class="text-green-600">
                             <i class="fas fa-check"></i>
@@ -33,7 +33,7 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="Actions" width="100">
+                <el-table-column label="Actions" width="100" align="center">
                     <template #default="scope">
                         <div class="flex flex-row space-x-2">
                             <div>
