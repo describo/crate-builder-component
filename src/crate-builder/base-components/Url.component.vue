@@ -1,5 +1,6 @@
 <template>
     <div class="flex flex-col">
+        here
         <div class="flex flex-row flex-grow space-x-2">
             <div class="flex-grow">
                 <el-input
@@ -52,10 +53,11 @@ export default {
         save() {
             let isurl;
             try {
-                isurl = !isURL(this.internalValue, {
+                isurl = isURL(this.internalValue, {
                     protocols: ["http", "https", "ftp", "ftps", "arcp"],
                 });
-                if (isurl) {
+                if (!isurl) {
+                    this.error = `The entry needs to be a valid url. The accepted protocols are: http, https, ftp, ftps and arcp.`;
                 } else {
                     this.error = false;
 
