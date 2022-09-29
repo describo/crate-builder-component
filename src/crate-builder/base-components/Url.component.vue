@@ -51,14 +51,11 @@ export default {
     },
     methods: {
         save() {
-            let isurl;
             try {
-                isurl = isURL(this.internalValue, {
+                let isurl = isURL(this.internalValue, {
                     protocols: ["http", "https", "ftp", "ftps", "arcp"],
                 });
-                if (!isurl) {
-                    this.error = `The entry needs to be a valid url. The accepted protocols are: http, https, ftp, ftps and arcp.`;
-                } else {
+                if (isurl) {
                     this.error = false;
 
                     this.$emit("create:entity", {
@@ -67,6 +64,8 @@ export default {
                         "@type": "URL",
                         name: this.internalValue,
                     });
+                } else {
+                    this.error = `The entry needs to be a valid url. The accepted protocols are: http, https, ftp, ftps and arcp.`;
                 }
             } catch (error) {
                 this.error = `The entry needs to be a valid url. The accepted protocols are: http, https, ftp, ftps and arcp.`;
