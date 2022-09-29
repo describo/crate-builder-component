@@ -3,7 +3,6 @@
         <div class="flex flex-row space-x-1" v-if="props.definition.type">
             <add-control-component
                 v-if="props.definition && props.definition.type !== 'Value'"
-                :crate-manager="props.crateManager"
                 :types="props.definition.type"
                 @add="add"
             />

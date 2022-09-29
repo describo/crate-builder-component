@@ -39,10 +39,6 @@ const props = defineProps({
         type: [String, Array],
         required: true,
     },
-    crateManager: {
-        type: Object,
-        required: true,
-    },
 });
 
 const emit = defineEmits(["add", "close"]);
@@ -59,14 +55,7 @@ onMounted(() => {
 });
 function init() {
     if (isArray(props.types)) {
-        let allowedTypes = props.types
-            .map((type) => {
-                if (isEmpty(props.crateManager.profile) && type.match(/Text$/)) {
-                    return "TextArea";
-                }
-                return type;
-            })
-            .filter((type) => !data.typeExclusions.includes(type));
+        let allowedTypes = props.types.filter((type) => !data.typeExclusions.includes(type));
         data.allowedTypes = allowedTypes;
     }
 }

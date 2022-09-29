@@ -76,11 +76,7 @@ let inputElementWidth = computed(() => {
     return `width: 500px;`;
 });
 let type = computed(() => {
-    if (!isEmpty(props.crateManager.profile)) {
-        return "textarea";
-    } else {
-        return props?.definition?.type?.[0].toLowerCase();
-    }
+    return props?.definition?.type?.[0].toLowerCase();
 });
 async function savePropertyValue(data) {
     if (!data.propertyId) {
