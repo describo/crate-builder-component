@@ -63,10 +63,11 @@
             </div>
 
             <!--render entities it links to  -->
-            <div class="flex flex-row space-x-2 flex-wrap">
+            <div class="flex flex-row flex-wrap">
                 <div v-for="(entities, property) of data.entity.reverseConnections" :key="property">
                     <div v-for="entity of entities" :key="entity.tgtEntityId">
                         <render-entity-reverse-item-link-component
+                            class="m-1"
                             :crate-manager="props.crateManager"
                             :property="property"
                             :entity="entity"
@@ -121,13 +122,15 @@
                         />
 
                         <!--render entities it links to  -->
-                        <div class="flex flex-row space-x-2 flex-wrap">
+                        <div class="flex flex-row flex-wrap">
                             <div
-                                v-for="(entities, property) of data.entity.reverseConnections"
+                                v-for="(entities, property) of data.tabs[0].entity
+                                    .reverseConnections"
                                 :key="property"
                             >
                                 <div v-for="entity of entities" :key="entity.tgtEntityId">
                                     <render-entity-reverse-item-link-component
+                                        class="m-2"
                                         :crate-manager="props.crateManager"
                                         :property="property"
                                         :entity="entity"
@@ -187,7 +190,7 @@ import RenderEntityPropertyComponent from "./RenderEntityProperty.component.vue"
 import RenderEntityReverseItemLinkComponent from "./RenderReverseItemLink.component.vue";
 import RenderControlsComponent from "./RenderControls.component.vue";
 import { reactive, onMounted, watch } from "vue";
-import { debounce, cloneDeep, flattenDeep } from "lodash";
+import { debounce, cloneDeep } from "lodash";
 import { ProfileManager } from "../profile-manager.js";
 
 const props = defineProps({
@@ -327,6 +330,7 @@ function applyLayout({ layouts, hide = [], entity }) {
 
     return { tabs };
 }
+// TODO: not yet implemented
 function updateEntityId(data) {}
 function addPropertyPlaceholder({ property }) {
     data.extraProperties.push(property);
@@ -336,6 +340,7 @@ function showProperty(property) {
     return !data.hideProperty.includes(property);
 }
 function loadEntity(data) {
+    data.activeTab = "about";
     emit("load:entity", data);
 }
 function saveCrate() {
