@@ -134,6 +134,7 @@ import EditContextDialog from "./DialogEditContext.component.vue";
 import PreviewCrateDialog from "./DialogPreviewCrate.component.vue";
 import BrowseEntitiesDialog from "./DialogBrowseEntities.component.vue";
 import { reactive, computed, inject } from "vue";
+import { isArray } from "lodash";
 
 const props = defineProps({
     crateManager: {
@@ -175,7 +176,10 @@ let hideTemplateSaving = computed(() => {
     return props.crateManager.lookup === undefined;
 });
 let definition = computed(() => {
-    let classDefinition = props.crateManager?.profile?.classes?.[props.entity["@type"]];
+    let type = isArray(props.entity["@type"])
+        ? props.entity["@type"].join(", ")
+        : props.entity["@type"];
+    let classDefinition = props.crateManager?.profile?.classes?.[type];
     if (!classDefinition) classDefinition = { definition: "inherit" };
     return classDefinition?.definition;
 });
