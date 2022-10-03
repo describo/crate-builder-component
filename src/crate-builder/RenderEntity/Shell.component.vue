@@ -16,7 +16,7 @@
 
             <!-- render entity id -->
             <render-entity-id-component
-                class="my-2"
+                class="my-2 p-2"
                 :class="{
                     'bg-green-200 rounded p-1 my-1': data.savedProperty === '@id',
                 }"
@@ -25,11 +25,11 @@
             />
 
             <!-- render entity type -->
-            <render-entity-type-component :entity="data.entity" class="my-2" />
+            <render-entity-type-component :entity="data.entity" class="my-2 p-2" />
 
             <!-- render entity name -->
             <render-entity-name-component
-                class="my-2"
+                class="my-2 p-2"
                 :class="{
                     'bg-green-200 rounded p-1 my-1': data.savedProperty === 'name',
                 }"
@@ -99,7 +99,7 @@
 
                         <!-- render entity id -->
                         <render-entity-id-component
-                            class="my-2"
+                            class="my-2 p-2"
                             :class="{
                                 'bg-green-200 rounded p-1 my-1': data.savedProperty === '@id',
                             }"
@@ -108,11 +108,14 @@
                         />
 
                         <!-- render entity type -->
-                        <render-entity-type-component class="my-2" :entity="data.tabs[0].entity" />
+                        <render-entity-type-component
+                            class="my-2 p-2"
+                            :entity="data.tabs[0].entity"
+                        />
 
                         <!-- render entity name -->
                         <render-entity-name-component
-                            class="my-2"
+                            class="my-2 p-2"
                             :class="{
                                 'bg-green-200 rounded p-1 my-1': data.savedProperty === 'name',
                             }"
@@ -339,6 +342,9 @@ function showProperty(property) {
 }
 function loadEntity(entity) {
     data.activeTab = "about";
+    if (props.crateManager.getEntity({ describoId: props.crateManager.currentEntity })) {
+        emit("load:entity", { describoId: props.crateManager.currentEntity });
+    }
     emit("load:entity", entity);
 }
 function saveCrate() {
@@ -380,8 +386,14 @@ function createEntity(data) {
     delete data.property;
     console.debug("Render Entity component: emit(create:entity)", data);
     if (props.mode === "embedded") {
-        let entity = props.crateManager.addEntity({ entity: data });
-        props.crateManager.linkEntity({ property, tgtEntityId: entity.describoId });
+        const dataType = data.type;
+        delete data.type;
+        if (dataType === "new") {
+            let entity = props.crateManager.addEntity({ entity: data });
+            props.crateManager.linkEntity({ property, tgtEntityId: entity.describoId });
+        } else {
+            props.crateManager.flattenAndIngest({ json: data });
+        }
         saveCrate();
     } else {
     }
@@ -410,7 +422,6 @@ function linkEntity(data) {
 function deleteEntity(data) {
     console.debug("Render Entity component: emit(delete:entity)", data);
     props.crateManager.deleteEntity(data);
-    emit("load:entity", { name: "RootDataset" });
 }
 function saveCrateAsTemplate(data) {
     console.debug("Render Entity component: emit(save:crate:template)", data);

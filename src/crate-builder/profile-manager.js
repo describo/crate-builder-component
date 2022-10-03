@@ -27,8 +27,8 @@ export class ProfileManager {
     }
 
     getTypeDefinition({ type }) {
-        let typeDefinition;
         if (isArray(type)) type = type.join(", ");
+        let typeDefinition;
 
         // do we have a definition in the profile?
         let typeDefinitionInProfile = this.profile?.classes?.[type];
@@ -50,6 +50,7 @@ export class ProfileManager {
     }
 
     getPropertyDefinition({ property, type }) {
+        if (isArray(type)) type = type.join(", ");
         let propertyDefinition;
         let entityDefinition = this.profile?.classes?.[type];
         console.debug("ENTITY definition:", JSON.stringify(entityDefinition, null, 2));

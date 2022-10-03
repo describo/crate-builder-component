@@ -89,6 +89,11 @@ function load() {
 }
 
 function close() {
+    if (!props.crateManager.getEntity({ describoId: props.crateManager.currentEntity })) {
+        loadEntity(props.crateManager.getRootDataset().describoId);
+    } else {
+        emit("load:entity", { describoId: props.crateManager.currentEntity });
+    }
     emit("close");
 }
 function loadEntity(describoId) {
@@ -96,6 +101,7 @@ function loadEntity(describoId) {
 }
 function deleteEntity(describoId) {
     emit("delete:entity", { describoId });
+    load();
 }
 </script>
 

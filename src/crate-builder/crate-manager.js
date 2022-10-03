@@ -1,13 +1,16 @@
 import { v4 as uuid } from "uuid";
-import { isString, isArray, isPlainObject, groupBy, cloneDeep } from "lodash";
+import {
+    isString,
+    isArray,
+    isPlainObject,
+    isEmpty,
+    groupBy,
+    cloneDeep,
+    flattenDeep,
+    compact,
+} from "lodash";
 import { isURL } from "validator";
 const urlProtocols = ["http", "https", "ftp", "ftps", "arcp"];
-
-// export function getProfileDefinitionForProperty({ profile, entityType, property }) {
-//     let entityDefinition = profile.classes[entityType];
-//     let propertyDefinition = entityDefinition.inputs.filter((p) => p.name === property)[0];
-//     return propertyDefinition;
-// }
 
 export class CrateManager {
     constructor() {
@@ -135,11 +138,7 @@ export class CrateManager {
                         "@id": targetEntity ? targetEntity["@id"] : instance.value,
                     });
                 } else {
-                    if (isURL(instance.value, { protocols: urlProtocols })) {
-                        entity[property].push({ "@id": instance.value });
-                    } else {
-                        entity[property].push(instance.value);
-                    }
+                    entity[property].push(instance.value);
                 }
             });
             if (entity[property].length === 1) entity[property] = entity[property][0];
@@ -322,6 +321,47 @@ export class CrateManager {
         );
     }
 
+    flatten({ json }) {
+        json = cloneDeep(json);
+        let flattened = [];
+        flattened.push(json);
+        Object.keys(json).forEach((property) => {
+            if (isPlainObject(json[property])) {
+                flattened.push(this.flatten({ json: json[property] }));
+                flattened = compact(flattened);
+                json[property] = { "@id": json[property]["@id"] };
+            } else if (isArray(json[property])) {
+                json[property].forEach((instance) => {
+                    if (isPlainObject(instance)) flattened.push(this.flatten({ json: instance }));
+                });
+                json[property] = json[property].map((instance) => {
+                    if (isPlainObject(instance)) return { "@id": instance["@id"] };
+                    return instance;
+                });
+            }
+        });
+        return compact(flattenDeep(flattened));
+    }
+
+    flattenAndIngest({ json }) {
+        let flattened = this.flatten({ json });
+        const rootDataset = this.getRootDataset();
+
+        let entities = flattened.map((entity) => {
+            return this.__addEntity({ entity });
+        });
+        this.__index();
+
+        entities.forEach((entity) => {
+            this.__processProperties({ entity });
+        });
+        this.linkEntity({
+            srcEntityId: rootDataset.describoId,
+            tgtEntityId: entities[0].describoId,
+            property: "language",
+        });
+    }
+
     __index() {
         this.entitiesByAtId = groupBy(this.entities, "@id");
         this.entitiesByType = groupBy(this.entities, "@type");
@@ -333,6 +373,9 @@ export class CrateManager {
         let e = this.coreProperties
             .map((p) => ({ [p]: entity[p] }))
             .reduce((obj, entry) => ({ ...obj, ...entry }));
+
+        if (!e["@type"]) e["@type"] = this._isURL(e["@id"]) ? "URL" : "Thing";
+        if (!e.name) e.name = e["@id"];
         console.debug("Crate Mgr, addEntity", e);
         this.entities.push(e);
         return entity;
@@ -341,65 +384,44 @@ export class CrateManager {
     __processProperties({ entity }) {
         const pushProperty = this.__pushProperty.bind(this);
 
-        for (let prop of Object.keys(entity)) {
-            if (this.coreProperties.includes(prop)) continue;
+        for (let property of Object.keys(entity)) {
+            if (this.coreProperties.includes(property)) continue;
 
-            if (isString(entity[prop])) {
-                pushProperty({
-                    srcEntityId: entity.describoId,
-                    property: prop,
-                    value: entity[prop],
-                });
-            } else if (isPlainObject(entity[prop])) {
-                entity[prop] = [entity[prop]];
-            }
+            if (!isArray(entity[property])) entity[property] = [entity[property]];
 
-            if (isArray(entity[prop])) {
-                entity[prop].forEach((instance) => {
-                    if (isString(instance)) {
+            entity[property].forEach((instance) => {
+                if (isString(instance) && !isEmpty(instance)) {
+                    pushProperty({
+                        srcEntityId: entity.describoId,
+                        property,
+                        value: instance,
+                    });
+                }
+
+                if (isPlainObject(instance)) {
+                    let targetEntity = this.__lookupEntityByAtId({ id: instance["@id"] });
+                    if (targetEntity) {
                         pushProperty({
                             srcEntityId: entity.describoId,
-                            property: prop,
-                            value: instance,
+                            property,
+                            tgtEntityId: targetEntity.describoId,
                         });
-                    } else if (isPlainObject(instance)) {
-                        if ("@id" in instance) {
-                            let targetEntity = this.__lookupEntityByAtId({ id: instance["@id"] });
-                            if (targetEntity) {
-                                pushProperty({
-                                    srcEntityId: entity.describoId,
-                                    property: prop,
-                                    tgtEntityId: targetEntity?.describoId,
-                                });
-                            } else if (
-                                !targetEntity &&
-                                isURL(instance["@id"], {
-                                    protocols: ["http", "https", "ftp", "ftps"],
-                                })
-                            ) {
-                                targetEntity = this.addEntity({
-                                    entity: {
-                                        "@id": instance["@id"],
-                                        "@type": "URL",
-                                        name: instance["@id"],
-                                    },
-                                });
-                                pushProperty({
-                                    srcEntityId: entity.describoId,
-                                    property: prop,
-                                    tgtEntityId: targetEntity.describoId,
-                                });
-                            } else {
-                                pushProperty({
-                                    srcEntityId: entity.describoId,
-                                    property: prop,
-                                    value: instance["@id"],
-                                });
-                            }
-                        }
+                    } else if (!targetEntity) {
+                        targetEntity = this.addEntity({
+                            entity: {
+                                "@id": instance["@id"],
+                                "@type": this._isURL(instance["@id"]) ? "URL" : "Thing",
+                                name: instance["@id"],
+                            },
+                        });
+                        pushProperty({
+                            srcEntityId: entity.describoId,
+                            property,
+                            tgtEntityId: targetEntity.describoId,
+                        });
                     }
-                });
-            }
+                }
+            });
         }
     }
 
@@ -417,5 +439,9 @@ export class CrateManager {
     __lookupEntityByDescriboId({ id }) {
         let targetEntity = cloneDeep(this.entitiesByDescriboId[id]);
         if (targetEntity?.length) return targetEntity.shift();
+    }
+
+    _isURL(value) {
+        return isURL(value, { protocols: urlProtocols });
     }
 }

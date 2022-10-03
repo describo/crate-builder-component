@@ -173,7 +173,7 @@ let isRootDataset = computed(() => {
     return props.entity.describoLabel === "RootDataset";
 });
 let hideTemplateSaving = computed(() => {
-    return props.crateManager.lookup === undefined;
+    return configuration.enableTemplateSave;
 });
 let definition = computed(() => {
     let type = isArray(props.entity["@type"])

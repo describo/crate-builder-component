@@ -38,7 +38,7 @@ const props = defineProps({
         validator: (val) => ["embedded", "online"].includes(val),
     },
     lookup: {
-        type: Object,
+        type: [Object, undefined],
     },
     enableContextEditor: {
         type: Boolean,
@@ -53,6 +53,11 @@ const props = defineProps({
     enableBrowseEntities: {
         type: Boolean,
         default: true,
+        validator: (val) => [true, false].includes(val),
+    },
+    enableTemplateSave: {
+        type: Boolean,
+        default: false,
         validator: (val) => [true, false].includes(val),
     },
     purgeUnlinkedEntitiesBeforeSave: {
@@ -85,11 +90,7 @@ watch(
     }
 );
 onBeforeMount(() => {
-    const configuration = {
-        enableContextEditor: props.enableContextEditor,
-        enableCratePreview: props.enableCratePreview,
-        enableBrowseEntities: props.enableBrowseEntities,
-    };
+    let configuration = configure();
     provide("configuration", configuration);
 });
 onMounted(() => {
@@ -107,6 +108,7 @@ function init() {
     data.crate = cloneDeep(props.crate);
 
     data.crateManager = new CrateManager();
+    data.crateManager.lookup = props.lookup;
     try {
         data.crateManager.load({ crate: data.crate, profile: data.profile });
     } catch (error) {
@@ -114,19 +116,27 @@ function init() {
         return;
     }
 
-    if (props.lookup) {
-        if (isFunction(props.lookup.entityTemplates) && isFunction(props.lookup.crateTemplates)) {
-            data.crateManager.lookup = props.lookup;
-        } else {
-            console.error(
-                `The lookup class must have functions 'entityTemplates' and 'crateTemplates'`
-            );
-        }
-    } else {
-        data.crateManager.lookup = undefined;
-    }
     setCurrentEntity({ name: "RootDataset" });
     data.ready = true;
+}
+function configure() {
+    const configuration = {
+        enableContextEditor: props.enableContextEditor,
+        enableCratePreview: props.enableCratePreview,
+        enableBrowseEntities: props.enableBrowseEntities,
+        enableTemplateSave: props.enableTemplateSave,
+        enableTemplateLookups: false,
+        enableDataPackLookups: false,
+    };
+    if (props.lookup) {
+        if (isFunction(props.lookup.entityTemplates)) {
+            configuration.enableTemplateLookups = true;
+        }
+        if (isFunction(props.lookup.dataPacks)) {
+            configuration.enableDataPackLookups = true;
+        }
+    }
+    return configuration;
 }
 async function setCurrentEntity({ describoId = undefined, name = undefined, id = undefined }) {
     if (!data.crateManager.getEntity) return;

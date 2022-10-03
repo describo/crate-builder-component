@@ -53,11 +53,14 @@ watch(props.types, () => {
 onMounted(() => {
     init();
 });
+let types;
 function init() {
-    if (isArray(props.types)) {
-        let allowedTypes = props.types.filter((type) => !data.typeExclusions.includes(type));
-        data.allowedTypes = allowedTypes;
+    let types = props.types;
+    if (!isArray(types)) {
+        types = [types];
     }
+    let allowedTypes = types.filter((type) => !data.typeExclusions.includes(type));
+    data.allowedTypes = allowedTypes;
 }
 function add(type) {
     data.selectedType = undefined;

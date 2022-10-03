@@ -20,12 +20,16 @@
                     :value="item"
                     :value-key="item['@id']"
                 >
-                    <div class="text-gray-500 text-sm">
+                    <div class="text-gray-700 text-sm">
                         <div v-if="item.type === 'new'">
                             <el-button type="success" size="default" class="flex flex-row">
                                 <div class="text-sm">Create new {{ item["@type"] }}:&nbsp;</div>
                                 <div class="text-sm">{{ item.name }}</div>
                             </el-button>
+                        </div>
+                        <div v-else-if="item.type === 'datapack'" class="flex flex-row space-x-2">
+                            <div class="text-sm">{{ item["@type"] }}:</div>
+                            <div class="text-sm">{{ item.name }} ({{ item["@id"] }})</div>
                         </div>
                         <div v-else class="flex flex-row space-x-2">
                             <div class="text-sm">{{ item["@type"] }}:</div>
@@ -40,7 +44,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from "vue";
+import { ref, reactive, onMounted, watch, inject } from "vue";
+import { isArray } from "lodash";
+
+import { Query, BoolQuery } from "@coedl/elastic-query-builder";
+import { wildcardQuery, matchQuery } from "@coedl/elastic-query-builder/queries";
+const configuration = inject("configuration");
 
 const props = defineProps({
     crateManager: {
@@ -59,9 +68,6 @@ const data = reactive({
     matches: [],
     entities: [],
 });
-onMounted(() => {
-    // querySearch();
-});
 watch(
     () => props.type,
     () => {
@@ -72,13 +78,11 @@ watch(
 async function querySearch(queryString) {
     selection.value = undefined;
     data.matches = [];
-    let query = {};
-    let entities = await props.crateManager.findMatchingEntities({
-        limit: 5,
-        type: props.type,
-        query: queryString,
-    });
+    let internal = [],
+        templates = [],
+        lookups = [];
 
+    // construct a definition for a new entity
     let newEntity = [
         {
             type: "new",
@@ -87,51 +91,86 @@ async function querySearch(queryString) {
             name: `${queryString}`,
         },
     ];
-    entities = entities.map((e) => ({ ...e, type: "internal" })).slice(0, 5);
+
+    // lookup entities in the crate (internal), in templates, and in datapacks (lookups)
+    [internal, templates, lookups] = await Promise.all([
+        await props.crateManager.findMatchingEntities({
+            limit: 5,
+            type: props.type,
+            query: queryString,
+        }),
+        await props.crateManager?.lookup?.entityTemplates({
+            type: props.type,
+            filter: queryString,
+            limit: 5,
+        }),
+        await lookup({ queryString }),
+    ]);
+    // console.log(internal, templates, lookups);
+
     let matches = [
         {
             label: "Create new entity",
             entities: queryString ? newEntity : [],
         },
-        {
-            label: "Associate an entity already defined in this crate",
-            entities,
-        },
     ];
 
-    let templates = await props.crateManager?.lookup?.entityTemplates({
-        type: props.type,
-        filter: queryString,
-        limit: 5,
-    });
-    if (templates) {
-        templates = templates.map((template) => template.entity);
-        // templates = templates.map((e) => ({ ...e, type: "template" })).slice(0, 5);
+    if (internal.length) {
+        internal = internal.map((e) => ({ ...e, type: "internal" })).slice(0, 5);
+        matches.push({
+            label: "Associate an entity already defined in this crate",
+            entities: internal,
+        });
+        data.entities = [...data.entities, ...internal];
+    }
+
+    if (templates?.length) {
+        templates = templates.map((template) => ({ ...template.entity, type: "template" }));
         matches.push({
             label: "Associate an entity from saved templates",
             entities: templates,
         });
+        data.entities = [...data.entities, ...templates];
+    }
+
+    if (lookups?.length) {
+        lookups = lookups.map((entity) => ({ ...entity, type: "datapack" }));
+        matches.push({ label: "Associate an entity from a data pack", entities: lookups });
+        data.entities = [...data.entities, ...lookups];
     }
     data.matches = matches;
-    // data.entities = [...entities, templates];
-    data.entities = [...entities];
 }
-function handleSelect(value) {
-    if (value) {
-        const entity = data.entities.filter((e) => e.id === value)[0];
-
+function handleSelect(entity) {
+    if (entity) {
         if (entity?.type === "internal") {
             emit("link:entity", { entity });
-            // } else if (entity?.type === "template") {
-            //     emit("add:template", { entity });
         } else {
-            let entity = {
-                "@id": value["@id"],
-                "@type": value["@type"],
-                name: value.name,
-            };
             emit("create:entity", entity);
         }
     }
+}
+
+async function lookup({ queryString }) {
+    let documents = [];
+    if (!configuration.enableDataPackLookups) return documents;
+    if (!props.crateManager?.profile?.lookup) return documents;
+
+    let type = isArray(type) ? props.type.join(", ") : props.type;
+    let { fields, url, datapack } = props.crateManager?.profile?.lookup?.[type];
+    if (fields && url) {
+        let query = new Query({ size: 5 });
+        query.append(
+            new BoolQuery().must([
+                matchQuery({ field: "@type.keyword", value: type }),
+                new BoolQuery().should(
+                    fields.map((field) => wildcardQuery({ field, value: queryString }))
+                ),
+            ])
+        );
+        ({ documents } = await props.crateManager.lookup.dataPacks({ url, query }));
+    } else if (datapack) {
+        ({ documents } = await props.crateManager.lookup.dataPacks({ datapack, queryString }));
+    }
+    return documents;
 }
 </script>

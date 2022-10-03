@@ -7,9 +7,12 @@
         "src/crate-builder"
     ],
     "scripts": {
-        "develop": "npm install && webpack serve -c webpack-development.js",
+        "develop": "npm install && npm run start:elastic && webpack serve -c webpack-development.js && npm run stop:elastic",
         "build": "./node_modules/.bin/parcel build --no-cache ./src/crate-builder/index.js",
-        "test:watch": "./node_modules/.bin/jest --watch --runInBand"
+        "test:watch": "./node_modules/.bin/jest --watch --runInBand",
+        "start:elastic": "docker compose up -d && npm run load:datapacks",
+        "load:datapacks": "sleep 10 && node ./load-data-packs.js",
+        "stop:elastic": "docker compose stop ; docker compose rm -f"
     },
     "repository": {
         "type": "git",
@@ -22,9 +25,11 @@
     },
     "homepage": "https://github.com/describo/crate-builder-component#readme",
     "dependencies": {
+        "@arkisto/describo-data-packs": "^0.6.2",
         "@codemirror/lang-javascript": "^6.0.2",
         "@codemirror/state": "^6.1.1",
         "@codemirror/theme-one-dark": "^6.1.0",
+        "@coedl/elastic-query-builder": "^0.3.0",
         "@element-plus/theme-chalk": "^2.2.16",
         "@fortawesome/fontawesome-free": "^6.2.0",
         "@fortawesome/fontawesome-svg-core": "^6.2.0",

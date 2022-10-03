@@ -19,7 +19,6 @@ describe("Test loading / exporting crate files", () => {
         let exportedCrate = crateManager.exportCrate({});
         expect(crate["@graph"].length).toEqual(exportedCrate["@graph"].length);
     });
-
     test("should fail on a crate file without @context", async () => {
         let crateManager = new CrateManager();
         try {
@@ -210,7 +209,18 @@ describe("Test loading / exporting crate files", () => {
         let entity = exportedCrate["@graph"].filter(
             (e) => e["@id"] === "http://entity.com/something"
         );
-        expect(entity).toEqual([]);
+        expect(entity).toEqual([
+            {
+                "@id": "http://entity.com/something",
+                "@type": "URL",
+                name: "http://entity.com/something",
+                "@reverse": {
+                    author: {
+                        "@id": "./",
+                    },
+                },
+            },
+        ]);
     });
     test("with root dataset and mixed type values for a property", async () => {
         let crate = getBaseCrate();
@@ -580,6 +590,160 @@ describe("Test interacting with the crate", () => {
 
         let exportedCrate = crateManager.exportCrate({});
         expect(exportedCrate["@graph"].length).toEqual(2);
+    });
+    test(`should be able to flatten a complex entity - like one coming from a datapack`, async () => {
+        const json = {
+            "@id": "http://some.thing",
+            "@type": "Thing",
+            level: {
+                "@id": "http://some.thing.2",
+                "@type": "Thing",
+                name: "level2",
+                level: {
+                    "@id": "http://some.thing.3",
+                    "@type": "Thing",
+                    name: "level3",
+                },
+                other: [
+                    {
+                        "@id": "http://some.thing.4",
+                        "@type": "Thing",
+                        name: "level4",
+                    },
+                    {
+                        "@id": "http://some.thing.5",
+                        "@type": "Thing",
+                        name: "level5",
+                    },
+                ],
+            },
+        };
+        let flattened = crateManager.flatten({ json });
+
+        expect(flattened).toEqual([
+            {
+                "@id": "http://some.thing",
+                "@type": "Thing",
+                level: {
+                    "@id": "http://some.thing.2",
+                },
+            },
+            {
+                "@id": "http://some.thing.2",
+                "@type": "Thing",
+                name: "level2",
+                level: {
+                    "@id": "http://some.thing.3",
+                },
+                other: [
+                    {
+                        "@id": "http://some.thing.4",
+                    },
+                    {
+                        "@id": "http://some.thing.5",
+                    },
+                ],
+            },
+            {
+                "@id": "http://some.thing.3",
+                "@type": "Thing",
+                name: "level3",
+            },
+            {
+                "@id": "http://some.thing.4",
+                "@type": "Thing",
+                name: "level4",
+            },
+            {
+                "@id": "http://some.thing.5",
+                "@type": "Thing",
+                name: "level5",
+            },
+        ]);
+        crateManager.flattenAndIngest({ json });
+        const crate = crateManager.exportCrate({});
+        // expect(crate["@graph"].length).toEqual(7);
+    });
+    test(`it should handle ingesting json objects with text arrays`, async () => {
+        let json = {
+            "@id": "http://some.thing",
+            "@type": "Thing",
+            alternateName: ["name1", "name2", "name3"],
+        };
+        crateManager.flattenAndIngest({ json });
+        const crate = crateManager.exportCrate({});
+        expect(crate["@graph"]).toEqual([
+            {
+                "@id": "ro-crate-metadata.json",
+                "@type": "CreativeWork",
+                conformsTo: {
+                    "@id": "https://w3id.org/ro/crate/1.1/context",
+                },
+                about: {
+                    "@id": "./",
+                },
+            },
+            {
+                "@id": "./",
+                "@type": ["Dataset"],
+                name: "Dataset",
+                language: {
+                    "@id": "http://some.thing",
+                },
+                "@reverse": {},
+            },
+            {
+                "@id": "http://some.thing",
+                "@type": "Thing",
+                name: "http://some.thing",
+                alternateName: ["name1", "name2", "name3"],
+                "@reverse": {
+                    language: {
+                        "@id": "./",
+                    },
+                },
+            },
+        ]);
+    });
+    test(`it should handle ingesting json objects whilst ignoring empty properties`, async () => {
+        let json = {
+            "@id": "http://some.thing",
+            "@type": "Thing",
+            alternateName: "",
+        };
+        crateManager.flattenAndIngest({ json });
+        const crate = crateManager.exportCrate({});
+        expect(crate["@graph"]).toEqual([
+            {
+                "@id": "ro-crate-metadata.json",
+                "@type": "CreativeWork",
+                conformsTo: {
+                    "@id": "https://w3id.org/ro/crate/1.1/context",
+                },
+                about: {
+                    "@id": "./",
+                },
+            },
+            {
+                "@id": "./",
+                "@type": ["Dataset"],
+                name: "Dataset",
+                language: {
+                    "@id": "http://some.thing",
+                },
+                "@reverse": {},
+            },
+            {
+                "@id": "http://some.thing",
+                "@type": "Thing",
+                name: "http://some.thing",
+                "@reverse": {
+                    language: {
+                        "@id": "./",
+                    },
+                },
+            },
+        ]);
     });
 });
 

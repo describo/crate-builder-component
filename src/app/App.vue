@@ -28,17 +28,24 @@
                 />
             </el-select>
         </div>
-        <describo-crate-builder :crate="data.selectedCrate" :profile="data.selectedProfile" />
+        <describo-crate-builder
+            :crate="data.selectedCrate"
+            :profile="data.selectedProfile"
+            :lookup="lookup"
+        />
     </div>
 </template>
 
 <script setup>
 import { reactive } from "vue";
-import crateFile1 from "../examples/collection/NT5/ro-crate-metadata.json";
-import crateFile2 from "../examples/item/NT1-98007/ro-crate-metadata.json";
+import { Lookup } from "./lookup.js";
+import crateFile1 from "../examples/blank-ro-crate-metadata.json";
+import crateFile2 from "../examples/collection/NT5/ro-crate-metadata.json";
+import crateFile3 from "../examples/item/NT1-98007/ro-crate-metadata.json";
 import profile1 from "../examples/profile/test-profile-without-groups.json";
 import profile2 from "../examples/profile/test-profile-with-groups.json";
 import profile3 from "../examples/profile/test-profile-with-datapacks-and-without-groups.json";
+const lookup = new Lookup();
 
 const data = reactive({
     select: {
@@ -46,8 +53,9 @@ const data = reactive({
         profile: undefined,
     },
     crates: [
-        { name: "NT5", value: crateFile1 },
-        { name: "NT1-98007", value: crateFile2 },
+        { name: "blank", value: crateFile1 },
+        { name: "NT5", value: crateFile2 },
+        { name: "NT1-98007", value: crateFile3 },
     ],
     profiles: [
         { name: "Profile -groups", value: profile1 },
