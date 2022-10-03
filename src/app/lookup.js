@@ -21,7 +21,7 @@ export class Lookup {
             //
             // If the url is to your api, you will likely need to adjust the 'execute' method
             //   unless your api endpoint just relays the elastic response back without modification
-            return await this.execute({ url, query });
+            return await this._execute({ url, query });
         } else if (queryString) {
             // do the lookup yourself in whatever way you want
             //
@@ -36,7 +36,8 @@ export class Lookup {
         }
     }
 
-    async execute({ url, query }) {
+    /** private method */
+    async _execute({ url, query }) {
         let response = await fetch(url, {
             method: "POST",
             headers: {
