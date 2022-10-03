@@ -132,8 +132,12 @@ Pass in the crate file and optionally a profile.
 
 ## Configuration
 
--   `lookup`: Pass in an instance of a class the component can use to lookup entity templates. The
-    signature of the class must be:
+-   `crate`: The RO Crate data. Note - this is the JSON object `not` a path to a file to be loaded.
+    Your app needs to do the loading.
+-   `profile`: The profile. Note - this is the JSON object `not` a path to a file to be loaded. Your
+    app needs to do the loading.
+-   `lookup`: Pass in an instance of a class the component can use to lookup entity templates or
+    datapacks. The signature of the class must be:
 
 ```
 export class Lookup {
@@ -142,18 +146,24 @@ export class Lookup {
     entityTemplates({ type, filter, limit = 5 }) {
         // code to lookup entity templates in *YOUR* system
     }
-    crateTemplates() {
-        // code to lookup crate templates in *YOUR* system
+    dataPacks({ url, query, datapack, queryString}) {
+        // code to lookup data in a datapack somehow
     }
 }
 ```
 
--   `enable-context-editor`: true | false: default(true) : enable / disable the context editor
+**See [./src/app/lookup.js](./src/app/lookup.js) for an example. In fact, you probably want to start
+from there.**
+
+-   `enable-context-editor`: true | false: `(default: true)` : enable / disable the context editor
     control
--   `enable-crate-preview`: true | false: default(true) : enable / disable the crate preview control
--   `enable-browse-entities`: true | false: default(true) : enable / disable the browse entities
+-   `enable-crate-preview`: true | false: `(default: true)` : enable / disable the crate preview
     control
--   `purge-unlinked-entities-before-save`: true | false: default(true) : purge unlinked entities
+-   `enable-browse-entities`: true | false: `(default: true)` : enable / disable the browse entities
+    control
+-   `enable-template-save`: true | false: `(default: false)` : enable / disable the template saving
+    controls
+-   `purge-unlinked-entities-before-save`: true | false: `(default: true)` : purge unlinked entities
     from the crate before emitting the save event
 
 ## Events
