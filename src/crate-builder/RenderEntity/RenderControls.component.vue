@@ -3,12 +3,14 @@
         <div class="flex flex-row space-x-1 py-2 mb-2 border-b-2 border-gray-700">
             <!-- navbar : controls -->
             <div>
+                <!-- go to root dataset -->
                 <el-button @click="loadRootDataset" type="primary" :disabled="isRootDataset">
                     <i class="fa-solid fa-house"></i>
                     &nbsp; Root Dataset
                 </el-button>
             </div>
             <div>
+                <!-- add property -->
                 <el-button
                     @click="toggle('addProperty')"
                     type="primary"
@@ -19,18 +21,21 @@
                 </el-button>
             </div>
             <div v-if="isRootDataset && configuration.enableContextEditor">
+                <!-- edit context -->
                 <el-button @click="toggle('editContext')" type="primary">
                     <i class="fa-solid fa-pen-to-square"></i>
                     &nbsp;Edit Context
                 </el-button>
             </div>
             <div v-if="configuration.enableCratePreview">
+                <!-- preview crate -->
                 <el-button @click="toggle('previewCrate')" type="primary">
                     <i class="fa-solid fa-eye"></i>
                     &nbsp;Preview
                 </el-button>
             </div>
             <div v-if="configuration.enableBrowseEntities">
+                <!-- browse crate entities -->
                 <el-button @click="toggle('browseEntities')" type="primary">
                     <i class="fa-solid fa-layer-group"></i>
                     &nbsp;Browse Entities
@@ -39,6 +44,7 @@
             <div class="flex flex-grow"></div>
             <div class="flex flex-row space-x-1">
                 <div v-if="!hideTemplateSaving && isRootDataset">
+                    <!-- save crate as template -->
                     <el-button
                         @click="toggle('saveCrateAsTemplate')"
                         type="primary"
@@ -56,6 +62,7 @@
                     </el-button>
                 </div>
                 <div v-if="!hideTemplateSaving && !isRootDataset">
+                    <!-- save entity as template -->
                     <el-button
                         @click="saveEntityAsTemplate"
                         type="primary"
@@ -73,6 +80,7 @@
                     </el-button>
                 </div>
                 <div v-if="!isRootDataset">
+                    <!-- delete entity -->
                     <el-button @click="deleteEntity" type="danger">
                         <div class="inline-block">
                             <i class="fas fa-trash"></i>
@@ -204,6 +212,7 @@ function deleteEntity(data) {
     emit("delete:entity", {
         describoId: data.describoId ? data.describoId : props.entity.describoId,
     });
+    loadEntity({ describoId: props.crateManager.getRootDataset().describoId });
 }
 function saveCrateAsTemplate(data) {
     emit("save:crate:template", data);
