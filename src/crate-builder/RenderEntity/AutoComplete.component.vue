@@ -155,7 +155,7 @@ async function lookup({ queryString }) {
     if (!configuration.enableDataPackLookups) return documents;
     if (!props.crateManager?.profile?.lookup) return documents;
 
-    let type = isArray(type) ? props.type.join(", ") : props.type;
+    let type = isArray(props.type) ? props.type.join(", ") : props.type;
     let { fields, datapack } = props.crateManager?.profile?.lookup?.[type];
     let query = new Query({ size: 10 });
     query.append(
