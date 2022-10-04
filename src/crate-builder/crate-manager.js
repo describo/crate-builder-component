@@ -369,13 +369,31 @@ export class CrateManager {
     }
 
     __addEntity({ entity }) {
-        entity = { describoId: uuid(), ...entity };
+        const id = uuid();
+
+        // is there an @id?
+        if (!entity["@id"]) entity["@id"] = `${id}`;
+
+        // is there a name?
+        if (!entity.name) entity.name = entity["@id"];
+
+        // is the id an IRI of some kind?
+        if (
+            !this._isURL(entity["@id"]) &&
+            !entity["@id"].match(/^\//) &&
+            !entity["@id"].match(/^\./)
+        ) {
+            entity["@id"] = `#${entity["@id"]}`;
+        }
+
+        // is there an @type
+        if (!entity["@type"]) entity["@type"] = this._isURL(entity["@id"]) ? "URL" : "Thing";
+
+        entity = { describoId: id, ...entity };
         let e = this.coreProperties
             .map((p) => ({ [p]: entity[p] }))
             .reduce((obj, entry) => ({ ...obj, ...entry }));
 
-        if (!e["@type"]) e["@type"] = this._isURL(e["@id"]) ? "URL" : "Thing";
-        if (!e.name) e.name = e["@id"];
         console.debug("Crate Mgr, addEntity", e);
         this.entities.push(e);
         return entity;

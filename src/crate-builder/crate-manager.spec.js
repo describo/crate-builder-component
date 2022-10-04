@@ -282,6 +282,36 @@ describe("Test interacting with the crate", () => {
         expect(e["@id"]).toEqual(entity["@id"]);
         expect(e.name).toEqual(entity.name);
         expect(e.describoId).toBeDefined();
+
+        entity = {
+            "@id": "something",
+            "@type": "Thing",
+        };
+        e = crateManager.addEntity({ entity });
+        expect(e["@id"]).toEqual("#something");
+        expect(e.name).toEqual("something");
+
+        entity = {
+            "@id": "http://something.com",
+        };
+        e = crateManager.addEntity({ entity });
+        expect(e["@id"]).toEqual("http://something.com");
+        expect(e["@type"]).toEqual("URL");
+        expect(e.name).toEqual("http://something.com");
+
+        entity = {
+            name: "some thing",
+        };
+        e = crateManager.addEntity({ entity });
+        expect(e["@type"]).toEqual("Thing");
+        expect(e["@id"]).toMatch(/^#[a-z,0-9]{8}-.*/);
+
+        entity = {
+            "@id": "./",
+        };
+        e = crateManager.addEntity({ entity });
+        expect(e["@id"]).toEqual("./");
+        expect(e["@type"]).toEqual(["Dataset"]);
     });
     test("add a simple entity to the crate and setCurrentEntity", () => {
         let entity = {
