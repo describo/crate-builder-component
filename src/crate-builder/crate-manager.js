@@ -15,7 +15,7 @@ const urlProtocols = ["http", "https", "ftp", "ftps", "arcp"];
 export class CrateManager {
     constructor() {
         this.describoProperties = ["describoId", "describoLabel"];
-        this.coreProperties = ["describoId", "describoLabel", "@id", "@type", "name"];
+        this.coreProperties = ["describoId", "describoLabel", "@id", "@type", "@reverse", "name"];
         this.entities = [];
         this.properties = [];
         this.currentEntity = undefined;
