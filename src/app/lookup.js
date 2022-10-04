@@ -1,5 +1,11 @@
 export class Lookup {
     constructor() {}
+    /**
+     *
+     * @param {Array | String} type: the type array or type string of the entity being looked up
+     * @param {String} queryString: the query string typed in by the user
+     * @param {Number} limit=5: the number of matches to return - default = 5
+     */
     async entityTemplates({ type = undefined, queryString = undefined, limit = 5 }) {
         // code to lookup entity templates in *YOUR* system
         //
@@ -9,14 +15,32 @@ export class Lookup {
         // limit: number of matches to return
     }
 
-    async dataPacks({ query = undefined, fields = [], datapack = [], queryString = undefined }) {
-        if (query) {
+    /**
+     *
+     * @param {Object} elasticQuery: a query object to be used against an elastic search server
+     * @param {Array | String} type: the type array or type string of the entity being looked up
+     * @param {String} queryString: the query string typed in by the user
+     * @param {Array | String} fields: the fields to search against in the data pack json objects
+     * @param {Array | String} datapack: the datapack or packs with the data to be used for this entity type
+     * @param {Number} limit=10: the number of matches to return - default = 10
+     *
+     * @returns
+     */
+    async dataPacks({
+        elasticQuery = undefined,
+        type = undefined,
+        queryString = undefined,
+        fields = undefined,
+        datapack = undefined,
+        limit = 10,
+    }) {
+        if (elasticQuery) {
             // query: the elastic query to perform
             //
             // it's up to you to get it to the elastic search server. In this example
             //   it's hardcoded in the _execute method
-            return await this._execute({ query });
-        } else if ((fields, datapack, queryString)) {
+            return await this._execute({ query: elasticQuery });
+        } else {
             // do the lookup yourself in whatever way you want
             //
             // the value of 'datapack' will be whatever the profile author defined so
