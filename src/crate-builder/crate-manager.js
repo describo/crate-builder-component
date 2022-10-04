@@ -369,7 +369,6 @@ export class CrateManager {
     }
 
     __addEntity({ entity }) {
-        console.log(entity);
         const id = uuid();
 
         // is there an @id?
