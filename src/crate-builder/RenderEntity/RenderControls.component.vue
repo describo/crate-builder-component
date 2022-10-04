@@ -43,7 +43,7 @@
             </div>
             <div class="flex flex-grow"></div>
             <div class="flex flex-row space-x-1">
-                <div v-if="!hideTemplateSaving && isRootDataset">
+                <div v-if="configuration.enableTemplateSave && isRootDataset">
                     <!-- save crate as template -->
                     <el-button
                         @click="toggle('saveCrateAsTemplate')"
@@ -61,7 +61,7 @@
                         </div>
                     </el-button>
                 </div>
-                <div v-if="!hideTemplateSaving && !isRootDataset">
+                <div v-if="configuration.enableTemplateSave && !isRootDataset">
                     <!-- save entity as template -->
                     <el-button
                         @click="saveEntityAsTemplate"
@@ -179,9 +179,6 @@ const data = reactive({
 });
 let isRootDataset = computed(() => {
     return props.entity.describoLabel === "RootDataset";
-});
-let hideTemplateSaving = computed(() => {
-    return configuration.enableTemplateSave;
 });
 let definition = computed(() => {
     let type = isArray(props.entity["@type"])
