@@ -146,7 +146,7 @@ export class Lookup {
     entityTemplates({ type, filter, limit = 5 }) {
         // code to lookup entity templates in *YOUR* system
     }
-    dataPacks({ url, query, datapack, queryString}) {
+    dataPacks({ query, fields, datapack, queryString}) {
         // code to lookup data in a datapack somehow
     }
 }
