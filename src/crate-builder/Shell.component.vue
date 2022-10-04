@@ -113,6 +113,7 @@ function init() {
         data.crateManager.load({ crate: data.crate, profile: data.profile });
     } catch (error) {
         data.error = error.message;
+        console.error(error);
         return;
     }
 
