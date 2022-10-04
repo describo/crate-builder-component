@@ -157,24 +157,23 @@ async function lookup({ queryString }) {
 
     let type = isArray(type) ? props.type.join(", ") : props.type;
     let { fields, datapack } = props.crateManager?.profile?.lookup?.[type];
-    if (fields && !datapack) {
-        let query = new Query({ size: 10 });
-        query.append(
-            new BoolQuery().must([
-                matchQuery({ field: "@type.keyword", value: type }),
-                new BoolQuery().should(
-                    fields.map((field) => wildcardQuery({ field, value: `*${queryString}*` }))
-                ),
-            ])
-        );
-        ({ documents } = await props.crateManager.lookup.dataPacks({ query }));
-    } else if (fields && datapack) {
-        ({ documents } = await props.crateManager.lookup.dataPacks({
-            fields,
-            datapack,
-            queryString,
-        }));
-    }
+    let query = new Query({ size: 10 });
+    query.append(
+        new BoolQuery().must([
+            matchQuery({ field: "@type.keyword", value: type }),
+            new BoolQuery().should(
+                fields.map((field) => wildcardQuery({ field, value: `*${queryString}*` }))
+            ),
+        ])
+    );
+    ({ documents } = await props.crateManager.lookup.dataPacks({
+        type: props.type,
+        elasticQuery: query,
+        fields,
+        datapack,
+        queryString,
+        limit: 10,
+    }));
     return documents;
 }
 </script>
