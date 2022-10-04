@@ -1,4 +1,4 @@
-const { IndexDataPacks } = require("@arkisto/describo-data-packs");
+const { IndexDataPacks } = require("@describo/data-packs");
 
 main();
 async function main() {
