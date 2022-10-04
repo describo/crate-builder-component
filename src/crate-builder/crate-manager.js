@@ -369,6 +369,7 @@ export class CrateManager {
     }
 
     __addEntity({ entity }) {
+        console.log(entity);
         const id = uuid();
 
         // is there an @id?
@@ -381,7 +382,8 @@ export class CrateManager {
         if (
             !this._isURL(entity["@id"]) &&
             !entity["@id"].match(/^\//) &&
-            !entity["@id"].match(/^\./)
+            !entity["@id"].match(/^\./) &&
+            !entity["@id"].match(/^#/)
         ) {
             entity["@id"] = `#${entity["@id"]}`;
         }
