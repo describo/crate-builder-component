@@ -9,20 +9,14 @@ export class Lookup {
         // limit: number of matches to return
     }
 
-    async dataPacks({
-        url = undefined,
-        query = undefined,
-        datapack = [],
-        queryString = undefined,
-    }) {
-        if (url && query) {
-            // url: the url to an endpoint that performs an elastic search lookup
+    async dataPacks({ query = undefined, fields = [], datapack = [], queryString = undefined }) {
+        if (query) {
             // query: the elastic query to perform
             //
-            // If the url is to your api, you will likely need to adjust the 'execute' method
-            //   unless your api endpoint just relays the elastic response back without modification
-            return await this._execute({ url, query });
-        } else if (queryString) {
+            // it's up to you to get it to the elastic search server. In this example
+            //   it's hardcoded in the _execute method
+            return await this._execute({ query });
+        } else if ((fields, datapack, queryString)) {
             // do the lookup yourself in whatever way you want
             //
             // the value of 'datapack' will be whatever the profile author defined so
@@ -37,8 +31,8 @@ export class Lookup {
     }
 
     /** private method */
-    async _execute({ url, query }) {
-        let response = await fetch(url, {
+    async _execute({ query }) {
+        let response = await fetch("http://localhost:9200/_search", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

@@ -156,8 +156,8 @@ async function lookup({ queryString }) {
     if (!props.crateManager?.profile?.lookup) return documents;
 
     let type = isArray(type) ? props.type.join(", ") : props.type;
-    let { fields, url, datapack } = props.crateManager?.profile?.lookup?.[type];
-    if (fields && url) {
+    let { fields, datapack } = props.crateManager?.profile?.lookup?.[type];
+    if (fields && !datapack) {
         let query = new Query({ size: 10 });
         query.append(
             new BoolQuery().must([
@@ -167,9 +167,13 @@ async function lookup({ queryString }) {
                 ),
             ])
         );
-        ({ documents } = await props.crateManager.lookup.dataPacks({ url, query }));
-    } else if (datapack) {
-        ({ documents } = await props.crateManager.lookup.dataPacks({ datapack, queryString }));
+        ({ documents } = await props.crateManager.lookup.dataPacks({ query }));
+    } else if (fields && datapack) {
+        ({ documents } = await props.crateManager.lookup.dataPacks({
+            fields,
+            datapack,
+            queryString,
+        }));
     }
     return documents;
 }
