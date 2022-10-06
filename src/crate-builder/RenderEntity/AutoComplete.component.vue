@@ -108,12 +108,7 @@ async function querySearch(queryString) {
     ]);
     // console.log(internal, templates, lookups);
 
-    let matches = [
-        {
-            label: "Create new entity",
-            entities: queryString ? newEntity : [],
-        },
-    ];
+    let matches = [];
 
     if (internal.length) {
         internal = internal.map((e) => ({ ...e, type: "internal" })).slice(0, 5);
@@ -138,6 +133,12 @@ async function querySearch(queryString) {
         matches.push({ label: "Associate an entity from a data pack", entities: lookups });
         data.entities = [...data.entities, ...lookups];
     }
+
+    matches.push({
+        label: "Create new entity",
+        entities: queryString ? newEntity : [],
+    });
+
     data.matches = matches;
 }
 function handleSelect(entity) {
