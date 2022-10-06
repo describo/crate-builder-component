@@ -27,7 +27,13 @@ onMounted(() => {
 });
 
 async function init() {
-    data.map = new Leaflet.map("map");
+    try {
+        data.map = new Leaflet.map("map");
+    } catch (error) {
+        data.map.off();
+        data.map.remove();
+        data.map = new Leaflet.map("map");
+    }
     centerMap();
     Leaflet.tileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.{ext}", {
         attribution:
