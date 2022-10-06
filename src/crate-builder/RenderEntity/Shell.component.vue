@@ -388,11 +388,11 @@ function createEntity(data) {
     if (props.mode === "embedded") {
         const dataType = data.type;
         delete data.type;
-        if (dataType === "new") {
+        if (dataType === "datapack") {
+            props.crateManager.flattenAndIngest({ json: data });
+        } else {
             let entity = props.crateManager.addEntity({ entity: data });
             props.crateManager.linkEntity({ property, tgtEntityId: entity.describoId });
-        } else {
-            props.crateManager.flattenAndIngest({ json: data });
         }
         saveCrate();
     } else {
