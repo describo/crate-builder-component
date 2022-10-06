@@ -45,6 +45,7 @@ import crateFile3 from "../examples/item/NT1-98007/ro-crate-metadata.json";
 import profile1 from "../examples/profile/test-profile-without-groups.json";
 import profile2 from "../examples/profile/test-profile-with-groups.json";
 import profile3 from "../examples/profile/test-profile-with-datapacks-and-without-groups.json";
+import profile4 from "../examples/profile/nyingarn-item-profile.json";
 const lookup = new Lookup();
 
 const data = reactive({
@@ -61,6 +62,7 @@ const data = reactive({
         { name: "Profile -groups", value: profile1 },
         { name: "Profile +groups", value: profile2 },
         { name: "Profile +datapacks, -groups", value: profile3 },
+        { name: "Profile Nyingarn Item", value: profile4 },
     ],
     selectedCrate: undefined,
     selectedProfile: undefined,
