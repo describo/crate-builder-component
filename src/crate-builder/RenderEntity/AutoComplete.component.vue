@@ -156,7 +156,7 @@ async function lookup({ queryString }) {
     if (!props.crateManager?.profile?.lookup) return documents;
 
     let type = isArray(props.type) ? props.type.join(", ") : props.type;
-    if (!props.crateManager?.profile?.lookup?.[type]) return documents;
+    if (!type || !props.crateManager?.profile?.lookup?.[type]) return documents;
 
     let { fields, datapack } = props.crateManager?.profile?.lookup?.[type];
     let query = new Query({ size: 10 });
