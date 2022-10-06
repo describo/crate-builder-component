@@ -92,7 +92,7 @@ const props = defineProps({
         type: Object,
     },
 });
-const emit = defineEmits(["create:object", "link:entity", "save:property", "create:property"]);
+const emit = defineEmits(["create:entity", "link:entity", "save:property"]);
 
 const data = reactive({
     mode: "box",
