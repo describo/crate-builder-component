@@ -228,18 +228,22 @@ export class CrateManager {
     }
 
     findMatchingEntities({ limit = 5, query = undefined, type = undefined }) {
+        if (query) {
+            query = query.toLowerCase();
+        }
         let entities = this.entities.filter((e) => {
             let eid = e["@id"].toLowerCase();
             let etype = isArray(e["@type"])
                 ? e["@type"].join(", ").toLowerCase()
                 : e["@type"].toLowerCase();
             type = type.toLowerCase();
+            let name = e.name.toLowerCase();
             if (type && !query) {
                 return etype.match(type);
             } else if (query && !type) {
                 return eid.match(query) || e.name.match(query);
             } else if (query && type) {
-                return etype.match(type) && (eid.match(query) || e.name.match(query));
+                return etype.match(type) && (eid.match(query) || name.match(query));
             }
         });
         entities = entities.filter((e) => e.describoLabel !== "RootDataset");
