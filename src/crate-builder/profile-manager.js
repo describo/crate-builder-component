@@ -1,4 +1,4 @@
-import { schemaOrgTypeDefinitions } from "./schema-type-definitions.js";
+import schemaOrgTypeDefinitions from "./schema-type-definitions.json";
 import {
     isString,
     isArray,
