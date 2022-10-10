@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-row">
-        <div class="w-1/3 xl:w-1/5 flex flex-col">Identifier</div>
+        <div class="w-1/3 xl:w-1/5 flex flex-col">@id</div>
 
         <div class="w-2/3 xl:w-4/5 flex flex-row">
             <div
