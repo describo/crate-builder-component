@@ -10,7 +10,7 @@
                 <el-badge is-dot class="animate-pulse -ml-1 -mt-2" v-if="isRequired && !isValid">
                 </el-badge>
             </div>
-            <div class="text-gray-500 text-xs pr-1">{{ data.help }}</div>
+            <div class="text-gray-600 font-light text-xs pr-1">{{ data.help }}</div>
             <div
                 v-if="!data.propertyDefinition && profileWarnMissingProperty"
                 class="text-red-600 text-xs"

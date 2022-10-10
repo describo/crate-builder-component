@@ -150,7 +150,14 @@
                         :key="idx"
                     >
                         <template #label>
-                            <span class="cursor-pointer text-gray-600 text-lg">{{ tab.name }}</span>
+                            <div class="flex flex-col my-6">
+                                <div class="cursor-pointer text-gray-600 text-lg">
+                                    {{ tab.name }}
+                                </div>
+                                <div class="text-gray-600 font-light text-xs pr-1">
+                                    {{ tab.description }}
+                                </div>
+                            </div>
                         </template>
                         <!-- render entity properties -->
                         <div v-for="(values, property) of tab.entity.properties" :key="property">
