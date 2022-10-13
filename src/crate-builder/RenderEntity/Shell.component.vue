@@ -92,65 +92,14 @@
                     @update:context="updateContext"
                 />
                 <el-tabs tab-position="left" v-model="data.activeTab">
-                    <el-tab-pane label="About" name="about">
-                        <template #label>
-                            <span class="cursor-pointerspace text-gray-600 text-lg"> About </span>
-                        </template>
-
-                        <!-- render entity id -->
-                        <render-entity-id-component
-                            class="my-2 p-2"
-                            :class="{
-                                'bg-green-200 rounded p-1 my-1': data.savedProperty === '@id',
-                            }"
-                            :entity="data.tabs[0].entity"
-                            @update:entity="updateEntity"
-                        />
-
-                        <!-- render entity type -->
-                        <render-entity-type-component
-                            class="my-2 p-2"
-                            :entity="data.tabs[0].entity"
-                        />
-
-                        <!-- render entity name -->
-                        <render-entity-name-component
-                            class="my-2 p-2"
-                            :class="{
-                                'bg-green-200 rounded p-1 my-1': data.savedProperty === 'name',
-                            }"
-                            :entity="data.tabs[0].entity"
-                            @save:property="saveProperty"
-                            @update:entity="updateEntity"
-                        />
-
-                        <!--render entities it links to  -->
-                        <div class="flex flex-row flex-wrap">
-                            <div
-                                v-for="(entities, property) of data.tabs[0].entity
-                                    .reverseConnections"
-                                :key="property"
-                            >
-                                <div v-for="entity of entities" :key="entity.tgtEntityId">
-                                    <render-entity-reverse-item-link-component
-                                        class="m-2"
-                                        :crate-manager="props.crateManager"
-                                        :property="property"
-                                        :entity="entity"
-                                        @load:entity="loadEntity"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </el-tab-pane>
                     <el-tab-pane
                         :label="tab.name"
                         :name="tab.name"
-                        v-for="(tab, idx) of data.tabs.slice(1)"
+                        v-for="(tab, idx) of data.tabs"
                         :key="idx"
                     >
                         <template #label>
-                            <div class="flex flex-col my-6">
+                            <div class="flex flex-col my-4">
                                 <div class="cursor-pointer text-gray-600 text-lg">
                                     {{ tab.name }}
                                 </div>
@@ -159,6 +108,54 @@
                                 </div>
                             </div>
                         </template>
+
+                        <div v-if="tab.name === 'About'">
+                            <!-- render entity id -->
+                            <render-entity-id-component
+                                class="my-2 p-2"
+                                :class="{
+                                    'bg-green-200 rounded p-1 my-1': data.savedProperty === '@id',
+                                }"
+                                :entity="data.tabs[0].entity"
+                                @update:entity="updateEntity"
+                            />
+                            <!-- render entity type -->
+                            <render-entity-type-component
+                                class="my-2 p-2"
+                                :entity="data.tabs[0].entity"
+                            />
+
+                            <!-- render entity name -->
+                            <render-entity-name-component
+                                class="my-2 p-2"
+                                :class="{
+                                    'bg-green-200 rounded p-1 my-1': data.savedProperty === 'name',
+                                }"
+                                :entity="data.tabs[0].entity"
+                                @save:property="saveProperty"
+                                @update:entity="updateEntity"
+                            />
+
+                            <!--render entities it links to  -->
+                            <div class="flex flex-row flex-wrap">
+                                <div
+                                    v-for="(entities, property) of data.tabs[0].entity
+                                        .reverseConnections"
+                                    :key="property"
+                                >
+                                    <div v-for="entity of entities" :key="entity.tgtEntityId">
+                                        <render-entity-reverse-item-link-component
+                                            class="m-2"
+                                            :crate-manager="props.crateManager"
+                                            :property="property"
+                                            :entity="entity"
+                                            @load:entity="loadEntity"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- render entity properties -->
                         <div v-for="(values, property) of tab.entity.properties" :key="property">
                             <div
@@ -182,6 +179,27 @@
                                     @link:entity="linkEntity"
                                     @add:template="addTemplate"
                                 />
+                            </div>
+                        </div>
+
+                        <div v-if="tab.name === 'About'">
+                            <!--render entities it links to  -->
+                            <div class="flex flex-row flex-wrap">
+                                <div
+                                    v-for="(entities, property) of data.tabs[0].entity
+                                        .reverseConnections"
+                                    :key="property"
+                                >
+                                    <div v-for="entity of entities" :key="entity.tgtEntityId">
+                                        <render-entity-reverse-item-link-component
+                                            class="m-2"
+                                            :crate-manager="props.crateManager"
+                                            :property="property"
+                                            :entity="entity"
+                                            @load:entity="loadEntity"
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </el-tab-pane>
@@ -222,7 +240,7 @@ const data = reactive({
     hideProperty: ["describoId"],
     classDefinition: undefined,
     entity: {},
-    activeTab: "about",
+    activeTab: "About",
     tabs: [],
     debouncedInit: debounce(init, 400),
     extraProperties: [],
@@ -306,23 +324,23 @@ function applyLayout({ layouts, hide = [], entity }) {
     if (!layouts?.length) return { entity };
 
     let tabs = [];
-    tabs.push({ name: "About", entity: cloneDeep(entity) });
 
     let mappedInputs = [];
     layouts.forEach((section) => {
         let sectionEntity = cloneDeep(entity);
         sectionEntity.properties = {};
-        tabs.push({
-            name: section.name,
-            description: section?.description,
-            entity: sectionEntity,
-        });
+
         section.inputs.forEach((input) => {
             let property = Object.keys(entity.properties).filter((property) => property === input);
             if (property.length && !hide.includes(input)) {
                 mappedInputs.push(input);
                 sectionEntity.properties[input] = entity.properties[input];
             }
+        });
+        tabs.push({
+            name: section.name,
+            description: section?.description,
+            entity: sectionEntity,
         });
     });
 
@@ -338,6 +356,14 @@ function applyLayout({ layouts, hide = [], entity }) {
         tabs.push({ name: "...", description: "", entity: sectionEntity });
     }
 
+    // is there an about tab?
+    const aboutTab = tabs.filter((tab) => tab.name.match(/about/i));
+    if (!aboutTab.length) {
+        let sectionEntity = cloneDeep(entity);
+        delete sectionEntity.properties;
+        tabs = [{ name: "About", entity: sectionEntity }, ...tabs];
+    }
+
     return { tabs };
 }
 function addPropertyPlaceholder({ property }) {
@@ -348,7 +374,7 @@ function showProperty(property) {
     return !data.hideProperty.includes(property);
 }
 function loadEntity(entity) {
-    data.activeTab = "about";
+    data.activeTab = "About";
     if (props.crateManager.getEntity({ describoId: props.crateManager.currentEntity })) {
         emit("load:entity", { describoId: props.crateManager.currentEntity });
     }
