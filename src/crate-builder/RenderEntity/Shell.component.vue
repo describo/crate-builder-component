@@ -99,12 +99,17 @@
                         :key="idx"
                     >
                         <template #label>
-                            <div class="flex flex-col">
-                                <div class="cursor-pointer text-gray-600 text-lg" v-if="tab.label">
+                            <div
+                                class="flex flex-col tab-label-width whitespace-normal text-gray-600"
+                            >
+                                <div
+                                    class="cursor-pointer text-lg hover:text-yellow-600"
+                                    v-if="tab.label"
+                                >
                                     {{ tab.label }}
                                 </div>
                                 <div
-                                    class="cursor-pointer text-gray-600 text-lg"
+                                    class="cursor-pointer text-lg hover:text-yellow-600"
                                     v-else-if="tab.name"
                                 >
                                     {{ tab.name }}
@@ -469,3 +474,9 @@ function updateContext(data) {
 }
 function addTemplate() {}
 </script>
+
+<style scoped>
+.tab-label-width {
+    width: 200px;
+}
+</style>
