@@ -1,6 +1,11 @@
 <template>
     <div class="flex flex-row">
-        <div class="w-1/3 xl:w-1/5 flex flex-col">Name</div>
+        <div class="w-1/3 xl:w-1/5 flex flex-col">
+            <div>Name</div>
+            <div class="text-gray-600 font-light text-xs pr-1">
+                A short, descriptive name for this item.
+            </div>
+        </div>
         <div class="w-2/3 xl:w-4/5 flex flex-col">
             <div class="flex-grow">
                 <text-component
