@@ -80,7 +80,8 @@ async function querySearch(queryString) {
     data.matches = [];
     let internal = [],
         templates = [],
-        lookups = [];
+        lookups = [],
+        ror = [];
 
     // construct a definition for a new entity
     let newEntity = [
@@ -93,7 +94,7 @@ async function querySearch(queryString) {
     ];
 
     // lookup entities in the crate (internal), in templates, and in datapacks (lookups)
-    [internal, templates, lookups] = await Promise.all([
+    lookups = [
         await props.crateManager.findMatchingEntities({
             limit: 5,
             type: props.type,
@@ -105,7 +106,11 @@ async function querySearch(queryString) {
             limit: 5,
         }),
         await lookup({ queryString }),
-    ]);
+    ];
+    if (["Organisation", "Organization"].includes(props.type)) {
+        lookups.push(await lookupROR({ queryString }));
+    }
+    [internal, templates, lookups, ror] = await Promise.all(lookups);
     // console.log(internal, templates, lookups);
 
     let matches = [];
@@ -128,6 +133,11 @@ async function querySearch(queryString) {
         data.entities = [...data.entities, ...templates];
     }
 
+    if (ror?.length) {
+        ror = ror.map((entity) => ({ ...entity, type: "template" }));
+        matches.push({ label: "Associate an Organization from ROR", entities: ror });
+        data.entities = [...data.entities, ...ror];
+    }
     if (lookups?.length) {
         lookups = lookups.map((entity) => ({ ...entity, type: "datapack" }));
         matches.push({ label: "Associate an entity from a data pack", entities: lookups });
@@ -178,5 +188,22 @@ async function lookup({ queryString }) {
         limit: 10,
     }));
     return documents;
+}
+
+async function lookupROR({ queryString }) {
+    const api = "https://api.ror.org/organizations";
+    let response = await fetch(`${api}?query.advanced=${queryString}`);
+    if (response.status === 200) {
+        response = await response.json();
+        response = response.items.slice(0, 5).map((item) => {
+            return {
+                "@id": item.id,
+                "@type": "Organization",
+                name: item.name,
+            };
+        });
+        return response;
+    }
+    return [];
 }
 </script>
