@@ -138,7 +138,7 @@ describe("Test working with profiles", () => {
             type: "Dataset",
         });
         expect(propertyDefinition.id).toEqual("http://schema.org/dateModified");
-        expect(propertyDefinition.type).toEqual(["Date", "DateTime"]);
+        expect(propertyDefinition.type.sort()).toEqual(["Date", "DateTime"]);
     });
     test("get property definition - not defined in profile or schema.org; create default entry", () => {
         const profile = {
@@ -222,7 +222,7 @@ describe("Test working with profiles", () => {
         const profile = {
             metadata: {},
             classes: {
-                Dataset: {
+                Thing: {
                     definition: "override",
                     subClassOf: [],
                     inputs: [
@@ -240,15 +240,17 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let types = profileManager.mapTypeHierarchies(["Dataset"]);
-        let { inputs } = profileManager.getInputs({ types: ["Dataset"] });
-        expect(inputs.length).toEqual(124);
+        let types = profileManager.mapTypeHierarchies(["Thing"]);
+        let { inputs } = profileManager.getInputs({ types: ["Thing"] });
+        inputs = inputs.map((input) => input.id);
+        expect(inputs).toEqual(["https://schema.org/date"]);
+        expect(inputs.length).toEqual(1);
     });
     test("get inputs for type defined in profile - no subClass in profile, definition inherit", () => {
         const profile = {
             metadata: {},
             classes: {
-                Dataset: {
+                Thing: {
                     definition: "inherit",
                     subClassOf: [],
                     inputs: [
@@ -266,14 +268,30 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let { inputs } = profileManager.getInputs({ types: ["Dataset"] });
-        expect(inputs.length).toEqual(133);
+        let { inputs } = profileManager.getInputs({ types: ["Thing"] });
+        inputs = inputs.map((input) => input.id);
+        expect(inputs).toEqual([
+            "http://schema.org/additionalType",
+            "http://schema.org/alternateName",
+            "https://schema.org/date",
+            "http://schema.org/description",
+            "http://schema.org/disambiguatingDescription",
+            "http://schema.org/identifier",
+            "http://schema.org/image",
+            "http://schema.org/mainEntityOfPage",
+            "http://schema.org/name",
+            "http://schema.org/potentialAction",
+            "http://schema.org/sameAs",
+            "http://schema.org/subjectOf",
+            "http://schema.org/url",
+        ]);
+        expect(inputs.length).toEqual(13);
     });
     test("get inputs for type defined in profile - subClass in profile, definition inherit, props dup'ed", () => {
         const profile = {
             metadata: {},
             classes: {
-                Dataset: {
+                Thing: {
                     definition: "override",
                     subClassOf: ["NoSuchEntity"],
                     inputs: [
@@ -305,15 +323,16 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let { inputs } = profileManager.getInputs({ types: ["Dataset"] });
-        expect(inputs.length).toEqual(124);
-        expect(inputs.filter((i) => i.name === "date").length).toEqual(1);
+        let { inputs } = profileManager.getInputs({ types: ["Thing"] });
+        inputs = inputs.map((input) => input.id);
+        expect(inputs).toEqual(["https://schema.org/date"]);
+        expect(inputs.length).toEqual(1);
     });
-    test("get inputs for type defined in profile - subClass in profile, definition inherit, props not dup'ed", () => {
+    test("get inputs for type defined in profile - subClass in profile, definition inherit", () => {
         const profile = {
             metadata: {},
             classes: {
-                Dataset: {
+                Thing: {
                     definition: "override",
                     subClassOf: ["NoSuchEntity"],
                     inputs: [
@@ -332,8 +351,8 @@ describe("Test working with profiles", () => {
                     definition: "override",
                     inputs: [
                         {
-                            id: "https://schema.org/nosuchprop",
-                            name: "nosuchprop",
+                            id: "https://schema.org/somethingElse",
+                            name: "else",
                             label: "Attach a date",
                             help: "",
                             type: ["Date"],
@@ -345,10 +364,79 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let { inputs } = profileManager.getInputs({ types: ["Dataset"] });
-        expect(inputs.length).toEqual(125);
-        expect(inputs.filter((i) => i.name === "date").length).toEqual(1);
-        expect(inputs.filter((i) => i.name === "nosuchprop").length).toEqual(1);
+        let { inputs } = profileManager.getInputs({ types: ["Thing"] });
+        inputs = inputs.map((input) => input.id);
+        expect(inputs.sort()).toEqual([
+            "https://schema.org/date",
+            "https://schema.org/somethingElse",
+        ]);
+        expect(inputs.length).toEqual(2);
+    });
+    test("get inputs for type array defined in profile - test 1", () => {
+        const profile = {
+            metadata: {},
+            classes: {
+                "Thing, Intangible": {
+                    definition: "inherit",
+                    subClassOf: [],
+                    inputs: [],
+                },
+            },
+        };
+        const profileManager = new ProfileManager({ profile });
+        let { inputs } = profileManager.getInputs({ types: ["Thing", "Intangible"] });
+        inputs = inputs.map((input) => input.id);
+        expect(inputs).toEqual([
+            "http://schema.org/additionalType",
+            "http://schema.org/alternateName",
+            "http://schema.org/description",
+            "http://schema.org/disambiguatingDescription",
+            "http://schema.org/identifier",
+            "http://schema.org/image",
+            "http://schema.org/mainEntityOfPage",
+            "http://schema.org/name",
+            "http://schema.org/potentialAction",
+            "http://schema.org/sameAs",
+            "http://schema.org/subjectOf",
+            "http://schema.org/url",
+        ]);
+    });
+    test("get inputs for type array defined in profile - test 2", () => {
+        const profile = {
+            metadata: {},
+            classes: {
+                "Thing, MedicalEntity": {
+                    definition: "inherit",
+                    subClassOf: [],
+                    inputs: [],
+                },
+            },
+        };
+        const profileManager = new ProfileManager({ profile });
+        let { inputs } = profileManager.getInputs({ types: ["Thing", "MedicalEntity"] });
+        inputs = inputs.map((input) => input.id);
+        expect(inputs).toEqual([
+            "http://schema.org/additionalType",
+            "http://schema.org/alternateName",
+            "http://schema.org/code",
+            "http://schema.org/description",
+            "http://schema.org/disambiguatingDescription",
+            "http://schema.org/funding",
+            "http://schema.org/guideline",
+            "http://schema.org/identifier",
+            "http://schema.org/image",
+            "http://schema.org/legalStatus",
+            "http://schema.org/mainEntityOfPage",
+            "http://schema.org/medicineSystem",
+            "http://schema.org/name",
+            "http://schema.org/potentialAction",
+            "http://schema.org/recognizingAuthority",
+            "http://schema.org/relevantSpecialty",
+            "http://schema.org/sameAs",
+            "http://schema.org/study",
+            "http://schema.org/subjectOf",
+            "http://schema.org/url",
+        ]);
     });
 });
 
