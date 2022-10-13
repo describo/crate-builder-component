@@ -99,11 +99,17 @@
                         :key="idx"
                     >
                         <template #label>
-                            <div class="flex flex-col my-4">
-                                <div class="cursor-pointer text-gray-600 text-lg">
+                            <div class="flex flex-col">
+                                <div class="cursor-pointer text-gray-600 text-lg" v-if="tab.label">
+                                    {{ tab.label }}
+                                </div>
+                                <div
+                                    class="cursor-pointer text-gray-600 text-lg"
+                                    v-else-if="tab.name"
+                                >
                                     {{ tab.name }}
                                 </div>
-                                <div class="text-gray-600 font-light text-xs pr-1">
+                                <div class="text-gray-600 font-light text-xs pr-1 pb-4">
                                     {{ tab.description }}
                                 </div>
                             </div>
@@ -135,25 +141,6 @@
                                 @save:property="saveProperty"
                                 @update:entity="updateEntity"
                             />
-
-                            <!--render entities it links to  -->
-                            <div class="flex flex-row flex-wrap">
-                                <div
-                                    v-for="(entities, property) of data.tabs[0].entity
-                                        .reverseConnections"
-                                    :key="property"
-                                >
-                                    <div v-for="entity of entities" :key="entity.tgtEntityId">
-                                        <render-entity-reverse-item-link-component
-                                            class="m-2"
-                                            :crate-manager="props.crateManager"
-                                            :property="property"
-                                            :entity="entity"
-                                            @load:entity="loadEntity"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                         <!-- render entity properties -->
@@ -338,8 +325,7 @@ function applyLayout({ layouts, hide = [], entity }) {
             }
         });
         tabs.push({
-            name: section.name,
-            description: section?.description,
+            ...section,
             entity: sectionEntity,
         });
     });
@@ -353,7 +339,21 @@ function applyLayout({ layouts, hide = [], entity }) {
                 sectionEntity.properties[p] = entity.properties[p];
             }
         });
-        tabs.push({ name: "...", description: "", entity: sectionEntity });
+        // is there an ungrouped properties tab?
+        let ungroupedTab = tabs.filter((tab) => tab.name.match(/\.\.\./));
+        if (ungroupedTab.length) {
+            tabs = tabs.map((tab) => {
+                if (tab.name === "...") {
+                    return {
+                        ...tab,
+                        entity: sectionEntity,
+                    };
+                }
+                return tab;
+            });
+        } else {
+            tabs.push({ name: "...", description: "", entity: sectionEntity });
+        }
     }
 
     // is there an about tab?
