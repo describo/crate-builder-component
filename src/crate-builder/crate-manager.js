@@ -400,12 +400,14 @@ export class CrateManager {
             !this._isURL(entity["@id"]) &&
             !entity["@id"].match(/^\//) &&
             !entity["@id"].match(/^\./) &&
-            !entity["@id"].match(/^#/)
+            !entity["@id"].match(/^#/) &&
+            !entity?.["@type"]?.includes("File") &&
+            !entity?.["@type"]?.includes("Dataset")
         ) {
             entity["@id"] = `#${entity["@id"]}`;
         }
 
-        // is there an @type
+        // if no @type then set to URL or Thing
         if (!entity["@type"]) entity["@type"] = this._isURL(entity["@id"]) ? "URL" : "Thing";
 
         entity = { describoId: id, ...entity };

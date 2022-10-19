@@ -313,6 +313,38 @@ describe("Test interacting with the crate", () => {
         expect(e["@id"]).toEqual("./");
         expect(e["@type"]).toEqual(["Dataset"]);
     });
+    test("add a simple File or Dataset entity to the crate", () => {
+        let entity = {
+            "@id": "file1.jpg",
+            "@type": "File",
+            name: "file1.jpg",
+        };
+        let e = crateManager.addEntity({ entity });
+        expect(e["@id"]).toEqual(entity["@id"]);
+        expect(e.name).toEqual(entity.name);
+        expect(e.describoId).toBeDefined();
+
+        entity = {
+            "@id": "something",
+            "@type": ["File", "Thing"],
+        };
+        e = crateManager.addEntity({ entity });
+        expect(e["@id"]).toEqual(entity["@id"]);
+
+        entity = {
+            "@id": "something",
+            "@type": "Dataset",
+        };
+        e = crateManager.addEntity({ entity });
+        expect(e["@id"]).toEqual(entity["@id"]);
+
+        entity = {
+            "@id": "something",
+            "@type": ["Dataset", "CreativeWork"],
+        };
+        e = crateManager.addEntity({ entity });
+        expect(e["@id"]).toEqual(entity["@id"]);
+    });
     test("add a simple entity to the crate and setCurrentEntity", () => {
         let entity = {
             "@id": chance.url(),
