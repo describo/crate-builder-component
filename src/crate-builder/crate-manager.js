@@ -479,6 +479,6 @@ export class CrateManager {
     }
 
     _isURL(value) {
-        return isURL(value, { protocols: urlProtocols });
+        return isURL(value, { require_protocol: true, protocols: urlProtocols });
     }
 }

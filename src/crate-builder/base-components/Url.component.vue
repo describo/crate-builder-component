@@ -52,8 +52,15 @@ export default {
         save() {
             try {
                 let isurl = isURL(this.internalValue, {
+                    require_protocol: true,
                     protocols: ["http", "https", "ftp", "ftps", "arcp"],
                 });
+                console.log(
+                    this.internalValue,
+                    isURL(this.internalValue, {
+                        protocols: ["http", "https", "ftp", "ftps", "arcp"],
+                    })
+                );
                 if (isurl) {
                     this.error = false;
 
