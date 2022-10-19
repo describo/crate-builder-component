@@ -427,7 +427,7 @@ function createEntity(data) {
         const dataType = data.type;
         delete data.type;
         if (dataType === "datapack") {
-            props.crateManager.flattenAndIngest({ json: data });
+            props.crateManager.ingestAndLink({ property, json: data });
         } else {
             let entity = props.crateManager.addEntity({ entity: data });
             props.crateManager.linkEntity({ property, tgtEntityId: entity.describoId });
@@ -460,6 +460,7 @@ function linkEntity(data) {
 function deleteEntity(data) {
     console.debug("Render Entity component: emit(delete:entity)", data);
     props.crateManager.deleteEntity(data);
+    saveCrate();
 }
 function saveCrateAsTemplate(data) {
     console.debug("Render Entity component: emit(save:crate:template)", data);
@@ -471,6 +472,7 @@ function saveEntityAsTemplate() {
 }
 function updateContext(data) {
     props.crateManager.context = data;
+    saveCrate();
 }
 function addTemplate() {}
 </script>

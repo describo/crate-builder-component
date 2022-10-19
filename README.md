@@ -163,8 +163,6 @@ from there.**
     control
 -   `enable-template-save`: true | false: `(default: false)` : enable / disable the entity and crate
     template saving controls
--   `purge-unlinked-entities-before-save`: true | false: `(default: true)` : purge unlinked entities
-    from the crate before emitting the save event
 
 ## Events
 

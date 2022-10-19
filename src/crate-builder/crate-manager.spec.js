@@ -482,7 +482,7 @@ describe("Test interacting with the crate", () => {
         expect(e).not.toHaveProperty("author");
 
         e = exportedCrate["@graph"].filter((e) => e["@id"] === url)[0];
-        expect(e["@reverse"]).not.toHaveProperty("author");
+        expect(e).toBeUndefined;
     });
     test("delete a property", () => {
         const url = chance.url();
@@ -602,8 +602,8 @@ describe("Test interacting with the crate", () => {
         };
         let e = crateManager.addEntity({ entity });
 
-        let exportedCrate = crateManager.exportCrate({});
-        expect(exportedCrate["@graph"].length).toEqual(2);
+        crate = crateManager.exportCrate();
+        expect(crate["@graph"].length).toEqual(2);
     });
     test("exporting a simple crate file with unlinked entities", async () => {
         let crate = getBaseCrate();
@@ -626,22 +626,22 @@ describe("Test interacting with the crate", () => {
             "@id": "http://some.thing",
             "@type": "Thing",
             level: {
-                "@id": "http://some.thing.2",
+                "@id": "http://2.some.thing",
                 "@type": "Thing",
                 name: "level2",
                 level: {
-                    "@id": "http://some.thing.3",
+                    "@id": "http://3.some.thing",
                     "@type": "Thing",
                     name: "level3",
                 },
                 other: [
                     {
-                        "@id": "http://some.thing.4",
+                        "@id": "http://4.some.thing",
                         "@type": "Thing",
                         name: "level4",
                     },
                     {
-                        "@id": "http://some.thing.5",
+                        "@id": "http://5.some.thing",
                         "@type": "Thing",
                         name: "level5",
                     },
@@ -655,44 +655,49 @@ describe("Test interacting with the crate", () => {
                 "@id": "http://some.thing",
                 "@type": "Thing",
                 level: {
-                    "@id": "http://some.thing.2",
+                    "@id": "http://2.some.thing",
                 },
             },
             {
-                "@id": "http://some.thing.2",
+                "@id": "http://2.some.thing",
                 "@type": "Thing",
                 name: "level2",
                 level: {
-                    "@id": "http://some.thing.3",
+                    "@id": "http://3.some.thing",
                 },
                 other: [
                     {
-                        "@id": "http://some.thing.4",
+                        "@id": "http://4.some.thing",
                     },
                     {
-                        "@id": "http://some.thing.5",
+                        "@id": "http://5.some.thing",
                     },
                 ],
             },
             {
-                "@id": "http://some.thing.3",
+                "@id": "http://3.some.thing",
                 "@type": "Thing",
                 name: "level3",
             },
             {
-                "@id": "http://some.thing.4",
+                "@id": "http://4.some.thing",
                 "@type": "Thing",
                 name: "level4",
             },
             {
-                "@id": "http://some.thing.5",
+                "@id": "http://5.some.thing",
                 "@type": "Thing",
                 name: "level5",
             },
         ]);
-        crateManager.flattenAndIngest({ json });
+
+        crateManager.ingestAndLink({
+            srcEntityId: crateManager.getRootDataset().describoId,
+            property: "language",
+            json,
+        });
         const crate = crateManager.exportCrate({});
-        // expect(crate["@graph"].length).toEqual(7);
+        expect(crate["@graph"].length).toEqual(7);
     });
     test(`it should handle ingesting json objects with text arrays`, async () => {
         let json = {
@@ -700,7 +705,11 @@ describe("Test interacting with the crate", () => {
             "@type": "Thing",
             alternateName: ["name1", "name2", "name3"],
         };
-        crateManager.flattenAndIngest({ json });
+        crateManager.ingestAndLink({
+            srcEntityId: crateManager.getRootDataset().describoId,
+            property: "language",
+            json,
+        });
         const crate = crateManager.exportCrate({});
         expect(crate["@graph"]).toEqual([
             {
@@ -741,7 +750,11 @@ describe("Test interacting with the crate", () => {
             "@type": "Thing",
             alternateName: "",
         };
-        crateManager.flattenAndIngest({ json });
+        crateManager.ingestAndLink({
+            srcEntityId: crateManager.getRootDataset().describoId,
+            property: "language",
+            json,
+        });
         const crate = crateManager.exportCrate({});
         expect(crate["@graph"]).toEqual([
             {
@@ -772,6 +785,107 @@ describe("Test interacting with the crate", () => {
                         "@id": "./",
                     },
                 },
+            },
+        ]);
+    });
+    test(`it should be able to handle self links`, async () => {
+        const json = {
+            "@id": "http://some.thing",
+            "@type": "Thing",
+            name: "level1",
+            level: {
+                "@id": "http://some.thing",
+                "@type": "Thing",
+                name: "level2",
+            },
+        };
+        crateManager.ingestAndLink({
+            srcEntityId: crateManager.getRootDataset().describoId,
+            property: "author",
+            json,
+        });
+
+        // delete the author property from the root dataset
+
+        let crate = crateManager.exportCrate({});
+        expect(crate["@graph"]).toEqual([
+            {
+                "@id": "ro-crate-metadata.json",
+                "@type": "CreativeWork",
+                conformsTo: {
+                    "@id": "https://w3id.org/ro/crate/1.1/context",
+                },
+                about: {
+                    "@id": "./",
+                },
+            },
+            {
+                "@id": "./",
+                "@type": ["Dataset"],
+                "@reverse": {},
+                name: "Dataset",
+                author: {
+                    "@id": "http://some.thing",
+                },
+            },
+            {
+                "@id": "http://some.thing",
+                "@type": "Thing",
+                "@reverse": {
+                    level: {
+                        "@id": "http://some.thing",
+                    },
+                    author: {
+                        "@id": "./",
+                    },
+                },
+                name: "level1",
+                level: {
+                    "@id": "http://some.thing",
+                },
+            },
+        ]);
+    });
+    test(`it should be able to ingest a complex entity, unlink it, and remove all descendants`, async () => {
+        const json = {
+            "@id": "http://some.thing",
+            "@type": "Thing",
+            name: "level1",
+            level: {
+                "@id": "http://some.other.thing",
+                "@type": "Thing",
+                name: "level2",
+            },
+        };
+        crateManager.ingestAndLink({
+            srcEntityId: crateManager.getRootDataset().describoId,
+            property: "author",
+            json,
+        });
+
+        // delete the author property from the root dataset
+        let rootDataset = crateManager.getRootDataset();
+        let author = rootDataset.properties[0];
+        crateManager.deleteProperty({ propertyId: author.propertyId });
+        crateManager.purgeUnlinkedEntities();
+
+        let crate = crateManager.exportCrate({});
+        expect(crate["@graph"]).toEqual([
+            {
+                "@id": "ro-crate-metadata.json",
+                "@type": "CreativeWork",
+                conformsTo: {
+                    "@id": "https://w3id.org/ro/crate/1.1/context",
+                },
+                about: {
+                    "@id": "./",
+                },
+            },
+            {
+                "@id": "./",
+                "@type": ["Dataset"],
+                "@reverse": {},
+                name: "Dataset",
             },
         ]);
     });

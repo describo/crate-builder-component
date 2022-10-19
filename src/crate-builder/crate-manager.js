@@ -71,31 +71,15 @@ export class CrateManager {
         this.currentEntity = describoId;
     }
 
-    exportCrate({ purgeUnlinkedEntities = true }) {
-        let propertiesGroupedBySrcId, propertiesGroupedByTgtId;
-        if (purgeUnlinkedEntities) {
-            propertiesGroupedBySrcId = groupBy(this.properties, "srcEntityId");
-            propertiesGroupedByTgtId = groupBy(this.properties, "tgtEntityId");
-        }
+    exportCrate() {
+        this.purgeUnlinkedEntities();
         let crate = {
             "@context": cloneDeep(this.context),
             "@graph": [cloneDeep(this.rootDescriptor)],
         };
         this.entities.forEach((entity) => {
-            if (purgeUnlinkedEntities) {
-                let rootDataset = this.getRootDataset();
-                if (
-                    propertiesGroupedBySrcId[entity.describoId]?.length ||
-                    propertiesGroupedByTgtId[entity.describoId]?.length ||
-                    entity.describoId === rootDataset.describoId
-                ) {
-                    entity = this.rehydrateEntity({ entity });
-                    crate["@graph"].push(entity);
-                }
-            } else {
-                entity = this.rehydrateEntity({ entity });
-                crate["@graph"].push(entity);
-            }
+            entity = this.rehydrateEntity({ entity });
+            crate["@graph"].push(entity);
         });
         return crate;
     }
@@ -269,6 +253,7 @@ export class CrateManager {
         this.properties = this.properties.filter(
             (p) => p.srcEntityId !== describoId && p.tgtEntityId !== describoId
         );
+        this.purgeUnlinkedEntities();
         this.__index();
     }
 
@@ -299,6 +284,7 @@ export class CrateManager {
         console.debug("Crate Mgr, deleteProperty", propertyId);
 
         this.properties = this.properties.filter((p) => p.propertyId !== propertyId);
+        this.purgeUnlinkedEntities();
     }
 
     linkEntity({ srcEntityId, property, tgtEntityId }) {
@@ -347,10 +333,14 @@ export class CrateManager {
         return compact(flattenDeep(flattened));
     }
 
-    flattenAndIngest({ json }) {
-        let flattened = this.flatten({ json });
-        const rootDataset = this.getRootDataset();
+    ingestAndLink({ srcEntityId = undefined, property = undefined, json = {} }) {
+        if (!property) throw new Error(`ingestAndLink: 'property' must be defined`);
 
+        if (!srcEntityId) {
+            srcEntityId = this.getRootDataset().describoId;
+        }
+
+        let flattened = this.flatten({ json });
         let entities = flattened.map((entity) => {
             return this.__addEntity({ entity });
         });
@@ -360,10 +350,34 @@ export class CrateManager {
             this.__processProperties({ entity });
         });
         this.linkEntity({
-            srcEntityId: rootDataset.describoId,
+            srcEntityId,
             tgtEntityId: entities[0].describoId,
-            property: "language",
+            property,
         });
+    }
+
+    purgeUnlinkedEntities() {
+        let walk = walker.bind(this);
+        let linkedEntities = [];
+        let rootDataset = this.getRootDataset();
+        // console.log(rootDataset);
+
+        walk(rootDataset);
+        function walker(entity) {
+            linkedEntities.push(entity.describoId);
+            entity.properties.forEach((p) => {
+                if (p.tgtEntityId && !linkedEntities.includes(p.tgtEntityId)) {
+                    walk(this.getEntity({ describoId: p.tgtEntityId }));
+                }
+            });
+        }
+
+        this.entities = this.entities.filter((entity) =>
+            linkedEntities.includes(entity.describoId)
+        );
+        this.properties = this.properties.filter((property) =>
+            linkedEntities.includes(property.srcEntityId)
+        );
     }
 
     __index() {

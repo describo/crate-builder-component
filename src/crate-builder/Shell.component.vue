@@ -60,11 +60,6 @@ const props = defineProps({
         default: false,
         validator: (val) => [true, false].includes(val),
     },
-    purgeUnlinkedEntitiesBeforeSave: {
-        type: Boolean,
-        default: true,
-        validator: (val) => [true, false].includes(val),
-    },
 });
 
 const emit = defineEmits(["save:crate", "save:crate:template"]);
@@ -158,11 +153,10 @@ async function setCurrentEntity({ describoId = undefined, name = undefined, id =
     }
 }
 function saveCrate() {
-    emit("save:crate", {
-        crate: data.crateManager.exportCrate({
-            purgeUnlinkedEntities: props.purgeUnlinkedEntitiesBeforeSave,
-        }),
+    const crate = data.crateManager.exportCrate({
+        purgeUnlinkedEntities: props.purgeUnlinkedEntitiesBeforeSave,
     });
+    emit("save:crate", { crate });
 }
 function saveCrateAsTemplate(template) {
     emit("save:crate:template", {
