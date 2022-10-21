@@ -72,13 +72,19 @@ export class CrateManager {
     }
 
     exportCrate() {
-        this.purgeUnlinkedEntities();
         let crate = {
             "@context": cloneDeep(this.context),
             "@graph": [cloneDeep(this.rootDescriptor)],
         };
+
+        let propertiesGroupedBySrcId = groupBy(this.properties, "srcEntityId");
+        let reverseConnectionsGroupedByTgtId = groupBy(this.properties, "tgtEntityId");
         this.entities.forEach((entity) => {
-            entity = this.rehydrateEntity({ entity });
+            entity = this.rehydrateEntity({
+                entity,
+                propertiesGroupedBySrcId,
+                reverseConnectionsGroupedByTgtId,
+            });
             crate["@graph"].push(entity);
         });
         return crate;
@@ -106,20 +112,18 @@ export class CrateManager {
         return entity;
     }
 
-    rehydrateEntity({ entity }) {
+    rehydrateEntity({ entity, propertiesGroupedBySrcId, reverseConnectionsGroupedByTgtId }) {
         entity = cloneDeep(entity);
-        // map in the entity properties
-        let properties = this.getEntityProperties({ describoId: entity.describoId });
+        let properties = propertiesGroupedBySrcId[entity.describoId];
         properties = groupBy(properties, "property");
+
+        // map in the entity properties
         for (let property of Object.keys(properties)) {
             entity[property] = [];
             properties[property].forEach((instance) => {
                 if (instance.tgtEntityId) {
-                    let targetEntity = this.__lookupEntityByDescriboId({
-                        id: instance.tgtEntityId,
-                    });
                     entity[property].push({
-                        "@id": targetEntity ? targetEntity["@id"] : instance.value,
+                        "@id": this.__lookupEntityByDescriboId({ id: instance.tgtEntityId })["@id"],
                     });
                 } else {
                     entity[property].push(instance.value);
@@ -130,14 +134,14 @@ export class CrateManager {
 
         // map in the reverse property links
         entity["@reverse"] = {};
-        let reverseProperties = this.getEntityReverseConnections({
-            describoId: entity.describoId,
-        });
+        let reverseProperties = reverseConnectionsGroupedByTgtId[entity.describoId];
         reverseProperties = groupBy(reverseProperties, "property");
         for (let property of Object.keys(reverseProperties)) {
             entity["@reverse"][property] = [];
             reverseProperties[property].forEach((instance) => {
-                let referencedEntity = this.entitiesByDescriboId[instance.srcEntityId][0];
+                let referencedEntity = this.__lookupEntityByDescriboId({
+                    id: instance.srcEntityId,
+                });
                 entity["@reverse"][property].push({ "@id": referencedEntity["@id"] });
             });
             if (entity["@reverse"][property].length === 1)
@@ -253,7 +257,7 @@ export class CrateManager {
         this.properties = this.properties.filter(
             (p) => p.srcEntityId !== describoId && p.tgtEntityId !== describoId
         );
-        this.purgeUnlinkedEntities();
+        this.__purgeUnlinkedEntities();
         this.__index();
     }
 
@@ -284,7 +288,7 @@ export class CrateManager {
         console.debug("Crate Mgr, deleteProperty", propertyId);
 
         this.properties = this.properties.filter((p) => p.propertyId !== propertyId);
-        this.purgeUnlinkedEntities();
+        this.__purgeUnlinkedEntities();
     }
 
     linkEntity({ srcEntityId, property, tgtEntityId }) {
@@ -356,7 +360,7 @@ export class CrateManager {
         });
     }
 
-    purgeUnlinkedEntities() {
+    __purgeUnlinkedEntities() {
         let walk = walker.bind(this);
         let linkedEntities = [];
         let rootDataset = this.getRootDataset();

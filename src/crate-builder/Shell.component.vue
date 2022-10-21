@@ -18,7 +18,7 @@
 
 <script setup>
 import RenderEntityComponent from "./RenderEntity/Shell.component.vue";
-import { onMounted, onBeforeMount, reactive, watch, provide } from "vue";
+import { onMounted, onBeforeMount, reactive, watch, provide, nextTick } from "vue";
 import { cloneDeep, isEmpty, debounce, isFunction } from "lodash";
 import { CrateManager } from "./crate-manager.js";
 import { useRouter, useRoute } from "vue-router";
@@ -158,13 +158,13 @@ async function setCurrentEntity({ describoId = undefined, name = undefined, id =
         data.entity = { ...entity };
     }
 }
-function saveCrate() {
-    const crate = data.crateManager.exportCrate({
-        purgeUnlinkedEntities: props.purgeUnlinkedEntitiesBeforeSave,
-    });
+async function saveCrate() {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    const crate = data.crateManager.exportCrate();
     emit("save:crate", { crate });
 }
-function saveCrateAsTemplate(template) {
+async function saveCrateAsTemplate(template) {
+    await new Promise((resolve) => setTimeout(resolve, 300));
     emit("save:crate:template", {
         template: {
             name: template.name,
