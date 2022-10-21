@@ -490,5 +490,9 @@ export class CrateManager {
 }
 
 export function isURL(value) {
-    return validatorIsURL(value, { require_protocol: true, protocols: urlProtocols });
+    try {
+        return validatorIsURL(value, { require_protocol: true, protocols: urlProtocols });
+    } catch (error) {
+        return false;
+    }
 }
