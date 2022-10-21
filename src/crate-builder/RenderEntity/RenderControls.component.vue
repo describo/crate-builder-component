@@ -20,7 +20,7 @@
                     &nbsp; Add
                 </el-button>
             </div>
-            <div v-if="isRootDataset && configuration.enableContextEditor">
+            <div v-if="configuration.enableContextEditor">
                 <!-- edit context -->
                 <el-button @click="toggle('editContext')" type="primary">
                     <i class="fa-solid fa-pen-to-square"></i>
@@ -41,7 +41,6 @@
                     &nbsp;Browse Entities
                 </el-button>
             </div>
-            <div class="flex flex-grow"></div>
             <div class="flex flex-row space-x-1">
                 <div v-if="configuration.enableTemplateSave && isRootDataset">
                     <!-- save crate as template -->

@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col">
         <!-- <pre>{{ data.entity }}</pre> -->
-        <div v-if="data.entity.describoId">
+        <div v-if="!data.tabs.length">
             <!-- render controls -->
             <render-controls-component
                 v-if="!configuration.readonly"
@@ -78,9 +78,9 @@
                 </div>
             </div>
         </div>
-        <div v-else-if="data.tabs.length">
+        <div v-if="data.tabs.length">
             <!-- grouped profile -->
-            <div class="flex flex-col flex-grow" v-if="data.tabs.length">
+            <div class="flex flex-col flex-grow">
                 <!-- render controls -->
                 <render-controls-component
                     v-if="!configuration.readonly"

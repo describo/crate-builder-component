@@ -5,7 +5,7 @@
             :crate-manager="data.crateManager"
             :entity="data.entity"
             :mode="props.mode"
-            @load:entity="setCurrentEntity"
+            @load:entity="data.debouncedSetCurrentEntity"
             @save:crate="saveCrate"
             @save:crate:template="saveCrateAsTemplate"
             @save:entity:template="saveEntityAsTemplate"
@@ -76,6 +76,7 @@ const data = reactive({
     profile: {},
     entity: {},
     debouncedInit: debounce(init, 400),
+    debouncedSetCurrentEntity: debounce(setCurrentEntity, 500),
     crateManager: {},
 });
 
@@ -86,10 +87,12 @@ watch([() => props.crate, () => props.profile], () => {
 watch(
     () => $route.query.id,
     (n) => {
-        if (n !== data.entity.describoId) setCurrentEntity({ describoId: $route.query.id });
+        if (n !== data.entity.describoId)
+            data.debouncedSetCurrentEntity({ describoId: $route.query.id });
     }
 );
 onBeforeMount(() => {
+    $router.replace({ query: "" });
     let configuration = configure();
     provide("configuration", configuration);
 });
@@ -98,6 +101,7 @@ onMounted(() => {
 });
 
 function init() {
+    $router.replace({ query: "" });
     if (!props.crate || isEmpty(props.crate)) {
         data.error = `This component requires you to pass in a crate file.`;
         return;
@@ -152,7 +156,11 @@ async function setCurrentEntity({ describoId = undefined, name = undefined, id =
         entity = data.crateManager.getEntity({ id });
     }
     if (entity) {
-        $router.push({ query: { id: entity.describoId } });
+        if (isEmpty($route.query)) {
+            $router.replace({ query: { id: entity.describoId } });
+        } else {
+            $router.push({ query: { id: entity.describoId } });
+        }
         console.debug(`Render Entity Parent, load entity:`, { ...entity });
         data.crateManager.setCurrentEntity({ describoId: entity.describoId });
         data.entity = { ...entity };
