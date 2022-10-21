@@ -96,8 +96,8 @@ function addFeatureGroup({ geoJSON, type }) {
     fg.addTo(data.map);
     data.layers.push(fg);
     setTimeout(() => {
-        data.map.fitBounds(fg.getBounds(), { maxZoom: 5 });
-    }, 500);
+        data.map.flyToBounds(fg.getBounds(), { maxZoom: 5, duration: 2 });
+    }, 1500);
 
     return fg;
 }
