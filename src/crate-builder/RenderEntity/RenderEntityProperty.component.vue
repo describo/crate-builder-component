@@ -1,5 +1,10 @@
 <template>
-    <div class="flex flex-row flex-grow p-2 hover:bg-blue-100">
+    <div
+        class="flex flex-row flex-grow p-2"
+        :class="{
+            'hover:bg-indigo-100': !configuration.readonly,
+        }"
+    >
         <div class="w-1/3 xl:w-1/5 flex flex-col">
             <div>
                 <display-property-name-component
@@ -63,7 +68,7 @@
                 </div>
             </div>
             <!-- render all the links in a wrapping row -->
-            <div class="flex flex-row flex-wrap items-center mt-2" v-if="data.linkInstances.length">
+            <div class="flex flex-row flex-wrap mt-2" v-if="data.linkInstances.length">
                 <div
                     v-for="(instance, idx) of data.linkInstances"
                     :key="instance.propertyId"
@@ -90,7 +95,7 @@ import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import AddComponent from "./Add.component.vue";
 import DisplayPropertyNameComponent from "./DisplayPropertyName.component.vue";
 import { ref, reactive, computed, onMounted, onBeforeMount, watch, inject } from "vue";
-import { cloneDeep } from "lodash";
+import { cloneDeep, orderBy } from "lodash";
 import { ProfileManager } from "../profile-manager.js";
 const configuration = inject("configuration");
 
@@ -177,7 +182,10 @@ const showAddControl = computed(() => {
 
 function sortInstances() {
     data.simpleInstances = props.values.filter((v) => v.value);
-    data.linkInstances = props.values.filter((v) => !v.value);
+    data.linkInstances = orderBy(
+        props.values.filter((v) => !v.value),
+        "@id"
+    );
 }
 function refresh() {
     console.debug("Render Entity Property component: emit(refresh)");

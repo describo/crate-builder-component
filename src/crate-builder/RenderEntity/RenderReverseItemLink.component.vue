@@ -1,5 +1,8 @@
 <template>
-    <div class="flex flex-col bg-blue-200 p-3 cursor-pointer rounded" @click="loadEntity">
+    <div
+        class="flex flex-col bg-blue-200 hover:bg-yellow-300 p-3 cursor-pointer rounded"
+        @click="loadEntity"
+    >
         <span class="text-gray-800 flex flex-row">
             <i class="pt-1 fa-solid fa-chevron-left"></i>&nbsp;
             <type-icon-component class="mr-2 text-gray-700" :type="type" v-if="type" />

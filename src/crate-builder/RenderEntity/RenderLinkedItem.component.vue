@@ -1,8 +1,15 @@
 <template>
     <div>
-        <div v-if="!showMap" class="flex flex-row">
+        <div
+            v-if="!showMap"
+            class="flex flex-row"
+            :class="{
+                'bg-yellow-200 hover:bg-cyan-200': !configuration.readonly,
+                'bg-blue-200 hover:bg-yellow-300 rounded': configuration.readonly,
+            }"
+        >
             <div
-                class="flex flex-col bg-yellow-200 p-3 cursor-pointer rounded-l"
+                class="flex flex-col p-3 cursor-pointer rounded-l"
                 @click="loadEntity"
                 v-if="!showMap"
             >
@@ -19,7 +26,7 @@
             </div>
             <delete-property-component
                 v-if="!configuration.readonly"
-                class="bg-yellow-200 cursor-pointer rounded-r p-2"
+                class="cursor-pointer rounded-r p-2"
                 :type="type"
                 :property="entity"
                 @delete:property="deleteProperty"
