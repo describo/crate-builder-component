@@ -262,6 +262,7 @@ watch(
     () => {
         data.extraProperties = [];
         data.entity = {};
+        data.tabs = [];
         data.debouncedInit();
     }
 );
@@ -320,6 +321,7 @@ function init() {
         data.entity = { ...entity, ...layout.entity };
     } else if (layout.tabs) {
         data.tabs = cloneDeep(layout.tabs);
+        data.activeTab = "About";
     }
 }
 function applyLayout({ layouts, hide = [], entity }) {
@@ -389,7 +391,6 @@ function showProperty(property) {
     return !data.hideProperty.includes(property);
 }
 function loadEntity(entity) {
-    data.activeTab = "About";
     if (props.crateManager.getEntity({ describoId: props.crateManager.currentEntity })) {
         emit("load:entity", { describoId: props.crateManager.currentEntity });
     }
