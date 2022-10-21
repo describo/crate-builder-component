@@ -1,6 +1,6 @@
 {
     "name": "@describo/crate-builder-component",
-    "version": "0.14.0",
+    "version": "0.15.0",
     "description": "A VueJS component for assembling an RO-Crate",
     "main": "./src/crate-builder/index.js",
     "files": [
