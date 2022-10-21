@@ -4,6 +4,7 @@
         <div v-if="data.entity.describoId">
             <!-- render controls -->
             <render-controls-component
+                v-if="!configuration.readonly"
                 :crate-manager="props.crateManager"
                 :entity="data.entity"
                 @load:entity="loadEntity"
@@ -82,6 +83,7 @@
             <div class="flex flex-col flex-grow" v-if="data.tabs.length">
                 <!-- render controls -->
                 <render-controls-component
+                    v-if="!configuration.readonly"
                     :crate-manager="props.crateManager"
                     :entity="data.tabs[0].entity"
                     @load:entity="loadEntity"
@@ -209,9 +211,10 @@ import RenderEntityNameComponent from "./RenderEntityName.component.vue";
 import RenderEntityPropertyComponent from "./RenderEntityProperty.component.vue";
 import RenderEntityReverseItemLinkComponent from "./RenderReverseItemLink.component.vue";
 import RenderControlsComponent from "./RenderControls.component.vue";
-import { reactive, onMounted, watch } from "vue";
+import { reactive, onMounted, watch, inject } from "vue";
 import { debounce, cloneDeep } from "lodash";
 import { ProfileManager } from "../profile-manager.js";
+const configuration = inject("configuration");
 
 const props = defineProps({
     crateManager: {

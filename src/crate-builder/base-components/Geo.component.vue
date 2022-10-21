@@ -74,7 +74,7 @@
 import "leaflet/dist/leaflet.css";
 import Leaflet from "leaflet";
 import SelectArea from "leaflet-area-select";
-import { reactive, onMounted } from "vue";
+import { reactive, onMounted, inject } from "vue";
 
 const props = defineProps({
     crateManager: {

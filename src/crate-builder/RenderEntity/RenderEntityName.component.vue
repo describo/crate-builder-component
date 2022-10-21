@@ -6,7 +6,7 @@
                 A short, descriptive name for this item.
             </div>
         </div>
-        <div class="w-2/3 xl:w-4/5 flex flex-col">
+        <div class="w-2/3 xl:w-4/5 flex flex-col" v-if="!configuration.readonly">
             <div class="flex-grow">
                 <text-component
                     class="w-full"
@@ -17,12 +17,16 @@
                 />
             </div>
         </div>
+        <div class="w-2/3 xl:w-4/5 flex flex-row" v-else>
+            {{ entity.name }}
+        </div>
     </div>
 </template>
 
 <script setup>
 import TextComponent from "../base-components/Text.component.vue";
-import { reactive, watch } from "vue";
+import { reactive, watch, inject } from "vue";
+const configuration = inject("configuration");
 
 let props = defineProps({
     entity: {

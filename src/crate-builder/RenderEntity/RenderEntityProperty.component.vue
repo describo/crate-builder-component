@@ -21,7 +21,7 @@
         <div class="w-2/3 xl:w-4/5 flex flex-col flex-grow">
             <add-component
                 class="mx-1"
-                v-if="showAddControl"
+                v-if="showAddControl && !configuration.readonly"
                 :property="props.property"
                 :definition="data.propertyDefinition"
                 :embedded="false"
@@ -49,7 +49,12 @@
                         @refresh="refresh"
                     />
                     <delete-property-component
-                        v-if="isNotValue && instance.value && !instance.tgtEntityId"
+                        v-if="
+                            isNotValue &&
+                            instance.value &&
+                            !instance.tgtEntityId &&
+                            !configuration.readonly
+                        "
                         class="pl-2"
                         type="delete"
                         :property="instance"
@@ -83,9 +88,10 @@ import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";
 import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import AddComponent from "./Add.component.vue";
 import DisplayPropertyNameComponent from "./DisplayPropertyName.component.vue";
-import { ref, reactive, computed, onMounted, onBeforeMount, watch } from "vue";
+import { ref, reactive, computed, onMounted, onBeforeMount, watch, inject } from "vue";
 import { cloneDeep } from "lodash";
 import { ProfileManager } from "../profile-manager.js";
+const configuration = inject("configuration");
 
 const props = defineProps({
     crateManager: {

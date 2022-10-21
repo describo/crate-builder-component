@@ -9,7 +9,7 @@ import {
     flattenDeep,
     compact,
 } from "lodash";
-import { isURL } from "validator";
+import { isURL as validatorIsURL } from "validator";
 const urlProtocols = ["http", "https", "ftp", "ftps", "arcp"];
 
 export class CrateManager {
@@ -481,6 +481,10 @@ export class CrateManager {
     }
 
     _isURL(value) {
-        return isURL(value, { require_protocol: true, protocols: urlProtocols });
+        return validatorIsURL(value, { require_protocol: true, protocols: urlProtocols });
     }
+}
+
+export function isURL(value) {
+    return validatorIsURL(value, { require_protocol: true, protocols: urlProtocols });
 }

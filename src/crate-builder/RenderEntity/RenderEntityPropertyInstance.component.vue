@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="!configuration.readonly">
         <date-component
             :property="data.property"
             :value="data.value"
@@ -42,6 +42,10 @@
             @save:property="savePropertyValue"
         />
     </div>
+    <div v-else>
+        <div v-if="isDateTime(data.value)">{{ parseISO(data.value) }}</div>
+        <div v-else>{{ data.value }}</div>
+    </div>
 </template>
 
 <script setup>
@@ -54,8 +58,9 @@ import ValueComponent from "../base-components/Value.component.vue";
 import SelectComponent from "../base-components/Select.component.vue";
 import { parseISO, startOfDay } from "date-fns";
 import { isDate as validatorIsDate, isDecimal, isInt, isFloat, isNumeric } from "validator";
-import { computed } from "vue";
+import { computed, inject } from "vue";
 import { isEmpty } from "lodash";
+const configuration = inject("configuration");
 
 const props = defineProps({
     crateManager: {

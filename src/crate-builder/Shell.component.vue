@@ -60,6 +60,11 @@ const props = defineProps({
         default: false,
         validator: (val) => [true, false].includes(val),
     },
+    readonly: {
+        type: Boolean,
+        default: false,
+        validator: (val) => [true, false].includes(val),
+    },
 });
 
 const emit = defineEmits(["save:crate", "save:crate:template"]);
@@ -121,6 +126,7 @@ function configure() {
         enableCratePreview: props.enableCratePreview,
         enableBrowseEntities: props.enableBrowseEntities,
         enableTemplateSave: props.enableTemplateSave,
+        readonly: props.readonly,
         enableTemplateLookups: false,
         enableDataPackLookups: false,
     };

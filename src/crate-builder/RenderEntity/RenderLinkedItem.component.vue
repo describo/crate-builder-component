@@ -18,6 +18,7 @@
                 </div>
             </div>
             <delete-property-component
+                v-if="!configuration.readonly"
                 class="bg-yellow-200 cursor-pointer rounded-r p-2"
                 :type="type"
                 :property="entity"
@@ -32,15 +33,20 @@
                     </div>
                     <map-component :crate-manager="props.crateManager" :entity="data.entity" />
                 </div>
-                <div class="flex flex-col space-y-6 bg-yellow-200 cursor-pointer rounded-r p-2">
+                <div
+                    class="flex flex-col space-y-6 bg-yellow-200 cursor-pointer rounded-r p-2"
+                    v-if="!configuration.readonly"
+                >
                     <delete-property-component
                         :type="type"
                         :property="entity"
                         @delete:property="deleteProperty"
                     />
-                    <el-button type="primary" @click="editLocation" class="inline-block">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                    </el-button>
+                    <div>
+                        <el-button type="primary" @click="editLocation" class="inline-block">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </el-button>
+                    </div>
                 </div>
             </div>
             <div v-if="data.editLocation">
@@ -61,7 +67,8 @@ import GeoComponent from "../base-components/Geo.component.vue";
 import TypeIconComponent from "./TypeIcon.component.vue";
 import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import MapComponent from "../base-components/Map.component.vue";
-import { computed, reactive, onMounted } from "vue";
+import { computed, reactive, onMounted, inject } from "vue";
+const configuration = inject("configuration");
 
 const emit = defineEmits(["load:entity", "create:property", "save:property", "delete:property"]);
 const props = defineProps({

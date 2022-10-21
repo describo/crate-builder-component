@@ -163,6 +163,8 @@ from there.**
     control
 -   `enable-template-save`: true | false: `(default: false)` : enable / disable the entity and crate
     template saving controls
+-   `readonly`: true | false: `(default: false)` : if set to true all of the controls to edit that
+    the data are turned off. The crate is set into a mode where it is readonly.
 
 ## Events
 
