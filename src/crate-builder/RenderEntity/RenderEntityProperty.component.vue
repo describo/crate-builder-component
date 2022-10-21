@@ -65,11 +65,12 @@
             <!-- render all the links in a wrapping row -->
             <div class="flex flex-row flex-wrap items-center mt-2" v-if="data.linkInstances.length">
                 <div
-                    v-for="instance of data.linkInstances"
+                    v-for="(instance, idx) of data.linkInstances"
                     :key="instance.propertyId"
                     class="flex flex-row m-1"
                 >
                     <render-linked-item-component
+                        :index="idx"
                         :crate-manager="props.crateManager"
                         :entity="instance"
                         @load:entity="loadEntity"

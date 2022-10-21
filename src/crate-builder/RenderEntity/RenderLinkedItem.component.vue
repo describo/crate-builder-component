@@ -39,7 +39,7 @@
                 >
                     <delete-property-component
                         :type="type"
-                        :property="entity"
+                        :property="data.entity"
                         @delete:property="deleteProperty"
                     />
                     <div>
@@ -72,6 +72,10 @@ const configuration = inject("configuration");
 
 const emit = defineEmits(["load:entity", "create:property", "save:property", "delete:property"]);
 const props = defineProps({
+    index: {
+        type: Number,
+        required: true,
+    },
     crateManager: {
         type: Object,
         required: true,
@@ -93,6 +97,7 @@ onMounted(() => {
 });
 
 async function loadEntityData() {
+    await new Promise((resolve) => setTimeout(resolve, props.index * 2));
     let entity = props.crateManager.getEntity({ describoId: props.entity.tgtEntityId });
     data.entity = { ...entity };
 }
