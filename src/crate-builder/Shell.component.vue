@@ -6,6 +6,7 @@
             :entity="data.entity"
             :mode="props.mode"
             @load:entity="data.debouncedSetCurrentEntity"
+            @ready="ready"
             @save:crate="saveCrate"
             @save:crate:template="saveCrateAsTemplate"
             @save:entity:template="saveEntityAsTemplate"
@@ -67,7 +68,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["save:crate", "save:crate:template"]);
+const emit = defineEmits(["ready", "save:crate", "save:crate:template"]);
 
 const data = reactive({
     ready: false,
@@ -165,6 +166,9 @@ async function setCurrentEntity({ describoId = undefined, name = undefined, id =
         data.crateManager.setCurrentEntity({ describoId: entity.describoId });
         data.entity = { ...entity };
     }
+}
+function ready() {
+    emit("ready");
 }
 async function saveCrate() {
     await new Promise((resolve) => setTimeout(resolve, 300));

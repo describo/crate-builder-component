@@ -29,6 +29,8 @@
             </el-select>
         </div>
         <describo-crate-builder
+            v-loading="data.loading"
+            @ready="data.loading = false"
             :crate="data.selectedCrate"
             :profile="data.selectedProfile"
             :lookup="lookup"
@@ -50,6 +52,7 @@ import profile4 from "../examples/profile/nyingarn-item-profile.json";
 const lookup = new Lookup();
 
 const data = reactive({
+    loading: false,
     select: {
         crate: undefined,
         profile: undefined,
@@ -71,6 +74,7 @@ const data = reactive({
 });
 
 function setCrate(name) {
+    data.loading = true;
     data.selectedCrate = name ? data.crates.filter((c) => c.name === name)[0].value : undefined;
 }
 function setProfile(name) {

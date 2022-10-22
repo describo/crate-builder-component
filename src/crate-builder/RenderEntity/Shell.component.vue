@@ -251,6 +251,7 @@ const data = reactive({
 });
 
 const emit = defineEmits([
+    "ready",
     "load:entity",
     "save:crate",
     "save:crate:template",
@@ -323,6 +324,7 @@ function init() {
         data.tabs = cloneDeep(layout.tabs);
         data.activeTab = "About";
     }
+    emit("ready");
 }
 function applyLayout({ layouts, hide = [], entity }) {
     if (!layouts?.length) return { entity };
