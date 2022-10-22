@@ -4,6 +4,7 @@
 - [Developing the plugin](#developing-the-plugin)
 - [Repo structure](#repo-structure)
 - [Using the component in your app](#using-the-component-in-your-app)
+  - [Profiles](#profiles)
   - [Tailwind CSS dependency](#tailwind-css-dependency)
   - [Vue Router Dependency](#vue-router-dependency)
   - [Install the package](#install-the-package)
@@ -36,6 +37,14 @@ npm run develop
 -   The component is at `./src/crate-builder`.
 
 # Using the component in your app
+
+## Profiles
+
+Profiles used with this component are described in
+[https://github.com/describo/profiles](https://github.com/describo/profiles).
+
+The profiles that this component understands are an evolution of the original Describo Online
+profiles so be sure to follow the documentation linked above.
 
 ## Tailwind CSS dependency
 
@@ -168,6 +177,11 @@ from there.**
 
 ## Events
 
+-   `ready`: When you pass a crate into the component the internal data view first needs to be
+    created. This takes longer as the size of the crate grows. Further, downloading large crates in
+    your app to pass into the component can also be slow. So, if you want to put a loading indicator
+    over the top of the component when you first start the download to when the crate is ready to be
+    used, listen for this event to cancel the indicator.
 -   `@save:crate`: whenever the crate changes internally, this event will be emitted with the full
     crate for your app to save or handle in some way
 -   `@save:crate:template`: this event emits the current crate as a template with a name. This is so
