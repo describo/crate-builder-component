@@ -2,14 +2,16 @@
     <div>
         <el-select
             class="w-full"
-            v-model="selection"
+            v-model="data.selection"
             placeholder="select an existing entity or create a new one"
             filterable
             clearable
             default-first-option
             automatic-dropdown
             remote
-            :remote-method="querySearch"
+            :persistent="false"
+            :loading="data.loading"
+            :remote-method="data.debouncedQuerySearch"
             @change="handleSelect"
         >
             <el-option-group v-for="group in data.matches" :key="group.label" :label="group.label">
@@ -20,21 +22,21 @@
                     :value="item"
                     :value-key="item['@id']"
                 >
-                    <div class="text-gray-600 text-sm">
+                    <div class="text-gray-700">
                         <div v-if="item.type === 'new'">
                             <el-button type="success" size="default" class="flex flex-row">
-                                <div class="text-sm">Create new {{ item["@type"] }}:&nbsp;</div>
-                                <div class="text-sm">{{ item.name }}</div>
+                                <div>Create new {{ item["@type"] }}:&nbsp;</div>
+                                <div>{{ item.name }}</div>
                             </el-button>
                         </div>
                         <div v-else-if="item.type === 'datapack'" class="flex flex-row space-x-2">
-                            <div class="text-sm">{{ item["@type"] }}:</div>
-                            <div class="text-sm">{{ item.name }} ({{ item["@id"] }})</div>
+                            <div>{{ item["@type"] }}:</div>
+                            <div>{{ item.name }} ({{ item["@id"] }})</div>
                         </div>
                         <div v-else class="flex flex-row space-x-2">
-                            <div class="text-sm">{{ item["@type"] }}:</div>
-                            <div class="text-sm" v-if="item.name">{{ item.name }}</div>
-                            <div class="text-sm text-right" v-else>{{ item["@id"] }}</div>
+                            <div>{{ item["@type"] }}:</div>
+                            <div v-if="item.name">{{ item.name }}</div>
+                            <div class="text-right" v-else>{{ item["@id"] }}</div>
                         </div>
                     </div>
                 </el-option>
@@ -45,7 +47,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, watch, inject } from "vue";
-import { isArray } from "lodash";
+import { isArray, debounce } from "lodash";
 
 import { Query, BoolQuery } from "@coedl/elastic-query-builder";
 import { wildcardQuery, matchQuery } from "@coedl/elastic-query-builder/queries";
@@ -63,8 +65,11 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["link:entity", "add:template", "create:entity"]);
-let selection = ref(undefined);
 const data = reactive({
+    promiseTimeout: 2500,
+    selection: undefined,
+    loading: false,
+    debouncedQuerySearch: debounce(querySearch, 500),
     matches: [],
     entities: [],
 });
@@ -76,7 +81,8 @@ watch(
 );
 
 async function querySearch(queryString) {
-    selection.value = undefined;
+    console.debug(`Query Search: '${queryString}'`);
+    data.loading = true;
     data.matches = [];
     let internal = [],
         templates = [],
@@ -95,27 +101,43 @@ async function querySearch(queryString) {
 
     // lookup entities in the crate (internal), in templates, and in datapacks (lookups)
     lookups = [
-        await props.crateManager.findMatchingEntities({
-            limit: 5,
-            type: props.type,
-            query: queryString,
+        wrapPromise(
+            props.crateManager.findMatchingEntities({
+                limit: 5,
+                type: props.type,
+                query: queryString,
+            }),
+            data.promiseTimeout
+        ),
+        wrapPromise(
+            props.crateManager?.lookup?.entityTemplates({
+                type: props.type,
+                filter: queryString,
+                limit: 5,
+            }),
+            data.promiseTimeout
+        ),
+        wrapPromise(lookup({ queryString }), data.promiseTimeout, {
+            reason: "External Lookup Timeout",
         }),
-        await props.crateManager?.lookup?.entityTemplates({
-            type: props.type,
-            filter: queryString,
-            limit: 5,
-        }),
-        await lookup({ queryString }),
     ];
     if (["Organisation", "Organization"].includes(props.type)) {
-        lookups.push(await lookupROR({ queryString }));
+        lookups.push(
+            wrapPromise(lookupROR({ queryString }), data.promiseTimeout, {
+                reason: "ROR Lookup Timeout",
+            })
+        );
     }
     [internal, templates, lookups, ror] = await Promise.all(lookups);
-    // console.log(internal, templates, lookups);
+    console.debug({ internal, templates, lookups, ror });
+    if (internal?.reason) console.error(internal.reason);
+    if (templates?.reason) console.error(templates.reason);
+    if (lookups?.reason) console.error(lookups.reason);
+    if (ror?.reason) console.error(ror.reason);
 
     let matches = [];
 
-    if (internal.length) {
+    if (internal?.length) {
         internal = internal.map((e) => ({ ...e, type: "internal" })).slice(0, 5);
         matches.push({
             label: "Associate an entity already defined in this crate",
@@ -123,7 +145,6 @@ async function querySearch(queryString) {
         });
         data.entities = [...data.entities, ...internal];
     }
-
     if (templates?.length) {
         templates = templates.map((template) => ({ ...template.entity, type: "template" }));
         matches.push({
@@ -132,10 +153,12 @@ async function querySearch(queryString) {
         });
         data.entities = [...data.entities, ...templates];
     }
-
     if (ror?.length) {
         ror = ror.map((entity) => ({ ...entity, type: "template" }));
-        matches.push({ label: "Associate an Organization from ROR", entities: ror });
+        matches.push({
+            label: "Associate an Organization defined in the Research Organization Registry",
+            entities: ror,
+        });
         data.entities = [...data.entities, ...ror];
     }
     if (lookups?.length) {
@@ -150,6 +173,7 @@ async function querySearch(queryString) {
     });
 
     data.matches = matches;
+    data.loading = false;
 }
 function handleSelect(entity) {
     if (entity) {
@@ -205,5 +229,15 @@ async function lookupROR({ queryString }) {
         return response;
     }
     return [];
+}
+
+function awaitTimeout(delay, reason) {
+    return new Promise((resolve, reject) =>
+        setTimeout(() => (reason === undefined ? resolve() : resolve(reason)), delay)
+    );
+}
+
+async function wrapPromise(promise, delay, reason = { reason: "Lookup Timeout" }) {
+    return Promise.race([promise, awaitTimeout(delay, reason)]);
 }
 </script>
