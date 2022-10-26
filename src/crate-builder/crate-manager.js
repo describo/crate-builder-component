@@ -8,6 +8,7 @@ import {
     cloneDeep,
     flattenDeep,
     compact,
+    orderBy,
 } from "lodash";
 import { isURL as validatorIsURL } from "validator";
 const urlProtocols = ["http", "https", "ftp", "ftps", "arcp"];
@@ -401,7 +402,7 @@ export class CrateManager {
 
         // is the id an IRI of some kind?
         if (
-            !this._isURL(entity["@id"]) &&
+            !isURL(entity["@id"]) &&
             !entity["@id"].match(/^\//) &&
             !entity["@id"].match(/^\./) &&
             !entity["@id"].match(/^#/) &&
@@ -412,7 +413,7 @@ export class CrateManager {
         }
 
         // if no @type then set to URL or Thing
-        if (!entity["@type"]) entity["@type"] = this._isURL(entity["@id"]) ? "URL" : "Thing";
+        if (!entity["@type"]) entity["@type"] = isURL(entity["@id"]) ? "URL" : "Thing";
 
         entity = { describoId: id, ...entity };
         let e = this.coreProperties
@@ -431,6 +432,7 @@ export class CrateManager {
             if (this.coreProperties.includes(property)) continue;
 
             if (!isArray(entity[property])) entity[property] = [entity[property]];
+            entity[property] = orderBy(entity[property], "@id");
 
             entity[property].forEach((instance) => {
                 if (isString(instance) && !isEmpty(instance)) {
@@ -453,7 +455,7 @@ export class CrateManager {
                         targetEntity = this.addEntity({
                             entity: {
                                 "@id": instance["@id"],
-                                "@type": this._isURL(instance["@id"]) ? "URL" : "Thing",
+                                "@type": isURL(instance["@id"]) ? "URL" : "Thing",
                                 name: instance["@id"],
                             },
                         });
@@ -482,10 +484,6 @@ export class CrateManager {
     __lookupEntityByDescriboId({ id }) {
         let targetEntity = cloneDeep(this.entitiesByDescriboId[id]);
         if (targetEntity?.length) return targetEntity.shift();
-    }
-
-    _isURL(value) {
-        return validatorIsURL(value, { require_protocol: true, protocols: urlProtocols });
     }
 }
 
