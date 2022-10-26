@@ -41,10 +41,10 @@
 <script setup>
 import { reactive } from "vue";
 import { Lookup } from "./lookup.js";
-import crateFile1 from "../examples/blank-ro-crate-metadata.json";
-import crateFile2 from "../examples/collection/NT5/ro-crate-metadata.json";
-import crateFile3 from "../examples/item/NT1-98007/ro-crate-metadata.json";
-import crateFile4 from "../examples/item/Bates34/ro-crate-metadata.json";
+import crateFile1 from "../examples/item/empty/ro-crate-metadata.json";
+import crateFile2 from "../examples/item/complex-collection/ro-crate-metadata.json";
+import crateFile3 from "../examples/item/complex-item/ro-crate-metadata.json";
+import crateFile4 from "../examples/item/large-crate/ro-crate-metadata.json";
 import profile1 from "../examples/profile/test-profile-without-groups.json";
 import profile2 from "../examples/profile/test-profile-with-groups.json";
 import profile3 from "../examples/profile/test-profile-with-datapacks-and-without-groups.json";
@@ -59,9 +59,9 @@ const data = reactive({
     },
     crates: [
         { name: "blank", value: crateFile1 },
-        { name: "NT5", value: crateFile2 },
-        { name: "NT1-98007", value: crateFile3 },
-        { name: "Bates34", value: crateFile4 },
+        { name: "Complex Collection", value: crateFile2 },
+        { name: "Complex Item", value: crateFile3 },
+        { name: "Large Crate", value: crateFile4 },
     ],
     profiles: [
         { name: "Profile -groups", value: profile1 },

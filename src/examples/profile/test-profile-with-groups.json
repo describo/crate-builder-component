@@ -1,0 +1,63 @@
+{
+    "metadata": {
+        "name": "Describo Test Profile with groups",
+        "description": "A profile with entries for each of the supported datatypes",
+        "version": 0.1,
+        "warnMissingProperty": true
+    },
+    "hide": {
+        "Dataset": ["date"]
+    },
+    "layouts": {
+        "Dataset": [{ "name": "About", "description": "", "inputs": ["author"] }],
+        "Person": [{ "name": "Metadata About", "description": "", "inputs": ["name"] }]
+    },
+    "classes": {
+        "Dataset": {
+            "definition": "override",
+            "subClassOf": [],
+            "inputs": [
+                {
+                    "id": "https://schema.org/date",
+                    "name": "date",
+                    "label": "Date",
+                    "help": "Attach a date",
+                    "type": ["Geo"],
+                    "required": true,
+                    "multiple": false
+                }
+            ]
+        },
+        "Person": {
+            "definition": "inherit",
+            "subClassOf": [],
+            "inputs": [
+                {
+                    "id": "https://schema.org/name",
+                    "name": "name",
+                    "label": "name",
+                    "help": "The name the person",
+                    "required": true,
+                    "multiple": false,
+                    "type": ["Text"]
+                }
+            ]
+        },
+        "Organisation": {
+            "definition": "override",
+            "subClassOf": [],
+            "inputs": [
+                {
+                    "id": "https://schema.org/name",
+                    "name": "name",
+                    "label": "name",
+                    "help": "The name of the organisation",
+                    "required": true,
+                    "multiple": false,
+                    "type": ["Text"]
+                }
+            ]
+        }
+    },
+    "enabledClasses": ["Dataset", "Person", "Organisation"]
+}

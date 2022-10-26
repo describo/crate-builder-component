@@ -24,4 +24,3 @@ pnpm-debug.log*
 *.sw?
 
 .parcel-cache
-examples
