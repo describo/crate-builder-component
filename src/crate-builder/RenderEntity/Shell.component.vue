@@ -322,7 +322,6 @@ function init() {
         data.entity = { ...entity, ...layout.entity };
     } else if (layout.tabs) {
         data.tabs = cloneDeep(layout.tabs);
-        data.activeTab = "About";
     }
     emit("ready");
 }
