@@ -19,10 +19,16 @@
             </div>
         </template>
         <div class="crate-entity-display overflow-scroll pr-2">
-            <el-table :data="data.entities">
-                <el-table-column prop="@id" label="@id" width="400" />
-                <el-table-column prop="@type" label="@type" width="250" />
-                <el-table-column prop="name" label="Name" />
+            <el-pagination
+                v-model:currentPage="data.currentPage"
+                layout="total, prev, pager, next, jumper"
+                :total="data.entities.length"
+                @current-change="update"
+            />
+            <el-table :data="data.page" @sort-change="sort">
+                <el-table-column prop="@id" label="@id" width="400" sortable />
+                <el-table-column prop="@type" label="@type" width="250" sortable />
+                <el-table-column prop="name" label="Name" sortable />
                 <el-table-column prop="isConnected" label="Linked" width="100" align="center">
                     <template #default="scope">
                         <div v-show="scope.row.isConnected" class="text-green-600">
@@ -64,6 +70,7 @@
 
 <script setup>
 import { reactive, onMounted, onBeforeUnmount } from "vue";
+import { orderBy } from "lodash";
 
 const props = defineProps({
     crateManager: {
@@ -73,6 +80,8 @@ const props = defineProps({
 });
 const data = reactive({
     entities: [],
+    currentPage: 1,
+    page: [],
     visible: true,
 });
 const emit = defineEmits(["close", "load:entity", "delete:entity"]);
@@ -86,8 +95,20 @@ onBeforeUnmount(() => {
 
 function load() {
     data.entities = props.crateManager.getEntitiesBrowseList();
+    update(1);
 }
-
+function update(page) {
+    data.page = data.entities.slice((page - 1) * 10, (page - 1) * 10 + 10);
+}
+function sort({ prop, order }) {
+    if (!order || order === "ascending") {
+        order = "asc";
+    } else {
+        order = "desc";
+    }
+    data.entities = orderBy(data.entities, [prop], [order]);
+    update(1);
+}
 function close() {
     if (!props.crateManager.getEntity({ describoId: props.crateManager.currentEntity })) {
         loadEntity(props.crateManager.getRootDataset().describoId);
