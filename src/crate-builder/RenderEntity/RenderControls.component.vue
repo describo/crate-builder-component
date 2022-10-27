@@ -204,11 +204,19 @@ function loadEntity(data) {
 function addPropertyPlaceholder(property) {
     emit("add:property:placeholder", property);
 }
-function deleteEntity(data) {
-    emit("delete:entity", {
-        describoId: data.describoId ? data.describoId : props.entity.describoId,
-    });
-    loadEntity({ describoId: props.crateManager.getRootDataset().describoId });
+function deleteEntity({ describoId }) {
+    if (data.dialog.browseEntities) {
+        // if the browse dialog is showing
+        emit("delete:entity", {
+            describoId: describoId,
+        });
+    } else {
+        // otherwise it's the delete entity button that was pressed
+        emit("delete:entity", {
+            describoId: props.entity.describoId,
+        });
+        loadEntity({ describoId: props.crateManager.getRootDataset().describoId });
+    }
 }
 function saveCrateAsTemplate(data) {
     emit("save:crate:template", data);
