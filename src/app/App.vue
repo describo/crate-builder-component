@@ -34,6 +34,7 @@
             :crate="data.selectedCrate"
             :profile="data.selectedProfile"
             :lookup="lookup"
+            :readonly="false"
         />
     </div>
 </template>
