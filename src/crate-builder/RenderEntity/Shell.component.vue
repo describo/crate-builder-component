@@ -296,7 +296,7 @@ function init() {
         if (entity.properties[input.name]) {
             entity.properties[input.name] = entity.properties[input.name];
         } else {
-            entity.properties[input.name] = [];
+            if (!configuration.readonly) entity.properties[input.name] = [];
         }
     });
     if (data.extraProperties.length) {
