@@ -25,6 +25,7 @@ template lookups.
 To work on this plugin there is a small VueJS app in this codebase. To start up the dev environment:
 
 ```
+docker compose up (starts ip an elastic container for datapack lookups)
 npm run develop
 
 --> browse to localhost:9000
