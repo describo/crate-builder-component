@@ -28,7 +28,7 @@
                 v-if="!configuration.readonly"
                 class="cursor-pointer rounded-r p-2"
                 :type="type"
-                :property="entity"
+                :property="props.entity"
                 @delete:property="deleteProperty"
             />
         </div>
@@ -46,7 +46,7 @@
                 >
                     <delete-property-component
                         :type="type"
-                        :property="data.entity"
+                        :property="props.entity"
                         @delete:property="deleteProperty"
                     />
                     <div>
@@ -122,8 +122,8 @@ function saveProperty(property) {
     console.debug("data.editLocation", data.editLocation);
     loadEntityData();
 }
-function deleteProperty(data) {
-    console.debug("Renderer Linked Item Component : emit(delete:property)", data);
-    emit("delete:property", data);
+function deleteProperty(target) {
+    console.debug("Renderer Linked Item Component : emit(delete:property)", target);
+    emit("delete:property", target);
 }
 </script>
