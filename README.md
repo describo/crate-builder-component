@@ -14,10 +14,10 @@
   - [Configuration](#configuration)
   - [Events](#events)
 
-This is the core UI component for assembling an RO-Crate inside Describo. It is a self container
+This is the core UI component for assembling an RO-Crate inside Describo. It is a self contained
 VueJS component that can be used inside your app. If you use this component, your app is responsible
 for loading the crate file from the storage layer (or minting a new one if none exists) and saving
-the update crate back. Your app can also provide a profile to the component and a class to handle
+the updated crate back. Your app can also provide a profile to the component and a class to handle
 template lookups.
 
 # Developing the plugin
@@ -25,7 +25,7 @@ template lookups.
 To work on this plugin there is a small VueJS app in this codebase. To start up the dev environment:
 
 ```
-docker compose up (starts ip an elastic container for datapack lookups)
+docker compose up (starts up an elastic search container for datapack lookups)
 npm run develop
 
 --> browse to localhost:9000
@@ -133,7 +133,8 @@ Pass in the crate file and optionally a profile.
         :enable-context-editor="true"
         :enable-crate-preview="true"
         :enable-browse-entities="true"
-        :purge-unlinked-entities-before-save="true
+        :purge-unlinked-entities-before-save="true"
+        :readonly="false"
         @save:crate="saveCrate"
         @save:crate:template="saveTemplate"
         @save:entity:template="saveTemplate">
