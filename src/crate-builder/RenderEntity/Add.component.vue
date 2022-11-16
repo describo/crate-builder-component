@@ -77,7 +77,7 @@
                     @create:entity="createEntity"
                 />
                 <geo-component
-                    v-if="data.addType === 'Geo'"
+                    v-if="['Geo', 'GeoCoordinates', 'GeoShape'].includes(data.addType)"
                     :crate-manager="props.crateManager"
                     mode="entity"
                     @create:entity="createEntity"
@@ -165,6 +165,8 @@ const data = reactive({
         "SelectURL",
         "SelectObject",
         "Geo",
+        "GeoCoordinates",
+        "GeoShape",
     ],
     addType: undefined,
 });
