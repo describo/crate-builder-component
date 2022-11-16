@@ -1,5 +1,5 @@
 <template>
-    <div id="map" class="map-style"></div>
+    <div :id="props.entity.describoId" class="map-style"></div>
 </template>
 
 <script setup>
@@ -28,11 +28,11 @@ onMounted(() => {
 
 async function init() {
     try {
-        data.map = new Leaflet.map("map");
+        data.map = new Leaflet.map(props.entity.describoId);
     } catch (error) {
         data.map.off();
         data.map.remove();
-        data.map = new Leaflet.map("map");
+        data.map = new Leaflet.map(props.entity.describoId);
     }
     centerMap();
     Leaflet.tileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.{ext}", {
