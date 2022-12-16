@@ -72,8 +72,8 @@
 
 <script setup>
 import "leaflet/dist/leaflet.css";
-import Leaflet from "leaflet";
-import SelectArea from "leaflet-area-select";
+import * as Leaflet from "leaflet";
+import * as SelectArea from "leaflet-area-select";
 import { reactive, onMounted, inject } from "vue";
 
 const props = defineProps({
