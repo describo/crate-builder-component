@@ -77,6 +77,7 @@ const data = reactive({
 function setCrate(name) {
     data.loading = true;
     data.selectedCrate = name ? data.crates.filter((c) => c.name === name)[0].value : undefined;
+    if (!data.selectedCrate) data.loading = false;
 }
 function setProfile(name) {
     data.selectedProfile = name ? data.profiles.filter((p) => p.name === name)[0].value : undefined;

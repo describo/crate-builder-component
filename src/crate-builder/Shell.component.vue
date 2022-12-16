@@ -11,9 +11,6 @@
             @save:crate:template="saveCrateAsTemplate"
             @save:entity:template="saveEntityAsTemplate"
         />
-        <div v-if="data.error" class="bg-red-100 p-4 text-center">
-            {{ data.error }}
-        </div>
     </div>
 </template>
 
@@ -68,7 +65,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["ready", "save:crate", "save:crate:template"]);
+const emit = defineEmits(["ready", "error", "save:crate", "save:crate:template"]);
 
 const data = reactive({
     ready: false,
@@ -104,7 +101,6 @@ onMounted(() => {
 function init() {
     $router.replace({ query: "" });
     if (!props.crate || isEmpty(props.crate)) {
-        data.error = `This component requires you to pass in a crate file.`;
         return;
     }
     data.error = false;
@@ -117,7 +113,7 @@ function init() {
     try {
         data.crateManager.load({ crate: data.crate, profile: data.profile });
     } catch (error) {
-        data.error = "Unable to load the crate in. See the console for the detailed error message.";
+        emit("error", "Unable to load the crate. See the console for the detailed error message.");
         console.error(error);
         return;
     }

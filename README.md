@@ -184,6 +184,8 @@ from there.**
     your app to pass into the component can also be slow. So, if you want to put a loading indicator
     over the top of the component when you first start the download to when the crate is ready to be
     used, listen for this event to cancel the indicator.
+-   `error`: If the component fails to load the crate it will emit an error message with more
+    information. You should listen for this event and handle it accordingly in your application.
 -   `@save:crate`: whenever the crate changes internally, this event will be emitted with the full
     crate for your app to save or handle in some way
 -   `@save:crate:template`: this event emits the current crate as a template with a name. This is so
