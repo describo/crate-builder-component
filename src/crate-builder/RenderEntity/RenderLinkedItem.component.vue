@@ -104,7 +104,7 @@ onMounted(() => {
 });
 
 async function loadEntityData() {
-    await new Promise((resolve) => setTimeout(resolve, props.index * 2));
+    await new Promise((resolve) => setTimeout(resolve, props.index * 4));
     let entity = props.crateManager.getEntity({ describoId: props.entity.tgtEntityId });
     data.entity = { ...entity };
 }
