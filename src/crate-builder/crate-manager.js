@@ -415,6 +415,9 @@ export class CrateManager {
         // if no @type then set to URL or Thing
         if (!entity["@type"]) entity["@type"] = isURL(entity["@id"]) ? "URL" : "Thing";
 
+        // set type as string if it's an array
+        if (isArray(entity["@type"])) entity["@type"] = entity["@type"].join(", ");
+
         entity = { describoId: id, ...entity };
         let e = this.coreProperties
             .map((p) => ({ [p]: entity[p] }))
