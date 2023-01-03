@@ -4,7 +4,7 @@
 
 <script setup>
 import "leaflet/dist/leaflet.css";
-import Leaflet from "leaflet";
+import * as Leaflet from "leaflet";
 import { groupBy } from "lodash";
 import { reactive, onMounted } from "vue";
 
