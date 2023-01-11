@@ -20,8 +20,8 @@ import { onMounted, onBeforeMount, reactive, watch, provide, nextTick } from "vu
 import { cloneDeep, isEmpty, debounce, isFunction } from "lodash";
 import { CrateManager } from "./crate-manager.js";
 import { useRouter, useRoute } from "vue-router";
-const $router = useRouter();
-const $route = useRoute();
+let $router = useRouter();
+let $route = useRoute();
 
 const props = defineProps({
     crate: {
@@ -83,14 +83,14 @@ watch([() => props.crate, () => props.profile], () => {
     data.debouncedInit();
 });
 watch(
-    () => $route.query.id,
+    () => $route?.query?.id,
     (n) => {
         if (n !== data.entity.describoId)
-            data.debouncedSetCurrentEntity({ describoId: $route.query.id });
+            data.debouncedSetCurrentEntity({ describoId: $route?.query?.id });
     }
 );
 onBeforeMount(() => {
-    $router.replace({ query: "" });
+    $router?.replace({ query: "" });
     let configuration = configure();
     provide("configuration", configuration);
 });
@@ -99,7 +99,7 @@ onMounted(() => {
 });
 
 function init() {
-    $router.replace({ query: "" });
+    $router?.replace({ query: "" });
     if (!props.crate || isEmpty(props.crate)) {
         return;
     }
@@ -153,10 +153,10 @@ async function setCurrentEntity({ describoId = undefined, name = undefined, id =
         entity = data.crateManager.getEntity({ id });
     }
     if (entity) {
-        if (isEmpty($route.query)) {
-            $router.replace({ query: { id: entity.describoId } });
+        if (isEmpty($route?.query)) {
+            $router?.replace({ query: { id: entity.describoId } });
         } else {
-            $router.push({ query: { id: entity.describoId } });
+            $router?.push({ query: { id: entity.describoId } });
         }
         console.debug(`Render Entity Parent, load entity:`, { ...entity });
         data.crateManager.setCurrentEntity({ describoId: entity.describoId });
