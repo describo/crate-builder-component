@@ -12,7 +12,11 @@
         "test:watch": "./node_modules/.bin/jest --watch --runInBand",
         "start:elastic": "docker compose up -d && npm run load:datapacks",
         "load:datapacks": "sleep 10 && node ./load-data-packs.js",
-        "stop:elastic": "docker compose stop ; docker compose rm -f"
+        "stop:elastic": "docker compose stop ; docker compose rm -f",
+        "dev:vite": "vite",
+        "build:vite": "vite build",
+        "preview:vite": "vite preview --port 8080",
+        "tw": "npx tailwindcss -i ./tailwind.css -o ./src/style/styles.css"
     },
     "repository": {
         "type": "git",
@@ -49,6 +53,7 @@
     "devDependencies": {
         "@babel/plugin-proposal-optional-chaining": "^7.20.7",
         "@babel/preset-env": "^7.20.2",
+        "@vitejs/plugin-vue": "^4.0.0",
         "autoprefixer": "^10.4.13",
         "babel-jest": "^29.3.1",
         "babel-loader": "^9.1.0",
@@ -67,6 +72,9 @@
         "regenerator-runtime": "^0.13.11",
         "sass": "^1.57.1",
         "sass-loader": "^13.2.0",
+        "unplugin-auto-import": "^0.12.1",
+        "unplugin-vue-components": "^0.22.12",
+        "vite": "^4.0.0",
         "vue-loader": "^17.0.1",
         "webpack": "^5.75.0",
         "webpack-cli": "^5.0.1",

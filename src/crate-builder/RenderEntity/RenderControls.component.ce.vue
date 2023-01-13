@@ -135,11 +135,11 @@
 </template>
 
 <script setup>
-import AddPropertyDialog from "./DialogAddProperty.component.vue";
-import SaveCrateAsTemplateDialog from "./DialogSaveCrateAsTemplate.component.vue";
-import EditContextDialog from "./DialogEditContext.component.vue";
-import PreviewCrateDialog from "./DialogPreviewCrate.component.vue";
-import BrowseEntitiesDialog from "./DialogBrowseEntities.component.vue";
+import AddPropertyDialog from "./DialogAddProperty.component.ce.vue";
+import SaveCrateAsTemplateDialog from "./DialogSaveCrateAsTemplate.component.ce.vue";
+import EditContextDialog from "./DialogEditContext.component.ce.vue";
+import PreviewCrateDialog from "./DialogPreviewCrate.component.ce.vue";
+import BrowseEntitiesDialog from "./DialogBrowseEntities.component.ce.vue";
 import { reactive, computed, inject } from "vue";
 import { isArray } from "lodash";
 

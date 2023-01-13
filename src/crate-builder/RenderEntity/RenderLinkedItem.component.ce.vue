@@ -70,10 +70,10 @@
 </template>
 
 <script setup>
-import GeoComponent from "../base-components/Geo.component.vue";
-import TypeIconComponent from "./TypeIcon.component.vue";
-import DeletePropertyComponent from "./DeleteProperty.component.vue";
-import MapComponent from "../base-components/Map.component.vue";
+import GeoComponent from "../base-components/Geo.component.ce.vue";
+import TypeIconComponent from "./TypeIcon.component.ce.vue";
+import DeletePropertyComponent from "./DeleteProperty.component.ce.vue";
+import MapComponent from "../base-components/Map.component.ce.vue";
 import { computed, reactive, onMounted, inject } from "vue";
 const configuration = inject("configuration");
 

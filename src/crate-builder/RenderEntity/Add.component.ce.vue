@@ -109,18 +109,18 @@
 </template>
 
 <script setup>
-import AddControlComponent from "./AddControl.component.vue";
-import TextComponent from "../base-components/Text.component.vue";
-import DateComponent from "../base-components/Date.component.vue";
-import DateTimeComponent from "../base-components/DateTime.component.vue";
-import TimeComponent from "../base-components/Time.component.vue";
-import NumberComponent from "../base-components/Number.component.vue";
-import UrlComponent from "../base-components/Url.component.vue";
-import SelectComponent from "../base-components/Select.component.vue";
-import SelectUrlComponent from "../base-components/SelectUrl.component.vue";
-import SelectObjectComponent from "../base-components/SelectObject.component.vue";
-import GeoComponent from "../base-components/Geo.component.vue";
-import AutocompleteComponent from "./AutoComplete.component.vue";
+import AddControlComponent from "./AddControl.component.ce.vue";
+import TextComponent from "../base-components/Text.component.ce.vue";
+import DateComponent from "../base-components/Date.component.ce.vue";
+import DateTimeComponent from "../base-components/DateTime.component.ce.vue";
+import TimeComponent from "../base-components/Time.component.ce.vue";
+import NumberComponent from "../base-components/Number.component.ce.vue";
+import UrlComponent from "../base-components/Url.component.ce.vue";
+import SelectComponent from "../base-components/Select.component.ce.vue";
+import SelectUrlComponent from "../base-components/SelectUrl.component.ce.vue";
+import SelectObjectComponent from "../base-components/SelectObject.component.ce.vue";
+import GeoComponent from "../base-components/Geo.component.ce.vue";
+import AutocompleteComponent from "./AutoComplete.component.ce.vue";
 import { reactive, computed } from "vue";
 
 const props = defineProps({

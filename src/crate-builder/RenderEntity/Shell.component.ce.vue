@@ -211,13 +211,13 @@
 </template>
 
 <script setup>
-import GeoComponent from "../base-components/Geo.component.vue";
-import RenderEntityIdComponent from "./RenderEntityId.component.vue";
-import RenderEntityTypeComponent from "./RenderEntityType.component.vue";
-import RenderEntityNameComponent from "./RenderEntityName.component.vue";
-import RenderEntityPropertyComponent from "./RenderEntityProperty.component.vue";
-import RenderEntityReverseItemLinkComponent from "./RenderReverseItemLink.component.vue";
-import RenderControlsComponent from "./RenderControls.component.vue";
+import GeoComponent from "../base-components/Geo.component.ce.vue";
+import RenderEntityIdComponent from "./RenderEntityId.component.ce.vue";
+import RenderEntityTypeComponent from "./RenderEntityType.component.ce.vue";
+import RenderEntityNameComponent from "./RenderEntityName.component.ce.vue";
+import RenderEntityPropertyComponent from "./RenderEntityProperty.component.ce.vue";
+import RenderEntityReverseItemLinkComponent from "./RenderReverseItemLink.component.ce.vue";
+import RenderControlsComponent from "./RenderControls.component.ce.vue";
 import { reactive, onMounted, watch, inject } from "vue";
 import { debounce, cloneDeep } from "lodash";
 import { ProfileManager } from "../profile-manager.js";

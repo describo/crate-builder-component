@@ -49,13 +49,13 @@
 </template>
 
 <script setup>
-import TextComponent from "../base-components/Text.component.vue";
-import DateComponent from "../base-components/Date.component.vue";
-import DateTimeComponent from "../base-components/DateTime.component.vue";
-import TimeComponent from "../base-components/Time.component.vue";
-import NumberComponent from "../base-components/Number.component.vue";
-import ValueComponent from "../base-components/Value.component.vue";
-import SelectComponent from "../base-components/Select.component.vue";
+import TextComponent from "../base-components/Text.component.ce.vue";
+import DateComponent from "../base-components/Date.component.ce.vue";
+import DateTimeComponent from "../base-components/DateTime.component.ce.vue";
+import TimeComponent from "../base-components/Time.component.ce.vue";
+import NumberComponent from "../base-components/Number.component.ce.vue";
+import ValueComponent from "../base-components/Value.component.ce.vue";
+import SelectComponent from "../base-components/Select.component.ce.vue";
 import { parseISO, startOfDay } from "date-fns";
 import { isDate as validatorIsDate, isDecimal, isInt, isFloat, isNumeric } from "validator";
 import { computed, inject } from "vue";

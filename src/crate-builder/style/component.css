@@ -1,0 +1,11 @@
+.el-tabs__item {
+    height: unset;
+}
+
+.el-select-dropdown__wrap {
+    max-height: 500px !important;
+}
+
+.el-select-group__title {
+    font-size: 14px !important;
+}

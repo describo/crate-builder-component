@@ -89,11 +89,11 @@
 </template>
 
 <script setup>
-import RenderEntityPropertyInstanceComponent from "./RenderEntityPropertyInstance.component.vue";
-import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";
-import DeletePropertyComponent from "./DeleteProperty.component.vue";
-import AddComponent from "./Add.component.vue";
-import DisplayPropertyNameComponent from "./DisplayPropertyName.component.vue";
+import RenderEntityPropertyInstanceComponent from "./RenderEntityPropertyInstance.component.ce.vue";
+import RenderLinkedItemComponent from "./RenderLinkedItem.component.ce.vue";
+import DeletePropertyComponent from "./DeleteProperty.component.ce.vue";
+import AddComponent from "./Add.component.ce.vue";
+import DisplayPropertyNameComponent from "./DisplayPropertyName.component.ce.vue";
 import { ref, reactive, computed, onMounted, onBeforeMount, watch, inject } from "vue";
 import { cloneDeep, orderBy } from "lodash";
 import { ProfileManager } from "../profile-manager.js";

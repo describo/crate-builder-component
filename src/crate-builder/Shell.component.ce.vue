@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import RenderEntityComponent from "./RenderEntity/Shell.component.vue";
+import RenderEntityComponent from "./RenderEntity/Shell.component.ce.vue";
 import { onMounted, onBeforeMount, reactive, watch, provide, nextTick } from "vue";
 import { cloneDeep, isEmpty, debounce, isFunction } from "lodash";
 import { CrateManager } from "./crate-manager.js";
@@ -65,7 +65,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["ready", "error", "save:crate", "save:crate:template"]);
+const emit = defineEmits(["ready", "error", "save:crate", "save:crate:template", "route-change"]);
 
 const data = reactive({
     ready: false,
@@ -153,7 +153,9 @@ async function setCurrentEntity({ describoId = undefined, name = undefined, id =
         entity = data.crateManager.getEntity({ id });
     }
     if (entity) {
-        if (isEmpty($route?.query)) {
+        if ($router == undefined) {
+            emit("route-change", entity)
+        } else if (isEmpty($route?.query)) {
             $router?.replace({ query: { id: entity.describoId } });
         } else {
             $router?.push({ query: { id: entity.describoId } });
@@ -185,3 +187,9 @@ function saveEntityAsTemplate(template) {
     emit("save:entity:template", { entity });
 }
 </script>
+<style>
+@import url("./style/component.css");
+@import url("./style/styles.css");
+@import url("@element-plus/theme-chalk/dist/index.css");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css");
+</style>

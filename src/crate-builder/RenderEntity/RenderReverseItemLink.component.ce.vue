@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import TypeIconComponent from "./TypeIcon.component.vue";
+import TypeIconComponent from "./TypeIcon.component.ce.vue";
 import { reactive, onMounted, computed } from "vue";
 import { isArray } from "lodash";
 
