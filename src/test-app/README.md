@@ -3,7 +3,7 @@
 ## Start project
 Start project using vite.
 ```
-cd crate-builder-comopnent
+cd crate-builder-component
 npm install
 npm run dev:vite
 ```
@@ -11,13 +11,13 @@ npm run dev:vite
 ## Build project
 Build project using vite.
 ```
-cd crate-builder-comopnent
+cd crate-builder-component
 npm install
 npm run build:vite
 ```
 
 ## Preview project
 ```
-cd crate-builder-comopnent
+cd crate-builder-component
 npm run preview:vite
 ```
