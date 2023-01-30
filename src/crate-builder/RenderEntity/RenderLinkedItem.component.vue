@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-loading="data.loading">
         <div
             v-if="!showMap"
             class="flex flex-row"
@@ -93,6 +93,7 @@ const props = defineProps({
     },
 });
 const data = reactive({
+    loading: false,
     entity: {},
     editLocation: false,
 });
@@ -104,11 +105,19 @@ onMounted(() => {
 });
 
 async function loadEntityData() {
-    await new Promise((resolve) => setTimeout(resolve, props.index * 4));
-    let entity = props.crateManager.getEntity({ describoId: props.entity.tgtEntityId });
-    data.entity = { ...entity };
+    if (props.entity.tgtEntity) {
+        data.entity = { ...props.entity };
+    } else {
+        await new Promise((resolve) => setTimeout(resolve, props.index * 4));
+        let entity = props.crateManager.getEntity({
+            describoId: props.entity.tgtEntityId,
+            loadProperties: false,
+        });
+        data.entity = { ...entity };
+    }
 }
 function loadEntity() {
+    data.loading = true;
     console.debug("Renderer Linked Item Component : emit(load:entity)", props.entity.tgtEntityId);
     emit("load:entity", { describoId: props.entity.tgtEntityId });
 }
