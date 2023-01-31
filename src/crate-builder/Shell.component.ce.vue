@@ -159,7 +159,6 @@ async function setCurrentEntity({ describoId = undefined, name = undefined, id =
     }
     if (entity) {
         if ($router == undefined) {
-            console.log("emit route change")
             emit("route-change", entity)
         } else if (isEmpty($route?.query)) {
             $router?.replace({ query: { id: entity.describoId } });
