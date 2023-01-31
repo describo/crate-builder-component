@@ -25,10 +25,10 @@ let $route = useRoute();
 
 const props = defineProps({
     crate: {
-        type: [Object, undefined],
+        type: [Object, String, undefined],
     },
     profile: {
-        type: [Object, undefined],
+        type: [Object, String, undefined],
     },
     mode: {
         type: [String, undefined],
@@ -108,6 +108,11 @@ function init() {
     data.profile = isEmpty(props.profile) ? {} : cloneDeep(props.profile);
     data.crate = cloneDeep(props.crate);
 
+    if (typeof data.crate === "string" && typeof data.profile === "string") {
+        data.crate = JSON.parse(data.crate)
+        data.profile = JSON.parse(data.profile)
+    }
+
     data.crateManager = new CrateManager();
     data.crateManager.lookup = props.lookup;
     try {
@@ -154,6 +159,7 @@ async function setCurrentEntity({ describoId = undefined, name = undefined, id =
     }
     if (entity) {
         if ($router == undefined) {
+            console.log("emit route change")
             emit("route-change", entity)
         } else if (isEmpty($route?.query)) {
             $router?.replace({ query: { id: entity.describoId } });
