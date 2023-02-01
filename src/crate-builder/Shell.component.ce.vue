@@ -65,7 +65,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["ready", "error", "save:crate", "save:crate:template", "route-change"]);
+const emit = defineEmits(["ready", "error", "save:crate", "save:crate:template"]);
 
 const data = reactive({
     ready: false,
@@ -161,9 +161,7 @@ async function setCurrentEntity({ describoId = undefined, name = undefined, id =
         entity = data.crateManager.getEntity({ id });
     }
     if (entity) {
-        if ($router == undefined) {
-            emit("route-change", entity)
-        } else if (isEmpty($route?.query)) {
+        if (isEmpty($route?.query)) {
             $router?.replace({ query: { id: entity.describoId } });
         } else {
             $router?.push({ query: { id: entity.describoId } });
