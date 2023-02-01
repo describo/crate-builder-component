@@ -108,6 +108,9 @@ function init() {
     data.profile = isEmpty(props.profile) ? {} : cloneDeep(props.profile);
     data.crate = cloneDeep(props.crate);
 
+    // The crate and profile could also be a string containing a JSON.
+    // This is always the case when used a web component, because there we cannot pass objects only
+    // strings.
     if (typeof data.crate === "string" && typeof data.profile === "string") {
         data.crate = JSON.parse(data.crate)
         data.profile = JSON.parse(data.profile)
