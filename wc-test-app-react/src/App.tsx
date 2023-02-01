@@ -1,6 +1,6 @@
 /* eslint-disable */
 import metaData from "./data/ro-crate-metadata.json" 
-import "crate-builder-wc/dist/crate-builder-component.mjs";
+import "crate-builder-wc/dist/crate-builder-component.umd";
 import "crate-builder-wc/dist/style.css"
 
 import {useState, useEffect, useRef, useLayoutEffect, DOMAttributes} from "react";
@@ -21,11 +21,8 @@ function DescriboCrateBuilder({crate, profile, onDataChange}: any) {
   useLayoutEffect(() => {
     const { current }: CustomElement<any> = ref;
 
-    // console.log("current", current)
     current?.addEventListener("save:crate", (event: Event ) => {
         const customEvent = event as CustomEvent;
-        // console.log("addEventListener event1", customEvent);
-        // console.log("addEventListener event2", customEvent?.detail[0]?.crate);
         onDataChange(customEvent?.detail[0]?.crate, customEvent?.detail[0]?.profile);
       }
     );
@@ -41,7 +38,6 @@ function DescriboCrateBuilder({crate, profile, onDataChange}: any) {
 }
 
 function App() {
-  const ref = useRef();
   const [data, setData] = useState({
     crate: metaData,
     profile: {}
@@ -51,10 +47,9 @@ function App() {
     setData({crate, profile})
   }
 
-  console.log("data", data)
   return (
     <div className="flex">
-      <DescriboCrateBuilder id="DescriboCrateBuilder"
+      <DescriboCrateBuilder
         crate={metaData}
         onDataChange={onDataChange}
       />
