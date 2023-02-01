@@ -1,6 +1,6 @@
 /* eslint-disable */
 import metaData from "./data/ro-crate-metadata.json" 
-import "crate-builder-wc/dist/crate-builder-component.umd";
+import "crate-builder-wc/dist/crate-builder-component.mjs";
 import "crate-builder-wc/dist/style.css"
 
 import {useState, useEffect, useRef, useLayoutEffect, DOMAttributes} from "react";
