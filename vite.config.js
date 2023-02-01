@@ -13,7 +13,7 @@ const path = require('path')
 export default defineConfig({
     build: {
         lib: {
-            entry: path.resolve(__dirname, 'src/crate-builder/index.js'),
+            entry: path.resolve(__dirname, 'src/crate-builder/index.wc.js'),
             name: 'CrateBuilderWC',
             // fileName: (format) => `my-lib.${format}.js`
         },
@@ -32,14 +32,6 @@ export default defineConfig({
     },
     plugins: [
         vue(
-        /*    {
-            template: {
-                compilerOptions: {
-                    // treat all components that includes "-" as custom elements
-                    isCustomElement: tag => tag.startsWith('el-'),
-                },
-            },
-        }*/
         ),
         AutoImport({
             resolvers: [ElementPlusResolver()],
