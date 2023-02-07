@@ -1,0 +1,33 @@
+{
+    "describoId": "fb46573e-1006-4294-9c4a-83798cba970a",
+    "describoLabel": "RootDataset",
+    "@id": "./",
+    "@type": "Dataset",
+    "name": "./",
+    "properties": {
+        "about": [
+            {
+                "propertyId": "c4109ab1-d374-41d1-9067-dda2fd3705f7",
+                "srcEntityId": "fb46573e-1006-4294-9c4a-83798cba970a",
+                "property": "about",
+                "tgtEntityId": "df893ca2-77fe-444d-950b-f8ae1a7ad4b6",
+                "tgtEntity": { "@id": "...", "@type": "...", "name": "..." }
+            }
+        ],
+        "abstract": [
+            {
+                "propertyId": "c885d833-3233-4e04-8afe-e7ff70d18313",
+                "srcEntityId": "fb46573e-1006-4294-9c4a-83798cba970a",
+                "property": "abstract",
+                "value": "some text"
+            },
+            {
+                "propertyId": "e565c240-a276-4971-b8c3-092e0c70d37b",
+                "srcEntityId": "fb46573e-1006-4294-9c4a-83798cba970a",
+                "property": "abstract",
+                "value": "some text"
+            }
+        ]
+    },
+    "reverseConnections": {}
+}

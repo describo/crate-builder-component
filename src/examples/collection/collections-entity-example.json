@@ -1,0 +1,131 @@
+{
+    "describoId": "zk9xqkuvq4s4ij0mrp45s1p0liy4b2wf",
+    "@id": "#E000245",
+    "@type": "Entity",
+    "name": "School Bell Games",
+    "properties": {
+        "entityType": [
+            {
+                "propertyId": "iip3t9ggb7vuv95h062sgcerrzalz7ld",
+                "srcEntityId": "zk9xqkuvq4s4ij0mrp45s1p0liy4b2wf",
+                "property": "entityType",
+                "tgtEntityId": "hykc9sqehehwrh900ll0pvs9resjbmx4",
+                "tgtEntity": {
+                    "@id": "#Playground%20Game%20-%20Miscellaneous%20Activities",
+                    "@type": "EntityType",
+                    "name": "Playground Game - Miscellaneous Activities"
+                }
+            }
+        ],
+        "identifier": [
+            {
+                "propertyId": "lcg05iv9eprttsp705tfogh1apm7tii0",
+                "srcEntityId": "zk9xqkuvq4s4ij0mrp45s1p0liy4b2wf",
+                "property": "identifier",
+                "value": "E000245"
+            }
+        ],
+        "efunction": [
+            {
+                "propertyId": "j1zboiqcf56bs3jszkf5tdtg8y0xbs44",
+                "srcEntityId": "zk9xqkuvq4s4ij0mrp45s1p0liy4b2wf",
+                "property": "efunction",
+                "value": "Language Play, Playground Game, Quiet Play"
+            }
+        ],
+        "esumnote": [
+            {
+                "propertyId": "jqphzadq9pwb4gfurr3roba1lpvhs28i",
+                "srcEntityId": "zk9xqkuvq4s4ij0mrp45s1p0liy4b2wf",
+                "property": "esumnote",
+                "value": "At some schools the bell provokes certain play activities."
+            }
+        ],
+        "efullnote": [
+            {
+                "propertyId": "qmn9qu0ltk0ta7ldphgzwgegvuzw0m0l",
+                "srcEntityId": "zk9xqkuvq4s4ij0mrp45s1p0liy4b2wf",
+                "property": "efullnote",
+                "value": "<H4>At Erskineville</H4>\r\n\r\nWaiting for the Bell\r\n\r\nTha Whole School is involved\r\n\r\n<em>Please see the attached sheet for full details of how the game worked.</em>\r\n\r\n<H4>At BBC</H4>\r\n\r\nSaved by the bell\r\n\r\nPlayers: Any number\r\nBoys\r\nAge: 8\r\n\r\nWhen the bell goes, someone can say, “Saved by the bell!” and that saves the game until the next play time when it can be continued.   In cricket, the person batting stays in, in other games players who are tagged by ‘It’ after they’ve said “Saved by the bell!” are not ‘It’, etc.\r\n\r\n(JMcK note:  There is a similar function in electronic video games, where players can save the game at a certain point and resume playing when they want to.)"
+            }
+        ],
+        "eappenddate": [
+            {
+                "propertyId": "c9oph2tz0k2j6a784gnytdnhx4y0w22m",
+                "srcEntityId": "zk9xqkuvq4s4ij0mrp45s1p0liy4b2wf",
+                "property": "eappenddate",
+                "value": "2009-03-20 15:34:43"
+            }
+        ],
+        "relationshipObject": [
+            {
+                "propertyId": "tu62i83pl38ifqq2qtv7o01iqqpk7476",
+                "srcEntityId": "zk9xqkuvq4s4ij0mrp45s1p0liy4b2wf",
+                "property": "relationshipObject",
+                "tgtEntityId": "a3m9hunrx7ira5mwea8pfe8ksmb70305",
+                "tgtEntity": {
+                    "@id": "#E000011",
+                    "@type": "Entity",
+                    "name": "McKinty, Judith"
+                }
+            },
+            {
+                "propertyId": "vj7vz80ip88f7jsy43gk4vwfpcztly0o",
+                "srcEntityId": "zk9xqkuvq4s4ij0mrp45s1p0liy4b2wf",
+                "property": "relationshipObject",
+                "tgtEntityId": "v43mdyp7i1z9jphhlf0f2c38n4pv1laz",
+                "tgtEntity": {
+                    "@id": "#E000233",
+                    "@type": "Entity",
+                    "name": "Erskineville Public School"
+                }
+            },
+            {
+                "propertyId": "d1mdul4lf10lanflfh1k1cm7pxaxwphd",
+                "srcEntityId": "zk9xqkuvq4s4ij0mrp45s1p0liy4b2wf",
+                "property": "relationshipObject",
+                "tgtEntityId": "u8qciqnf77gycqfu114atwcrfq3ow1kp",
+                "tgtEntity": {
+                    "@id": "#E000352",
+                    "@type": "Entity",
+                    "name": "Brisbane Boys College"
+                }
+            }
+        ],
+        "relationshipSubject": [
+            {
+                "propertyId": "tsl8pakdltn56gla8rxl2wdkgi932cu0",
+                "srcEntityId": "zk9xqkuvq4s4ij0mrp45s1p0liy4b2wf",
+                "property": "relationshipSubject",
+                "tgtEntityId": "v43mdyp7i1z9jphhlf0f2c38n4pv1laz",
+                "tgtEntity": {
+                    "@id": "#E000233",
+                    "@type": "Entity",
+                    "name": "Erskineville Public School"
+                }
+            },
+            {
+                "propertyId": "oqir5ek9px3jm4s45k1ti76s9xu4pnl6",
+                "srcEntityId": "zk9xqkuvq4s4ij0mrp45s1p0liy4b2wf",
+                "property": "relationshipSubject",
+                "tgtEntityId": "a3m9hunrx7ira5mwea8pfe8ksmb70305",
+                "tgtEntity": {
+                    "@id": "#E000011",
+                    "@type": "Entity",
+                    "name": "McKinty, Judith"
+                }
+            },
+            {
+                "propertyId": "n1qy3uk9bz78bf4qnz11kv5sxacn84k4",
+                "srcEntityId": "zk9xqkuvq4s4ij0mrp45s1p0liy4b2wf",
+                "property": "relationshipSubject",
+                "tgtEntityId": "u8qciqnf77gycqfu114atwcrfq3ow1kp",
+                "tgtEntity": {
+                    "@id": "#E000352",
+                    "@type": "Entity",
+                    "name": "Brisbane Boys College"
+                }
+            }
+        ]
+    }
+}
