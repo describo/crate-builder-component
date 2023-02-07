@@ -158,11 +158,11 @@ export class CrateManager {
         return this.getEntity({ describoId: e.describoId });
     }
 
-    getEntity({ id, describoId }) {
+    getEntity({ id, describoId, loadProperties = true }) {
         let entity;
         if (id) entity = this.__lookupEntityByAtId({ id });
         if (describoId) entity = this.__lookupEntityByDescriboId({ id: describoId });
-        if (entity?.describoId) {
+        if (entity?.describoId && loadProperties) {
             entity.properties = this.getEntityProperties({
                 describoId: entity.describoId,
             }).map((c) => {
