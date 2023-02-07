@@ -4,6 +4,7 @@
     "description": "A VueJS component for assembling an RO-Crate",
     "main": "./src/crate-builder/index.js",
     "files": [
+        "dist",
         "src/crate-builder"
     ],
     "scripts": {
