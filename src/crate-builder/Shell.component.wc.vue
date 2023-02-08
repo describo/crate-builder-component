@@ -51,3 +51,14 @@ function init() {
     };
 }
 </script>
+
+<!--
+We import the compiled css from the vue dir, because it is already built.
+For now, font-awesome must be included here and also where the web component is used,
+because for some reason it doesn't load the fonts here, only the css. Loading it again
+in the react component is not an overhead as it will be already cached.
+-->
+<style>
+@import "../../dist/vue/style.css";
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css");
+</style>
