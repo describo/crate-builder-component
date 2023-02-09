@@ -9,6 +9,10 @@
             :enable-crate-preview="data.enableCratePreview"
             :enable-browse-entities="data.enableBrowseEntities"
             :enable-template-save="data.enableTemplateSave"
+            @ready="ready"
+            @error="error"
+            @save:crate="saveCrate"
+            @save:crate:template="saveCrateTemplate"
         />
     </div>
 </template>
@@ -49,6 +53,26 @@ function init() {
         enableTemplateSave: $this?.config?.enableTemplateSave ?? false,
         readonly: $this?.config?.readonly ?? false,
     };
+}
+
+// Emit the same events as Shell.component.vue
+const emit = defineEmits(["ready", "error", "save:crate", "save:crate:template"]);
+
+function ready() {
+    emit("ready");
+}
+
+function error(args) {
+    emit("error", args);
+}
+
+function saveCrate(args) {
+    emit("save:crate", args);
+}
+
+function saveCrateTemplate(args) {
+    emit("save:crate:template", args);
+
 }
 </script>
 
