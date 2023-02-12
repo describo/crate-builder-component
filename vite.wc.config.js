@@ -1,7 +1,8 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-
-const path = require("path");
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import {ElementPlusResolver, ElementUiResolver} from 'unplugin-vue-components/resolvers'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -15,6 +16,21 @@ export default defineConfig({
         // Don't minify so there's a chance to debug problems while experimenting
         minify: false,
         minifySyntax: false,
+        // rollupOptions: {
+        //     external: "./src/crate-builder/x.js"
+        // }
     },
-    plugins: [vue()],
+    plugins: [
+        vue({
+            // Force inlining styles, especially in Shell.component.wc.vue
+            customElement: true
+        }),
+        // https://element-plus.org/en-US/guide/quickstart.html#on-demand-import
+        AutoImport({
+            resolvers: [ElementPlusResolver()],
+        }),
+        Components({
+            resolvers: [ElementPlusResolver()],
+        }),
+    ],
 });
