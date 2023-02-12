@@ -12,7 +12,7 @@
         "test:watch": "./node_modules/.bin/jest --watch --runInBand",
         "build": "npm run build:vue && npm run build:wc",
         "build:vue": "vite build",
-        "build:wc": "vite --config vite.wc.config.js build",
+        "build:wc": "npx rollup -c && vite --config vite.wc.config.js build",
         "start:elastic": "docker compose up -d && npm run load:datapacks",
         "load:datapacks": "sleep 10 && node ./load-data-packs.js",
         "stop:elastic": "docker compose stop ; docker compose rm -f"
@@ -50,16 +50,21 @@
         "vuex": "^4.1.0"
     },
     "devDependencies": {
+        "@rollup/plugin-node-resolve": "^15.0.1",
         "@vitejs/plugin-vue": "^4.0.0",
         "autoprefixer": "^10.4.13",
         "chance": "^1.1.9",
+        "cssnano": "^5.1.14",
         "jest": "^29.3.1",
-        "postcss": "^8.4.20",
+        "postcss": "^8.4.21",
         "process": "^0.11.10",
         "regenerator-runtime": "^0.13.11",
+        "rollup": "^3.14.0",
+        "rollup-plugin-copy": "^3.4.0",
+        "rollup-plugin-postcss": "^4.0.2",
         "sass": "^1.57.1",
-        "vite": "^4.1.1",
-        "unplugin-auto-import": "^0.13.0",
-        "unplugin-vue-components": "^0.23.0"
+        "unplugin-auto-import": "^0.14.2",
+        "unplugin-vue-components": "^0.23.0",
+        "vite": "^4.1.1"
     }
 }
