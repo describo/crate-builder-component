@@ -12,6 +12,8 @@
 - [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
 - [Full Usage - configuration and events](#full-usage---configuration-and-events)
   - [Configuration](#configuration)
+    - [Reactive Properties](#reactive-properties)
+    - [Unreactive Properties](#unreactive-properties)
   - [Events](#events)
 
 This is the core UI component for assembling an RO-Crate inside Describo. It is a self contained
@@ -143,10 +145,21 @@ Pass in the crate file and optionally a profile.
 
 ## Configuration
 
+### Reactive Properties
+
+These properties are reactive. If you change them in the outer application they will update inside
+the component.
+
 -   `crate`: The RO Crate data. Note - this is the JSON object `not` a path to a file to be loaded.
     Your app needs to do the loading.
 -   `profile`: The profile. Note - this is the JSON object `not` a path to a file to be loaded. Your
     app needs to do the loading.
+
+### Unreactive Properties
+
+The properties are NOT reactive. If you change them in the outer application they will not update
+inside the component.
+
 -   `lookup`: Pass in an instance of a class the component can use to lookup entity templates or
     datapacks. The signature of the class must be:
 
