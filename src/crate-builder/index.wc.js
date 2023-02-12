@@ -1,4 +1,4 @@
-import { defineCustomElement } from "vue";
+import { defineCustomElement, h } from "vue";
 import DescriboCrateBuilder from "./Shell.component.wc.vue";
 
 // We need to import and inline the styles into the component. These

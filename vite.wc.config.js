@@ -16,6 +16,9 @@ export default defineConfig({
         // Don't minify so there's a chance to debug problems while experimenting
         minify: false,
         minifySyntax: false,
+        // rollupOptions: {
+        //     external: "./src/crate-builder/x.js"
+        // }
     },
     plugins: [
         vue({}),
