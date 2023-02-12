@@ -13,6 +13,7 @@
             @error="error"
             @save:crate="saveCrate"
             @save:crate:template="saveCrateTemplate"
+            @save:entity:template="saveEntityTemplate"
         />
     </div>
 </template>
@@ -32,6 +33,14 @@ const props = defineProps({
         required: true,
     },
 });
+
+const $emit = defineEmits([
+    "ready",
+    "error",
+    "save:crate",
+    "save:crate:template",
+    "save:entity:template",
+]);
 
 let data = reactive(init());
 
@@ -55,34 +64,22 @@ function init() {
     };
 }
 
-// Emit the same events as Shell.component.vue
-const emit = defineEmits(["ready", "error", "save:crate", "save:crate:template"]);
-
 function ready() {
-    emit("ready");
+    $emit("ready");
 }
 
 function error(args) {
-    emit("error", args);
+    $emit("error", args);
 }
 
 function saveCrate(args) {
-    emit("save:crate", args);
+    $emit("save:crate", args);
 }
 
 function saveCrateTemplate(args) {
-    emit("save:crate:template", args);
-
+    $emit("save:crate:template", args);
+}
+function saveEntityTemplate(args) {
+    $emit("save:entity:template", args);
 }
 </script>
-
-<!--
-We import the compiled css from the vue dir, because it is already built.
-For now, font-awesome must be included here and also where the web component is used,
-because for some reason it doesn't load the fonts here, only the css. Loading it again
-in the react component is not an overhead as it will be already cached.
--->
-<style>
-@import "../../dist/vue/style.css";
-@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css");
-</style>
