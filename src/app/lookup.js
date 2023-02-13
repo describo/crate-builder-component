@@ -40,7 +40,8 @@ export class Lookup {
             // The crate builder component will pass a fully formed elastic search query to this method
             // It's up to you to get it to the elastic search server. In this example
             //   it's hardcoded in the _execute method
-            return await this._execute({ query: elasticQuery });
+            let results = await this._execute({ query: elasticQuery });
+            return results;
         } else {
             // do the lookup yourself in whatever way you want
             //

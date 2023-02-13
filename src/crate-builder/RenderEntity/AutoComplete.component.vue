@@ -199,7 +199,7 @@ async function lookup({ queryString }) {
         new BoolQuery().must([
             matchQuery({ field: "@type.keyword", value: type }),
             new BoolQuery().should(
-                fields.map((field) => wildcardQuery({ field, value: `*${queryString}*` }))
+                fields.map((field) => matchQuery({ field, value: queryString }))
             ),
         ])
     );
