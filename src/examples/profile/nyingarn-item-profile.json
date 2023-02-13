@@ -18,7 +18,7 @@
             {
                 "name": "Languages",
                 "description": "Languages relating to this item",
-                "inputs": ["contentLanguages", "subjectLanguages", "languageAsGiven", "subject"]
+                "inputs": ["language", "subjectLanguages", "languageAsGiven", "subject"]
             },
             {
                 "name": "Original Source Information",
