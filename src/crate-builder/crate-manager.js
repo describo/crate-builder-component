@@ -11,7 +11,7 @@ import {
     orderBy,
 } from "lodash";
 import { isURL as validatorIsURL } from "validator";
-const urlProtocols = ["http", "https", "ftp", "ftps", "arcp"];
+const urlProtocols = ["http", "https", "ftp", "ftps"];
 
 export class CrateManager {
     constructor() {
@@ -491,9 +491,11 @@ export class CrateManager {
 }
 
 export function isURL(value) {
-    try {
-        return validatorIsURL(value, { require_protocol: true, protocols: urlProtocols });
-    } catch (error) {
-        return false;
-    }
+    if (value.match(/arcp:\/\/name,.*/)) return true;
+    if (value.match(/arcp:\/\/uuid,.*/)) return true;
+    if (value.match(/arcp:\/\/ni,sha-256;,.*/)) return true;
+    return validatorIsURL(value, {
+        require_protocol: true,
+        protocols: urlProtocols,
+    });
 }

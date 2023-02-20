@@ -1,58 +1,52 @@
 <template>
-    <div class="flex flex-row flex-grow space-x-2">
-        <div class="flex-grow">
-            <el-input
-                class="w-full"
-                type="number"
-                @input="debouncedSave"
-                v-model="internalValue"
-                resize="vertical"
-            ></el-input>
+    <div class="flex flex-col">
+        <el-input
+            v-if="data.isValidNumber"
+            class="w-full"
+            type="number"
+            @input="debouncedSave"
+            v-model="data.internalValue"
+            resize="vertical"
+        ></el-input>
+        <div class="text-xs text-gray-700" v-else>
+            The supplied number '{{ props.value }}' is invalid. The value must be a valid number
+            passed in as a String or a Number.
         </div>
     </div>
 </template>
 
-<script>
-import { debounce } from "lodash";
+<script setup>
+import debounce from "lodash/debounce";
+import { reactive, watch } from "vue";
+import isNumeric from "validator/lib/isNumeric";
 
-export default {
-    props: {
-        property: {
-            type: String,
-            required: true,
-        },
-        value: {
-            type: String,
-        },
-        autoSave: {
-            type: Boolean,
-            default: true,
-        },
+const props = defineProps({
+    property: {
+        type: String,
+        required: true,
     },
-    data() {
-        return {
-            internalValue: this.value,
-            debouncedSave: this.autoSave ? debounce(this.save, 1000) : () => {},
-        };
+    value: {
+        type: [String, Number],
     },
-    watch: {
-        value: function() {
-            this.internalValue = this.value;
-        },
-    },
-    methods: {
-        save() {
-            this.$emit("save:property", {
-                property: this.property,
-                value: this.internalValue,
-            });
-        },
-    },
-};
-</script>
+});
+const $emit = defineEmits(["save:property"]);
+const data = reactive({
+    internalValue: props.value,
+    isValidNumber: isNumeric(String(props.value)),
+    debouncedSave: debounce(save, 1000),
+});
 
-<style lang="scss">
-.el-input-number {
-    min-width: 300px;
+watch(
+    () => props.value,
+    () => {
+        data.internalValue = props.value;
+        data.isValidDate = isNumeric(String(data.internalValue));
+    }
+);
+function save() {
+    $emit("save:property", {
+        property: props.property,
+        value: data.internalValue,
+    });
 }
-</style>
+</script>

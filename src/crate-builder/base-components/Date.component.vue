@@ -1,7 +1,8 @@
 <template>
     <div class="flex flex-col">
         <el-date-picker
-            v-model="internalValue"
+            v-if="props.value && data.isValidDate"
+            v-model="data.internalValue"
             type="date"
             placeholder="Pick a date"
             format="YYYY-MM-DD"
@@ -9,49 +10,44 @@
             :clearable="true"
         >
         </el-date-picker>
-        <div class="text-xs text-gray-700" v-if="!value">
-            Date format is: YYYY-MM-DD. e.g. 2021-03-22
+        <div class="text-xs text-gray-700" v-else>
+            The supplied date '{{ props.value }}' is invalid. Date format is: YYYY-MM-DD. e.g.
+            2021-03-22
         </div>
     </div>
 </template>
 
-<script>
-import { startOfDay } from "date-fns";
+<script setup>
+import { reactive, watch } from "vue";
+import { startOfDay, parseISO } from "date-fns";
+import isDate from "validator/lib/isDate";
 
-export default {
-    props: {
-        property: {
-            type: String,
-            required: true,
-        },
-        value: {
-            type: String,
-        },
+const props = defineProps({
+    property: {
+        type: String,
+        required: true,
     },
-    data() {
-        return {
-            internalValue: this.value,
-        };
+    value: {
+        type: String,
     },
-    watch: {
-        value: function () {
-            this.internalValue = this.value;
-        },
-    },
-    methods: {
-        save() {
-            this.$emit("save:property", {
-                property: this.property,
-                value: startOfDay(this.internalValue).toISOString(),
-            });
-        },
-    },
-    save() {},
-};
-</script>
+});
+const $emit = defineEmits(["save:property"]);
+const data = reactive({
+    internalValue: props.value,
+    isValidDate: isDate(parseISO(props.value)),
+});
 
-<style lang="scss" scoped>
-.style-text-input {
-    width: 500px;
+watch(
+    () => props.value,
+    () => {
+        data.internalValue = props.value;
+        data.isValidDate = isDate(data.internalValue);
+    }
+);
+function save() {
+    $emit("save:property", {
+        property: props.property,
+        value: startOfDay(data.internalValue).toISOString(),
+    });
 }
-</style>
+</script>

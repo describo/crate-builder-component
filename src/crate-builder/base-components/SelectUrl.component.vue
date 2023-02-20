@@ -1,63 +1,88 @@
 <template>
     <div>
         <el-select
+            v-if="data.hasValidValues && data.isValidValue"
             class="w-full"
-            v-model="internalValue"
+            v-model="data.internalValue"
             placeholder="Select"
             filterable
             :filter-method="filter"
             @change="save"
             @blur="reset"
         >
-            <el-option v-for="(item, idx) in data" :key="idx" :label="item" :value="item">
+            <el-option v-for="(item, idx) in data.options" :key="idx" :label="item" :value="item">
             </el-option>
         </el-select>
+        <div v-if="!data.isValidValue" class="text-xs text-gray-700">
+            The value '{{ props.value }}' provided to this component is of the wrong from. It can
+            only be a valid URL.
+        </div>
+        <div v-if="!data.hasValidValues" class="text-xs text-gray-700">
+            The definition provided to this component has values of the wrong from. It can only be
+            an array of strings which are each valid URLs.
+        </div>
     </div>
 </template>
 
-<script>
-export default {
-    props: {
-        property: {
-            type: String,
-            required: true,
-        },
-        value: {
-            type: String,
-        },
-        definition: {
-            type: Object,
-            required: true,
-        },
+<script setup>
+import { reactive, watch } from "vue";
+import isArray from "lodash/isArray";
+import isString from "lodash/isString";
+import uniq from "lodash/uniq";
+import { isURL } from "../crate-manager.js";
+
+const props = defineProps({
+    property: {
+        type: String,
+        required: true,
     },
-    data() {
-        return {
-            data: [...this.definition.values],
-            internalValue: this.value,
-        };
+    value: {
+        type: String,
     },
-    methods: {
-        save() {
-            this.$emit("create:entity", {
-                property: this.property,
-                "@id": this.internalValue,
-                "@type": "URL",
-                name: this.internalValue,
-            });
-        },
-        filter(d) {
-            this.data = this.definition.values.filter((v) => {
-                let match = false;
-                values(v).forEach((v) => {
-                    const re = new RegExp(d);
-                    if (v.toLowerCase().match(re)) match = true;
-                });
-                if (match) return v;
-            });
-        },
-        reset() {
-            this.data = [...this.definition.values];
-        },
+    definition: {
+        type: Object,
+        required: true,
     },
-};
+});
+const $emit = defineEmits(["create:entity"]);
+const data = reactive({
+    options: [...props.definition.values],
+    internalValue: props.value,
+    isValidValue: isURL(props.value),
+    hasValidValues: verifySelectValuesAreUrls([...props.definition.values]),
+});
+
+watch(
+    () => props.value,
+    () => {
+        data.internalValue = props.value;
+        data.hasValidValues = verifySelectValuesAreUrls([...props.definition.values]);
+        data.isValidValue = isURL(props.value);
+    }
+);
+function save() {
+    $emit("create:entity", {
+        property: props.property,
+        "@id": data.internalValue,
+        "@type": "URL",
+        name: data.internalValue,
+    });
+}
+function filter(d) {
+    data.options = props.definition.values.filter((v) => {
+        let match = false;
+        const re = new RegExp(d);
+        if (v.toLowerCase().match(re)) match = true;
+        if (match) return v;
+    });
+}
+function reset() {
+    data.options = [...props.definition.values];
+}
+function verifySelectValuesAreUrls(values) {
+    if (!isArray(values)) return false;
+    values = values.map((v) => isString(v) && isURL(v));
+    values = uniq(values);
+    return values.length === 1 && values[0] === true ? true : false;
+}
 </script>

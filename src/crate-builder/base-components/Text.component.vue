@@ -1,64 +1,68 @@
 <template>
-    <div class="flex flex-row space-x-2">
-        <el-input
-            class="w-full"
-            :type="type"
-            v-model="internalValue"
-            @blur="save"
-            @change="save"
-            resize="vertical"
-            :rows="5"
-            :placeholder="placeholder"
-        ></el-input>
-        <el-button @click="save" type="success" size="default">
-            <i class="fas fa-check fa-fw"></i>
-        </el-button>
+    <div>
+        <div class="flex flex-row space-x-2" v-if="data.isValidType">
+            <el-input
+                class="w-full"
+                :type="type"
+                v-model="data.internalValue"
+                @blur="save"
+                @change="save"
+                resize="vertical"
+                :rows="5"
+                :placeholder="props.placeholder"
+            ></el-input>
+            <el-button @click="save" type="success" size="default">
+                <i class="fas fa-check fa-fw"></i>
+            </el-button>
+        </div>
+        <div v-else class="text-xs text-gray-700">
+            The type '{{ props.type }}' is not valid for this component. It can only be 'text' or
+            'textarea'
+        </div>
     </div>
 </template>
 
-<script>
-export default {
-    props: {
-        type: {
-            type: String,
-            default: "textarea",
-        },
-        property: {
-            type: String,
-            required: true,
-        },
-        value: {
-            type: String,
-        },
-        definition: {
-            type: Object,
-        },
-        placeholder: {
-            type: String,
-        },
-    },
-    data() {
-        return {
-            internalValue: this.value,
-            currentValue: this.value,
-        };
-    },
-    watch: {
-        value: function () {
-            this.internalValue = this.value;
-        },
-    },
-    methods: {
-        save() {
-            if (this.internalValue !== this.currentValue) {
-                this.currentValue = this.internalValue;
+<script setup>
+import { reactive, watch } from "vue";
 
-                this.$emit("save:property", {
-                    property: this.property,
-                    value: this.internalValue.trim(),
-                });
-            }
-        },
+const props = defineProps({
+    type: {
+        type: String,
+        default: "textarea",
+        validator: (value) => ["text", "textarea"].includes(value),
     },
-};
+    property: {
+        type: String,
+        required: true,
+    },
+    value: {
+        type: String,
+    },
+    placeholder: {
+        type: String,
+    },
+});
+const $emit = defineEmits(["save:property"]);
+const data = reactive({
+    internalValue: props.value,
+    currentValue: props.value,
+    isValidType: ["text", "textarea"].includes(props.type),
+});
+watch(
+    () => props.value,
+    () => {
+        data.internalValue = props.value;
+        data.isValidType = ["text", "textarea"].includes(props.type);
+    }
+);
+function save() {
+    if (data.internalValue !== data.currentValue) {
+        data.currentValue = data.internalValue;
+
+        $emit("save:property", {
+            property: props.property,
+            value: data.internalValue.trim(),
+        });
+    }
+}
 </script>

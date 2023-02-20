@@ -9,10 +9,10 @@ import { groupBy } from "lodash";
 import { reactive, onMounted } from "vue";
 
 const props = defineProps({
-    crateManager: {
-        type: Object,
-        required: true,
-    },
+    // crateManager: {
+    //     type: Object,
+    //     required: true,
+    // },
     entity: { type: Object },
 });
 
@@ -27,11 +27,14 @@ onMounted(() => {
 });
 
 async function init() {
+    data.map = new Leaflet.map(props.entity.describoId);
     try {
         data.map = new Leaflet.map(props.entity.describoId);
     } catch (error) {
-        data.map.off();
-        data.map.remove();
+        if (data.map) {
+            data.map.off();
+            data.map.remove();
+        }
         data.map = new Leaflet.map(props.entity.describoId);
     }
     centerMap();
@@ -50,6 +53,10 @@ async function init() {
     if (properties.box) {
         const boxes = properties.box.map((box) => {
             box = box.value.split(" ");
+            console.log(
+                box,
+                box.map((b) => b.split(","))
+            );
             return {
                 type: "Polygon",
                 coordinates: [box.map((b) => b.split(","))],
@@ -96,7 +103,7 @@ function addFeatureGroup({ geoJSON, type }) {
     fg.addTo(data.map);
     data.layers.push(fg);
     setTimeout(() => {
-        data.map.flyToBounds(fg.getBounds(), { maxZoom: 5, duration: 2 });
+        data.map.flyToBounds(fg.getBounds(), { maxZoom: 3, duration: 2 });
     }, 1500);
 
     return fg;
