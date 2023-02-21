@@ -87,6 +87,7 @@
                 </div>
                 <div v-else>
                     <PaginateLinkedEntitiesComponent
+                        :crate-manager="props.crateManager"
                         :entities="data.linkInstances"
                         @load:entity="loadEntity"
                         @save:property="saveProperty"
