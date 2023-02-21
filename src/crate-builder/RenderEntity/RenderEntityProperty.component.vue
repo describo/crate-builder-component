@@ -69,15 +69,25 @@
             </div>
             <!-- render all the links in a wrapping row -->
             <div class="flex flex-row flex-wrap mt-2" v-if="data.linkInstances.length">
-                <div
-                    v-for="(instance, idx) of data.linkInstances"
-                    :key="instance.propertyId"
-                    class="flex flex-row m-1"
-                >
-                    <render-linked-item-component
-                        :index="idx"
-                        :crate-manager="props.crateManager"
-                        :entity="instance"
+                <div v-if="data.linkInstances.length <= 30">
+                    <div
+                        v-for="(instance, idx) of data.linkInstances"
+                        :key="instance.propertyId"
+                        class="flex flex-row m-1"
+                    >
+                        <render-linked-item-component
+                            :index="idx"
+                            :crate-manager="props.crateManager"
+                            :entity="instance"
+                            @load:entity="loadEntity"
+                            @save:property="saveProperty"
+                            @delete:property="deleteProperty"
+                        />
+                    </div>
+                </div>
+                <div v-else>
+                    <PaginateLinkedEntitiesComponent
+                        :entities="data.linkInstances"
                         @load:entity="loadEntity"
                         @save:property="saveProperty"
                         @delete:property="deleteProperty"
@@ -90,6 +100,7 @@
 
 <script setup>
 import RenderEntityPropertyInstanceComponent from "./RenderEntityPropertyInstance.component.vue";
+import PaginateLinkedEntitiesComponent from "./PaginateLinkedEntities.component.vue";
 import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";
 import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import AddComponent from "./Add.component.vue";

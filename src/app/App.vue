@@ -46,6 +46,7 @@ import crateFile1 from "../examples/item/empty/ro-crate-metadata.json";
 import crateFile2 from "../examples/item/complex-collection/ro-crate-metadata.json";
 import crateFile3 from "../examples/item/complex-item/ro-crate-metadata.json";
 import crateFile4 from "../examples/item/large-crate/ro-crate-metadata.json";
+import crateFile5 from "../examples/item/ridiculously-big-collection/ro-crate-metadata.json";
 import profile1 from "../examples/profile/test-profile-without-groups.json";
 import profile2 from "../examples/profile/test-profile-with-groups.json";
 import profile3 from "../examples/profile/test-profile-with-datapacks-and-without-groups.json";
@@ -63,6 +64,7 @@ const data = reactive({
         { name: "Complex Collection", value: crateFile2 },
         { name: "Complex Item", value: crateFile3 },
         { name: "Large Crate", value: crateFile4 },
+        { name: "Ridiculously Big Crate", value: crateFile5 },
     ],
     profiles: [
         { name: "Profile -groups", value: profile1 },

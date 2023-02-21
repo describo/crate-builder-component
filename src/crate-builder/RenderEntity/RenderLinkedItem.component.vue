@@ -74,7 +74,7 @@ import GeoComponent from "../base-components/Geo.component.vue";
 import TypeIconComponent from "./TypeIcon.component.vue";
 import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import MapComponent from "../base-components/Map.component.vue";
-import { computed, reactive, onMounted, inject } from "vue";
+import { computed, reactive, inject } from "vue";
 const configuration = inject("configuration");
 
 const emit = defineEmits(["load:entity", "create:property", "save:property", "delete:property"]);
@@ -94,28 +94,12 @@ const props = defineProps({
 });
 const data = reactive({
     loading: false,
-    entity: {},
+    entity: props.entity.tgtEntity,
     editLocation: false,
 });
 let showMap = computed(() => (data.entity?.["@type"]?.match("Geo") ? true : false));
 let type = "unlink";
 
-onMounted(() => {
-    loadEntityData();
-});
-
-async function loadEntityData() {
-    if (props.entity.tgtEntity) {
-        data.entity = { ...props.entity };
-    } else {
-        await new Promise((resolve) => setTimeout(resolve, props.index * 4));
-        let entity = props.crateManager.getEntity({
-            describoId: props.entity.tgtEntityId,
-            loadProperties: false,
-        });
-        data.entity = { ...entity };
-    }
-}
 function loadEntity() {
     data.loading = true;
     console.debug("Renderer Linked Item Component : emit(load:entity)", props.entity.tgtEntityId);
@@ -132,7 +116,8 @@ function saveProperty(property) {
     loadEntityData();
 }
 function deleteProperty(target) {
+    data.loading = true;
     console.debug("Renderer Linked Item Component : emit(delete:property)", target);
-    emit("delete:property", target);
+    setTimeout(() => emit("delete:property", target), 200);
 }
 </script>

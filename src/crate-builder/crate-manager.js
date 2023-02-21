@@ -169,7 +169,6 @@ export class CrateManager {
                 if (c.tgtEntityId && c.tgtEntityId !== "not found") {
                     return {
                         ...c,
-                        tgtEntity: this.__lookupEntityByDescriboId({ id: c.tgtEntityId }),
                     };
                 } else {
                     return c;
@@ -192,7 +191,15 @@ export class CrateManager {
     }
 
     getEntityProperties({ describoId, grouped = false }) {
-        let properties = this.properties.filter((p) => p.srcEntityId === describoId);
+        let properties = this.properties
+            .filter((p) => p.srcEntityId === describoId)
+            .map((p) => {
+                return {
+                    ...p,
+                    tgtEntity: this.__lookupEntityByDescriboId({ id: p.tgtEntityId }),
+                };
+            });
+
         if (grouped) return groupBy(properties, "property");
         return properties;
     }
