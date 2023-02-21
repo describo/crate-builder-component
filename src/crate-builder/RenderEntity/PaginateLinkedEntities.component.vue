@@ -20,7 +20,7 @@
         </div>
         <div class="flex flex-row flex-wrap mt-2">
             <div
-                v-for="(instance, idx) of entities"
+                v-for="(instance, idx) of data.entities"
                 :key="instance.propertyId"
                 class="flex flex-row m-1"
             >
@@ -43,7 +43,7 @@
 <script setup>
 import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";
 
-import { reactive, computed } from "vue";
+import { reactive, watch } from "vue";
 const props = defineProps({
     crateManager: {
         type: Object,
@@ -63,8 +63,16 @@ const data = reactive({
     currentPage: 1,
     entities: [],
 });
+watch(
+    () => props.entities,
+    () => {
+        filterAndChunkEntitiesForDisplay();
+    }
+);
 
-let entities = computed(() => {
+filterAndChunkEntitiesForDisplay();
+
+function filterAndChunkEntitiesForDisplay() {
     let offset = (data.currentPage - 1) * data.pageSize;
     if (data.filter) {
         const re = new RegExp(data.filter, "i");
@@ -72,12 +80,12 @@ let entities = computed(() => {
             (e) => e.tgtEntity.name.match(re) || e.tgtEntity["@id"].match(re)
         );
         data.total = entities.length;
-        return entities.slice(offset, offset + data.pageSize);
+        data.entities = entities.slice(offset, offset + data.pageSize);
     } else {
         data.total = props.entities.length;
-        return props.entities.slice(offset, offset + data.pageSize);
+        data.entities = props.entities.slice(offset, offset + data.pageSize);
     }
-});
+}
 
 function loadEntity(data) {
     console.debug("Paginate Linked Entities component: emit(load:entity)", data);
