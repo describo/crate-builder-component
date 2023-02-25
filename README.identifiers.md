@@ -26,7 +26,7 @@ Here's the [function in crate-manager.js, line 560](./src/crate-builder/crate-ma
 explanation following.
 
 ```
-export function validateId(id) {
+export function validateId(id, type) {
     // if type matches File then whatever is provided is valid
     type = isArray(type) ? type.join(", ") : type;
     if (type.match(/file/i)) return true;
