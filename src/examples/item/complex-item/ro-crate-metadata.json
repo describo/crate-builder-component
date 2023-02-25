@@ -166,7 +166,7 @@
             "memberOf": { "@id": "https://catalog.paradisec.org.au/collections/NT1" },
             "metadataExportable": 1,
             "name": "Recordings in South Efate",
-            "operator": { "@id": "jommij@yahoo.com" },
+            "operator": { "@id": "#jommij@yahoo.com" },
             "originalMedia": "audiocassette",
             "originatedOn": "1998-10-03",
             "private": 0,
@@ -752,7 +752,7 @@
             "name": "Vanuatu"
         },
         {
-            "@id": "jommij@yahoo.com",
+            "@id": "#jommij@yahoo.com",
             "@type": "Person",
             "email": "jommij@yahoo.com",
             "familyName": "Bone",
