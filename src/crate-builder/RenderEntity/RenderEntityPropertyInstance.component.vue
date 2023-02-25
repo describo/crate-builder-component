@@ -1,41 +1,47 @@
 <template>
     <div v-if="!configuration.readonly">
         <date-component
+            v-if="isDate(data.value)"
             :property="data.property"
             :value="data.value"
             @save:property="savePropertyValue"
-            v-if="isDate(data.value)"
         />
         <date-time-component
+            v-else-if="isDateTime(data.value)"
             :property="data.property"
             :value="data.value"
             @save:property="savePropertyValue"
-            v-if="isDateTime(data.value)"
         />
         <time-component
+            v-else-if="isTime(data.value)"
             :property="data.property"
             :value="data.value"
             @save:property="savePropertyValue"
-            v-if="isTime(data.value)"
         />
         <number-component
+            v-else-if="isNumber(data.value)"
             :property="data.property"
             :value="data.value"
             @save:property="savePropertyValue"
-            v-if="isNumber(data.value)"
         />
-        <text-component
-            v-if="isText(data.value) && !isValue() && !isSelect()"
-            :type="type"
+        <value-component v-else-if="isValue()" :definition="props.definition" />
+        <select-component
+            v-else-if="isSelect()"
+            :style="inputElementWidth"
             :property="data.property"
             :value="data.value"
             :definition="props.definition"
             @save:property="savePropertyValue"
         />
-        <value-component v-if="isValue()" :definition="props.definition" />
-        <select-component
-            v-if="isSelect()"
-            :style="inputElementWidth"
+        <url-component
+            v-else-if="isUrl(data.value)"
+            :property="data.property"
+            :value="data.value"
+            @create:entity="createEntity"
+        />
+        <text-component
+            v-else-if="isText(data.value)"
+            :type="type"
             :property="data.property"
             :value="data.value"
             :definition="props.definition"
@@ -56,10 +62,11 @@ import TimeComponent from "../base-components/Time.component.vue";
 import NumberComponent from "../base-components/Number.component.vue";
 import ValueComponent from "../base-components/Value.component.vue";
 import SelectComponent from "../base-components/Select.component.vue";
+import UrlComponent from "../base-components/Url.component.vue";
 import { parseISO, startOfDay } from "date-fns";
 import { isDate as validatorIsDate, isDecimal, isInt, isFloat, isNumeric } from "validator";
 import { computed, inject } from "vue";
-import { isEmpty } from "lodash";
+import { isURL } from "../crate-manager.js";
 const configuration = inject("configuration");
 
 const props = defineProps({
@@ -76,7 +83,7 @@ const props = defineProps({
         required: true,
     },
 });
-const emit = defineEmits(["load:entity", "save:property", "delete:property"]);
+const $emit = defineEmits(["save:property", "create:entity"]);
 let inputElementWidth = computed(() => {
     return `width: 500px;`;
 });
@@ -88,15 +95,11 @@ async function savePropertyValue(data) {
         data = { ...data, property: props.data.property, propertyId: props.data.propertyId };
     }
     console.debug("Render Entity Property Instance Component : emit(save:property)", data);
-    emit("save:property", data);
+    $emit("save:property", data);
 }
-function deleteProperty(data) {
-    console.debug("Render Entity Property Instance Component : emit(delete:property)", data);
-    emit("delete:property", data);
-}
-function loadEntity(data) {
-    console.debug("Render Entity Property Instance Component : emit(load:entity)", data);
-    emit("load:entity", data);
+function createEntity(data) {
+    console.debug("Render Entity Property Instance Component : emit(create:entity)", data);
+    $emit("create:entity", data);
 }
 function isDate(string) {
     const date = parseISO(string);
@@ -115,10 +118,19 @@ function isDateTime(string) {
     );
 }
 function isTime(string) {
-    return string?.match(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/);
+    return string?.match(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/) ? true : false;
 }
 function isText(string) {
-    if (!isDate(string) && !isDateTime(string) && !isTime(string) && !isNumber(string)) return true;
+    if (
+        !isDate(string) &&
+        !isDateTime(string) &&
+        !isTime(string) &&
+        !isNumber(string) &&
+        !isUrl(string) &&
+        !isSelect() &&
+        !isValue()
+    )
+        return true;
 }
 function isNumber(string) {
     return isDecimal(string) || isInt(string) || isFloat(string) || isNumeric(string);
@@ -127,6 +139,10 @@ function isValue() {
     return props?.definition?.type === "Value";
 }
 function isSelect() {
-    return props?.definition?.values?.includes(props.data.property);
+    return props?.definition?.values?.includes(props.data.property) ? true : false;
+}
+function isUrl(string) {
+    let result = isURL(string);
+    return result;
 }
 </script>
