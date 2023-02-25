@@ -60,7 +60,7 @@ export class CrateManager {
                 this.rootDescriptor = { ...e };
             } else {
                 // While we're here - let's see if @id is a valid IRI
-                let result = validateId(e["@id"]);
+                let result = validateId(e["@id"], e["@type"]);
                 if (result?.message) {
                     this.errors.push({
                         message: result.message,
@@ -71,7 +71,6 @@ export class CrateManager {
             }
         }
         if (this.errors.length) throw new Error(`The crate contains @id's which are not valid`);
-        this.rootDescriptor.about["@id"] = "./";
 
         // and then on the second pass we mark the root dataset
         //   so in total - one less pass over the entire graph
@@ -81,6 +80,7 @@ export class CrateManager {
                 ? { ...e, describoLabel: "RootDataset", "@id": "./" }
                 : e;
         });
+        this.rootDescriptor.about["@id"] = "./";
 
         // for each entity, populate entities and properties structs
         let entities = graph.map((entity) => {
@@ -557,7 +557,11 @@ export function isURL(value) {
     });
 }
 
-export function validateId(id) {
+export function validateId(id, type) {
+    // if type matches File then whatever is provided is valid
+    type = isArray(type) ? type.join(", ") : type;
+    if (type.match(/file/i)) return true;
+
     // @id is relative
     if (id.match(/^\/.*/)) return true;
 
