@@ -3,10 +3,17 @@
 - [Identifiers in your crate](#identifiers-in-your-crate)
   - [What is valid](#what-is-valid)
   - [What happens when crates are loaded into the component](#what-happens-when-crates-are-loaded-into-the-component)
+- [Key Takeaway](#key-takeaway)
 
 According to the [JSON-LD spec, IRI's](https://www.w3.org/TR/json-ld11/#iris) should be used to
 identify nodes. That said, the spec defines some other types of identifiers that are valid in
 JSON-LD but are not valid IRI's.
+
+The
+[RO Crate specification](https://www.researchobject.org/ro-crate/1.0/#describing-entities-in-json-ld)
+goes further in this regard.
+
+This component, for the sake of validation, conform to both but the SHOULD's are treated as MUST's.
 
 So, when a crate is loaded into the component it will first check that all identifiers are actually
 valid. If invalid identifiers are found, the crate will not be loaded and an `error` event will be
@@ -19,6 +26,10 @@ explanation following.
 
 ```
 export function validateId(id) {
+    // if type matches File then whatever is provided is valid
+    type = isArray(type) ? type.join(", ") : type;
+    if (type.match(/file/i)) return true;
+
     // @id is relative
     if (id.match(/^\/.*/)) return true;
 
@@ -87,8 +98,10 @@ crate. So, when processing that property Describo will create an entity internal
 Notice that the type is URL. That's because the ID is checked to see if it's a URL or not. If it's
 not, then it would be set to Thing as there is no way of knowing what it is.
 
-> This next bit is super important to understand. If you have a reference to an entity in your crate
-> that does not resolve to a URL or something inside the crate, Describo will create Thing entities
-> and that's probably not what you want. The answer is that you need to ensure that all of your
-> references either resolved to something in the crate (with valid identifiers as Describo doesn't
-> do any data fixing) or be a valid URL so that the additional entries it adds make sense.
+# Key Takeaway
+
+> If you have a reference to an entity in your crate that does not resolve to a URL or something
+> inside the crate, Describo will create Thing entities and that's probably not what you want. The
+> answer is that you need to ensure that all of your references either resolved to something in the
+> crate (with valid identifiers as Describo doesn't do any data fixing) or be a valid URL so that
+> the additional entries it adds make sense.
