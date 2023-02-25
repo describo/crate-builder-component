@@ -13,7 +13,8 @@ The
 [RO Crate specification](https://www.researchobject.org/ro-crate/1.0/#describing-entities-in-json-ld)
 goes further in this regard.
 
-This component, for the sake of validation, conform to both but the SHOULD's are treated as MUST's.
+For the sake of validation, this component conforms to both but the SHOULD's in the RO Crate spec
+are treated as MUST's.
 
 So, when a crate is loaded into the component it will first check that all identifiers are actually
 valid. If invalid identifiers are found, the crate will not be loaded and an `error` event will be
@@ -52,6 +53,7 @@ export function validateId(id) {
 }
 ```
 
+-   any file name - the entity must have File somewhere in @type
 -   relative @id's:
     -   `/something/a/b/c`
     -   `//...`
@@ -102,6 +104,6 @@ not, then it would be set to Thing as there is no way of knowing what it is.
 
 > If you have a reference to an entity in your crate that does not resolve to a URL or something
 > inside the crate, Describo will create Thing entities and that's probably not what you want. The
-> answer is that you need to ensure that all of your references either resolved to something in the
+> answer is that you need to ensure that all of your references either resolve to something in the
 > crate (with valid identifiers as Describo doesn't do any data fixing) or be a valid URL so that
 > the additional entries it adds make sense.
