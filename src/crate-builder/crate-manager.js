@@ -1,17 +1,18 @@
-import { v4 as uuid } from "uuid";
-import {
-    isString,
-    isArray,
-    isPlainObject,
-    isEmpty,
-    groupBy,
-    cloneDeep,
-    flattenDeep,
-    compact,
-    orderBy,
-} from "lodash";
+import isString from "lodash/isString";
+import isArray from "lodash/isArray";
+import isPlainObject from "lodash/isPlainObject";
+import isEmpty from "lodash/isEmpty";
+import groupBy from "lodash/groupBy";
+import cloneDeep from "lodash/cloneDeep";
+import flattenDeep from "lodash/flattenDeep";
+import compact from "lodash/compact";
+import orderBy from "lodash/orderBy";
+import partition from "lodash/partition";
 import { isURL as validatorIsURL } from "validator";
 const urlProtocols = ["http", "https", "ftp", "ftps"];
+import { validateIri, IriValidationStrategy } from "validate-iri";
+import { init } from "@paralleldrive/cuid2";
+const createId = init({ length: 32 });
 
 export class CrateManager {
     constructor() {
@@ -26,22 +27,60 @@ export class CrateManager {
         this.profile = profile;
         this.context = crate["@context"];
 
+        /**
+         *
+         * ORIGINAL Method with a few passes over the graph
+         *   of course this means the larger the graph, the longer this takes
+         *
+         *
         // store root descriptor as found
-        this.rootDescriptor = crate["@graph"].filter(
-            (e) => e["@id"] === "ro-crate-metadata.json" && e["@type"] === "CreativeWork"
-        )[0];
+        // this.rootDescriptor = crate["@graph"].filter(
+        //     (e) => e["@id"] === "ro-crate-metadata.json" && e["@type"] === "CreativeWork"
+        // )[0];
+
         // filter root descriptor from the graph
-        let graph = crate["@graph"]
-            .filter(
-                (e) => !(e["@id"] === "ro-crate-metadata.json" && e["@type"] === "CreativeWork")
-            )
-            .map((e) => {
-                // mark root dataset
-                return e["@id"] === this.rootDescriptor.about["@id"]
-                    ? { describoLabel: "RootDataset", ...e, "@id": "./" }
-                    : e;
-            });
+        // let graph = crate["@graph"]
+        //     .filter(
+        //         (e) => !(e["@id"] === "ro-crate-metadata.json" && e["@type"] === "CreativeWork")
+        //     )
+        //     .map((e) => {
+        //         // mark root dataset
+        //         return e["@id"] === this.rootDescriptor.about["@id"]
+        //             ? { describoLabel: "RootDataset", ...e, "@id": "./" }
+        //             : e;
+        //     });
+         */
+
+        /** Doing it this way means we partition on the first pass */
+        this.errors = [];
+        this.rootDescriptor;
+        let graph = [];
+        for (let [i, e] of crate["@graph"].entries()) {
+            if (e["@id"] === "ro-crate-metadata.json") {
+                this.rootDescriptor = { ...e };
+            } else {
+                // While we're here - let's see if @id is a valid IRI
+                let result = validateId(e["@id"]);
+                if (result?.message) {
+                    this.errors.push({
+                        message: result.message,
+                        entity: e,
+                    });
+                }
+                graph.push(e);
+            }
+        }
+        if (this.errors.length) throw new Error(`The crate contains @id's which are not valid`);
         this.rootDescriptor.about["@id"] = "./";
+
+        // and then on the second pass we mark the root dataset
+        //   so in total - one less pass over the entire graph
+        graph = graph.map((e) => {
+            // mark root dataset
+            return e["@id"] === this.rootDescriptor.about["@id"]
+                ? { ...e, describoLabel: "RootDataset", "@id": "./" }
+                : e;
+        });
 
         // for each entity, populate entities and properties structs
         let entities = graph.map((entity) => {
@@ -93,7 +132,13 @@ export class CrateManager {
 
     exportEntityTemplate({ describoId }) {
         let entity = this.getEntity({ describoId });
-        entity = this.rehydrateEntity({ entity });
+        let propertiesGroupedBySrcId = groupBy(this.properties, "srcEntityId");
+        let reverseConnectionsGroupedByTgtId = groupBy(this.properties, "tgtEntityId");
+        entity = this.rehydrateEntity({
+            entity,
+            propertiesGroupedBySrcId,
+            reverseConnectionsGroupedByTgtId,
+        });
 
         // remove all the internal stuff
         delete entity.reverseConnections;
@@ -399,7 +444,7 @@ export class CrateManager {
     }
 
     __addEntity({ entity }) {
-        const id = uuid();
+        const id = createId();
 
         // is there an @id?
         if (!entity["@id"]) entity["@id"] = `${id}`;
@@ -407,17 +452,22 @@ export class CrateManager {
         // is there a name?
         if (!entity.name) entity.name = entity["@id"];
 
-        // is the id an IRI of some kind?
-        if (
-            !isURL(entity["@id"]) &&
-            !entity["@id"].match(/^\//) &&
-            !entity["@id"].match(/^\./) &&
-            !entity["@id"].match(/^#/) &&
-            !entity?.["@type"]?.includes("File") &&
-            !entity?.["@type"]?.includes("Dataset")
-        ) {
-            entity["@id"] = `#${entity["@id"]}`;
-        }
+        /**
+         *
+         * NO LONGER valid or required because we fail fast if we find
+         *   invalid id's when we first load the crate
+         */
+        // is the id a URL of some kind?
+        // if (
+        //     !isURL(entity["@id"]) &&
+        //     !entity["@id"].match(/^\//) &&
+        //     !entity["@id"].match(/^\./) &&
+        //     !entity["@id"].match(/^#/) &&
+        //     !entity?.["@type"]?.includes("File") &&
+        //     !entity?.["@type"]?.includes("Dataset")
+        // ) {
+        //     entity["@id"] = `#${entity["@id"]}`;
+        // }
 
         // if no @type then set to URL or Thing
         if (!entity["@type"]) entity["@type"] = isURL(entity["@id"]) ? "URL" : "Thing";
@@ -481,7 +531,7 @@ export class CrateManager {
     }
 
     __pushProperty({ srcEntityId, property, value, tgtEntityId }) {
-        let data = { propertyId: uuid(), srcEntityId, property, value, tgtEntityId };
+        let data = { propertyId: createId(), srcEntityId, property, value, tgtEntityId };
         console.debug("Crate Mgr, addProperty", data);
         this.properties.push(data);
     }
@@ -505,4 +555,26 @@ export function isURL(value) {
         require_protocol: true,
         protocols: urlProtocols,
     });
+}
+
+export function validateId(id) {
+    // @id is relative
+    if (id.match(/^\/.*/)) return true;
+
+    // @id starting with . is valid
+    if (id.match(/^\..*/)) return true;
+
+    // @id starting with # is valid
+    if (id.match(/^\#.*/)) return true;
+
+    // @id with blank node is valid
+    if (id.match(/^\_:.*/)) return true;
+
+    // arcp URI's are valid
+    if (id.match(/arcp:\/\/name,.*/)) return true;
+    if (id.match(/arcp:\/\/uuid,.*/)) return true;
+    if (id.match(/arcp:\/\/ni,sha-256;,.*/)) return true;
+
+    // otherewise check that the id is a valid IRI
+    return validateIri(id, IriValidationStrategy.Strict);
 }

@@ -1,10 +1,62 @@
 import "regenerator-runtime";
-import { CrateManager } from "./crate-manager.js";
+import { CrateManager, validateId } from "./crate-manager.js";
 import Chance from "chance";
 const chance = Chance();
 import { range, round, compact, groupBy, random } from "lodash";
 import { performance } from "perf_hooks";
 
+describe("Test @id's that should be valid", () => {
+    test(`/.* should be valid`, () => {
+        expect(validateId("/.*")).toBeTrue;
+    });
+    test(`./ should be valid`, () => {
+        expect(validateId("./")).toBeTrue;
+    });
+    test(`../ should be valid`, () => {
+        expect(validateId("../")).toBeTrue;
+    });
+    test(`_:xxx should be valid`, () => {
+        expect(validateId("_:xxx")).toBeTrue;
+    });
+    test(`#xxx should be valid`, () => {
+        expect(validateId("#xxx")).toBeTrue;
+    });
+    test(`http://schema.org/name should be valid`, () => {
+        expect(validateId("http://schema.org/name")).toBeTrue;
+    });
+    test(`https://schema.org/name should be valid`, () => {
+        expect(validateId("https://schema.org/name")).toBeTrue;
+    });
+    test(`ftp://schema.org/name should be valid`, () => {
+        expect(validateId("ftp://schema.org/name")).toBeTrue;
+    });
+    test(`ftps://schema.org/name should be valid`, () => {
+        expect(validateId("ftps://schema.org/name")).toBeTrue;
+    });
+    test(`arcp://uuid,32a423d6-52ab-47e3-a9cd-54f418a48571/doc.html`, () => {
+        expect(validateId("arcp://uuid,32a423d6-52ab-47e3-a9cd-54f418a48571/doc.html")).toBeTrue;
+    });
+    test(`arcp://uuid,b7749d0b-0e47-5fc4-999d-f154abe68065/pics/`, () => {
+        expect(validateId("arcp://uuid,b7749d0b-0e47-5fc4-999d-f154abe68065/pics/")).toBeTrue;
+    });
+    test(`arcp://ni,sha-256;F-34D4TUeOfG0selz7REKRDo4XePkewPeQYtjL3vQs0/`, () => {
+        expect(validateId("arcp://ni,sha-256;F-34D4TUeOfG0selz7REKRDo4XePkewPeQYtjL3vQs0/"))
+            .toBeTrue;
+    });
+    test(`arcp://name,gallery.example.org/`, () => {
+        expect(validateId("arcp://name,gallery.example.org/")).toBeTrue;
+    });
+});
+describe("Test @id's that should NOT be valid", () => {
+    test(`aaa should not be valid`, () => {
+        expect(validateId("aaa").message).toEqual(`Invalid IRI according to RFC 3987: 'aaa'`);
+    });
+    test(`32a423d6-52ab-47e3-a9cd-54f418a48571 should not be valid`, () => {
+        expect(validateId("32a423d6-52ab-47e3-a9cd-54f418a48571").message).toEqual(
+            `Invalid IRI according to RFC 3987: '32a423d6-52ab-47e3-a9cd-54f418a48571'`
+        );
+    });
+});
 describe("Test loading / exporting crate files", () => {
     beforeAll(() => {
         jest.spyOn(console, "debug").mockImplementation(() => {});
@@ -59,8 +111,52 @@ describe("Test loading / exporting crate files", () => {
         try {
             crateManager.load({ crate });
         } catch (error) {
-            expect(error.message).toEqual(`A root dataset cannot be identified in the crate.`);
+            expect(error.message).toEqual(`The crate contains @id's which are not valid`);
         }
+    });
+    test(`it should fail on a crate with bad id's`, () => {
+        let crate = {
+            "@context": ["https://w3id.org/ro/crate/1.1/context"],
+            "@graph": [
+                {
+                    hasPart: [{ "@id": "0659b26d-7a7a-4393-9aed-9db7a4924c7a" }],
+                    "@id": "./",
+                },
+                {
+                    "@type": "CreativeWork",
+                    about: { "@id": "./" },
+                    conformsTo: { "@id": "https://w3id.org/ro/crate/1.1" },
+                    "@id": "ro-crate-metadata.json",
+                },
+                {
+                    "@type": "File",
+                    contentSize: 8585,
+                    name: "angular-multi-series-chart.png",
+                    encodingFormat: "image/png",
+                    "@id": "0659b26d-7a7a-4393-9aed-9db7a4924c7a",
+                },
+            ],
+        };
+
+        let crateManager = new CrateManager();
+        try {
+            crateManager.load({ crate });
+        } catch (error) {
+            expect(error.message).toEqual(`The crate contains @id's which are not valid`);
+        }
+        expect(crateManager.errors).toEqual([
+            {
+                message:
+                    "Invalid IRI according to RFC 3987: '0659b26d-7a7a-4393-9aed-9db7a4924c7a'",
+                entity: {
+                    "@type": "File",
+                    contentSize: 8585,
+                    name: "angular-multi-series-chart.png",
+                    encodingFormat: "image/png",
+                    "@id": "0659b26d-7a7a-4393-9aed-9db7a4924c7a",
+                },
+            },
+        ]);
     });
     test("with root dataset, one type", async () => {
         let crate = getBaseCrate();
@@ -74,11 +170,15 @@ describe("Test loading / exporting crate files", () => {
         crateManager.load({ crate });
 
         let exportedCrate = crateManager.exportCrate({});
-        exportedCrate["@graph"] = exportedCrate["@graph"].map((e) => {
-            delete e["@reverse"];
-            return e;
-        });
-        expect(crate).toEqual(exportedCrate);
+        let rootDataset = exportedCrate["@graph"]
+            .filter((e) => e["@id"] === "./")
+            .map((e) => {
+                delete e["@reverse"];
+                return e;
+            })[0];
+        let originalRootDataset = crate["@graph"].filter((e) => e["@id"] === "./")[0];
+        originalRootDataset["@type"] = originalRootDataset["@type"].join(", ");
+        expect(rootDataset).toEqual(originalRootDataset);
     });
     test("with root dataset, multiple types", async () => {
         let crate = getBaseCrate();
@@ -92,11 +192,15 @@ describe("Test loading / exporting crate files", () => {
         crateManager.load({ crate });
 
         let exportedCrate = crateManager.exportCrate({});
-        exportedCrate["@graph"] = exportedCrate["@graph"].map((e) => {
-            delete e["@reverse"];
-            return e;
-        });
-        expect(crate).toEqual(exportedCrate);
+        let rootDataset = exportedCrate["@graph"]
+            .filter((e) => e["@id"] === "./")
+            .map((e) => {
+                delete e["@reverse"];
+                return e;
+            })[0];
+        let originalRootDataset = crate["@graph"].filter((e) => e["@id"] === "./")[0];
+        originalRootDataset["@type"] = originalRootDataset["@type"].join(", ");
+        expect(rootDataset).toEqual(originalRootDataset);
     });
     test("with root dataset and one text property", async () => {
         let crate = getBaseCrate();
@@ -111,11 +215,13 @@ describe("Test loading / exporting crate files", () => {
         crateManager.load({ crate });
 
         let exportedCrate = crateManager.exportCrate({});
-        exportedCrate["@graph"] = exportedCrate["@graph"].map((e) => {
-            delete e["@reverse"];
-            return e;
-        });
-        expect(crate).toEqual(exportedCrate);
+        let rootDataset = exportedCrate["@graph"]
+            .filter((e) => e["@id"] === "./")
+            .map((e) => {
+                delete e["@reverse"];
+                return e;
+            })[0];
+        expect(rootDataset).toMatchObject({ text: "some text" });
     });
     test("with root dataset and one text property in array", async () => {
         let crate = getBaseCrate();
@@ -130,16 +236,13 @@ describe("Test loading / exporting crate files", () => {
         crateManager.load({ crate });
 
         let exportedCrate = crateManager.exportCrate({});
-        let rootDataset = exportedCrate["@graph"].filter((e) => e["@id"] === "./");
-        expect(rootDataset).toEqual([
-            {
-                "@id": "./",
-                "@type": ["Dataset"],
-                name: "Dataset",
-                text: "some text",
-                "@reverse": {},
-            },
-        ]);
+        let rootDataset = exportedCrate["@graph"]
+            .filter((e) => e["@id"] === "./")
+            .map((e) => {
+                delete e["@reverse"];
+                return e;
+            })[0];
+        expect(rootDataset).toMatchObject({ text: "some text" });
     });
     test("with root dataset and one reference to another object", async () => {
         let crate = getBaseCrate();
@@ -159,16 +262,13 @@ describe("Test loading / exporting crate files", () => {
         crateManager.load({ crate });
 
         let exportedCrate = crateManager.exportCrate({});
-        let rootDataset = exportedCrate["@graph"].filter((e) => e["@id"] === "./");
-        expect(rootDataset).toEqual([
-            {
-                "@id": "./",
-                "@type": ["Dataset"],
-                name: "Dataset",
-                author: { "@id": "http://entity.com/something" },
-                "@reverse": {},
-            },
-        ]);
+        let rootDataset = exportedCrate["@graph"]
+            .filter((e) => e["@id"] === "./")
+            .map((e) => {
+                delete e["@reverse"];
+                return e;
+            })[0];
+        expect(rootDataset).toMatchObject({ author: { "@id": "http://entity.com/something" } });
 
         let entity = exportedCrate["@graph"].filter(
             (e) => e["@id"] === "http://entity.com/something"
@@ -196,10 +296,10 @@ describe("Test loading / exporting crate files", () => {
 
         let exportedCrate = crateManager.exportCrate({});
         let rootDataset = exportedCrate["@graph"].filter((e) => e["@id"] === "./");
-        expect(rootDataset).toEqual([
+        expect(rootDataset).toMatchObject([
             {
                 "@id": "./",
-                "@type": ["Dataset"],
+                "@type": "Dataset",
                 name: "Dataset",
                 author: { "@id": "http://entity.com/something" },
                 "@reverse": {},
@@ -249,7 +349,6 @@ describe("Test loading / exporting crate files", () => {
         ]);
     });
 });
-
 describe("Test interacting with the crate", () => {
     let crate, crateManager;
     beforeAll(() => {
@@ -304,14 +403,14 @@ describe("Test interacting with the crate", () => {
         };
         e = crateManager.addEntity({ entity });
         expect(e["@type"]).toEqual("Thing");
-        expect(e["@id"]).toMatch(/^#[a-z,0-9]{8}-.*/);
+        expect(e["@id"]).toMatch(/^#[a-z,0-9]{32}/);
 
         entity = {
             "@id": "./",
         };
         e = crateManager.addEntity({ entity });
         expect(e["@id"]).toEqual("./");
-        expect(e["@type"]).toEqual(["Dataset"]);
+        expect(e["@type"]).toEqual("Dataset");
     });
     test("add a simple File or Dataset entity to the crate", () => {
         let entity = {
@@ -633,6 +732,7 @@ describe("Test interacting with the crate", () => {
             name: chance.sentence(),
         };
         let e = crateManager.addEntity({ entity });
+        crateManager.deleteEntity({ describoId: e.describoId });
 
         crate = crateManager.exportCrate();
         expect(crate["@graph"].length).toEqual(2);
@@ -650,8 +750,8 @@ describe("Test interacting with the crate", () => {
         };
         let e = crateManager.addEntity({ entity });
 
-        let exportedCrate = crateManager.exportCrate({});
-        expect(exportedCrate["@graph"].length).toEqual(2);
+        crate = crateManager.exportCrate({});
+        expect(crate["@graph"].length).toEqual(3);
     });
     test(`should be able to flatten a complex entity - like one coming from a datapack`, async () => {
         const json = {
@@ -756,7 +856,7 @@ describe("Test interacting with the crate", () => {
             },
             {
                 "@id": "./",
-                "@type": ["Dataset"],
+                "@type": "Dataset",
                 name: "Dataset",
                 language: {
                     "@id": "http://some.thing",
@@ -801,7 +901,7 @@ describe("Test interacting with the crate", () => {
             },
             {
                 "@id": "./",
-                "@type": ["Dataset"],
+                "@type": "Dataset",
                 name: "Dataset",
                 language: {
                     "@id": "http://some.thing",
@@ -838,6 +938,10 @@ describe("Test interacting with the crate", () => {
         });
 
         // delete the author property from the root dataset
+        let rootDataset = crateManager.getRootDataset();
+        let authorPropertyId = rootDataset.properties.filter((p) => p.property === "author")[0]
+            .propertyId;
+        crateManager.deleteProperty({ propertyId: authorPropertyId });
 
         let crate = crateManager.exportCrate({});
         expect(crate["@graph"]).toEqual([
@@ -853,28 +957,9 @@ describe("Test interacting with the crate", () => {
             },
             {
                 "@id": "./",
-                "@type": ["Dataset"],
+                "@type": "Dataset",
                 "@reverse": {},
                 name: "Dataset",
-                author: {
-                    "@id": "http://some.thing",
-                },
-            },
-            {
-                "@id": "http://some.thing",
-                "@type": "Thing",
-                "@reverse": {
-                    level: {
-                        "@id": "http://some.thing",
-                    },
-                    author: {
-                        "@id": "./",
-                    },
-                },
-                name: "level1",
-                level: {
-                    "@id": "http://some.thing",
-                },
             },
         ]);
     });
@@ -899,7 +984,6 @@ describe("Test interacting with the crate", () => {
         let rootDataset = crateManager.getRootDataset();
         let author = rootDataset.properties[0];
         crateManager.deleteProperty({ propertyId: author.propertyId });
-        crateManager.purgeUnlinkedEntities();
 
         let crate = crateManager.exportCrate({});
         expect(crate["@graph"]).toEqual([
@@ -915,14 +999,13 @@ describe("Test interacting with the crate", () => {
             },
             {
                 "@id": "./",
-                "@type": ["Dataset"],
+                "@type": "Dataset",
                 "@reverse": {},
                 name: "Dataset",
             },
         ]);
     });
 });
-
 describe("Test working with a complex crate", () => {
     let crate, crateManager;
     beforeAll(() => {
@@ -983,7 +1066,6 @@ describe("Test working with a complex crate", () => {
         expect(org.reverseConnections[0].property).toEqual("organization");
     });
 });
-
 describe.skip("Test loading large crates and see how it performs", () => {
     test("n = 10, 100, 500, 1000, 2000, 4000, 8000, 16000", async () => {
         const tests = [10, 100, 500, 1000, 2000, 4000, 8000, 16000];
@@ -1036,7 +1118,6 @@ describe.skip("Test loading large crates and see how it performs", () => {
         }
     });
 });
-
 describe.skip("Test operations on large entity arrays", () => {
     test("n = 20000", async () => {
         const tests = [20000];

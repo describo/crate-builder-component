@@ -9,6 +9,7 @@
   - [Vue Router Dependency](#vue-router-dependency)
   - [Install the package](#install-the-package)
   - [Wire it up](#wire-it-up)
+- [About identifiers and your data](#about-identifiers-and-your-data)
 - [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
 - [Full Usage - configuration and events](#full-usage---configuration-and-events)
   - [Configuration](#configuration)
@@ -111,6 +112,11 @@ app.use(router);
 app.use(DescriboCrateBuilder);
 app.mount("#app");
 ```
+
+# About identifiers and your data
+
+It is super important that your data is well formed.
+[Read about how describo handles your crate when it loads and what is required of you](./README.identifiers.md)
 
 # Basic Usage - pass in crate and profile
 

@@ -115,6 +115,7 @@ function init() {
     } catch (error) {
         emit("error", "Unable to load the crate. See the console for the detailed error message.");
         console.error(error);
+        console.error(crateManager?.errors);
         return;
     }
 
