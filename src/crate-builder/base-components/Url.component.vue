@@ -46,14 +46,16 @@ watch(
     }
 );
 function save() {
-    let isUrl = verifyValidUrl(data.internalValue);
+    let isUrl = isURL(data.internalValue);
     if (isUrl) {
         $emit("create:entity", {
-            property: this.property,
-            "@id": this.internalValue,
+            property: props.property,
+            "@id": data.internalValue,
             "@type": "URL",
-            name: this.internalValue,
+            name: data.internalValue,
         });
+    } else {
+        data.isValidUrl = false;
     }
 }
 </script>

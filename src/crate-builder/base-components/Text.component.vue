@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="">
         <div class="flex flex-row space-x-2" v-if="data.isValidType">
             <el-input
                 class="w-full"
@@ -29,7 +29,11 @@ const props = defineProps({
     type: {
         type: String,
         default: "textarea",
-        validator: (value) => ["text", "textarea"].includes(value),
+        // We can't really validate this as text is the catchall regardless of what
+        //   the data type is supposed to be for any given field
+        // validator: (value) => {
+        //     return ["text", "textarea", "url"].includes(value.toLowerCase());
+        // },
     },
     property: {
         type: String,
