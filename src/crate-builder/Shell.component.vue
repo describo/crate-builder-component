@@ -114,8 +114,8 @@ function init() {
         data.crateManager.load({ crate: data.crate, profile: data.profile });
     } catch (error) {
         emit("error", "Unable to load the crate. See the console for the detailed error message.");
-        console.error(error);
-        console.error(crateManager?.errors);
+        console.error(error.message);
+        console.error(data.crateManager?.errors);
         return;
     }
 
