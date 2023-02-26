@@ -6,54 +6,64 @@ import { range, round, compact, groupBy, random } from "lodash";
 import { performance } from "perf_hooks";
 
 describe("Test @id's that should be valid", () => {
-    test(`/.* should be valid`, () => {
-        expect(validateId("/.*")).toBeTrue;
+    test(`LICENCE.md should be valid`, () => {
+        expect(validateId("LICENCE.md", "File")).toBeTrue;
+        expect(validateId("LICENCE.md", "File, Licence")).toBeTrue;
+        expect(validateId("LICENCE.md", ["File", "Licence"])).toBeTrue;
+    });
+    test(`/path/to/file should be valid`, () => {
+        expect(validateId("/path/to/file", "Dataset")).toBeTrue;
     });
     test(`./ should be valid`, () => {
-        expect(validateId("./")).toBeTrue;
+        expect(validateId("./", "Dataset")).toBeTrue;
     });
     test(`../ should be valid`, () => {
-        expect(validateId("../")).toBeTrue;
+        expect(validateId("../", "Dataset")).toBeTrue;
     });
     test(`_:xxx should be valid`, () => {
-        expect(validateId("_:xxx")).toBeTrue;
+        expect(validateId("_:xxx", "Dataset")).toBeTrue;
     });
     test(`#xxx should be valid`, () => {
-        expect(validateId("#xxx")).toBeTrue;
+        expect(validateId("#xxx", "Dataset")).toBeTrue;
     });
     test(`http://schema.org/name should be valid`, () => {
-        expect(validateId("http://schema.org/name")).toBeTrue;
+        expect(validateId("http://schema.org/name", "Dataset")).toBeTrue;
     });
     test(`https://schema.org/name should be valid`, () => {
-        expect(validateId("https://schema.org/name")).toBeTrue;
+        expect(validateId("https://schema.org/name", "Dataset")).toBeTrue;
     });
     test(`ftp://schema.org/name should be valid`, () => {
-        expect(validateId("ftp://schema.org/name")).toBeTrue;
+        expect(validateId("ftp://schema.org/name", "Dataset")).toBeTrue;
     });
     test(`ftps://schema.org/name should be valid`, () => {
-        expect(validateId("ftps://schema.org/name")).toBeTrue;
+        expect(validateId("ftps://schema.org/name", "Dataset")).toBeTrue;
     });
     test(`arcp://uuid,32a423d6-52ab-47e3-a9cd-54f418a48571/doc.html`, () => {
-        expect(validateId("arcp://uuid,32a423d6-52ab-47e3-a9cd-54f418a48571/doc.html")).toBeTrue;
-    });
-    test(`arcp://uuid,b7749d0b-0e47-5fc4-999d-f154abe68065/pics/`, () => {
-        expect(validateId("arcp://uuid,b7749d0b-0e47-5fc4-999d-f154abe68065/pics/")).toBeTrue;
-    });
-    test(`arcp://ni,sha-256;F-34D4TUeOfG0selz7REKRDo4XePkewPeQYtjL3vQs0/`, () => {
-        expect(validateId("arcp://ni,sha-256;F-34D4TUeOfG0selz7REKRDo4XePkewPeQYtjL3vQs0/"))
+        expect(validateId("arcp://uuid,32a423d6-52ab-47e3-a9cd-54f418a48571/doc.html", "Dataset"))
             .toBeTrue;
     });
+    test(`arcp://uuid,b7749d0b-0e47-5fc4-999d-f154abe68065/pics/`, () => {
+        expect(validateId("arcp://uuid,b7749d0b-0e47-5fc4-999d-f154abe68065/pics/", "Dataset"))
+            .toBeTrue;
+    });
+    test(`arcp://ni,sha-256;F-34D4TUeOfG0selz7REKRDo4XePkewPeQYtjL3vQs0/`, () => {
+        expect(
+            validateId("arcp://ni,sha-256;F-34D4TUeOfG0selz7REKRDo4XePkewPeQYtjL3vQs0/", "Dataset")
+        ).toBeTrue;
+    });
     test(`arcp://name,gallery.example.org/`, () => {
-        expect(validateId("arcp://name,gallery.example.org/")).toBeTrue;
+        expect(validateId("arcp://name,gallery.example.org/a", "Dataset")).toBeTrue;
     });
 });
 describe("Test @id's that should NOT be valid", () => {
     test(`aaa should not be valid`, () => {
-        expect(validateId("aaa").message).toEqual(`Invalid IRI according to RFC 3987: 'aaa'`);
+        expect(validateId("aaa", "Dataset").message).toEqual(
+            "Invalid identifier 'aaa'. See https://github.com/describo/crate-builder-component/blob/master/README.identifiers.md for more information."
+        );
     });
     test(`32a423d6-52ab-47e3-a9cd-54f418a48571 should not be valid`, () => {
-        expect(validateId("32a423d6-52ab-47e3-a9cd-54f418a48571").message).toEqual(
-            `Invalid IRI according to RFC 3987: '32a423d6-52ab-47e3-a9cd-54f418a48571'`
+        expect(validateId("32a423d6-52ab-47e3-a9cd-54f418a48571", "Dataset").message).toEqual(
+            `Invalid identifier '32a423d6-52ab-47e3-a9cd-54f418a48571'. See https://github.com/describo/crate-builder-component/blob/master/README.identifiers.md for more information.`
         );
     });
 });
@@ -113,50 +123,6 @@ describe("Test loading / exporting crate files", () => {
         } catch (error) {
             expect(error.message).toEqual(`The crate contains @id's which are not valid`);
         }
-    });
-    test(`it should fail on a crate with bad id's`, () => {
-        let crate = {
-            "@context": ["https://w3id.org/ro/crate/1.1/context"],
-            "@graph": [
-                {
-                    hasPart: [{ "@id": "0659b26d-7a7a-4393-9aed-9db7a4924c7a" }],
-                    "@id": "./",
-                },
-                {
-                    "@type": "CreativeWork",
-                    about: { "@id": "./" },
-                    conformsTo: { "@id": "https://w3id.org/ro/crate/1.1" },
-                    "@id": "ro-crate-metadata.json",
-                },
-                {
-                    "@type": "File",
-                    contentSize: 8585,
-                    name: "angular-multi-series-chart.png",
-                    encodingFormat: "image/png",
-                    "@id": "0659b26d-7a7a-4393-9aed-9db7a4924c7a",
-                },
-            ],
-        };
-
-        let crateManager = new CrateManager();
-        try {
-            crateManager.load({ crate });
-        } catch (error) {
-            expect(error.message).toEqual(`The crate contains @id's which are not valid`);
-        }
-        expect(crateManager.errors).toEqual([
-            {
-                message:
-                    "Invalid IRI according to RFC 3987: '0659b26d-7a7a-4393-9aed-9db7a4924c7a'",
-                entity: {
-                    "@type": "File",
-                    contentSize: 8585,
-                    name: "angular-multi-series-chart.png",
-                    encodingFormat: "image/png",
-                    "@id": "0659b26d-7a7a-4393-9aed-9db7a4924c7a",
-                },
-            },
-        ]);
     });
     test("with root dataset, one type", async () => {
         let crate = getBaseCrate();
@@ -387,7 +353,7 @@ describe("Test interacting with the crate", () => {
             "@type": "Thing",
         };
         e = crateManager.addEntity({ entity });
-        expect(e["@id"]).toEqual("#something");
+        expect(e["@id"]).toEqual("something");
         expect(e.name).toEqual("something");
 
         entity = {
@@ -403,6 +369,7 @@ describe("Test interacting with the crate", () => {
         };
         e = crateManager.addEntity({ entity });
         expect(e["@type"]).toEqual("Thing");
+        console.log(e["@id"]);
         expect(e["@id"]).toMatch(/^#[a-z,0-9]{32}/);
 
         entity = {

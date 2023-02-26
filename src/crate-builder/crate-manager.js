@@ -447,7 +447,7 @@ export class CrateManager {
         const id = createId();
 
         // is there an @id?
-        if (!entity["@id"]) entity["@id"] = `${id}`;
+        if (!entity["@id"]) entity["@id"] = `#${id}`;
 
         // is there a name?
         if (!entity.name) entity.name = entity["@id"];
@@ -580,5 +580,17 @@ export function validateId(id, type) {
     if (id.match(/arcp:\/\/ni,sha-256;,.*/)) return true;
 
     // otherewise check that the id is a valid IRI
-    return validateIri(id, IriValidationStrategy.Strict);
+    let result = validateIri(id, IriValidationStrategy.Strict);
+    if (!result) {
+        // it's valid
+        return true;
+    } else if (result?.message?.match(/Invalid IRI according to RFC 3987:/)) {
+        // otherwise
+        const message = `${result.message.replace(
+            /Invalid IRI according to RFC 3987:/,
+            "Invalid identifier"
+        )}. See https://github.com/describo/crate-builder-component/blob/master/README.identifiers.md for more information.`;
+        result.message = message;
+    }
+    return result;
 }
