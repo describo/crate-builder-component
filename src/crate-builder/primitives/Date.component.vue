@@ -40,10 +40,12 @@ watch(
     () => props.value,
     () => {
         data.internalValue = props.value;
-        data.isValidDate = checkDateIsValid(data.internalValue);
+        data.isValidDate = checkDateIsValid(props.value);
     }
 );
 function save() {
+    data.isValidDate = checkDateIsValid(data.internalValue);
+    if (!data.isValidDate) return;
     $emit("save:property", {
         property: props.property,
         value: startOfDay(data.internalValue).toISOString(),
