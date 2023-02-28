@@ -9,7 +9,7 @@
                 @change="save"
                 resize="vertical"
             ></el-input>
-            <el-button @click="save" type="success">
+            <el-button @click="save" type="success" :disabled="!data.isValidUrl">
                 <i class="fas fa-check fa-fw"></i>
             </el-button>
         </div>
@@ -46,16 +46,16 @@ watch(
     }
 );
 function save() {
-    let isUrl = isURL(data.internalValue);
-    if (isUrl) {
+    data.isValidUrl = isURL(data.internalValue);
+    if (data.isValidUrl) {
         $emit("create:entity", {
             property: props.property,
-            "@id": data.internalValue,
-            "@type": "URL",
-            name: data.internalValue,
+            json: {
+                "@id": data.internalValue,
+                "@type": "URL",
+                name: data.internalValue,
+            },
         });
-    } else {
-        data.isValidUrl = false;
     }
 }
 </script>
