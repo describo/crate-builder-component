@@ -2,29 +2,26 @@ import TimeComponent from "./Time.component.vue";
 
 export default {
     component: TimeComponent,
+    argTypes: {
+        property: {
+            control: { type: "text" },
+        },
+        value: {
+            options: ["09:30", "11:00:03", "15:58", "18:34:21", "time now"],
+            control: { type: "radio" },
+        },
+        saveProperty: { action: "saveProperty" },
+    },
 };
 
-const Template = (args) => ({
+const Template = (args, { argTypes }) => ({
     components: { TimeComponent },
-    setup() {
-        return { property: args.property, value: args.value };
-    },
-    template: '<TimeComponent property="property" value="value" />',
+    props: Object.keys(argTypes),
+    template: '<TimeComponent v-bind="$props" @save:property="saveProperty" />',
 });
 
-export const ValidTime = Template.bind({});
-ValidTime.args = {
+export const TimeComponentStory = Template.bind({});
+TimeComponentStory.args = {
     property: "currentTime",
     value: "09:30",
-};
-
-export const InvalidTime = Template.bind({});
-InvalidTime.args = {
-    property: "currentTime",
-    value: "time now",
-};
-
-export const NoTimeSupplied = Template.bind({});
-NoTimeSupplied.args = {
-    property: "currentTime",
 };

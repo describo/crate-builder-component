@@ -34,15 +34,15 @@ const props = defineProps({
 });
 const $emit = defineEmits(["save:property"]);
 const data = reactive({
-    internalValue: isTime(props.value) ? props.value : null,
-    isValidTime: isTime(props.value),
+    internalValue: props.value,
+    isValidTime: checkTimeIsValid(props.value),
 });
 
 watch(
     () => props.value,
     () => {
         data.internalValue = props.value;
-        data.isValidTime = isTime(data.internalValue);
+        data.isValidTime = checkTimeIsValid(data.internalValue);
     }
 );
 function save() {
@@ -50,5 +50,14 @@ function save() {
         property: props.property,
         value: data.internalValue,
     });
+}
+
+function checkTimeIsValid(time) {
+    try {
+        if (!time) return true;
+        if (time.match(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/)) return true;
+        if (time.match(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/)) return true;
+    } catch (error) {}
+    return false;
 }
 </script>
