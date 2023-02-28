@@ -2,30 +2,24 @@ import NumberComponent from "./Number.component.vue";
 
 export default {
     component: NumberComponent,
+    argTypes: {
+        property: { control: { type: "text" } },
+        value: {
+            options: [1, "2", "not a number"],
+            control: { type: "select" },
+        },
+        saveProperty: { action: "saveProperty" },
+    },
 };
 
-const Template = (args) => ({
+const Template = (args, { argTypes }) => ({
     components: { NumberComponent },
-    setup() {
-        return { property: args.property, value: args.value };
-    },
-    template: '<NumberComponent property="property" value="value" />',
+    props: Object.keys(argTypes),
+    template: '<NumberComponent v-bind="$props" @save:property="saveProperty" />',
 });
 
-export const ValidNumber1 = Template.bind({});
-ValidNumber1.args = {
-    property: "number",
-    value: "1",
-};
-
-export const ValidNumber2 = Template.bind({});
-ValidNumber2.args = {
+export const NumberComponentStory = Template.bind({});
+NumberComponentStory.args = {
     property: "number",
     value: 1,
-};
-
-export const InvalidNumber = Template.bind({});
-InvalidNumber.args = {
-    property: "number",
-    value: "something not a number",
 };
