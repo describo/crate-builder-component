@@ -15,6 +15,6 @@ import RenderEntityComponent from "./RenderEntity.component.vue";
 import { reactive } from "vue";
 
 const data = reactive({
-    activeTab: "entity",
+    activeTab: "component",
 });
 </script>
