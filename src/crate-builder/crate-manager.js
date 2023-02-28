@@ -59,7 +59,16 @@ export class CrateManager {
             if (e["@id"] === "ro-crate-metadata.json") {
                 this.rootDescriptor = { ...e };
             } else {
-                // While we're here - let's see if @id is a valid IRI
+                //  ensure every entity has a defined type
+                if (!e?.["@type"]) {
+                    this.errors.push({
+                        message: `The entity does not have '@type' defined.`,
+                        entity: e,
+                    });
+                    continue;
+                }
+
+                // then see if @id is a valid IRI
                 let result = validateId(e["@id"], e["@type"]);
                 if (result?.message) {
                     this.errors.push({
@@ -67,10 +76,11 @@ export class CrateManager {
                         entity: e,
                     });
                 }
+
                 graph.push(e);
             }
         }
-        if (this.errors.length) throw new Error(`The crate contains @id's which are not valid`);
+        if (this.errors.length) throw new Error(`The crate is invalid.`);
 
         // and then on the second pass we mark the root dataset
         //   so in total - one less pass over the entire graph

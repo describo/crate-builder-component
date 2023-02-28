@@ -109,7 +109,7 @@ describe("Test loading / exporting crate files", () => {
             );
         }
     });
-    test("should fail on a crate where root dataset can't be identified", async () => {
+    test("should fail on a crate with bad @id's and no @type", async () => {
         let crate = getBaseCrate();
         crate["@graph"].push({
             "@id": "not expected",
@@ -121,8 +121,19 @@ describe("Test loading / exporting crate files", () => {
         try {
             crateManager.load({ crate });
         } catch (error) {
-            expect(error.message).toEqual(`The crate contains @id's which are not valid`);
+            expect(error.message).toEqual(`The crate is invalid.`);
         }
+
+        crate = getBaseCrate();
+        crate["@graph"].push({
+            "@id": "#valid id",
+            name: "Dataset",
+        });
+
+        crateManager = new CrateManager();
+        try {
+            crateManager.load({ crate });
+        } catch (error) {}
     });
     test("with root dataset, one type", async () => {
         let crate = getBaseCrate();
@@ -369,7 +380,6 @@ describe("Test interacting with the crate", () => {
         };
         e = crateManager.addEntity({ entity });
         expect(e["@type"]).toEqual("Thing");
-        console.log(e["@id"]);
         expect(e["@id"]).toMatch(/^#[a-z,0-9]{32}/);
 
         entity = {
