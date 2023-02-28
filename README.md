@@ -2,6 +2,9 @@
 
 - [Crate Builder Component](#crate-builder-component)
 - [Developing the plugin](#developing-the-plugin)
+  - [Storybook](#storybook)
+  - [Development application](#development-application)
+- [Building and publishing a release](#building-and-publishing-a-release)
 - [Repo structure](#repo-structure)
 - [Using the component in your app](#using-the-component-in-your-app)
   - [Profiles](#profiles)
@@ -25,7 +28,20 @@ template lookups.
 
 # Developing the plugin
 
-To work on this plugin there is a small VueJS app in this codebase. To start up the dev environment:
+## Storybook
+
+[Storybook](storybook.js.org/) is used in this application. When you are just developing the
+components, storybook is what you want as you can focus just on the component in isolation. To start
+it run:
+
+```
+npm run storybook
+```
+
+## Development application
+
+When you want to see component in action as a whole, there is a small VueJS app in this codebase. To
+start up the dev environment:
 
 ```
 docker compose up (starts up an elastic search container for datapack lookups)
@@ -33,6 +49,21 @@ npm run develop
 
 --> browse to localhost:9000
 ```
+
+# Building and publishing a release
+
+Build the VueJS and web component
+
+-   `npm run build`
+
+Version it
+
+-   npm version {minor|patch}
+
+Push the tag to github and create a release
+
+-   git push origin master --tags
+-   Go to the repo and create a release from the tag, documenting what is in it.
 
 # Repo structure
 
