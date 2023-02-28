@@ -24,4 +24,7 @@ const Template = (args, { argTypes }) => ({
     template: '<DisplayPropertyNameComponent v-bind="$props" />',
 });
 
-export const DisplayPropertyName = Template.bind({});
+export const DisplayPropertyNameComponentStory = Template.bind({});
+DisplayPropertyNameComponentStory.args = {
+    label: "name",
+};

@@ -10,7 +10,7 @@ const props = defineProps({
     label: { type: String, required: true },
 });
 const labelDisplay = computed(() => {
-    if (props.label.match(/:/)) {
+    if (props?.label?.match(/:/)) {
         let [namespace, label] = props.label.split(":");
         return `${namespace}:${startCase(label)}`;
     } else {
