@@ -42,7 +42,6 @@ watch(
     }
 );
 function save() {
-    console.log(data.internalValue, data.internalValue.toISOString());
     $emit("save:property", {
         property: props.property,
         value: data.internalValue.toISOString(),
