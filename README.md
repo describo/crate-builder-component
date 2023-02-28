@@ -9,7 +9,7 @@
   - [Vue Router Dependency](#vue-router-dependency)
   - [Install the package](#install-the-package)
   - [Wire it up](#wire-it-up)
-- [Identifiers](#identifiers)
+- [Identifiers and Types](#identifiers-and-types)
 - [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
 - [Full Usage - configuration and events](#full-usage---configuration-and-events)
   - [Configuration](#configuration)
@@ -113,11 +113,14 @@ app.use(DescriboCrateBuilder);
 app.mount("#app");
 ```
 
-# Identifiers
+# Identifiers and Types
 
 It is super important that your data is well formed. A big part of this is how you define your
 identifiers.
-[Read about how describo handles your crate when it loads and what is required of you](./README.identifiers.md)
+[Read about how describo handles your crate when it loads and what is required of you.](./README.identifiers.md)
+
+In addition, every entity in your crate must have an `@type`. If any entity doesn't, then the whole
+crate will be marked bad not be loaded.
 
 # Basic Usage - pass in crate and profile
 
@@ -205,7 +208,8 @@ from there.**
     over the top of the component when you first start the download to when the crate is ready to be
     used, listen for this event to cancel the indicator.
 -   `error`: If the component fails to load the crate it will emit an error message with more
-    information. You should listen for this event and handle it accordingly in your application.
+    information. You should listen for this event and handle it accordingly in your application. It
+    emits an object with one property, `errors` which is an array of errors found in the crate.
 -   `@save:crate`: whenever the crate changes internally, this event will be emitted with the full
     crate for your app to save or handle in some way
 -   `@save:crate:template`: this event emits the current crate as a template with a name. This is so

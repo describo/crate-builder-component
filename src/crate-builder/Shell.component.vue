@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col">
         <render-entity-component
-            v-if="data.ready"
+            v-if="data.ready && !data.error"
             :crate-manager="data.crateManager"
             :entity="data.entity"
             :mode="props.mode"
@@ -11,6 +11,13 @@
             @save:crate:template="saveCrateAsTemplate"
             @save:entity:template="saveEntityAsTemplate"
         />
+
+        <div v-if="data.error && data.errors.length">
+            There are errors in the data.
+            <pre
+                >{{ data.errors }}
+            </pre>
+        </div>
     </div>
 </template>
 
@@ -70,6 +77,7 @@ const emit = defineEmits(["ready", "error", "save:crate", "save:crate:template"]
 const data = reactive({
     ready: false,
     error: false,
+    errors: [],
     crate: [],
     profile: {},
     entity: {},
@@ -113,14 +121,17 @@ function init() {
     try {
         data.crateManager.load({ crate: data.crate, profile: data.profile });
     } catch (error) {
-        emit("error", "Unable to load the crate. See the console for the detailed error message.");
-        console.error(error.message);
-        console.error(data.crateManager?.errors);
+        emit("error", {
+            errors: data.crateManager.errors,
+        });
+        data.error = true;
+        data.errors = data.crateManager.errors;
+        ready();
         return;
     }
 
     setCurrentEntity({ name: "RootDataset" });
-    data.ready = true;
+    ready();
 }
 function configure() {
     const configuration = {
@@ -165,6 +176,7 @@ async function setCurrentEntity({ describoId = undefined, name = undefined, id =
     }
 }
 function ready() {
+    data.ready = true;
     emit("ready");
 }
 async function saveCrate() {
