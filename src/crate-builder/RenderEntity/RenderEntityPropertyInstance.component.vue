@@ -55,14 +55,14 @@
 </template>
 
 <script setup>
-import TextComponent from "../base-components/Text.component.vue";
-import DateComponent from "../base-components/Date.component.vue";
-import DateTimeComponent from "../base-components/DateTime.component.vue";
-import TimeComponent from "../base-components/Time.component.vue";
-import NumberComponent from "../base-components/Number.component.vue";
-import ValueComponent from "../base-components/Value.component.vue";
-import SelectComponent from "../base-components/Select.component.vue";
-import UrlComponent from "../base-components/Url.component.vue";
+import TextComponent from "../primitives/Text.component.vue";
+import DateComponent from "../primitives/Date.component.vue";
+import DateTimeComponent from "../primitives/DateTime.component.vue";
+import TimeComponent from "../primitives/Time.component.vue";
+import NumberComponent from "../primitives/Number.component.vue";
+import ValueComponent from "../primitives/Value.component.vue";
+import SelectComponent from "../primitives/Select.component.vue";
+import UrlComponent from "../primitives/Url.component.vue";
 import { parseISO, startOfDay } from "date-fns";
 import { isDate as validatorIsDate, isDecimal, isInt, isFloat, isNumeric } from "validator";
 import { computed, inject } from "vue";
