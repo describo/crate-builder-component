@@ -2,26 +2,25 @@ import ValueComponent from "./Value.component.vue";
 
 export default {
     component: ValueComponent,
+    argTypes: {
+        property: {
+            control: { type: "text" },
+        },
+        value: {
+            options: ["1", "http://schema.org/name", { key: "value" }],
+            control: { type: "select" },
+        },
+    },
 };
 
-const Template = (args) => ({
+const Template = (args, { argTypes }) => ({
     components: { ValueComponent },
-    setup() {
-        return { definition: args.definition };
-    },
-    template: '<ValueComponent definition="definition" />',
+    props: Object.keys(argTypes),
+    template: '<ValueComponent v-bind="$props" />',
 });
 
-export const Value1 = Template.bind({});
-Value1.args = {
-    definition: {
-        value: "some value",
-    },
-};
-
-export const Value2 = Template.bind({});
-Value2.args = {
-    definition: {
-        value: "some other value",
-    },
+export const ValueComponentStory = Template.bind({});
+ValueComponentStory.args = {
+    property: "value",
+    value: "1",
 };

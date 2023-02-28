@@ -1,17 +1,26 @@
 <template>
-    <div>{{ this.definition.value }}</div>
+    <div class="flex flex-col">
+        <div v-if="isValidString">{{ props.value }}</div>
+        <div v-if="!isValidString">
+            The supplied value '{{ props.value }}' is invalid. It can only be a string.
+        </div>
+    </div>
 </template>
 
-<script>
-export default {
-    props: {
-        definition: {
-            type: Object,
-            required: true,
-        },
+<script setup>
+import { computed } from "vue";
+import isString from "lodash/isString";
+
+const props = defineProps({
+    property: {
+        type: String,
+        required: true,
     },
-    data() {
-        return {};
+    value: {
+        type: String,
+        required: true,
     },
-};
+});
+
+let isValidString = computed(() => isString(props.value));
 </script>
