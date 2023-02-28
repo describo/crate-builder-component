@@ -63,7 +63,6 @@ export class ProfileManager {
         // let typeDefinitions = [];
 
         // do we have a definition in the profile?
-        // for (let type of types) {
         let typeDefinition;
         if (this.profile?.classes?.[type]) {
             //   yes - get it
@@ -72,6 +71,12 @@ export class ProfileManager {
             //   no  - find it in schema.org
             typeDefinition = schemaOrgTypeDefinitions?.[type];
             typeDefinition.definition = "inherit";
+
+            /**
+             * We set the inputs to an empty array here otherwise we get
+             *  all of them on the page which we don't want. By setting to inherit
+             *  the user can choose to add inputs.
+             */
             typeDefinition.inputs = [];
         } else {
             typeDefinition = {
@@ -80,10 +85,11 @@ export class ProfileManager {
             };
         }
         if (!typeDefinition.inputs) typeDefinition.inputs = [];
-        /**
-         *
 
-         *
+        /**
+         * Get the hierarchy for the type definition we're interested in
+         *  and then go join in any inputs we find on any of those types
+         *  in the profile.
          */
         let types = this.getAdditionalEntityTypes({ entity });
         if (types) {

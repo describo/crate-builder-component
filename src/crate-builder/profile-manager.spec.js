@@ -72,7 +72,7 @@ describe("Test working with profiles", () => {
         const entity = { "@type": ["Dataset"] };
         let typeDefinition = profileManager.getTypeDefinition({ entity });
         expect(typeDefinition.definition).toEqual("inherit");
-        expect(typeDefinition.inputs.length).toEqual(9);
+        expect(typeDefinition.inputs.length).toEqual(0);
 
         let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
         expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing"]);
@@ -83,7 +83,7 @@ describe("Test working with profiles", () => {
         const entity = { "@type": "Dataset" };
         let typeDefinition = profileManager.getTypeDefinition({ entity });
         expect(typeDefinition.definition).toEqual("inherit");
-        expect(typeDefinition.inputs.length).toEqual(9);
+        expect(typeDefinition.inputs.length).toEqual(0);
 
         let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
         expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing"]);
@@ -97,7 +97,7 @@ describe("Test working with profiles", () => {
         const entity = { "@type": "Dataset" };
         let typeDefinition = profileManager.getTypeDefinition({ entity });
         expect(typeDefinition.definition).toEqual("inherit");
-        expect(typeDefinition.inputs.length).toEqual(9);
+        expect(typeDefinition.inputs.length).toEqual(0);
 
         let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
         expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing"]);
