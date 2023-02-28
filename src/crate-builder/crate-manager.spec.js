@@ -154,7 +154,6 @@ describe("Test loading / exporting crate files", () => {
                 return e;
             })[0];
         let originalRootDataset = crate["@graph"].filter((e) => e["@id"] === "./")[0];
-        originalRootDataset["@type"] = originalRootDataset["@type"].join(", ");
         expect(rootDataset).toEqual(originalRootDataset);
     });
     test("with root dataset, multiple types", async () => {
@@ -176,7 +175,6 @@ describe("Test loading / exporting crate files", () => {
                 return e;
             })[0];
         let originalRootDataset = crate["@graph"].filter((e) => e["@id"] === "./")[0];
-        originalRootDataset["@type"] = originalRootDataset["@type"].join(", ");
         expect(rootDataset).toEqual(originalRootDataset);
     });
     test("with root dataset and one text property", async () => {
@@ -276,7 +274,7 @@ describe("Test loading / exporting crate files", () => {
         expect(rootDataset).toMatchObject([
             {
                 "@id": "./",
-                "@type": "Dataset",
+                "@type": ["Dataset"],
                 name: "Dataset",
                 author: { "@id": "http://entity.com/something" },
                 "@reverse": {},
@@ -728,7 +726,7 @@ describe("Test interacting with the crate", () => {
         let e = crateManager.addEntity({ entity });
 
         crate = crateManager.exportCrate({});
-        expect(crate["@graph"].length).toEqual(3);
+        expect(crate["@graph"].length).toEqual(2);
     });
     test(`should be able to flatten a complex entity - like one coming from a datapack`, async () => {
         const json = {
@@ -833,7 +831,7 @@ describe("Test interacting with the crate", () => {
             },
             {
                 "@id": "./",
-                "@type": "Dataset",
+                "@type": ["Dataset"],
                 name: "Dataset",
                 language: {
                     "@id": "http://some.thing",
@@ -878,7 +876,7 @@ describe("Test interacting with the crate", () => {
             },
             {
                 "@id": "./",
-                "@type": "Dataset",
+                "@type": ["Dataset"],
                 name: "Dataset",
                 language: {
                     "@id": "http://some.thing",
@@ -934,7 +932,7 @@ describe("Test interacting with the crate", () => {
             },
             {
                 "@id": "./",
-                "@type": "Dataset",
+                "@type": ["Dataset"],
                 "@reverse": {},
                 name: "Dataset",
             },
@@ -976,7 +974,7 @@ describe("Test interacting with the crate", () => {
             },
             {
                 "@id": "./",
-                "@type": "Dataset",
+                "@type": ["Dataset"],
                 "@reverse": {},
                 name: "Dataset",
             },
