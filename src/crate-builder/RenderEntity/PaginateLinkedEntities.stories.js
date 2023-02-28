@@ -6,9 +6,9 @@ import range from "lodash/range";
 export default {
     component: PaginateLinkedEntitiesComponent,
     argTypes: {
-        le: { action: "loadEntity" },
-        sp: { action: "saveProperty" },
-        dp: { action: "deleteProperty" },
+        loadEntity: { action: "loadEntity" },
+        saveProperty: { action: "saveProperty" },
+        deleteProperty: { action: "deleteProperty" },
     },
     parameters: {
         docs: () => null,
@@ -18,8 +18,13 @@ export default {
 const Template = (args, { argTypes }) => ({
     components: { PaginateLinkedEntitiesComponent },
     props: Object.keys(argTypes),
-    template:
-        '<PaginateLinkedEntitiesComponent v-bind="$props" @load:entity="le" @save:property="sp" @delete:property="dp" />',
+    template: `
+        <PaginateLinkedEntitiesComponent
+            v-bind="$props"
+            @load:entity="loadEntity"
+            @save:property="saveProperty"
+            @delete:property="deleteProperty" />
+    `,
 });
 
 /**
