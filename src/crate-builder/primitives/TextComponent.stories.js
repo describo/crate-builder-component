@@ -2,25 +2,22 @@ import TextComponent from "./Text.component.vue";
 
 export default {
     component: TextComponent,
+    argTypes: {
+        type: { options: ["text", "textarea"], control: { type: "radio" } },
+        property: { control: { type: "text" } },
+        value: {
+            options: ["http://schema.org/name", "define something", undefined],
+            control: { type: "radio" },
+        },
+        placeholder: { options: [undefined, "some helpful text"], control: { type: "radio" } },
+    },
 };
 
-const Template = (args) => ({
+const Template = (args, { argTypes }) => ({
     components: { TextComponent },
-    setup() {
-        return { ...args };
-    },
-    template: '<TextComponent property="property" value="value" />',
+    props: Object.keys(argTypes),
+    template: '<TextComponent v-bind="$props" @save:property="saveProperty" />',
 });
 
-const args = { type: "text", property: "url", placeholder: "Please input something" };
-export const Text1 = Template.bind({});
-Text1.args = { ...args, value: "http://schema.org/name" };
-
-export const Text2 = Template.bind({});
-Text2.args = { ...args, value: "", placeholder: "Define something" };
-
-export const TextArea1 = Template.bind({});
-TextArea1.args = { ...args, type: "textarea", value: "http://schema.org/name" };
-
-export const InvalidType1 = Template.bind({});
-InvalidType1.args = { ...args, type: "date", value: "http://schema.org/name" };
+export const TextComponentStory = Template.bind({});
+TextComponentStory.args = { type: "text", property: "text", value: "http://schema.org/name" };
