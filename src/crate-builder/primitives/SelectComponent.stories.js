@@ -2,18 +2,26 @@ import SelectComponent from "./Select.component.vue";
 
 export default {
     component: SelectComponent,
+    argTypes: {
+        property: {
+            control: { type: "text" },
+        },
+        value: {
+            options: ["a", "b", "c"],
+            control: { type: "select" },
+        },
+        saveProperty: { action: "saveProperty" },
+    },
 };
 
-const Template = (args) => ({
+const Template = (args, { argTypes }) => ({
     components: { SelectComponent },
-    setup() {
-        return { property: args.property, value: args.value, definition: args.definition };
-    },
-    template: '<SelectComponent property="property" value="value" definition="definition" />',
+    props: Object.keys(argTypes),
+    template: '<SelectComponent v-bind="$props" @save:property="saveProperty" />',
 });
 
-export const ValidSelect = Template.bind({});
-ValidSelect.args = {
+export const SelectComponentStory = Template.bind({});
+SelectComponentStory.args = {
     property: "select",
     value: "a",
     definition: {

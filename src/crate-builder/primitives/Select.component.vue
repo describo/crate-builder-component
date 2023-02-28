@@ -45,14 +45,21 @@ const props = defineProps({
 const $emit = defineEmits(["save:property"]);
 const data = reactive({
     internalValue: props.value,
-    hasValidValues: verifySelectValuesAreStrings([...props.definition.values]),
+    hasValidValues: verifySelectValuesAreStrings(props.definition.values),
 });
 
 watch(
     () => props.value,
     () => {
         data.internalValue = props.value;
-        data.hasValidValues = verifySelectValuesAreStrings([...props.definition.values]);
+        data.hasValidValues = verifySelectValuesAreStrings(props.definition.values);
+    }
+);
+watch(
+    () => props.definition.values,
+    () => {
+        data.items = [...props.definition.values];
+        data.hasValidValues = verifySelectValuesAreStrings(props.definition.values);
     }
 );
 

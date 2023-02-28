@@ -10,7 +10,7 @@
             @change="save"
             @blur="reset"
         >
-            <el-option v-for="(item, idx) in data.options" :key="idx" :label="item" :value="item">
+            <el-option v-for="(item, idx) in data.items" :key="idx" :label="item" :value="item">
             </el-option>
         </el-select>
         <div v-if="!data.isValidValue" class="text-xs text-gray-700">
@@ -46,26 +46,35 @@ const props = defineProps({
 });
 const $emit = defineEmits(["create:entity"]);
 const data = reactive({
-    options: [...props.definition.values],
+    items: [...props.definition.values],
     internalValue: props.value,
     isValidValue: isURL(props.value),
-    hasValidValues: verifySelectValuesAreUrls([...props.definition.values]),
+    hasValidValues: verifySelectValuesAreUrls(props.definition.values),
 });
 
 watch(
     () => props.value,
     () => {
         data.internalValue = props.value;
-        data.hasValidValues = verifySelectValuesAreUrls([...props.definition.values]);
         data.isValidValue = isURL(props.value);
     }
 );
+watch(
+    () => props.definition.values,
+    () => {
+        data.items = [...props.definition.values];
+        data.hasValidValues = verifySelectValuesAreUrls(props.definition.values);
+    }
+);
+
 function save() {
     $emit("create:entity", {
         property: props.property,
-        "@id": data.internalValue,
-        "@type": "URL",
-        name: data.internalValue,
+        json: {
+            "@id": data.internalValue,
+            "@type": "URL",
+            name: data.internalValue,
+        },
     });
 }
 function filter(d) {
