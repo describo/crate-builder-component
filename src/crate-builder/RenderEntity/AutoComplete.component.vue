@@ -97,7 +97,7 @@ async function querySearch(queryString) {
 
     // lookup entities in the crate (internal), in templates, and in datapacks (lookups)
     const lookupMapping = {};
-    lookups = [];
+    let lookups = [];
     if (props.crateManager.findMatchingEntities) {
         lookups = [
             wrapPromise(
