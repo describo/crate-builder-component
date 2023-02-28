@@ -211,17 +211,15 @@
 </template>
 
 <script setup>
-import GeoComponent from "../base-components/Geo.component.vue";
 import RenderEntityIdComponent from "./RenderEntityId.component.vue";
 import RenderEntityTypeComponent from "./RenderEntityType.component.vue";
 import RenderEntityNameComponent from "./RenderEntityName.component.vue";
 import RenderEntityPropertyComponent from "./RenderEntityProperty.component.vue";
 import RenderEntityReverseItemLinkComponent from "./RenderReverseItemLink.component.vue";
 import RenderControlsComponent from "./RenderControls.component.vue";
-import { reactive, onMounted, watch, inject } from "vue";
+import { reactive, onMounted, onBeforeMount, watch, provide } from "vue";
 import { debounce, cloneDeep } from "lodash";
 import { ProfileManager } from "../profile-manager.js";
-const configuration = inject("configuration");
 
 const props = defineProps({
     crateManager: {
@@ -232,8 +230,8 @@ const props = defineProps({
         type: Object,
         required: true,
     },
-    mode: {
-        type: String,
+    configuration: {
+        type: Object,
         required: true,
     },
 });
@@ -250,53 +248,68 @@ const data = reactive({
     savedPropertyTimeout: 1000,
 });
 
-const emit = defineEmits([
+const $emit = defineEmits([
     "ready",
     "load:entity",
     "save:crate",
     "save:crate:template",
     "save:entity:template",
+    "add:property",
+    "save:property",
+    "delete:property",
+    "ingest:entity",
+    "link:entity",
+    "update:entity",
+    "delete:entity",
 ]);
 
 watch(
     () => props.entity,
-    () => {
-        data.extraProperties = [];
-        data.entity = {};
-        data.tabs = [];
+    (n, o) => {
+        if (n.describoId !== o.describoId) {
+            data.extraProperties = [];
+            data.entity = {};
+            data.tabs = [];
+        }
         data.debouncedInit();
     }
 );
+onBeforeMount(() => {
+    provide("configuration", props.configuration);
+});
 onMounted(() => {
     data.debouncedInit();
 });
 
 function init() {
+    if (!props.entity.describoId) return;
     const profileManager = new ProfileManager({ profile: props.crateManager.profile });
 
-    let entity = {
-        ...props.entity,
-        properties: props.crateManager.getEntityProperties({
-            describoId: props.entity.describoId,
-            grouped: true,
-        }),
-        reverseConnections: props.crateManager.getEntityReverseConnections({
-            describoId: props.entity.describoId,
-            grouped: true,
-        }),
-    };
+    let entity;
+    if (props.configuration.mode === "embedded") {
+        entity = {
+            ...props.entity,
+            properties: props.crateManager.getEntityProperties({
+                describoId: props.entity.describoId,
+                grouped: true,
+            }),
+            reverseConnections: props.crateManager.getEntityReverseConnections({
+                describoId: props.entity.describoId,
+                grouped: true,
+            }),
+        };
+    } else if (props.configuration.mode === "online") {
+        entity = props.entity;
+    }
 
-    const typeDefinition = profileManager.getTypeDefinition({
-        type: entity["@type"],
-        profile: props.crateManager.profile,
-    });
+    const typeDefinition = profileManager.getTypeDefinition({ entity });
 
     typeDefinition?.inputs.forEach((input) => {
         if (input.name === "name") return;
         if (entity.properties[input.name]) {
             entity.properties[input.name] = entity.properties[input.name];
         } else {
-            if (!configuration.readonly) entity.properties[input.name] = [];
+            if (!props.configuration.readonly) entity.properties[input.name] = [];
         }
     });
     if (data.extraProperties.length) {
@@ -313,17 +326,14 @@ function init() {
         .forEach((k) => (properties[propertyNames[k]] = entity.properties[propertyNames[k]]));
     entity.properties = properties;
 
-    const { layouts, hide } = profileManager.getLayout({
-        type: entity["@type"],
-        profile: props.crateManager.profile,
-    });
+    const { layouts, hide } = profileManager.getLayout({ type: entity["@type"] });
     let layout = applyLayout({ layouts, hide, entity });
     if (layout.entity) {
         data.entity = { ...entity, ...layout.entity };
     } else if (layout.tabs) {
         data.tabs = cloneDeep(layout.tabs);
     }
-    emit("ready");
+    $emit("ready");
 }
 function applyLayout({ layouts, hide = [], entity }) {
     if (!layouts?.length) return { entity };
@@ -392,95 +402,108 @@ function showProperty(property) {
     return !data.hideProperty.includes(property);
 }
 function loadEntity(entity) {
-    if (props.crateManager.getEntity({ describoId: props.crateManager.currentEntity })) {
-        emit("load:entity", { describoId: props.crateManager.currentEntity });
+    if (props.configuration.mode === "embedded") {
+        if (props.crateManager.getEntity({ describoId: props.crateManager.currentEntity })) {
+            $emit("load:entity", { describoId: props.crateManager.currentEntity });
+        }
     }
-    emit("load:entity", entity);
+    $emit("load:entity", entity);
 }
 function saveCrate() {
-    emit("save:crate");
+    $emit("save:crate");
 }
 function createProperty(patch) {
     console.debug("Render Entity component: emit(create:property)", patch);
-    if (props.mode === "embedded") {
+    if (props.configuration.mode === "embedded") {
         props.crateManager.addProperty({ ...patch });
-        saveCrate();
-        data.savedProperty = patch.property;
-        setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
     } else {
+        $emit("add:property", { ...patch, entityId: props.entity.describoId });
     }
+    data.savedProperty = patch.property;
+    setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
+    saveCrate();
     init();
 }
 function saveProperty(patch) {
     console.debug("Render Entity component: emit(save:property)", patch);
-    if (props.mode === "embedded") {
+    if (props.configuration.mode === "embedded") {
         props.crateManager.updateProperty({ ...patch });
-        saveCrate();
-        data.savedProperty = patch.property;
-        setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
     } else {
+        $emit("save:property", patch);
     }
+    data.savedProperty = patch.property;
+    setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
+    saveCrate();
     init();
 }
 function deleteProperty(data) {
     console.debug("Render Entity component: emit(delete:property)", data);
-    if (props.mode === "embedded") {
+    if (props.configuration.mode === "embedded") {
         props.crateManager.deleteProperty({ propertyId: data.propertyId });
-        saveCrate();
     } else {
+        $emit("delete:property", { propertyId: data.propertyId });
     }
+    saveCrate();
     init();
 }
 function createEntity(data) {
     const property = data.property;
     delete data.property;
+    const dataType = data.type;
+    delete data.type;
     console.debug("Render Entity component: emit(create:entity)", data);
-    if (props.mode === "embedded") {
-        const dataType = data.type;
-        delete data.type;
+    if (props.configuration.mode === "embedded") {
         if (dataType === "datapack") {
             props.crateManager.ingestAndLink({ property, json: data });
         } else {
             let entity = props.crateManager.addEntity({ entity: data });
             props.crateManager.linkEntity({ property, tgtEntityId: entity.describoId });
         }
-        saveCrate();
     } else {
+        $emit("ingest:entity", { property, entityId: props.entity.describoId, json: data });
     }
     init();
+    saveCrate();
 }
 function updateEntity(patch) {
     console.debug("Render Entity component: emit(update:entity)", patch);
-    props.crateManager.updateEntity({ ...patch });
-    if (props.mode === "embedded") {
-        saveCrate();
-        data.savedProperty = patch.property;
-        setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
+    if (props.configuration.mode === "embedded") {
+        props.crateManager.updateEntity({ ...patch });
     } else {
+        $emit("update:entity", { ...patch, entityId: props.entity.describoId });
     }
+    data.savedProperty = patch.property;
+    setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
     init();
+    saveCrate();
 }
 function linkEntity(data) {
     console.debug("Render Entity component: emit(link:entity)", data);
-    if (props.mode === "embedded") {
+    if (props.configuration.mode === "embedded") {
         props.crateManager.linkEntity({ property: data.property, tgtEntityId: data.describoId });
-        saveCrate();
     } else {
+        $emit("link:entity", { property: data.property, tgtEntityId: data.describoId });
     }
     init();
+    saveCrate();
 }
 function deleteEntity(data) {
     console.debug("Render Entity component: emit(delete:entity)", data);
-    props.crateManager.deleteEntity(data);
+    if (props.configuration.mode === "embedded") {
+        props.crateManager.deleteEntity(data);
+        init();
+    } else {
+        $emit("delete:entity", data);
+    }
     saveCrate();
 }
 function saveCrateAsTemplate(data) {
     console.debug("Render Entity component: emit(save:crate:template)", data);
-    emit("save:crate:template", data);
+    $emit("save:crate:template", data);
 }
 function saveEntityAsTemplate() {
     console.debug("Render Entity component: emit(save:entity:template)");
-    emit("save:entity:template");
+    $emit("save:entity:template");
 }
 function updateContext(data) {
     props.crateManager.context = data;

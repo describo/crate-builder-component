@@ -8,6 +8,16 @@ config.autoReplaceSvg = "nest";
 
 setup((app) => {
     app.use(ElementPlus);
+    app.provide("configuration", {
+        mode: "embedded",
+        enableContextEditor: true,
+        enableCratePreview: true,
+        enableBrowseEntities: true,
+        enableTemplateSave: true,
+        readonly: false,
+        enableTemplateLookups: false,
+        enableDataPackLookups: false,
+    });
 });
 
 // export const parameters = {

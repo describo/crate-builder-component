@@ -127,9 +127,12 @@ export class CrateManager {
             "@graph": [cloneDeep(this.rootDescriptor)],
         };
 
+        this.__purgeUnlinkedEntities();
         let propertiesGroupedBySrcId = groupBy(this.properties, "srcEntityId");
         let reverseConnectionsGroupedByTgtId = groupBy(this.properties, "tgtEntityId");
         this.entities.forEach((entity) => {
+            entity = cloneDeep(entity);
+            entity["@type"] = entity["@type"].split(", ");
             entity = this.rehydrateEntity({
                 entity,
                 propertiesGroupedBySrcId,

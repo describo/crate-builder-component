@@ -4,7 +4,12 @@
             <!-- navbar : controls -->
             <div>
                 <!-- go to root dataset -->
-                <el-button @click="loadRootDataset" type="primary" :disabled="isRootDataset">
+                <el-button
+                    @click="loadRootDataset"
+                    type="primary"
+                    :disabled="isRootDataset"
+                    v-if="configuration.mode === 'embedded'"
+                >
                     <i class="fa-solid fa-house"></i>
                     &nbsp; Root Dataset
                 </el-button>
@@ -142,6 +147,7 @@ import PreviewCrateDialog from "./DialogPreviewCrate.component.vue";
 import BrowseEntitiesDialog from "./DialogBrowseEntities.component.vue";
 import { reactive, computed, inject } from "vue";
 import { isArray } from "lodash";
+const configuration = inject("configuration");
 
 const props = defineProps({
     crateManager: {
@@ -153,7 +159,7 @@ const props = defineProps({
         required: true,
     },
 });
-const emit = defineEmits([
+const $emit = defineEmits([
     "load:entity",
     "add:property:placeholder",
     "delete:entity",
@@ -161,8 +167,6 @@ const emit = defineEmits([
     "save:entity:template",
     "update:context",
 ]);
-
-const configuration = inject("configuration");
 
 const data = reactive({
     loading: false,
@@ -196,35 +200,34 @@ function toggle(dialog) {
     });
 }
 function loadRootDataset() {
-    emit("load:entity", { name: "RootDataset" });
+    $emit("load:entity", { name: "RootDataset" });
 }
 function loadEntity(data) {
-    emit("load:entity", data);
+    $emit("load:entity", data);
 }
 function addPropertyPlaceholder(property) {
-    emit("add:property:placeholder", property);
+    $emit("add:property:placeholder", property);
 }
 function deleteEntity({ describoId }) {
     if (data.dialog.browseEntities) {
         // if the browse dialog is showing
-        emit("delete:entity", {
-            describoId: describoId,
+        $emit("delete:entity", {
+            describoId,
         });
     } else {
         // otherwise it's the delete entity button that was pressed
-        emit("delete:entity", {
+        $emit("delete:entity", {
             describoId: props.entity.describoId,
         });
-        loadEntity({ describoId: props.crateManager.getRootDataset().describoId });
     }
 }
 function saveCrateAsTemplate(data) {
-    emit("save:crate:template", data);
+    $emit("save:crate:template", data);
 }
 function saveEntityAsTemplate(data) {
-    emit("save:entity:template");
+    $emit("save:entity:template");
 }
 function updateContext(data) {
-    emit("update:context", data);
+    $emit("update:context", data);
 }
 </script>

@@ -253,7 +253,7 @@ describe("Test loading / exporting crate files", () => {
         expect(entity).toEqual([
             {
                 "@id": "http://entity.com/something",
-                "@type": "Person",
+                "@type": ["Person"],
                 name: "Person",
                 "@reverse": { author: { "@id": "./" } },
             },
@@ -289,7 +289,7 @@ describe("Test loading / exporting crate files", () => {
         expect(entity).toEqual([
             {
                 "@id": "http://entity.com/something",
-                "@type": "URL",
+                "@type": ["URL"],
                 name: "http://entity.com/something",
                 "@reverse": {
                     author: {
@@ -842,7 +842,7 @@ describe("Test interacting with the crate", () => {
             },
             {
                 "@id": "http://some.thing",
-                "@type": "Thing",
+                "@type": ["Thing"],
                 name: "http://some.thing",
                 alternateName: ["name1", "name2", "name3"],
                 "@reverse": {
@@ -887,7 +887,7 @@ describe("Test interacting with the crate", () => {
             },
             {
                 "@id": "http://some.thing",
-                "@type": "Thing",
+                "@type": ["Thing"],
                 name: "http://some.thing",
                 "@reverse": {
                     language: {
@@ -1080,7 +1080,7 @@ describe.skip("Test loading large crates and see how it performs", () => {
 
             t0 = performance.now();
             let crateManager = new CrateManager({ crate });
-            crateManager.init();
+            crateManager.load({ crate });
             t1 = performance.now();
             runtime.init = round(t1 - t0, 2);
 
@@ -1127,7 +1127,7 @@ describe.skip("Test operations on large entity arrays", () => {
             }
 
             let crateManager = new CrateManager({ crate });
-            crateManager.init();
+            crateManager.load({ crate });
 
             let t0 = performance.now();
             groupBy(crateManager.entities, "@id");

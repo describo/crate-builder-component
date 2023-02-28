@@ -6,7 +6,7 @@ describe("Test working with profiles", () => {
     beforeAll(() => {
         jest.spyOn(console, "debug").mockImplementation(() => {});
     });
-    test("get type definition from the profile", () => {
+    test("get type definition and inputs from the profile", () => {
         const profile = {
             metadata: {},
             classes: {
@@ -27,9 +27,14 @@ describe("Test working with profiles", () => {
                 },
             },
         };
+        const entity = { "@type": "Dataset" };
         const profileManager = new ProfileManager({ profile });
-        let type = profileManager.getTypeDefinition({ type: "Dataset" });
-        expect(type).toEqual(profile.classes.Dataset);
+        let typeDefinition = profileManager.getTypeDefinition({ entity });
+        expect(typeDefinition.definition).toEqual("override");
+        expect(typeDefinition.inputs.length).toEqual(1);
+
+        let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
+        expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing"]);
     });
     test("get type definition from the profile - handle type Array", () => {
         const profile = {
@@ -52,21 +57,36 @@ describe("Test working with profiles", () => {
                 },
             },
         };
+        const entity = { "@type": ["Dataset"] };
         const profileManager = new ProfileManager({ profile });
-        let type = profileManager.getTypeDefinition({ type: ["Dataset"] });
-        expect(type).toEqual(profile.classes.Dataset);
+        let typeDefinition = profileManager.getTypeDefinition({ entity });
+        expect(typeDefinition.definition).toEqual("override");
+        expect(typeDefinition.inputs.length).toEqual(1);
+
+        let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
+        expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing"]);
     });
-    test("get type definition - no profile", () => {
+    test("get type definition - no profile, look in schema.org", () => {
         const profile = undefined;
         const profileManager = new ProfileManager({ profile });
-        let type = profileManager.getTypeDefinition({ type: "Dataset" });
-        expect(type).toEqual({ definition: "inherit", inputs: [] });
+        const entity = { "@type": ["Dataset"] };
+        let typeDefinition = profileManager.getTypeDefinition({ entity });
+        expect(typeDefinition.definition).toEqual("inherit");
+        expect(typeDefinition.inputs.length).toEqual(9);
+
+        let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
+        expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing"]);
     });
-    test("get type definition - no profile - handle type array", () => {
+    test("get type definition - no profile, handle type array, look in schema.org", () => {
         const profile = undefined;
         const profileManager = new ProfileManager({ profile });
-        let type = profileManager.getTypeDefinition({ type: ["Dataset"] });
-        expect(type).toEqual({ definition: "inherit", inputs: [] });
+        const entity = { "@type": "Dataset" };
+        let typeDefinition = profileManager.getTypeDefinition({ entity });
+        expect(typeDefinition.definition).toEqual("inherit");
+        expect(typeDefinition.inputs.length).toEqual(9);
+
+        let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
+        expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing"]);
     });
     test("get type definition - none defined in profile", () => {
         const profile = {
@@ -74,8 +94,141 @@ describe("Test working with profiles", () => {
             classes: {},
         };
         const profileManager = new ProfileManager({ profile });
-        let type = profileManager.getTypeDefinition({ type: "Dataset" });
-        expect(type).toEqual({ definition: "inherit", inputs: [] });
+        const entity = { "@type": "Dataset" };
+        let typeDefinition = profileManager.getTypeDefinition({ entity });
+        expect(typeDefinition.definition).toEqual("inherit");
+        expect(typeDefinition.inputs.length).toEqual(9);
+
+        let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
+        expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing"]);
+    });
+    test("get type definition - additional type property defined", () => {
+        const profile = {
+            classes: {
+                Dataset: {
+                    definition: "override",
+                    subClassOf: [],
+                    inputs: [
+                        {
+                            id: "https://schema.org/datePublished",
+                            name: "datePublished",
+                            label: "Attach a date",
+                            help: "",
+                            type: ["Date"],
+                            required: true,
+                            multiple: false,
+                        },
+                    ],
+                },
+                A: {
+                    definition: "override",
+                    subClassOf: [],
+                    inputs: [
+                        {
+                            id: "https://schema.org/dateModified",
+                            name: "dateModified",
+                            label: "Attach a date",
+                            help: "",
+                            type: ["Date"],
+                            required: true,
+                            multiple: false,
+                        },
+                    ],
+                },
+                B: {
+                    definition: "override",
+                    subClassOf: [],
+                    inputs: [
+                        {
+                            id: "https://schema.org/dateCreated",
+                            name: "dateCreated",
+                            label: "Attach a date",
+                            help: "",
+                            type: ["Date"],
+                            required: true,
+                            multiple: false,
+                        },
+                    ],
+                },
+            },
+        };
+        const profileManager = new ProfileManager({ profile });
+        const entity = { "@type": "Dataset", datasetType: ["A", "B"] };
+        let typeDefinition = profileManager.getTypeDefinition({ entity });
+        expect(typeDefinition.definition).toEqual("override");
+        expect(typeDefinition.inputs.length).toEqual(3);
+
+        let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
+        expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing", "A", "B"]);
+    });
+    test("get type definition - additional type property defined; each with subclasses", () => {
+        const profile = {
+            classes: {
+                Dataset: {
+                    definition: "override",
+                    subClassOf: [],
+                    inputs: [
+                        {
+                            id: "https://schema.org/datePublished",
+                            name: "datePublished",
+                            label: "Attach a date",
+                            help: "",
+                            type: ["Date"],
+                            required: true,
+                            multiple: false,
+                        },
+                    ],
+                },
+                A: {
+                    definition: "override",
+                    subClassOf: ["C"],
+                    inputs: [
+                        {
+                            id: "https://schema.org/dateModified",
+                            name: "dateModified",
+                            label: "Attach a date",
+                            help: "",
+                            type: ["Date"],
+                            required: true,
+                            multiple: false,
+                        },
+                    ],
+                },
+                B: {
+                    definition: "override",
+                    subClassOf: ["D", "E", "F"],
+                    inputs: [
+                        {
+                            id: "https://schema.org/dateCreated",
+                            name: "dateCreated",
+                            label: "Attach a date",
+                            help: "",
+                            type: ["Date"],
+                            required: true,
+                            multiple: false,
+                        },
+                    ],
+                },
+            },
+        };
+        const profileManager = new ProfileManager({ profile });
+        const entity = { "@type": "Dataset", datasetType: ["A", "B"] };
+        let typeDefinition = profileManager.getTypeDefinition({ entity });
+        expect(typeDefinition.definition).toEqual("override");
+        expect(typeDefinition.inputs.length).toEqual(3);
+
+        let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
+        expect(typeHierarchies).toEqual([
+            "Dataset",
+            "CreativeWork",
+            "Thing",
+            "A",
+            "C",
+            "B",
+            "D",
+            "E",
+            "F",
+        ]);
     });
     test("get layout information from profile", () => {
         const profile = {
@@ -125,17 +278,19 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
+        const entity = { "@type": "Dataset" };
         let { propertyDefinition } = profileManager.getPropertyDefinition({
             property: "date",
-            type: "Dataset",
+            entity,
         });
         expect(propertyDefinition.id).toEqual("https://schema.org/date");
     });
     test("get property definition - not defined in profile, lookup schema.org", () => {
         const profileManager = new ProfileManager({ profile: undefined });
+        const entity = { "@type": "Dataset" };
         let { propertyDefinition } = profileManager.getPropertyDefinition({
             property: "dateModified",
-            type: "Dataset",
+            entity,
         });
         expect(propertyDefinition.id).toEqual("http://schema.org/dateModified");
         expect(propertyDefinition.type.sort()).toEqual(["Date", "DateTime"]);
@@ -162,9 +317,10 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
+        const entity = { "@type": "Dataset" };
         let { propertyDefinition } = profileManager.getPropertyDefinition({
             property: "mojumbo",
-            type: "Dataset",
+            entity,
         });
         expect(propertyDefinition.type).toEqual(["Text"]);
     });
@@ -190,7 +346,7 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let types = profileManager.mapTypeHierarchies(["Dataset"]);
+        let types = profileManager.mapTypeHierarchies({ types: ["Dataset"] });
         expect(types).toEqual(["Dataset", "CreativeWork", "Thing"]);
     });
     test("get type hierarchy - type defined in profile with subClass", () => {
@@ -215,8 +371,23 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let types = profileManager.mapTypeHierarchies(["Dataset"]);
+        let types = profileManager.mapTypeHierarchies({ types: ["Dataset"] });
         expect(types).toEqual(["Dataset", "CreativeWork", "Thing", "NoSuchEntity"]);
+    });
+    test("get type hierarchy - type not defined in profile or schema.org", () => {
+        const profile = {
+            metadata: {},
+            classes: {
+                Children: {
+                    definition: "override",
+                    subClassOf: [],
+                    inputs: [],
+                },
+            },
+        };
+        const profileManager = new ProfileManager({ profile });
+        let types = profileManager.mapTypeHierarchies({ types: ["Children"] });
+        expect(types).toEqual(["Children", "Thing"]);
     });
     test("get inputs for type defined in profile - no subClass in profile, definition override", () => {
         const profile = {
@@ -240,7 +411,7 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let types = profileManager.mapTypeHierarchies(["Thing"]);
+        let types = profileManager.mapTypeHierarchies({ types: ["Thing"] });
         let { inputs } = profileManager.getInputs({ types: ["Thing"] });
         inputs = inputs.map((input) => input.id);
         expect(inputs).toEqual(["https://schema.org/date"]);

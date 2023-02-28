@@ -3,6 +3,7 @@
     "version": "0.24.3",
     "description": "A VueJS component for assembling an RO-Crate",
     "main": "./src/crate-builder/index.js",
+    "type": "module",
     "files": [
         "dist",
         "src/crate-builder"
@@ -12,9 +13,9 @@
         "test:watch": "./node_modules/.bin/jest --watch --runInBand",
         "build": "npm run build:vue && npm run build:wc",
         "build:vue": "vite build",
-        "build:wc": "npx rollup -c && vite --config vite.wc.config.js build",
+        "build:wc": "npx rollup -c && vite --config vite.wc.config.cjs build",
         "start:elastic": "docker compose up -d && npm run load:datapacks",
-        "load:datapacks": "sleep 10 && node ./load-data-packs.js",
+        "load:datapacks": "sleep 10 && node ./load-data-packs.cjs",
         "stop:elastic": "docker compose stop ; docker compose rm -f",
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build"

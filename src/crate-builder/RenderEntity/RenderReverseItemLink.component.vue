@@ -2,6 +2,7 @@
     <div
         class="flex flex-col bg-blue-200 hover:bg-yellow-300 p-3 cursor-pointer rounded"
         @click="loadEntity"
+        v-loading="data.loading"
     >
         <span class="text-gray-800 flex flex-row">
             <i class="pt-1 fa-solid fa-chevron-left"></i>&nbsp;
@@ -31,7 +32,7 @@ const props = defineProps({
     },
 });
 const emit = defineEmits(["load:entity"]);
-const data = reactive({ entity: {} });
+const data = reactive({ loading: false, entity: {} });
 let type = computed(() => {
     return isArray(data.entity["@type"])
         ? data.entity["@type"].length === 1
@@ -45,6 +46,7 @@ onMounted(() => {
 });
 
 function loadEntity() {
+    data.loading = true;
     emit("load:entity", { describoId: props.entity.srcEntityId });
 }
 async function loadEntityData() {

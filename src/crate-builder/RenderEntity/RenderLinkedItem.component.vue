@@ -11,17 +11,17 @@
             <div
                 class="flex flex-col p-3 cursor-pointer rounded-l"
                 @click="loadEntity"
-                v-if="!showMap"
+                v-if="data.entity.tgtEntity"
             >
                 <div class="text-sm flex flex-row space-x-1">
                     <type-icon-component
                         class="mr-2 text-gray-700"
-                        :type="data.entity['@type']"
-                        v-if="data.entity['@type']"
+                        :type="data.entity.tgtEntity['@type']"
+                        v-if="data.entity.tgtEntity['@type']"
                     />
-                    <div>{{ data.entity["@type"] }}:</div>
-                    <span v-if="data.entity.name">{{ data.entity.name }}</span>
-                    <span v-else>{{ data.entity["@id"] }}</span>
+                    <div>{{ data.entity.tgtEntity["@type"] }}:</div>
+                    <span v-if="data.entity.tgtEntity.name">{{ data.entity.tgtEntity.name }}</span>
+                    <span v-else>{{ data.entity.tgtEntity["@id"] }}</span>
                 </div>
             </div>
             <delete-property-component
@@ -70,11 +70,11 @@
 </template>
 
 <script setup>
-import GeoComponent from "../base-components/Geo.component.vue";
+import GeoComponent from "../primitives/Geo.component.vue";
 import TypeIconComponent from "./TypeIcon.component.vue";
 import DeletePropertyComponent from "./DeleteProperty.component.vue";
-import MapComponent from "../base-components/Map.component.vue";
-import { computed, reactive, inject } from "vue";
+import MapComponent from "../primitives/Map.component.vue";
+import { computed, reactive, inject, onMounted } from "vue";
 const configuration = inject("configuration");
 
 const emit = defineEmits(["load:entity", "create:property", "save:property", "delete:property"]);
@@ -94,12 +94,29 @@ const props = defineProps({
 });
 const data = reactive({
     loading: false,
-    entity: props.entity.tgtEntity,
+    entity: {},
     editLocation: false,
 });
 let showMap = computed(() => (data.entity?.["@type"]?.match("Geo") ? true : false));
 let type = "unlink";
 
+onMounted(() => {
+    loadEntityData();
+});
+
+async function loadEntityData() {
+    if (props.entity.tgtEntity) {
+        data.entity = { ...props.entity };
+    } else {
+        if (configuration.mode !== "embedded") return;
+        await new Promise((resolve) => setTimeout(resolve, props.index * 4));
+        let entity = props.crateManager.getEntity({
+            describoId: props.entity.tgtEntityId,
+            loadProperties: false,
+        });
+        data.entity.tgtEntity = { ...entity };
+    }
+}
 function loadEntity() {
     data.loading = true;
     console.debug("Renderer Linked Item Component : emit(load:entity)", props.entity.tgtEntityId);

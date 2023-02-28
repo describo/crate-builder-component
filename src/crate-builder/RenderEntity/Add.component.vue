@@ -110,16 +110,16 @@
 
 <script setup>
 import AddControlComponent from "./AddControl.component.vue";
-import TextComponent from "../base-components/Text.component.vue";
-import DateComponent from "../base-components/Date.component.vue";
-import DateTimeComponent from "../base-components/DateTime.component.vue";
-import TimeComponent from "../base-components/Time.component.vue";
-import NumberComponent from "../base-components/Number.component.vue";
-import UrlComponent from "../base-components/Url.component.vue";
-import SelectComponent from "../base-components/Select.component.vue";
-import SelectUrlComponent from "../base-components/SelectUrl.component.vue";
-import SelectObjectComponent from "../base-components/SelectObject.component.vue";
-import GeoComponent from "../base-components/Geo.component.vue";
+import TextComponent from "../primitives/Text.component.vue";
+import DateComponent from "../primitives/Date.component.vue";
+import DateTimeComponent from "../primitives/DateTime.component.vue";
+import TimeComponent from "../primitives/Time.component.vue";
+import NumberComponent from "../primitives/Number.component.vue";
+import UrlComponent from "../primitives/Url.component.vue";
+import SelectComponent from "../primitives/Select.component.vue";
+import SelectUrlComponent from "../primitives/SelectUrl.component.vue";
+import SelectObjectComponent from "../primitives/SelectObject.component.vue";
+import GeoComponent from "../primitives/Geo.component.vue";
 import AutocompleteComponent from "./AutoComplete.component.vue";
 import { reactive, computed } from "vue";
 

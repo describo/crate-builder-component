@@ -4,7 +4,7 @@
             v-if="data.ready && !data.error"
             :crate-manager="data.crateManager"
             :entity="data.entity"
-            :mode="props.mode"
+            :configuration="data.configuration"
             @load:entity="data.debouncedSetCurrentEntity"
             @ready="ready"
             @save:crate="saveCrate"
@@ -23,7 +23,7 @@
 
 <script setup>
 import RenderEntityComponent from "./RenderEntity/Shell.component.vue";
-import { onMounted, onBeforeMount, reactive, watch, provide, nextTick } from "vue";
+import { onMounted, onBeforeMount, reactive, watch } from "vue";
 import { cloneDeep, isEmpty, debounce, isFunction } from "lodash";
 import { CrateManager } from "./crate-manager.js";
 import { useRouter, useRoute } from "vue-router";
@@ -99,8 +99,7 @@ watch(
 );
 onBeforeMount(() => {
     $router?.replace({ query: "" });
-    let configuration = configure();
-    provide("configuration", configuration);
+    data.configuration = configure();
 });
 onMounted(() => {
     data.debouncedInit();
@@ -135,6 +134,7 @@ function init() {
 }
 function configure() {
     const configuration = {
+        mode: props.mode,
         enableContextEditor: props.enableContextEditor,
         enableCratePreview: props.enableCratePreview,
         enableBrowseEntities: props.enableBrowseEntities,

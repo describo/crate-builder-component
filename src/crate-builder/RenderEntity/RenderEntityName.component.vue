@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import TextComponent from "../base-components/Text.component.vue";
+import TextComponent from "../primitives/Text.component.vue";
 import { reactive, watch, inject } from "vue";
 const configuration = inject("configuration");
 

@@ -4,7 +4,7 @@
             v-if="data.isValidNumber"
             class="w-full"
             type="number"
-            @input="debouncedSave"
+            @input="data.debouncedSave"
             v-model="data.internalValue"
             resize="vertical"
         ></el-input>

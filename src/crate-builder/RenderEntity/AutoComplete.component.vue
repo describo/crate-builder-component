@@ -14,6 +14,7 @@
             :remote-method="data.debouncedQuerySearch"
             @change="handleSelect"
         >
+            <template #empty></template>
             <el-option-group v-for="group in data.matches" :key="group.label" :label="group.label">
                 <el-option
                     v-for="item in group.entities"
@@ -64,7 +65,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["link:entity", "add:template", "create:entity"]);
+const $emit = defineEmits(["link:entity", "add:template", "create:entity"]);
 const data = reactive({
     promiseTimeout: 2500,
     selection: undefined,
@@ -93,34 +94,43 @@ async function querySearch(queryString) {
     let newEntity = [
         {
             type: "new",
-            "@id": queryString,
+            "@id": `#${queryString}`,
             "@type": props.type,
             name: `${queryString}`,
         },
     ];
 
     // lookup entities in the crate (internal), in templates, and in datapacks (lookups)
-    lookups = [
-        wrapPromise(
-            props.crateManager.findMatchingEntities({
-                limit: 5,
-                type: props.type,
-                query: queryString,
+    lookups = [];
+    if (props.crateManager.findMatchingEntities) {
+        lookups = [
+            wrapPromise(
+                props.crateManager?.findMatchingEntities({
+                    limit: 5,
+                    type: props.type,
+                    query: queryString,
+                }),
+                data.promiseTimeout
+            ),
+        ];
+    }
+    if (props.crateManager.lookup) {
+        lookups = [
+            ...lookups,
+
+            wrapPromise(
+                props.crateManager?.lookup?.entityTemplates({
+                    type: props.type,
+                    filter: queryString,
+                    limit: 5,
+                }),
+                data.promiseTimeout
+            ),
+            wrapPromise(lookup({ queryString }), data.promiseTimeout, {
+                reason: "External Lookup Timeout",
             }),
-            data.promiseTimeout
-        ),
-        wrapPromise(
-            props.crateManager?.lookup?.entityTemplates({
-                type: props.type,
-                filter: queryString,
-                limit: 5,
-            }),
-            data.promiseTimeout
-        ),
-        wrapPromise(lookup({ queryString }), data.promiseTimeout, {
-            reason: "External Lookup Timeout",
-        }),
-    ];
+        ];
+    }
     if (["Organisation", "Organization"].includes(props.type)) {
         lookups.push(
             wrapPromise(lookupROR({ queryString }), data.promiseTimeout, {
@@ -178,9 +188,9 @@ async function querySearch(queryString) {
 function handleSelect(entity) {
     if (entity) {
         if (entity?.type === "internal") {
-            emit("link:entity", { entity });
+            $emit("link:entity", { entity });
         } else {
-            emit("create:entity", entity);
+            $emit("create:entity", entity);
         }
     }
 }
@@ -203,7 +213,7 @@ async function lookup({ queryString }) {
             ),
         ])
     );
-    ({ documents } = await props.crateManager.lookup.dataPacks({
+    ({ documents } = await props.crateManager?.lookup?.dataPacks({
         type: props.type,
         elasticQuery: query,
         fields,

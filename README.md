@@ -145,7 +145,7 @@ Pass in the crate file and optionally a profile.
         :enable-context-editor="true"
         :enable-crate-preview="true"
         :enable-browse-entities="true"
-        :purge-unlinked-entities-before-save="true"
+        :enable-template-save="true"
         :readonly="false"
         @save:crate="saveCrate"
         @save:crate:template="saveTemplate"

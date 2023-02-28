@@ -159,7 +159,7 @@ function getProfileDefinitionForProperty() {
     const profileManager = new ProfileManager({ profile: props.crateManager.profile });
     let { propertyDefinition } = profileManager.getPropertyDefinition({
         property: props.property,
-        type: props.entity["@type"],
+        entity: props.entity,
     });
     data.propertyDefinition = cloneDeep(propertyDefinition);
     data.help = propertyDefinition.help;
