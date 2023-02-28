@@ -212,8 +212,7 @@ export class CrateManager {
     }
 
     getRootDataset() {
-        let e = this.entities.filter((e) => e.describoLabel === "RootDataset")[0];
-        return this.getEntity({ describoId: e.describoId });
+        return this.getEntity({ describoId: "RootDataset" });
     }
 
     getEntity({ id, describoId, loadProperties = true }) {
@@ -430,7 +429,6 @@ export class CrateManager {
         let walk = walker.bind(this);
         let linkedEntities = [];
         let rootDataset = this.getRootDataset();
-        // console.log(rootDataset);
 
         walk(rootDataset);
         function walker(entity) {
@@ -457,7 +455,7 @@ export class CrateManager {
     }
 
     __addEntity({ entity }) {
-        const id = createId();
+        const id = entity.describoLabel ?? createId();
 
         // is there an @id?
         if (!entity["@id"]) entity["@id"] = `#${id}`;
