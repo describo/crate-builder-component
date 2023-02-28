@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-loading="data.loading">
         <el-select
             class="w-full"
             v-model="data.selection"
@@ -10,7 +10,6 @@
             automatic-dropdown
             remote
             :persistent="false"
-            :loading="data.loading"
             :remote-method="data.debouncedQuerySearch"
             @change="handleSelect"
         >
@@ -85,10 +84,6 @@ async function querySearch(queryString) {
     console.debug(`Query Search: '${queryString}'`);
     data.loading = true;
     data.matches = [];
-    let internal = [],
-        templates = [],
-        lookups = [],
-        ror = [];
 
     // construct a definition for a new entity
     let newEntity = [
@@ -101,6 +96,7 @@ async function querySearch(queryString) {
     ];
 
     // lookup entities in the crate (internal), in templates, and in datapacks (lookups)
+    const lookupMapping = {};
     lookups = [];
     if (props.crateManager.findMatchingEntities) {
         lookups = [
@@ -113,6 +109,7 @@ async function querySearch(queryString) {
                 data.promiseTimeout
             ),
         ];
+        lookupMapping.internal = 0;
     }
     if (props.crateManager.lookup) {
         lookups = [
@@ -130,6 +127,9 @@ async function querySearch(queryString) {
                 reason: "External Lookup Timeout",
             }),
         ];
+
+        lookupMapping.templates = 1;
+        lookupMapping.external = 2;
     }
     if (["Organisation", "Organization"].includes(props.type)) {
         lookups.push(
@@ -137,44 +137,45 @@ async function querySearch(queryString) {
                 reason: "ROR Lookup Timeout",
             })
         );
+        lookupMapping.ror = lookups.length - 1;
     }
-    [internal, templates, lookups, ror] = await Promise.all(lookups);
-    console.debug({ internal, templates, lookups, ror });
-    if (internal?.reason) console.error(internal.reason);
-    if (templates?.reason) console.error(templates.reason);
-    if (lookups?.reason) console.error(lookups.reason);
-    if (ror?.reason) console.error(ror.reason);
-
+    let responses = await Promise.all(lookups);
     let matches = [];
+    for (let key of Object.keys(lookupMapping)) {
+        let results = responses[lookupMapping[key]];
+        if (results?.reason) {
+            console.error(results.reason);
+            continue;
+        }
+        if (!results?.length) {
+            continue;
+        }
 
-    if (internal?.length) {
-        internal = internal.map((e) => ({ ...e, type: "internal" })).slice(0, 5);
-        matches.push({
-            label: "Associate an entity already defined in this crate",
-            entities: internal,
-        });
-        data.entities = [...data.entities, ...internal];
-    }
-    if (templates?.length) {
-        templates = templates.map((template) => ({ ...template.entity, type: "template" }));
-        matches.push({
-            label: "Associate an entity from saved templates",
-            entities: templates,
-        });
-        data.entities = [...data.entities, ...templates];
-    }
-    if (ror?.length) {
-        ror = ror.map((entity) => ({ ...entity, type: "template" }));
-        matches.push({
-            label: "Associate an Organization defined in the Research Organization Registry",
-            entities: ror,
-        });
-        data.entities = [...data.entities, ...ror];
-    }
-    if (lookups?.length) {
-        lookups = lookups.map((entity) => ({ ...entity, type: "datapack" }));
-        matches.push({ label: "Associate an entity from a data pack", entities: lookups });
-        data.entities = [...data.entities, ...lookups];
+        if (key === "internal" && results?.length) {
+            matches.push({
+                label: "Associate an entity already defined in this crate",
+                entities: internal.map((e) => ({ ...e, type: "internal" })).slice(0, 5),
+            });
+            data.entities = [...data.entities, ...internal];
+        } else if (key === "templates" && results?.length) {
+            matches.push({
+                label: "Associate an entity from saved templates",
+                entities: results.map((template) => ({ ...template.entity, type: "template" })),
+            });
+            data.entities = [...data.entities, ...templates];
+        } else if (key === "ror" && results?.length) {
+            matches.push({
+                label: "Associate an Organization defined in the Research Organization Registry",
+                entities: results.map((entity) => ({ ...entity, type: "template" })),
+            });
+            data.entities = [...data.entities, ...ror];
+        } else if (key === "lookups" && results?.length) {
+            matches.push({
+                label: "Associate an entity from a data pack",
+                entities: lookups.map((entity) => ({ ...entity, type: "datapack" })),
+            });
+            data.entities = [...data.entities, ...lookups];
+        }
     }
 
     matches.push({
@@ -229,7 +230,7 @@ async function lookupROR({ queryString }) {
     let response = await fetch(`${api}?query.advanced=${queryString}`);
     if (response.status === 200) {
         response = await response.json();
-        response = response.items.slice(0, 5).map((item) => {
+        response = response.items.slice(0, 10).map((item) => {
             return {
                 "@id": item.id,
                 "@type": "Organization",
