@@ -104,7 +104,7 @@ watch(
 );
 onBeforeMount(() => {
     $router?.replace({ query: "" });
-    data.configuration = configure();
+    data.configuration = reactive(configure());
 });
 onMounted(() => {
     data.debouncedInit();
@@ -124,6 +124,8 @@ function init() {
     // does the profile have a context defined? yes - disable the context editor
     if (data.profile?.context) {
         data.configuration.enableContextEditor = false;
+    } else {
+        data.configuration.enableContextEditor = props.enableContextEditor;
     }
 
     data.crateManager = new CrateManager();

@@ -449,15 +449,19 @@ function deleteProperty(data) {
 function createEntity(data) {
     const property = data.property;
     delete data.property;
-    const dataType = data.type;
-    delete data.type;
+    const dataType = data.json.type;
+    delete data.json.type;
     console.debug("Render Entity component: emit(create:entity)", data);
     if (props.configuration.mode === "embedded") {
         if (dataType === "datapack") {
             props.crateManager.ingestAndLink({ property, json: data });
         } else {
             let entity = props.crateManager.addEntity({ entity: data.json });
-            props.crateManager.linkEntity({ property, tgtEntityId: entity.describoId });
+            props.crateManager.linkEntity({
+                srcEntityId: props.entity.describoId,
+                property,
+                tgtEntityId: entity.describoId,
+            });
         }
     } else {
         $emit("ingest:entity", { property, entityId: props.entity.describoId, json: data });

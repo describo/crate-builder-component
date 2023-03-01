@@ -36,9 +36,12 @@
             <div class="flex flex-row" v-if="!data.editLocation">
                 <div class="flex flex-col">
                     <div class="bg-blue-200 p-2 cursor-pointer">
-                        {{ data.entity.name }}
+                        {{ data.entity.tgtEntity.name }}
                     </div>
-                    <map-component :crate-manager="props.crateManager" :entity="data.entity" />
+                    <map-component
+                        :crate-manager="props.crateManager"
+                        :entity="data.entity.tgtEntity"
+                    />
                 </div>
                 <div
                     class="flex flex-col space-y-6 bg-yellow-200 cursor-pointer rounded-r p-2"
@@ -60,7 +63,8 @@
                 <geo-component
                     class="bg-blue-200"
                     :crate-manager="props.crateManager"
-                    :entity="data.entity"
+                    :property="data.entity.property"
+                    :entity="data.entity.tgtEntity"
                     mode="feature"
                     @save:property="saveProperty"
                 />
@@ -74,7 +78,7 @@ import GeoComponent from "../primitives/Geo.component.vue";
 import TypeIconComponent from "./TypeIcon.component.vue";
 import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import MapComponent from "../primitives/Map.component.vue";
-import { computed, reactive, inject, onMounted } from "vue";
+import { computed, reactive, inject } from "vue";
 const configuration = inject("configuration");
 
 const emit = defineEmits(["load:entity", "create:property", "save:property", "delete:property"]);
@@ -94,47 +98,29 @@ const props = defineProps({
 });
 const data = reactive({
     loading: false,
-    entity: {},
+    entity: { ...props.entity },
     editLocation: false,
 });
-let showMap = computed(() => (data.entity?.["@type"]?.match("Geo") ? true : false));
+let showMap = computed(() => (data.entity?.tgtEntity?.["@type"]?.match(/Geo/) ? true : false));
 let type = "unlink";
 
-onMounted(() => {
-    loadEntityData();
-});
-
-async function loadEntityData() {
-    if (props.entity.tgtEntity) {
-        data.entity = { ...props.entity };
-    } else {
-        if (configuration.mode !== "embedded") return;
-        await new Promise((resolve) => setTimeout(resolve, props.index * 4));
-        let entity = props.crateManager.getEntity({
-            describoId: props.entity.tgtEntityId,
-            loadProperties: false,
-        });
-        data.entity.tgtEntity = { ...entity };
-    }
-}
 function loadEntity() {
     data.loading = true;
-    console.debug("Renderer Linked Item Component : emit(load:entity)", props.entity.tgtEntityId);
+    // console.debug("Renderer Linked Item Component : emit(load:entity)", props.entity.tgtEntityId);
     emit("load:entity", { describoId: props.entity.tgtEntityId });
 }
 function editLocation() {
     data.editLocation = true;
 }
 function saveProperty(property) {
-    console.debug("Renderer Linked Item Component : emit(save:property)", property);
+    // console.debug("Renderer Linked Item Component : emit(save:property)", property);
     emit("save:property", property);
     data.editLocation = false;
-    console.debug("data.editLocation", data.editLocation);
-    loadEntityData();
+    // console.debug("data.editLocation", data.editLocation);
 }
 function deleteProperty(target) {
     data.loading = true;
-    console.debug("Renderer Linked Item Component : emit(delete:property)", target);
+    // console.debug("Renderer Linked Item Component : emit(delete:property)", target);
     setTimeout(() => emit("delete:property", target), 200);
 }
 </script>
