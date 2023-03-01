@@ -51,6 +51,5 @@
                 }
             ]
         }
-    },
-    "enabledClasses": ["Dataset", "Person", "Organisation"]
+    }
 }

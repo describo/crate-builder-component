@@ -91,7 +91,6 @@
             "definition": "override"
         }
     },
-    "enabledClasses": ["Dataset", "Person", "Organisation"],
     "lookup": {
         "Language": {
             "fields": [

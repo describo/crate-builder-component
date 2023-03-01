@@ -5,6 +5,7 @@
         "version": 0.1,
         "warnMissingProperty": true
     },
+    "context": "https://w3id.org/ro/crate/1.1/context",
     "hide": {
         "Dataset": ["date"]
     },
@@ -58,6 +59,5 @@
                 }
             ]
         }
-    },
-    "enabledClasses": ["Dataset", "Person", "Organisation"]
+    }
 }
