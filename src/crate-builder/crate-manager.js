@@ -122,8 +122,11 @@ export class CrateManager {
     }
 
     exportCrate() {
+        // the context will come from the profile if defined or the original crate otherwise
         let crate = {
-            "@context": cloneDeep(this.context),
+            "@context": this.profile?.context
+                ? cloneDeep(this.profile.context)
+                : cloneDeep(this.context),
             "@graph": [cloneDeep(this.rootDescriptor)],
         };
 
