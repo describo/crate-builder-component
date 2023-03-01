@@ -46,11 +46,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch, inject } from "vue";
+import { reactive, watch, inject } from "vue";
 import { isArray, debounce } from "lodash";
 
 import { Query, BoolQuery } from "@coedl/elastic-query-builder";
-import { wildcardQuery, matchQuery } from "@coedl/elastic-query-builder/queries";
+import { matchQuery } from "@coedl/elastic-query-builder/queries";
 const configuration = inject("configuration");
 
 const props = defineProps({
@@ -154,27 +154,23 @@ async function querySearch(queryString) {
         if (key === "internal" && results?.length) {
             matches.push({
                 label: "Associate an entity already defined in this crate",
-                entities: internal.map((e) => ({ ...e, type: "internal" })).slice(0, 5),
+                entities: results.map((e) => ({ ...e, type: "internal" })).slice(0, 5),
             });
-            data.entities = [...data.entities, ...internal];
         } else if (key === "templates" && results?.length) {
             matches.push({
                 label: "Associate an entity from saved templates",
                 entities: results.map((template) => ({ ...template.entity, type: "template" })),
             });
-            data.entities = [...data.entities, ...templates];
         } else if (key === "ror" && results?.length) {
             matches.push({
                 label: "Associate an Organization defined in the Research Organization Registry",
-                entities: results.map((entity) => ({ ...entity, type: "template" })),
+                entities: results.map((entity) => ({ ...entity, type: "ror" })),
             });
-            data.entities = [...data.entities, ...ror];
         } else if (key === "lookups" && results?.length) {
             matches.push({
                 label: "Associate an entity from a data pack",
                 entities: lookups.map((entity) => ({ ...entity, type: "datapack" })),
             });
-            data.entities = [...data.entities, ...lookups];
         }
     }
 
@@ -189,9 +185,9 @@ async function querySearch(queryString) {
 function handleSelect(entity) {
     if (entity) {
         if (entity?.type === "internal") {
-            $emit("link:entity", { entity });
+            $emit("link:entity", { json: entity });
         } else {
-            $emit("create:entity", entity);
+            $emit("create:entity", { json: entity });
         }
     }
 }
