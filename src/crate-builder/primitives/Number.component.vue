@@ -52,6 +52,7 @@ function save() {
 }
 
 function checkIsNumeric(value) {
+    value = value + "";
     return isNumeric(String(value));
 }
 </script>
