@@ -24,7 +24,7 @@
             :value="data.value"
             @save:property="savePropertyValue"
         />
-        <value-component v-else-if="isValue()" :definition="props.definition" />
+        <value-component v-else-if="isValue()" :definition="props.definition.value" />
         <select-component
             v-else-if="isSelect()"
             :style="inputElementWidth"
