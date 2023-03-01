@@ -121,6 +121,11 @@ function init() {
     data.profile = isEmpty(props.profile) ? {} : cloneDeep(props.profile);
     data.crate = cloneDeep(props.crate);
 
+    // does the profile have a context defined? yes - disable the context editor
+    if (data.profile?.context) {
+        data.configuration.enableContextEditor = false;
+    }
+
     data.crateManager = new CrateManager();
     data.crateManager.lookup = props.lookup;
     try {
