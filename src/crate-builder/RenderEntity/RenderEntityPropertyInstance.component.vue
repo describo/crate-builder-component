@@ -1,7 +1,14 @@
 <template>
+    <div v-if="configuration.readonly">
+        <!-- Just render the value on screen (parse ISO dates for niceness though) -->
+        <div v-if="isDateTime(data.value)">{{ parseISO(data.value) }}</div>
+        <div v-else>{{ data.value }}</div>
+    </div>
     <div v-if="!configuration.readonly">
+        <!--  not readonly - try to load the relevant display component-->
+        <value-component v-if="isValue()" :definition="props.definition.value" />
         <date-component
-            v-if="isDate(data.value)"
+            v-else-if="isDate(data.value)"
             :property="data.property"
             :value="data.value"
             @save:property="savePropertyValue"
@@ -24,7 +31,6 @@
             :value="data.value"
             @save:property="savePropertyValue"
         />
-        <value-component v-else-if="isValue()" :definition="props.definition.value" />
         <select-component
             v-else-if="isSelect()"
             :style="inputElementWidth"
@@ -47,10 +53,6 @@
             :definition="props.definition"
             @save:property="savePropertyValue"
         />
-    </div>
-    <div v-else>
-        <div v-if="isDateTime(data.value)">{{ parseISO(data.value) }}</div>
-        <div v-else>{{ data.value }}</div>
     </div>
 </template>
 
@@ -139,7 +141,7 @@ function isValue() {
     return props?.definition?.type === "Value";
 }
 function isSelect() {
-    return props?.definition?.values?.includes(props.data.property) ? true : false;
+    return props?.definition?.values?.includes(props.data.value) ? true : false;
 }
 function isUrl(string) {
     let result = isURL(string);
