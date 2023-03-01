@@ -6,13 +6,13 @@
 import "leaflet/dist/leaflet.css";
 import * as Leaflet from "leaflet";
 import { groupBy } from "lodash";
-import { reactive, onMounted } from "vue";
+import { reactive, onMounted, onBeforeUnmount } from "vue";
 
 const props = defineProps({
-    // crateManager: {
-    //     type: Object,
-    //     required: true,
-    // },
+    crateManager: {
+        type: Object,
+        required: true,
+    },
     entity: { type: Object },
 });
 
@@ -25,18 +25,17 @@ const data = reactive({
 onMounted(() => {
     init();
 });
+onBeforeUnmount(() => {
+    data.map.off();
+    data.map.remove();
+});
 
 async function init() {
+    const entity = props.crateManager.getEntity({ describoId: props.entity.describoId });
     data.map = new Leaflet.map(props.entity.describoId);
-    try {
-        data.map = new Leaflet.map(props.entity.describoId);
-    } catch (error) {
-        if (data.map) {
-            data.map.off();
-            data.map.remove();
-        }
-        data.map = new Leaflet.map(props.entity.describoId);
-    }
+
+    // we need to give leaflet and vue and the dom a couple seconds before barreling on
+    await new Promise((resolve) => setTimeout(resolve, 200));
     centerMap();
     Leaflet.tileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.{ext}", {
         attribution:
@@ -47,34 +46,16 @@ async function init() {
         ext: "jpg",
         noWrap: true,
     }).addTo(data.map);
-    let properties = groupBy(props.entity.properties, "property");
 
-    let fg;
-    if (properties.box) {
-        const boxes = properties.box.map((box) => {
-            box = box.value.split(" ");
-            console.log(
-                box,
-                box.map((b) => b.split(","))
-            );
-            return {
-                type: "Polygon",
-                coordinates: [box.map((b) => b.split(","))],
-            };
-        });
-        removeExistingLayers();
-        fg = addFeatureGroup({ geoJSON: boxes, type: "box" });
-    } else if (properties.latitude && data.properties.longitude) {
-        let geojson = {
-            type: "Point",
-            coordinates: [properties.longitude[0].value, properties.latitude[0].value],
-        };
-        removeExistingLayers();
-        fg = addFeatureGroup({ geoJSON: geojson, type: "point" });
-    } else if (properties.geojson) {
+    let properties = groupBy(entity.properties, "property");
+
+    if (properties.geojson) {
         let geojson = JSON.parse(properties.geojson[0].value);
         removeExistingLayers();
-        fg = addFeatureGroup({ geoJSON: geojson });
+
+        // we need to give leaflet and vue and the dom a couple seconds before barreling on
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        addFeatureGroup({ geoJSON: geojson });
     }
 }
 
@@ -87,18 +68,13 @@ function removeExistingLayers() {
 }
 
 function addFeatureGroup({ geoJSON, type }) {
-    let fg;
-    if (type === "box") {
-        fg = Leaflet.featureGroup(Leaflet.geoJSON(geoJSON));
-    } else {
-        fg = Leaflet.featureGroup([
-            Leaflet.geoJSON(geoJSON, {
-                pointToLayer: function (feature, latlng) {
-                    return L.circleMarker(latlng);
-                },
-            }),
-        ]);
-    }
+    let fg = Leaflet.featureGroup([
+        Leaflet.geoJSON(geoJSON, {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng);
+            },
+        }),
+    ]);
     fg.setStyle({ color: "#fff000" });
     fg.addTo(data.map);
     data.layers.push(fg);

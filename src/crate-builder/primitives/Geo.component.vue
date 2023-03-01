@@ -74,7 +74,7 @@
 import "leaflet/dist/leaflet.css";
 import * as Leaflet from "leaflet";
 import * as SelectArea from "leaflet-area-select";
-import { reactive, onMounted, inject } from "vue";
+import { reactive, onMounted, onBeforeUnmount, inject } from "vue";
 
 const props = defineProps({
     crateManager: {
@@ -85,6 +85,9 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    // setting mode to
+    //   * entity means the component will emit a complete entity
+    //   * feature means the component will emit patch to the geojson property
     mode: {
         type: String,
         default: "entity",
@@ -117,17 +120,18 @@ const data = reactive({
 onMounted(() => {
     init();
 });
+onBeforeUnmount(() => {
+    data.map.off();
+    data.map.remove();
+});
 
 async function init() {
     await loadGeoDataInCrate();
     await loadPropertyData();
-    try {
-        data.map = new Leaflet.map("map");
-    } catch (error) {
-        data.map.off();
-        data.map.remove();
-        data.map = new Leaflet.map("map");
-    }
+    data.map = new Leaflet.map("map");
+
+    // we need to give leaflet and vue and the dom a couple seconds before barreling on
+    await new Promise((resolve) => setTimeout(resolve, 200));
     centerMap();
     Leaflet.tileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.{ext}", {
         attribution:
@@ -156,7 +160,8 @@ async function loadGeoDataInCrate() {
 
 async function loadPropertyData() {
     if (props.entity?.describoId) {
-        data.geojsonProperty = props.entity.properties.filter((p) => p.property === "geojson")[0];
+        let entity = props.crateManager.getEntity({ describoId: props.entity.describoId });
+        data.geojsonProperty = entity.properties.filter((p) => p.property === "geojson")[0];
     }
 }
 
@@ -267,7 +272,7 @@ function emitFeature() {
 function emitSelection(selection) {
     const entity = data.existingEntities.filter((e) => e.describoId === selection)[0];
     console.debug("GEO Component : emit(link:entity)", entity);
-    emit("link:entity", { entity });
+    emit("link:entity", { property: props.property, json: entity });
 }
 </script>
 
