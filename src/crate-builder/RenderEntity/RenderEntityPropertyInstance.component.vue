@@ -8,14 +8,14 @@
         <div v-if="!configuration.readonly">
             <!--  not readonly - try to load the relevant display component-->
             <value-component v-if="isValue()" :definition="props.definition.value" />
-            <date-component
-                v-else-if="isDate(props.data.value)"
+            <date-time-component
+                v-else-if="isDateTime(props.data.value)"
                 :property="props.data.property"
                 :value="props.data.value"
                 @save:property="savePropertyValue"
             />
-            <date-time-component
-                v-else-if="isDateTime(props.data.value)"
+            <date-component
+                v-else-if="isDate(props.data.value)"
                 :property="props.data.property"
                 :value="props.data.value"
                 @save:property="savePropertyValue"
@@ -101,19 +101,11 @@ function createEntity(data) {
 }
 function isDate(string) {
     const date = parseISO(string);
-    return (
-        validatorIsDate(date) &&
-        date.toISOString() === startOfDay(date).toISOString() &&
-        !isNumber(string)
-    );
+    return validatorIsDate(date) && props.definition.type.includes("Date");
 }
 function isDateTime(string) {
     const date = parseISO(string);
-    return (
-        validatorIsDate(date) &&
-        !isNumber(string) &&
-        date.toISOString() !== startOfDay(date).toISOString()
-    );
+    return validatorIsDate(date) && props.definition.type.includes("DateTime");
 }
 function isTime(string) {
     return string?.match(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/) ? true : false;
