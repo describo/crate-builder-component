@@ -195,6 +195,10 @@ export class ProfileManager {
             };
         }
 
+        if (!isArray(propertyDefinition.type)) {
+            propertyDefinition.type = [propertyDefinition.type];
+        }
+
         return { propertyDefinition };
     }
 
