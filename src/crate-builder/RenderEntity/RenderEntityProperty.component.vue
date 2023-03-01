@@ -191,7 +191,6 @@ const profileWarnMissingProperty = computed(() => {
 const showAddControl = computed(() => {
     return data?.propertyDefinition?.multiple || !props?.values?.length;
 });
-
 function sortInstances() {
     data.simpleInstances = props.values.filter((v) => v.value);
     data.linkInstances = orderBy(
@@ -200,31 +199,31 @@ function sortInstances() {
     );
 }
 function refresh() {
-    console.debug("Render Entity Property component: emit(refresh)");
+    // console.debug("Render Entity Property component: emit(refresh)");
     emit("refresh");
 }
 function loadEntity(data) {
-    console.debug("Render Entity Property component: emit(load:entity)", data);
+    // console.debug("Render Entity Property component: emit(load:entity)", data);
     emit("load:entity", data);
 }
 function createProperty(data) {
-    console.debug("Render Entity Property component: emit(create:property)", data);
+    // console.debug("Render Entity Property component: emit(create:property)", data);
     emit("create:property", data);
 }
 function createEntity(data) {
-    console.debug("Render Entity Property component: emit(create:entity)", data);
+    // console.debug("Render Entity Property component: emit(create:entity)", data);
     emit("create:entity", data);
 }
 function linkEntity(data) {
-    console.debug("Render Entity Property component: emit(link:entity)", data);
+    // console.debug("Render Entity Property component: emit(link:entity)", data);
     emit("link:entity", data);
 }
 function saveProperty(data) {
-    console.debug("Render Entity Property component: emit(save:property)", data);
+    // console.debug("Render Entity Property component: emit(save:property)", data);
     emit("save:property", data);
 }
 function deleteProperty(data) {
-    console.debug("Render Entity Property component: emit(delete:property)", data);
+    // console.debug("Render Entity Property component: emit(delete:property)", data);
     emit("delete:property", data);
 }
 </script>

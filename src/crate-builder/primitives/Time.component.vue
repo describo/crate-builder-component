@@ -1,7 +1,6 @@
 <template>
     <div class="flex flex-col">
         <el-time-select
-            v-if="props.value && data.isValidTime"
             v-model="data.internalValue"
             placeholder="Pick a time"
             @change="save"
@@ -13,7 +12,7 @@
             }"
         >
         </el-time-select>
-        <div class="text-xs text-gray-700" v-else>
+        <div class="text-xs text-gray-700" v-if="!data.isValidTime">
             The supplied time '{{ props.value }}' is invalid. Time format is: HH:mm::ss.
             e.g.09:03:59
         </div>
@@ -22,7 +21,6 @@
 
 <script setup>
 import { reactive, watch } from "vue";
-import isTime from "validator/lib/isTime";
 const props = defineProps({
     property: {
         type: String,

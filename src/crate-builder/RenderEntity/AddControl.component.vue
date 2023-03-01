@@ -47,9 +47,12 @@ const data = reactive({
     allowedTypes: [],
     typeExclusions: ["File", "Dataset"],
 });
-watch(props.types, () => {
-    init();
-});
+watch(
+    () => props.types,
+    () => {
+        init();
+    }
+);
 onMounted(() => {
     init();
 });

@@ -48,7 +48,7 @@ const $emit = defineEmits(["create:entity"]);
 const data = reactive({
     items: [...props.definition.values],
     internalValue: props.value,
-    isValidValue: isURL(props.value),
+    isValidValue: props.value ? isURL(props.value) : true,
     hasValidValues: verifySelectValuesAreUrls(props.definition.values),
 });
 
@@ -56,7 +56,7 @@ watch(
     () => props.value,
     () => {
         data.internalValue = props.value;
-        data.isValidValue = isURL(props.value);
+        data.isValidValue = props.value ? isURL(props.value) : true;
     }
 );
 watch(

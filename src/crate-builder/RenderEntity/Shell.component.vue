@@ -456,7 +456,7 @@ function createEntity(data) {
         if (dataType === "datapack") {
             props.crateManager.ingestAndLink({ property, json: data });
         } else {
-            let entity = props.crateManager.addEntity({ entity: data });
+            let entity = props.crateManager.addEntity({ entity: data.json });
             props.crateManager.linkEntity({ property, tgtEntityId: entity.describoId });
         }
     } else {
@@ -480,7 +480,10 @@ function updateEntity(patch) {
 function linkEntity(data) {
     console.debug("Render Entity component: emit(link:entity)", data);
     if (props.configuration.mode === "embedded") {
-        props.crateManager.linkEntity({ property: data.property, tgtEntityId: data.describoId });
+        props.crateManager.linkEntity({
+            property: data.property,
+            tgtEntityId: data.json.describoId,
+        });
     } else {
         $emit("link:entity", { property: data.property, tgtEntityId: data.describoId });
     }

@@ -3,7 +3,7 @@
         <el-input
             class="w-full"
             type="number"
-            @input="data.debouncedSave"
+            @input="save"
             v-model="data.internalValue"
             resize="vertical"
         ></el-input>

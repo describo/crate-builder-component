@@ -81,6 +81,10 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+    property: {
+        type: String,
+        required: true,
+    },
     mode: {
         type: String,
         default: "entity",
@@ -249,7 +253,7 @@ function emitFeature() {
             geojson: JSON.stringify(data.feature.geojson),
         };
         console.debug("GEO Component : emit(create:entity)", entity);
-        emit("create:entity", entity);
+        emit("create:entity", { property: props.property, json: entity });
     } else if (props.mode === "feature" && data.feature?.geojson) {
         let property = {
             propertyId: data.geojsonProperty.propertyId,
