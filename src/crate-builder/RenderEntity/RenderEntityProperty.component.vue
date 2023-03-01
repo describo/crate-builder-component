@@ -49,9 +49,7 @@
                         :data="instance"
                         :definition="data.propertyDefinition"
                         @save:property="saveProperty"
-                        @delete:property="deleteProperty"
-                        @load:entity="loadEntity"
-                        @refresh="refresh"
+                        @create:entity="createEntity"
                     />
                     <delete-property-component
                         v-if="
@@ -198,32 +196,22 @@ function sortInstances() {
         "@id"
     );
 }
-function refresh() {
-    // console.debug("Render Entity Property component: emit(refresh)");
-    emit("refresh");
-}
 function loadEntity(data) {
-    // console.debug("Render Entity Property component: emit(load:entity)", data);
     emit("load:entity", data);
 }
 function createProperty(data) {
-    // console.debug("Render Entity Property component: emit(create:property)", data);
     emit("create:property", data);
 }
 function createEntity(data) {
-    // console.debug("Render Entity Property component: emit(create:entity)", data);
     emit("create:entity", data);
 }
 function linkEntity(data) {
-    // console.debug("Render Entity Property component: emit(link:entity)", data);
     emit("link:entity", data);
 }
 function saveProperty(data) {
-    // console.debug("Render Entity Property component: emit(save:property)", data);
     emit("save:property", data);
 }
 function deleteProperty(data) {
-    // console.debug("Render Entity Property component: emit(delete:property)", data);
     emit("delete:property", data);
 }
 </script>

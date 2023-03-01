@@ -1,58 +1,59 @@
 <template>
-    <div v-if="configuration.readonly">
-        <!-- Just render the value on screen (parse ISO dates for niceness though) -->
-        <div v-if="isDateTime(data.value)">{{ parseISO(data.value) }}</div>
-        <div v-else>{{ data.value }}</div>
-    </div>
-    <div v-if="!configuration.readonly">
-        <!--  not readonly - try to load the relevant display component-->
-        <value-component v-if="isValue()" :definition="props.definition.value" />
-        <date-component
-            v-else-if="isDate(data.value)"
-            :property="data.property"
-            :value="data.value"
-            @save:property="savePropertyValue"
-        />
-        <date-time-component
-            v-else-if="isDateTime(data.value)"
-            :property="data.property"
-            :value="data.value"
-            @save:property="savePropertyValue"
-        />
-        <time-component
-            v-else-if="isTime(data.value)"
-            :property="data.property"
-            :value="data.value"
-            @save:property="savePropertyValue"
-        />
-        <number-component
-            v-else-if="isNumber(data.value)"
-            :property="data.property"
-            :value="data.value"
-            @save:property="savePropertyValue"
-        />
-        <select-component
-            v-else-if="isSelect()"
-            :style="inputElementWidth"
-            :property="data.property"
-            :value="data.value"
-            :definition="props.definition"
-            @save:property="savePropertyValue"
-        />
-        <url-component
-            v-else-if="isUrl(data.value)"
-            :property="data.property"
-            :value="data.value"
-            @create:entity="createEntity"
-        />
-        <text-component
-            v-else-if="isText(data.value)"
-            :type="type"
-            :property="data.property"
-            :value="data.value"
-            :definition="props.definition"
-            @save:property="savePropertyValue"
-        />
+    <div>
+        <div v-if="configuration.readonly">
+            <!-- Just render the value on screen (parse ISO dates for niceness though) -->
+            <div v-if="isDateTime(props.data.value)">{{ parseISO(props.data.value) }}</div>
+            <div v-else>{{ props.data.value }}</div>
+        </div>
+        <div v-if="!configuration.readonly">
+            <!--  not readonly - try to load the relevant display component-->
+            <value-component v-if="isValue()" :definition="props.definition.value" />
+            <date-component
+                v-else-if="isDate(props.data.value)"
+                :property="props.data.property"
+                :value="props.data.value"
+                @save:property="savePropertyValue"
+            />
+            <date-time-component
+                v-else-if="isDateTime(props.data.value)"
+                :property="props.data.property"
+                :value="props.data.value"
+                @save:property="savePropertyValue"
+            />
+            <time-component
+                v-else-if="isTime(props.data.value)"
+                :property="props.data.property"
+                :value="props.data.value"
+                @save:property="savePropertyValue"
+            />
+            <number-component
+                v-else-if="isNumber(props.data.value)"
+                :property="props.data.property"
+                :value="props.data.value"
+                @save:property="savePropertyValue"
+            />
+            <select-component
+                v-else-if="isSelect()"
+                :property="props.data.property"
+                :value="props.data.value"
+                :definition="props.definition"
+                @save:property="savePropertyValue"
+            />
+            <url-component
+                v-else-if="isUrl(props.data.value)"
+                :property="props.data.property"
+                :value="props.data.value"
+                @create:entity="createEntity"
+            />
+            <text-component
+                v-else-if="isText(props.data.value)"
+                :type="type"
+                :property="props.data.property"
+                :value="props.data.value"
+                :definition="props.definition"
+                @save:property="savePropertyValue"
+            />
+        </div>
     </div>
 </template>
 
@@ -86,9 +87,6 @@ const props = defineProps({
     },
 });
 const $emit = defineEmits(["save:property", "create:entity"]);
-let inputElementWidth = computed(() => {
-    return `width: 500px;`;
-});
 let type = computed(() => {
     return props?.definition?.type?.[0].toLowerCase();
 });
@@ -96,11 +94,9 @@ async function savePropertyValue(data) {
     if (!data.propertyId) {
         data = { ...data, property: props.data.property, propertyId: props.data.propertyId };
     }
-    console.debug("Render Entity Property Instance Component : emit(save:property)", data);
     $emit("save:property", data);
 }
 function createEntity(data) {
-    console.debug("Render Entity Property Instance Component : emit(create:entity)", data);
     $emit("create:entity", data);
 }
 function isDate(string) {
