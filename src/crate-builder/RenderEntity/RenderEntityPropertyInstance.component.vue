@@ -6,6 +6,7 @@
             <div v-else>{{ props.data.value }}</div>
         </div>
         <div v-if="!configuration.readonly">
+            <pre>{{ props.definition }}</pre>
             <!--  not readonly - try to load the relevant display component-->
             <value-component v-if="isValue()" :definition="props.definition.value" />
             <date-time-component
@@ -67,6 +68,7 @@ import ValueComponent from "../primitives/Value.component.vue";
 import SelectComponent from "../primitives/Select.component.vue";
 import UrlComponent from "../primitives/Url.component.vue";
 import { parseISO, startOfDay } from "date-fns";
+import isString from "lodash/isString";
 import { isDate as validatorIsDate, isDecimal, isInt, isFloat, isNumeric } from "validator";
 import { computed, inject } from "vue";
 import { isURL } from "../crate-manager.js";
@@ -108,7 +110,11 @@ function isDateTime(string) {
     return validatorIsDate(date) && props.definition.type.includes("DateTime");
 }
 function isTime(string) {
-    return string?.match(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/) ? true : false;
+    string = string + "";
+    return string?.match(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/) &&
+        props.definition.type.includes("DateTime")
+        ? true
+        : false;
 }
 function isText(string) {
     if (
@@ -123,7 +129,13 @@ function isText(string) {
         return true;
 }
 function isNumber(string) {
-    return isDecimal(string) || isInt(string) || isFloat(string) || isNumeric(string);
+    string = string + "";
+    return (
+        (isDecimal(string) || isInt(string) || isFloat(string) || isNumeric(string)) &&
+        (props.definition.type.includes("Number") ||
+            props.definition.type.includes("Float") ||
+            props.definition.type.includes("Integer"))
+    );
 }
 function isValue() {
     return props?.definition?.type === "Value";
