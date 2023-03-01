@@ -65,6 +65,11 @@ const props = defineProps({
         default: false,
         validator: (val) => [true, false].includes(val),
     },
+    enableInternalRouting: {
+        type: Boolean,
+        default: true,
+        validator: (val) => [true, false].includes(val),
+    },
     readonly: {
         type: Boolean,
         default: false,
@@ -72,7 +77,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["ready", "error", "save:crate", "save:crate:template"]);
+const $emit = defineEmits(["ready", "error", "navigation", "save:crate", "save:crate:template"]);
 
 const data = reactive({
     ready: false,
@@ -106,7 +111,8 @@ onMounted(() => {
 });
 
 function init() {
-    $router?.replace({ query: "" });
+    // $router?.replace({ query: "" });
+    updateRoute({ describoId: "" });
     if (!props.crate || isEmpty(props.crate)) {
         return;
     }
@@ -120,7 +126,7 @@ function init() {
     try {
         data.crateManager.load({ crate: data.crate, profile: data.profile });
     } catch (error) {
-        emit("error", {
+        $emit("error", {
             errors: data.crateManager.errors,
         });
         data.error = true;
@@ -165,28 +171,38 @@ async function setCurrentEntity({ describoId = undefined, name = undefined, id =
         entity = data.crateManager.getEntity({ id });
     }
     if (entity) {
-        if (isEmpty($route?.query)) {
-            $router?.replace({ query: { id: entity.describoId } });
-        } else {
-            $router?.push({ query: { id: entity.describoId } });
-        }
+        // if (isEmpty($route?.query)) {
+        //     $router?.replace({ query: { id: entity.describoId } });
+        // } else {
+        //     $router?.push({ query: { id: entity.describoId } });
+        // }
+        updateRoute({ describoId: entity.describoId });
         console.debug(`Render Entity Parent, load entity:`, { ...entity });
         data.crateManager.setCurrentEntity({ describoId: entity.describoId });
         data.entity = { ...entity };
     }
 }
+function updateRoute({ describoId }) {
+    if (!$router || !$route || !props.enableInternalRouting) return;
+    if (isEmpty($route?.query)) {
+        $router?.replace({ query: { id: describoId } });
+    } else {
+        $router?.push({ query: { id: describoId } });
+    }
+    $emit("navigation", { id: describoId });
+}
 function ready() {
     data.ready = true;
-    emit("ready");
+    $emit("ready");
 }
 async function saveCrate() {
     await new Promise((resolve) => setTimeout(resolve, 300));
     const crate = data.crateManager.exportCrate();
-    emit("save:crate", { crate });
+    $emit("save:crate", { crate });
 }
 async function saveCrateAsTemplate(template) {
     await new Promise((resolve) => setTimeout(resolve, 300));
-    emit("save:crate:template", {
+    $emit("save:crate:template", {
         template: {
             name: template.name,
             crate: data.crateManager.exportCrate(),
@@ -195,6 +211,6 @@ async function saveCrateAsTemplate(template) {
 }
 function saveEntityAsTemplate(template) {
     let entity = data.crateManager.exportEntityTemplate({ describoId: data.entity.describoId });
-    emit("save:entity:template", { entity });
+    $emit("save:entity:template", { entity });
 }
 </script>

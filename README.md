@@ -228,6 +228,11 @@ from there.**
     control
 -   `enable-template-save`: true | false: `(default: false)` : enable / disable the entity and crate
     template saving controls
+-   `enableInternalRouting`: true | false: `(default: false)`: enable / disable the internal router
+    which updates the location whenever an entity is selected. If no router is found (ie inside a
+    web component or just not used), routing is turned off anyway. Most likely you want to leave the
+    component to deal with this or listen out for the `navigation` event and handle it yourself if
+    the component can't.
 -   `readonly`: true | false: `(default: false)` : if set to true all of the controls to edit that
     the data are turned off. The crate is set into a mode where it is readonly.
 
@@ -241,6 +246,9 @@ from there.**
 -   `error`: If the component fails to load the crate it will emit an error message with more
     information. You should listen for this event and handle it accordingly in your application. It
     emits an object with one property, `errors` which is an array of errors found in the crate.
+-   `navigation`: The component emits a navigation event whenever an entity is selected. The output
+    is an object with a single property `id` which you can set on the location if you want to enable
+    navigation (back, forward) and want to manage it yourself.
 -   `@save:crate`: whenever the crate changes internally, this event will be emitted with the full
     crate for your app to save or handle in some way
 -   `@save:crate:template`: this event emits the current crate as a template with a name. This is so
