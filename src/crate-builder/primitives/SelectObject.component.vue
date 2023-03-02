@@ -63,9 +63,8 @@ function filter(d) {
     data.items = props.definition.values.filter((v) => {
         let match = false;
         const re = new RegExp(d);
-        if (v["@id"].match(re)) match = true;
-        if (v["@type"].match(re)) match = true;
-        if (v["name"].match(re)) match = true;
+        let data = `${v["@id"]} ${v["@type"]} ${v["name"]}`;
+        if (data.match(re)) match = true;
         if (match) return v;
     });
 }
@@ -79,7 +78,6 @@ function verifySelectValuesAreValidPlainObjects(values) {
         if (!"@id" in v) valid = false;
         if (!"@type" in v) valid = false;
         if (!"name" in v) valid = false;
-        console.log({ ...v }, valid);
     });
     return valid;
 }
