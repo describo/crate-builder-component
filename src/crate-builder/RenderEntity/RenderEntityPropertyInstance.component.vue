@@ -102,17 +102,17 @@ function createEntity(data) {
 }
 function isDate(string) {
     const date = parseISO(string);
-    return validatorIsDate(date) && props.definition.type.includes("Date");
+    return validatorIsDate(date) && definitionIncludes("Date");
 }
 function isDateTime(string) {
     const date = parseISO(string);
-    return validatorIsDate(date) && props.definition.type.includes("DateTime");
+    return validatorIsDate(date) && definitionIncludes("DateTime");
 }
 function isTime(string) {
     string = string + "";
     return (string.match(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/) ||
         string.match(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/)) &&
-        (props.definition.type.includes("DateTime") || props.definition.type.includes("Time"))
+        (definitionIncludes("DateTime") || definitionIncludes("Time"))
         ? true
         : false;
 }
@@ -132,9 +132,9 @@ function isNumber(string) {
     string = string + "";
     return (
         (isDecimal(string) || isInt(string) || isFloat(string) || isNumeric(string)) &&
-        (props.definition.type.includes("Number") ||
-            props.definition.type.includes("Float") ||
-            props.definition.type.includes("Integer"))
+        (definitionIncludes("Number") ||
+            definitionIncludes("Float") ||
+            definitionIncludes("Integer"))
     );
 }
 function isValue() {
@@ -146,5 +146,15 @@ function isSelect() {
 function isUrl(string) {
     let result = isURL(string);
     return result;
+}
+
+function definitionIncludes(type) {
+    // If @type is more than one thing then we can't really determine
+    //   what the data type is in the usual sense. This can only be sorted out
+    //   in the profile where the author specifies only a single type of data
+    //   for a given property.
+    //
+    // This makes sense in most cases anyway.
+    return props.definition?.type?.length === 1 && props.definition?.type?.includes(type);
 }
 </script>
