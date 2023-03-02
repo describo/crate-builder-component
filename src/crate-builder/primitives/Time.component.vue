@@ -1,19 +1,16 @@
 <template>
     <div class="flex flex-col">
-        <el-time-select
+        <el-input
+            class="w-full"
+            type="text"
             v-model="data.internalValue"
-            placeholder="Pick a time"
+            @blur="save"
             @change="save"
-            :clearable="false"
-            :picker-options="{
-                start: '00:00',
-                step: '00:15',
-                end: '23:45',
-            }"
-        >
-        </el-time-select>
+            resize="vertical"
+            placeholder="Please provide a time."
+        ></el-input>
         <div class="text-xs text-gray-700" v-if="!data.isValidTime">
-            The supplied time '{{ props.value }}' is invalid. Time format is: HH:mm::ss.
+            The supplied time '{{ data.internalValue }}' is invalid. Time format is: HH:mm::ss.
             e.g.09:03:59
         </div>
     </div>
@@ -44,17 +41,19 @@ watch(
     }
 );
 function save() {
+    data.isValidTime = checkTimeIsValid(data.internalValue);
+    if (!data.isValidTime) return;
     $emit("save:property", {
         property: props.property,
         value: data.internalValue,
     });
 }
 
-function checkTimeIsValid(time) {
+function checkTimeIsValid(string) {
     try {
-        if (!time) return true;
-        if (time.match(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/)) return true;
-        if (time.match(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/)) return true;
+        if (!string) return true;
+        if (string.match(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/)) return true;
+        if (string.match(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/)) return true;
     } catch (error) {}
     return false;
 }
