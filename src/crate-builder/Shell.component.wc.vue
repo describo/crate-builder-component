@@ -14,6 +14,7 @@
             @save:crate="saveCrate"
             @save:crate:template="saveCrateTemplate"
             @save:entity:template="saveEntityTemplate"
+            @navigation="navigation"
         />
     </div>
 </template>
@@ -40,6 +41,7 @@ const $emit = defineEmits([
     "save:crate",
     "save:crate:template",
     "save:entity:template",
+    "navigation",
 ]);
 
 let data = reactive(init());
@@ -61,6 +63,7 @@ function init() {
         enableBrowseEntities: $this?.config?.enableBrowseEntities ?? true,
         enableTemplateSave: $this?.config?.enableTemplateSave ?? false,
         readonly: $this?.config?.readonly ?? false,
+        enableInternalRouting: $this?.config?.enableInternalRouting ?? false,
     };
 }
 
@@ -81,5 +84,9 @@ function saveCrateTemplate(args) {
 }
 function saveEntityTemplate(args) {
     $emit("save:entity:template", args);
+}
+
+function navigation(args) {
+    $emit("navigation", args);
 }
 </script>
