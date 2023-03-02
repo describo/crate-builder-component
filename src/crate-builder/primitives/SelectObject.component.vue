@@ -30,6 +30,7 @@
 <script setup>
 import { reactive, watch } from "vue";
 import isPlainObject from "lodash/isPlainObject";
+import { validateId } from "../crate-manager.js";
 
 const props = defineProps({
     property: {
@@ -75,6 +76,8 @@ function verifySelectValuesAreValidPlainObjects(values) {
     let valid = true;
     values.forEach((v) => {
         if (!isPlainObject(v)) valid = false;
+        let result = validateId(v["@id"], v["@type"]);
+        if (result?.message) valid = false;
         if (!"@id" in v) valid = false;
         if (!"@type" in v) valid = false;
         if (!"name" in v) valid = false;
