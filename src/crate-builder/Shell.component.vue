@@ -111,8 +111,7 @@ onMounted(() => {
 });
 
 function init() {
-    // $router?.replace({ query: "" });
-    updateRoute({ describoId: "" });
+    updateRoute({ entity: {} });
     if (!props.crate || isEmpty(props.crate)) {
         return;
     }
@@ -178,24 +177,19 @@ async function setCurrentEntity({ describoId = undefined, name = undefined, id =
         entity = data.crateManager.getEntity({ id });
     }
     if (entity) {
-        // if (isEmpty($route?.query)) {
-        //     $router?.replace({ query: { id: entity.describoId } });
-        // } else {
-        //     $router?.push({ query: { id: entity.describoId } });
-        // }
-        updateRoute({ describoId: entity.describoId });
+        updateRoute({ entity });
         console.debug(`Render Entity Parent, load entity:`, { ...entity });
         data.crateManager.setCurrentEntity({ describoId: entity.describoId });
         data.entity = { ...entity };
     }
 }
-function updateRoute({ describoId }) {
-    $emit("navigation", { id: describoId });
+function updateRoute({ entity }) {
+    $emit("navigation", { id: entity.describoId, "@id": entity["@id"] });
     if (!$router || !$route || !props.enableInternalRouting) return;
     if (isEmpty($route?.query)) {
-        $router?.replace({ query: { id: describoId } });
+        $router?.replace({ query: { id: entity.describoId } });
     } else {
-        $router?.push({ query: { id: describoId } });
+        $router?.push({ query: { id: entity.describoId } });
     }
 }
 function ready() {
