@@ -149,12 +149,6 @@ function isUrl(string) {
 }
 
 function definitionIncludes(type) {
-    // If @type is more than one thing then we can't really determine
-    //   what the data type is in the usual sense. This can only be sorted out
-    //   in the profile where the author specifies only a single type of data
-    //   for a given property.
-    //
-    // This makes sense in most cases anyway.
-    return props.definition?.type?.length === 1 && props.definition?.type?.includes(type);
+    return props.definition?.type?.includes(type);
 }
 </script>
