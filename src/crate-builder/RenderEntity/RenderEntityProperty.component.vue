@@ -105,7 +105,9 @@ import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import AddComponent from "./Add.component.vue";
 import DisplayPropertyNameComponent from "./DisplayPropertyName.component.vue";
 import { ref, reactive, computed, onMounted, onBeforeMount, watch, inject } from "vue";
-import { cloneDeep, orderBy } from "lodash";
+import cloneDeep from "lodash/cloneDeep";
+import orderBy from "lodash/orderBy";
+import debounce from "lodash/debounce";
 import { ProfileManager } from "../profile-manager.js";
 const configuration = inject("configuration");
 
@@ -132,12 +134,13 @@ const data = reactive({
     propertyDefinition: {},
     simpleInstances: [],
     linkInstances: [],
+    debouncedGetProfileDefinitionForProperty: debounce(getProfileDefinitionForProperty, 200),
 });
 
 watch(
     () => props.property,
     () => {
-        getProfileDefinitionForProperty();
+        data.debouncedGetProfileDefinitionForProperty();
     }
 );
 watch(
@@ -150,7 +153,7 @@ onBeforeMount(() => {
     sortInstances();
 });
 onMounted(() => {
-    getProfileDefinitionForProperty();
+    data.debouncedGetProfileDefinitionForProperty();
 });
 
 function getProfileDefinitionForProperty() {
