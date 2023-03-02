@@ -125,9 +125,9 @@
                     "multiple": true,
                     "type": ["SelectObject"],
                     "values": [
-                        { "@id": 1, "@type": "Dataset", "name": "one" },
-                        { "@id": 2, "@type": "Dataset", "name": "two" },
-                        { "@id": 3, "@type": "Dataset", "name": "three" }
+                        { "@id": "#one", "@type": "Dataset", "name": "one" },
+                        { "@id": "#two", "@type": "Dataset", "name": "two" },
+                        { "@id": "#three", "@type": "Dataset", "name": "three" }
                     ]
                 },
                 {
