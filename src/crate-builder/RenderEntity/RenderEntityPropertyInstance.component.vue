@@ -6,7 +6,6 @@
             <div v-else>{{ props.data.value }}</div>
         </div>
         <div v-if="!configuration.readonly">
-            <pre>{{ props.definition }}</pre>
             <!--  not readonly - try to load the relevant display component-->
             <value-component v-if="isValue()" :definition="props.definition.value" />
             <date-time-component
@@ -111,8 +110,9 @@ function isDateTime(string) {
 }
 function isTime(string) {
     string = string + "";
-    return string?.match(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/) &&
-        props.definition.type.includes("DateTime")
+    return (string.match(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/) ||
+        string.match(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/)) &&
+        (props.definition.type.includes("DateTime") || props.definition.type.includes("Time"))
         ? true
         : false;
 }
