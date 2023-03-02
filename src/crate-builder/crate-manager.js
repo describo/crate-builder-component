@@ -461,27 +461,16 @@ export class CrateManager {
         const id = entity.describoLabel ?? createId();
 
         // is there an @id?
-        if (!entity["@id"]) entity["@id"] = `#${id}`;
+        if (entity["@id"]) {
+            // ensure @id is a string
+            entity["@id"] = entity["@id"] + "";
+        } else {
+            // set it to the generated describoId
+            entity["@id"] = `#${id}`;
+        }
 
         // is there a name?
         if (!entity.name) entity.name = entity["@id"];
-
-        /**
-         *
-         * NO LONGER valid or required because we fail fast if we find
-         *   invalid id's when we first load the crate
-         */
-        // is the id a URL of some kind?
-        // if (
-        //     !isURL(entity["@id"]) &&
-        //     !entity["@id"].match(/^\//) &&
-        //     !entity["@id"].match(/^\./) &&
-        //     !entity["@id"].match(/^#/) &&
-        //     !entity?.["@type"]?.includes("File") &&
-        //     !entity?.["@type"]?.includes("Dataset")
-        // ) {
-        //     entity["@id"] = `#${entity["@id"]}`;
-        // }
 
         // if no @type then set to URL or Thing
         if (!entity["@type"]) entity["@type"] = isURL(entity["@id"]) ? "URL" : "Thing";
