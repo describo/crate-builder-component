@@ -190,13 +190,13 @@ async function setCurrentEntity({ describoId = undefined, name = undefined, id =
     }
 }
 function updateRoute({ describoId }) {
+    $emit("navigation", { id: describoId });
     if (!$router || !$route || !props.enableInternalRouting) return;
     if (isEmpty($route?.query)) {
         $router?.replace({ query: { id: describoId } });
     } else {
         $router?.push({ query: { id: describoId } });
     }
-    $emit("navigation", { id: describoId });
 }
 function ready() {
     data.ready = true;
