@@ -62,8 +62,9 @@ Version it
 
 Push the tag to github and create a release
 
--   git push origin master --tags
+-   `git push origin master --tags`
 -   Go to the repo and create a release from the tag, documenting what is in it.
+-   Publish to npm: `npm publish`
 
 # Repo structure
 
