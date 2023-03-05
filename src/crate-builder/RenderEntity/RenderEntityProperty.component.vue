@@ -66,12 +66,12 @@
                 </div>
             </div>
             <!-- render all the links in a wrapping row -->
-            <div class="flex flex-row flex-wrap mt-2" v-if="data.linkInstances.length">
-                <div v-if="data.linkInstances.length <= 30">
+            <div class="mt-2" v-if="data.linkInstances.length">
+                <div v-if="data.linkInstances.length <= 30" class="flex flex-row flex-wrap">
                     <div
                         v-for="(instance, idx) of data.linkInstances"
                         :key="instance.propertyId"
-                        class="flex flex-row m-1"
+                        class="m-1"
                     >
                         <render-linked-item-component
                             :index="idx"
