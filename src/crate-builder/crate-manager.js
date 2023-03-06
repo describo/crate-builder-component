@@ -7,10 +7,9 @@ import cloneDeep from "lodash/cloneDeep";
 import flattenDeep from "lodash/flattenDeep";
 import compact from "lodash/compact";
 import orderBy from "lodash/orderBy";
-import partition from "lodash/partition";
 import { isURL as validatorIsURL } from "validator";
 const urlProtocols = ["http", "https", "ftp", "ftps"];
-import { validateIri, IriValidationStrategy } from "validate-iri";
+import { validateIri } from "validate-iri";
 import { init } from "@paralleldrive/cuid2";
 const createId = init({ length: 32 });
 
@@ -583,7 +582,7 @@ export function validateId(id, type) {
     if (id.match(/arcp:\/\/ni,sha-256;,.*/)) return true;
 
     // otherewise check that the id is a valid IRI
-    let result = validateIri(id, IriValidationStrategy.Strict);
+    let result = validateIri(id);
     if (!result) {
         // it's valid
         return true;
