@@ -4,6 +4,7 @@
             :crate="data.crate"
             :profile="data.profile"
             :lookup="data.lookup"
+            :entityId="data.entityId"
             :readonly="data.readonly"
             :enable-context-editor="data.enableContextEditor"
             :enable-crate-preview="data.enableCratePreview"
