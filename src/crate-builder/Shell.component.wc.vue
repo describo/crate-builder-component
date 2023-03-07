@@ -4,6 +4,7 @@
             :crate="data.crate"
             :profile="data.profile"
             :lookup="data.lookup"
+            :entityId="data.entityId"
             :readonly="data.readonly"
             :enable-context-editor="data.enableContextEditor"
             :enable-crate-preview="data.enableCratePreview"
@@ -58,6 +59,7 @@ function init() {
         crate: $this.crate,
         profile: $this.profile,
         lookup: $this.lookup,
+        entityId: $this.entityId,
         enableContextEditor: $this?.config?.enableContextEditor ?? true,
         enableCratePreview: $this?.config?.enableCratePreview ?? true,
         enableBrowseEntities: $this?.config?.enableBrowseEntities ?? true,

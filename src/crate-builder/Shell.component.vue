@@ -37,6 +37,9 @@ const props = defineProps({
     profile: {
         type: [Object, undefined],
     },
+    entityId: {
+        type: [String, undefined]
+    },
     mode: {
         type: [String, undefined],
         default: "embedded",
@@ -91,7 +94,7 @@ const data = reactive({
     crateManager: {},
 });
 
-watch([() => props.crate, () => props.profile], () => {
+watch([() => props.crate, () => props.profile, () => props.entityId], () => {
     data.ready = false;
     data.debouncedInit();
 });
@@ -102,6 +105,11 @@ watch(
             data.debouncedSetCurrentEntity({ describoId: $route?.query?.id });
     }
 );
+
+// if new entity is selected it sets it as current entity
+watch([() => props.entityId], () => {
+    data.debouncedSetCurrentEntity({id: props.entityId})
+});
 onBeforeMount(() => {
     $router?.replace({ query: "" });
     data.configuration = reactive(configure());
@@ -141,7 +149,14 @@ function init() {
         return;
     }
 
-    setCurrentEntity({ name: "RootDataset" });
+    if (props.entityId) {
+        console.log("### entity id is present", props.entityId)
+        setCurrentEntity({id: props.entityId})
+    } else {
+        console.log("### entity id is NOT present", props.entityId)
+        setCurrentEntity({ name: "RootDataset" });
+    }
+    
     ready();
 }
 function configure() {
