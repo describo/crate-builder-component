@@ -38,7 +38,7 @@ const props = defineProps({
         type: [Object, undefined],
     },
     entityId: {
-        type: [String, undefined]
+        type: [String, undefined],
     },
     mode: {
         type: [String, undefined],
@@ -94,22 +94,22 @@ const data = reactive({
     crateManager: {},
 });
 
-watch([() => props.crate, () => props.profile, () => props.entityId], () => {
+watch([() => props.crate, () => props.profile], () => {
     data.ready = false;
     data.debouncedInit();
 });
 watch(
     () => $route?.query?.id,
     (n) => {
-        if (n !== data.entity.describoId)
-            data.debouncedSetCurrentEntity({ describoId: $route?.query?.id });
+        data.debouncedSetCurrentEntity({ describoId: $route?.query?.id });
     }
 );
-
-// if new entity is selected it sets it as current entity
-watch([() => props.entityId], () => {
-    data.debouncedSetCurrentEntity({id: props.entityId})
-});
+watch(
+    () => props.entityId,
+    (n) => {
+        data.debouncedSetCurrentEntity({ id: props.entityId });
+    }
+);
 onBeforeMount(() => {
     $router?.replace({ query: "" });
     data.configuration = reactive(configure());
@@ -150,13 +150,11 @@ function init() {
     }
 
     if (props.entityId) {
-        console.log("### entity id is present", props.entityId)
-        setCurrentEntity({id: props.entityId})
+        setCurrentEntity({ id: props.entityId });
     } else {
-        console.log("### entity id is NOT present", props.entityId)
         setCurrentEntity({ name: "RootDataset" });
     }
-    
+
     ready();
 }
 function configure() {
@@ -191,7 +189,7 @@ async function setCurrentEntity({ describoId = undefined, name = undefined, id =
     } else if (id) {
         entity = data.crateManager.getEntity({ id });
     }
-    if (entity) {
+    if (entity && entity.describoId !== data.entity.describoId) {
         updateRoute({ entity });
         console.debug(`Render Entity Parent, load entity:`, { ...entity });
         data.crateManager.setCurrentEntity({ describoId: entity.describoId });
