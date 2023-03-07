@@ -174,10 +174,12 @@ Pass in the crate file and optionally a profile.
         :crate="data.crate"
         :profile="data.profile"
         :lookup="lookup"
+        :entityId="data.entityId"
         :enable-context-editor="true"
         :enable-crate-preview="true"
         :enable-browse-entities="true"
         :enable-template-save="true"
+        :enable-internal-routing="true"
         :readonly="false"
         @save:crate="saveCrate"
         @save:crate:template="saveTemplate"
@@ -196,6 +198,8 @@ the component.
     Your app needs to do the loading.
 -   `profile`: The profile. Note - this is the JSON object `not` a path to a file to be loaded. Your
     app needs to do the loading.
+-   `entityId`: Setting this property to an `@id` inside the crate will trigger the component to
+    load that entity.
 
 ### Unreactive Properties
 
