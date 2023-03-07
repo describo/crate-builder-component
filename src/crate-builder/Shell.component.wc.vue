@@ -59,6 +59,7 @@ function init() {
         crate: $this.crate,
         profile: $this.profile,
         lookup: $this.lookup,
+        entityId: $this.entityId,
         enableContextEditor: $this?.config?.enableContextEditor ?? true,
         enableCratePreview: $this?.config?.enableCratePreview ?? true,
         enableBrowseEntities: $this?.config?.enableBrowseEntities ?? true,
