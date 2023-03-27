@@ -30,4 +30,8 @@ export default defineConfig({
             resolvers: [ElementPlusResolver()],
         }),
     ],
+    define: {
+        // No process.env in web component
+        'process.env': {}
+    }
 });
