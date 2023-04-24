@@ -308,8 +308,16 @@ export class CrateManager {
     addEntity({ entity }) {
         // check there isn't an entity wth that @id already
         let match = this.__lookupEntityByAtId({ id: entity["@id"] });
-        if (match) {
+        if (match && match?.["@type"] === entity["@type"]) {
             return match;
+        } else if (match && match?.["@type"] !== entity["@type"]) {
+            // @id matches something in the graph but the type is not the same
+            //   generate a random @id so that the entity can be added
+            entity["@id"] = `#${createId()}`;
+            entity = this.__addEntity({ entity });
+            this.__processProperties({ entity });
+            this.__index();
+            return this.getEntity({ describoId: entity.describoId });
         } else {
             //  if not
             entity = this.__addEntity({ entity });
