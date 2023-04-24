@@ -69,7 +69,10 @@ const data = reactive({
     promiseTimeout: 2500,
     selection: undefined,
     loading: false,
-    debouncedQuerySearch: debounce(querySearch, 500),
+    debouncedQuerySearch: (queryString) => {
+        data.selection = queryString;
+        debounce(() => querySearch(queryString), 500)();
+    },
     matches: [],
     entities: [],
 });
