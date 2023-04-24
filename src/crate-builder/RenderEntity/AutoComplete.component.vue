@@ -64,15 +64,19 @@ const props = defineProps({
     },
 });
 
-const $emit = defineEmits(["link:entity", "add:template", "create:entity"]);
+const $emit = defineEmits(["link:entity", "create:entity"]);
 const data = reactive({
     promiseTimeout: 2500,
     selection: undefined,
     loading: false,
-    debouncedQuerySearch: (queryString) => {
+    // debouncedQuerySearch: (queryString) => {
+    //     data.selection = queryString;
+    //     debounce(() => querySearch(queryString), 500)();
+    // },
+    debouncedQuerySearch: debounce((queryString) => {
         data.selection = queryString;
-        debounce(() => querySearch(queryString), 500)();
-    },
+        return querySearch(queryString);
+    }, 500),
     matches: [],
     entities: [],
 });
