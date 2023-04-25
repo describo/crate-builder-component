@@ -236,6 +236,8 @@ from there.**
     the component can't.
 -   `readonly`: true | false: `(default: false)` : if set to true all of the controls to edit that
     the data are turned off. The crate is set into a mode where it is readonly.
+-   `webComponent`: true | false: `(default: true)` : Setting this to true alters the behaviour of
+    some components when the crate builder is used as a web component.
 
 ## Events
 
