@@ -64,12 +64,26 @@ const props = defineProps({
     },
 });
 
-const $emit = defineEmits(["link:entity", "add:template", "create:entity"]);
+const $emit = defineEmits(["link:entity", "create:entity"]);
 const data = reactive({
     promiseTimeout: 2500,
-    selection: undefined,
+    selection: "",
     loading: false,
-    debouncedQuerySearch: debounce(querySearch, 500),
+    // debouncedQuerySearch: (queryString) => {
+    //     console.log(data.selection, "***", queryString);
+    //     data.selection = queryString;
+    //     debounce(() => querySearch(queryString), 800)();
+    // },
+    debouncedQuerySearch: debounce(
+        (queryString) => {
+            if (configuration.webComponent) {
+                data.selection = queryString;
+            }
+            return querySearch(queryString);
+        },
+        1000,
+        { leading: true }
+    ),
     matches: [],
     entities: [],
 });
@@ -83,7 +97,6 @@ watch(
 async function querySearch(queryString) {
     console.debug(`Query Search: '${queryString}'`);
     data.loading = true;
-    data.matches = [];
 
     // construct a definition for a new entity
     let newEntity = [

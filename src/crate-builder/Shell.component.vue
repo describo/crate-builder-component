@@ -78,6 +78,11 @@ const props = defineProps({
         default: false,
         validator: (val) => [true, false].includes(val),
     },
+    webComponent: {
+        type: Boolean,
+        default: false,
+        validator: (val) => [true, false].includes(val),
+    },
 });
 
 const $emit = defineEmits(["ready", "error", "navigation", "save:crate", "save:crate:template"]);
@@ -165,6 +170,7 @@ function configure() {
         enableBrowseEntities: props.enableBrowseEntities,
         enableTemplateSave: props.enableTemplateSave,
         readonly: props.readonly,
+        webComponent: props.webComponent,
         enableTemplateLookups: false,
         enableDataPackLookups: false,
     };
