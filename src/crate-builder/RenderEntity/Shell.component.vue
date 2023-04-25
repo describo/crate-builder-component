@@ -329,8 +329,10 @@ function init() {
     const { layouts, hide } = profileManager.getLayout({ type: entity["@type"] });
     let layout = applyLayout({ layouts, hide, entity });
     if (layout.entity) {
+        data.tabs = [];
         data.entity = { ...entity, ...layout.entity };
     } else if (layout.tabs) {
+        data.entity = {};
         data.tabs = cloneDeep(layout.tabs);
     }
     $emit("ready");

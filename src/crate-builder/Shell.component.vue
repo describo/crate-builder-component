@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col">
         <render-entity-component
-            v-if="data.ready && !data.error"
+            v-if="!data.error && props.crate"
             :crate-manager="data.crateManager"
             :entity="data.entity"
             :configuration="data.configuration"
@@ -130,11 +130,11 @@ function init() {
     }
     data.error = false;
 
-    data.profile = isEmpty(props.profile) ? {} : cloneDeep(props.profile);
-    data.crate = cloneDeep(props.crate);
+    let profile = isEmpty(props.profile) ? {} : cloneDeep(props.profile);
+    let crate = cloneDeep(props.crate);
 
     // does the profile have a context defined? yes - disable the context editor
-    if (data.profile?.context) {
+    if (profile?.context) {
         data.configuration.enableContextEditor = false;
     } else {
         data.configuration.enableContextEditor = props.enableContextEditor;
@@ -143,7 +143,7 @@ function init() {
     data.crateManager = new CrateManager();
     data.crateManager.lookup = props.lookup;
     try {
-        data.crateManager.load({ crate: data.crate, profile: data.profile });
+        data.crateManager.load({ crate, profile });
     } catch (error) {
         $emit("error", {
             errors: data.crateManager.errors,
@@ -157,6 +157,7 @@ function init() {
     if (props.entityId) {
         setCurrentEntity({ id: props.entityId });
     } else {
+        data.entity = {};
         setCurrentEntity({ name: "RootDataset" });
     }
 
