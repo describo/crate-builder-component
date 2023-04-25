@@ -5,6 +5,7 @@
             :profile="data.profile"
             :lookup="data.lookup"
             :readonly="data.readonly"
+            :web-component="data.webComponent"
             :enable-context-editor="data.enableContextEditor"
             :enable-crate-preview="data.enableCratePreview"
             :enable-browse-entities="data.enableBrowseEntities"
@@ -63,6 +64,7 @@ function init() {
         enableBrowseEntities: $this?.config?.enableBrowseEntities ?? true,
         enableTemplateSave: $this?.config?.enableTemplateSave ?? false,
         readonly: $this?.config?.readonly ?? false,
+        webComponent: $this?.config?.webComponent ?? true,
         enableInternalRouting: $this?.config?.enableInternalRouting ?? false,
     };
 }
