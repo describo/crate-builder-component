@@ -9,7 +9,8 @@
         "src/crate-builder"
     ],
     "scripts": {
-        "develop": "npm install && npm run start:elastic && vite  && npm run stop:elastic",
+        "develop": "npm install && npm run update-dependencies && npm run start:elastic && vite && npm run stop:elastic",
+        "update-dependencies": "bash -x ./update-deps.sh",
         "test:watch": "./node_modules/.bin/jest --watch --runInBand",
         "build": "npm run build:vue && npm run build:wc",
         "build:vue": "vite build",

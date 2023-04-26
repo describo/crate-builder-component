@@ -9,8 +9,8 @@ import compact from "lodash-es/compact";
 import orderBy from "lodash-es/orderBy";
 import validatorIsURL from "validator/es/lib/isURL.js";
 const urlProtocols = ["http", "https", "ftp", "ftps"];
-import { validateIri } from "validate-iri";
-import cuid2 from "@paralleldrive/cuid2";
+import validateIriPkg from "./lib/validate-iri";
+import cuid2 from "./lib/cuid2";
 const createId = cuid2.init({ length: 32 });
 
 export class CrateManager {
@@ -590,7 +590,7 @@ export function validateId(id, type) {
     if (id.match(/arcp:\/\/ni,sha-256;,.*/)) return true;
 
     // otherewise check that the id is a valid IRI
-    let result = validateIri(id);
+    let result = validateIriPkg.validateIri(id, validateIriPkg.IriValidationStrategy.Strict);
     if (!result) {
         // it's valid
         return true;
