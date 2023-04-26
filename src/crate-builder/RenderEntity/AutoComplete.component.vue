@@ -47,7 +47,8 @@
 
 <script setup>
 import { reactive, watch, inject } from "vue";
-import { isArray, debounce } from "lodash";
+import isArray from "lodash-es/isArray";
+import debounce from "lodash-es/debounce";
 
 import { Query, BoolQuery } from "@coedl/elastic-query-builder";
 import { matchQuery } from "@coedl/elastic-query-builder/queries";

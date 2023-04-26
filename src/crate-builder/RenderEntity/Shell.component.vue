@@ -218,7 +218,8 @@ import RenderEntityPropertyComponent from "./RenderEntityProperty.component.vue"
 import RenderEntityReverseItemLinkComponent from "./RenderReverseItemLink.component.vue";
 import RenderControlsComponent from "./RenderControls.component.vue";
 import { reactive, onMounted, onBeforeMount, watch, provide } from "vue";
-import { debounce, cloneDeep } from "lodash";
+import debounce from "lodash-es/debounce";
+import cloneDeep from "lodash-es/cloneDeep";
 import { ProfileManager } from "../profile-manager.js";
 
 const props = defineProps({

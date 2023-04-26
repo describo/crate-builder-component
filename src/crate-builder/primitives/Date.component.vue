@@ -18,7 +18,7 @@
 
 <script setup>
 import { reactive, watch } from "vue";
-import { startOfDay } from "date-fns";
+import startOfDay from "date-fns/esm/startOfDay";
 import { checkDateIsValid } from "./date-libs";
 
 const props = defineProps({

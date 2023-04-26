@@ -42,7 +42,6 @@
 </template>
 
 <script setup>
-import AddComponent from "./Add.component.vue";
 import { reactive, computed, watch } from "vue";
 import { ProfileManager } from "../profile-manager";
 

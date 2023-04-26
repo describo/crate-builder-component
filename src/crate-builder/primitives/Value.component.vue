@@ -9,7 +9,7 @@
 
 <script setup>
 import { computed } from "vue";
-import isString from "lodash/isString";
+import isString from "lodash-es/isString";
 
 const props = defineProps({
     property: {

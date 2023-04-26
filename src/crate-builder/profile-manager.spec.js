@@ -1,6 +1,6 @@
 import "regenerator-runtime";
 import { range, round, compact, groupBy, random } from "lodash";
-import { ProfileManager } from "./profile-manager.js";
+import { ProfileManager } from "./profile-manager.bundle.js";
 
 describe("Test working with profiles", () => {
     beforeAll(() => {

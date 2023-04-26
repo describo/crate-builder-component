@@ -70,7 +70,7 @@
 
 <script setup>
 import { reactive, onMounted, onBeforeUnmount } from "vue";
-import { orderBy } from "lodash";
+import orderBy from "lodash-es/orderBy";
 
 const props = defineProps({
     crateManager: {

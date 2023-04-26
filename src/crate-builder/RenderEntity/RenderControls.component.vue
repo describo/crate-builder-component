@@ -146,7 +146,7 @@ import EditContextDialog from "./DialogEditContext.component.vue";
 import PreviewCrateDialog from "./DialogPreviewCrate.component.vue";
 import BrowseEntitiesDialog from "./DialogBrowseEntities.component.vue";
 import { reactive, computed, inject } from "vue";
-import { isArray } from "lodash";
+import isArray from "lodash-es/isArray";
 const configuration = inject("configuration");
 
 const props = defineProps({

@@ -66,9 +66,13 @@ import NumberComponent from "../primitives/Number.component.vue";
 import ValueComponent from "../primitives/Value.component.vue";
 import SelectComponent from "../primitives/Select.component.vue";
 import UrlComponent from "../primitives/Url.component.vue";
-import { parseISO, startOfDay } from "date-fns";
-import isString from "lodash/isString";
-import { isDate as validatorIsDate, isDecimal, isInt, isFloat, isNumeric } from "validator";
+import parseISO from "date-fns/esm/parseISO";
+import validatorIsDate from "validator/es/lib/isDate";
+import isDecimal from "validator/es/lib/isDecimal";
+import isInt from "validator/es/lib/isInt";
+import isFloat from "validator/es/lib/isFloat";
+import isNumeric from "validator/es/lib/isNumeric";
+
 import { computed, inject } from "vue";
 import { isURL } from "../crate-manager.js";
 const configuration = inject("configuration");

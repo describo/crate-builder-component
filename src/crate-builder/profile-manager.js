@@ -1,17 +1,15 @@
 import schemaOrgTypeDefinitions from "./schema-type-definitions.json";
-import {
-    isString,
-    isArray,
-    flattenDeep,
-    isEmpty,
-    orderBy,
-    cloneDeep,
-    has,
-    compact,
-    uniqBy,
-    uniq,
-    difference,
-} from "lodash";
+import isArray from "lodash-es/isArray";
+import isString from "lodash-es/isString";
+import isEmpty from "lodash-es/isEmpty";
+import flattenDeep from "lodash-es/flattenDeep";
+import cloneDeep from "lodash-es/cloneDeep";
+import orderBy from "lodash-es/orderBy";
+import has from "lodash-es/has";
+import compact from "lodash-es/compact";
+import uniq from "lodash-es/uniq";
+import uniqBy from "lodash-es/uniqBy";
+import difference from "lodash-es/difference";
 
 // TODO: write some tests against this
 export class ProfileManager {

@@ -7,4 +7,5 @@ module.exports = {
     transform: {
         "\\.[jt]sx?$": ["babel-jest", { rootMode: "upward" }],
     },
+    globalSetup: "<rootDir>/crate-builder/test-global-setup.cjs",
 };

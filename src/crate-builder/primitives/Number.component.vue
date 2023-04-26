@@ -15,9 +15,9 @@
 </template>
 
 <script setup>
-import debounce from "lodash/debounce";
+import debounce from "lodash-es/debounce";
 import { reactive, watch } from "vue";
-import isNumeric from "validator/lib/isNumeric";
+import isNumeric from "validator/es/lib/isNumeric";
 
 const props = defineProps({
     property: {

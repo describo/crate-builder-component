@@ -5,7 +5,7 @@
 <script setup>
 import "leaflet/dist/leaflet.css";
 import * as Leaflet from "leaflet";
-import { groupBy } from "lodash";
+import groupBy from "lodash-es/groupBy";
 import { reactive, onMounted, onBeforeUnmount } from "vue";
 
 const props = defineProps({

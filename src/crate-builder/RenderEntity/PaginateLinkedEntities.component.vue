@@ -42,8 +42,8 @@
 
 <script setup>
 import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";
-
 import { reactive, watch } from "vue";
+
 const props = defineProps({
     crateManager: {
         type: Object,

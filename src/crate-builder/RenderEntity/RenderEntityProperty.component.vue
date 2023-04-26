@@ -105,9 +105,9 @@ import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import AddComponent from "./Add.component.vue";
 import DisplayPropertyNameComponent from "./DisplayPropertyName.component.vue";
 import { ref, reactive, computed, onMounted, onBeforeMount, watch, inject } from "vue";
-import cloneDeep from "lodash/cloneDeep";
-import orderBy from "lodash/orderBy";
-import debounce from "lodash/debounce";
+import cloneDeep from "lodash-es/cloneDeep";
+import orderBy from "lodash-es/orderBy";
+import debounce from "lodash-es/debounce";
 import { ProfileManager } from "../profile-manager.js";
 const configuration = inject("configuration");
 

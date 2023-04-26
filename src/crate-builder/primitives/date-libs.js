@@ -1,5 +1,5 @@
-import { parseISO } from "date-fns";
-import isDate from "validator/lib/isDate";
+import parseISO from "date-fns/esm/parseISO";
+import isDate from "validator/es/lib/isDate";
 
 export function checkDateIsValid(date) {
     try {

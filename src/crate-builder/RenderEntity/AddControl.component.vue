@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { isArray, uniq, isEmpty } from "lodash";
+import isArray from "lodash-es/isArray";
 import { reactive, onMounted, watch } from "vue";
 const props = defineProps({
     types: {
@@ -56,7 +56,6 @@ watch(
 onMounted(() => {
     init();
 });
-let types;
 function init() {
     let types = props.types;
     if (!isArray(types)) {

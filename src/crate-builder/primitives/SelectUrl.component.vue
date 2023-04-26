@@ -26,9 +26,9 @@
 
 <script setup>
 import { reactive, watch } from "vue";
-import isArray from "lodash/isArray";
-import isString from "lodash/isString";
-import uniq from "lodash/uniq";
+import isArray from "lodash-es/isArray";
+import isString from "lodash-es/isString";
+import uniq from "lodash-es/uniq";
 import { isURL } from "../crate-manager.js";
 
 const props = defineProps({

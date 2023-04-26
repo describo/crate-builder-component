@@ -1,13 +1,13 @@
-import isString from "lodash/isString";
-import isArray from "lodash/isArray";
-import isPlainObject from "lodash/isPlainObject";
-import isEmpty from "lodash/isEmpty";
-import groupBy from "lodash/groupBy";
-import cloneDeep from "lodash/cloneDeep";
-import flattenDeep from "lodash/flattenDeep";
-import compact from "lodash/compact";
-import orderBy from "lodash/orderBy";
-import { isURL as validatorIsURL } from "validator";
+import isString from "lodash-es/isString";
+import isArray from "lodash-es/isArray";
+import isPlainObject from "lodash-es/isPlainObject";
+import isEmpty from "lodash-es/isEmpty";
+import groupBy from "lodash-es/groupBy";
+import cloneDeep from "lodash-es/cloneDeep";
+import flattenDeep from "lodash-es/flattenDeep";
+import compact from "lodash-es/compact";
+import orderBy from "lodash-es/orderBy";
+import validatorIsURL from "validator/es/lib/isURL.js";
 const urlProtocols = ["http", "https", "ftp", "ftps"];
 import { validateIri } from "validate-iri";
 import { init } from "@paralleldrive/cuid2";
@@ -308,7 +308,7 @@ export class CrateManager {
     addEntity({ entity }) {
         // check there isn't an entity wth that @id already
         let match = this.__lookupEntityByAtId({ id: entity["@id"] });
-        if (match && match?.["@type"] === entity["@type"]) {
+        if (match && (match?.["@type"] === entity["@type"] || entity["@id"] === "./")) {
             return match;
         } else if (match && match?.["@type"] !== entity["@type"]) {
             // @id matches something in the graph but the type is not the same

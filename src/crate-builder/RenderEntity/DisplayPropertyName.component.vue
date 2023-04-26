@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { startCase } from "lodash";
+import startCase from "lodash-es/startCase";
 import { computed } from "vue";
 
 const props = defineProps({

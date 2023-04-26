@@ -24,7 +24,10 @@
 <script setup>
 import RenderEntityComponent from "./RenderEntity/Shell.component.vue";
 import { onMounted, onBeforeMount, reactive, watch } from "vue";
-import { cloneDeep, isEmpty, debounce, isFunction } from "lodash";
+import cloneDeep from "lodash-es/cloneDeep";
+import isEmpty from "lodash-es/isEmpty";
+import isFunction from "lodash-es/isFunction";
+import debounce from "lodash-es/debounce";
 import { CrateManager } from "./crate-manager.js";
 import { useRouter, useRoute } from "vue-router";
 let $router = useRouter();

@@ -29,7 +29,7 @@
 
 <script setup>
 import { reactive, watch } from "vue";
-import isPlainObject from "lodash/isPlainObject";
+import isPlainObject from "lodash-es/isPlainObject";
 import { validateId } from "../crate-manager.js";
 
 const props = defineProps({

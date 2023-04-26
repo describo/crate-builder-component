@@ -15,7 +15,7 @@
 <script setup>
 import TypeIconComponent from "./TypeIcon.component.vue";
 import { reactive, onMounted, computed } from "vue";
-import { isArray } from "lodash";
+import isArray from "lodash-es/isArray";
 
 const props = defineProps({
     crateManager: {
