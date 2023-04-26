@@ -10,8 +10,8 @@ import orderBy from "lodash-es/orderBy";
 import validatorIsURL from "validator/es/lib/isURL.js";
 const urlProtocols = ["http", "https", "ftp", "ftps"];
 import { validateIri } from "validate-iri";
-import { init } from "@paralleldrive/cuid2";
-const createId = init({ length: 32 });
+import cuid2 from "@paralleldrive/cuid2";
+const createId = cuid2.init({ length: 32 });
 
 export class CrateManager {
     constructor() {
