@@ -46,6 +46,7 @@
 </template>
 
 <script setup>
+import { ElButton, ElSelect, ElOption, ElOptionGroup } from "element-plus";
 import { reactive, watch, inject } from "vue";
 import isArray from "lodash-es/isArray";
 import debounce from "lodash-es/debounce";

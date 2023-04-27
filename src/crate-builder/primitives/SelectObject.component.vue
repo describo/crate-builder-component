@@ -28,6 +28,7 @@
 </template>
 
 <script setup>
+import { ElSelect, ElOption } from "element-plus";
 import { reactive, watch } from "vue";
 import isPlainObject from "lodash-es/isPlainObject";
 import { validateId } from "../crate-manager.js";

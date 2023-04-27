@@ -32,6 +32,7 @@
 </template>
 
 <script setup>
+import { ElButton, ElSelect, ElOption } from "element-plus";
 import isArray from "lodash-es/isArray";
 import { reactive, onMounted, watch } from "vue";
 const props = defineProps({

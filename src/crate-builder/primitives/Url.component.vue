@@ -21,6 +21,7 @@
 </template>
 
 <script setup>
+import { ElButton, ElInput } from "element-plus";
 import { reactive, watch } from "vue";
 import { isURL } from "../crate-manager.js";
 const props = defineProps({

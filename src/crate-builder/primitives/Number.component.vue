@@ -15,6 +15,7 @@
 </template>
 
 <script setup>
+import { ElInput } from "element-plus";
 import debounce from "lodash-es/debounce";
 import { reactive, watch } from "vue";
 import isNumeric from "validator/es/lib/isNumeric";

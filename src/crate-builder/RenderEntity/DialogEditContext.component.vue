@@ -23,6 +23,7 @@
 </template>
 
 <script setup>
+import { ElButton } from "element-plus";
 import { EditorView, basicSetup } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import { javascript } from "@codemirror/lang-javascript";

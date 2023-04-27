@@ -24,6 +24,7 @@
 </template>
 
 <script setup>
+import { ElSelect, ElOption } from "element-plus";
 import { reactive, watch } from "vue";
 import isArray from "lodash-es/isArray";
 import isString from "lodash-es/isString";

@@ -110,6 +110,7 @@
 </template>
 
 <script setup>
+import { ElButton } from "element-plus";
 import AddControlComponent from "./AddControl.component.vue";
 import TextComponent from "../primitives/Text.component.vue";
 import DateComponent from "../primitives/Date.component.vue";

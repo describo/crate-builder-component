@@ -25,6 +25,7 @@
 </template>
 
 <script setup>
+import { ElButton } from "element-plus";
 import { reactive } from "vue";
 const props = defineProps({
     entity: {

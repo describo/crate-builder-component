@@ -98,6 +98,7 @@
 </template>
 
 <script setup>
+import { ElButton, ElBadge } from "element-plus";
 import RenderEntityPropertyInstanceComponent from "./RenderEntityPropertyInstance.component.vue";
 import PaginateLinkedEntitiesComponent from "./PaginateLinkedEntities.component.vue";
 import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";

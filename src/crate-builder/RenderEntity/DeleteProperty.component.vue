@@ -12,6 +12,7 @@
 </template>
 
 <script setup>
+import { ElButton } from "element-plus";
 const emit = defineEmits(["delete:property"]);
 const props = defineProps({
     type: {

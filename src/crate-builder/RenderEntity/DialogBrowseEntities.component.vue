@@ -69,6 +69,7 @@
 </template>
 
 <script setup>
+import { ElButton, ElDialog, ElTable, ElTableColumn, ElPopconfirm } from "element-plus";
 import { reactive, onMounted, onBeforeUnmount } from "vue";
 import orderBy from "lodash-es/orderBy";
 

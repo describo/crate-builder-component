@@ -25,6 +25,7 @@
 </template>
 
 <script setup>
+import { ElButton, ElDialog } from "element-plus";
 import { reactive, onMounted, onBeforeUnmount } from "vue";
 
 const props = defineProps({

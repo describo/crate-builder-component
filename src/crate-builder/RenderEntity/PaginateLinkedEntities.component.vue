@@ -41,6 +41,7 @@
 </template>
 
 <script setup>
+import { ElInput, ElPagination } from "element-plus";
 import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";
 import { reactive, watch } from "vue";
 

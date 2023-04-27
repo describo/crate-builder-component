@@ -140,6 +140,7 @@
 </template>
 
 <script setup>
+import { ElButton } from "element-plus";
 import AddPropertyDialog from "./DialogAddProperty.component.vue";
 import SaveCrateAsTemplateDialog from "./DialogSaveCrateAsTemplate.component.vue";
 import EditContextDialog from "./DialogEditContext.component.vue";

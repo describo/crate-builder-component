@@ -17,6 +17,7 @@
 </template>
 
 <script setup>
+import { ElInput } from "element-plus";
 import { reactive, watch } from "vue";
 const props = defineProps({
     property: {
