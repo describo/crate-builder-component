@@ -296,14 +296,9 @@ function init() {
     let entity;
     if (props.configuration.mode === "embedded") {
         entity = {
-            ...props.entity,
-            properties: props.crateManager.getEntityProperties({
+            ...props.crateManager.getEntity({
                 describoId: props.entity.describoId,
-                grouped: true,
-            }),
-            reverseConnections: props.crateManager.getEntityReverseConnections({
-                describoId: props.entity.describoId,
-                grouped: true,
+                groupProperties: true,
             }),
         };
     } else if (props.configuration.mode === "online") {
