@@ -450,7 +450,7 @@ describe("Test interacting with the crate", () => {
             value: "something else",
         });
         e = crateManager.getEntity({ describoId: e.describoId });
-        expect(e["@id"]).toEqual("something else");
+        expect(e["@id"]).toEqual("#something else");
     });
     test("adding a property to an entity", () => {
         const url = chance.url();

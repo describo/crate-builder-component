@@ -217,34 +217,47 @@ export class CrateManager {
         return this.getEntity({ describoId: "RootDataset" });
     }
 
-    getEntity({ id, describoId, loadProperties = true }) {
+    getEntity({
+        id,
+        describoId,
+        loadEntityProperties = true,
+        resolveLinkedEntities = true,
+        groupProperties = false,
+    }) {
+        // can't resolve entities without loading properties
+        if (resolveLinkedEntities && !loadEntityProperties) loadEntityProperties = true;
+
         let entity;
         if (id) entity = this.__lookupEntityByAtId({ id });
         if (describoId) entity = this.__lookupEntityByDescriboId({ id: describoId });
-        if (entity?.describoId && loadProperties) {
+
+        if (!entity?.describoId) return;
+
+        if (loadEntityProperties) {
             entity.properties = this.getEntityProperties({
                 describoId: entity.describoId,
-            }).map((c) => {
-                if (c.tgtEntityId && c.tgtEntityId !== "not found") {
-                    return {
-                        ...c,
-                    };
-                } else {
-                    return c;
-                }
             });
             entity.reverseConnections = this.getEntityReverseConnections({
                 describoId: entity.describoId,
-            }).map((c) => {
-                if (c.tgtEntityId && c.tgtEntityId !== "not found") {
-                    return {
-                        ...c,
-                        tgtEntity: this.__lookupEntityByDescriboId({ id: c.tgtEntityId }),
-                    };
-                } else {
-                    return c;
-                }
             });
+        }
+        if (resolveLinkedEntities) {
+            entity.properties = entity.properties.map((p) => {
+                return {
+                    ...p,
+                    tgtEntity: this.__lookupEntityByDescriboId({ id: p?.tgtEntityId }),
+                };
+            });
+            entity.reverseConnections = entity.reverseConnections.map((p) => {
+                return {
+                    ...p,
+                    tgtEntity: this.__lookupEntityByDescriboId({ id: p?.tgtEntityId }),
+                };
+            });
+        }
+        if (groupProperties) {
+            entity.properties = groupBy(entity.properties, "property");
+            entity.reverseConnections = groupBy(entity.reverseConnections, "property");
         }
         return entity;
     }
@@ -259,13 +272,13 @@ export class CrateManager {
                 };
             });
 
-        if (grouped) return groupBy(properties, "property");
+        // if (grouped) return groupBy(properties, "property");
         return properties;
     }
 
     getEntityReverseConnections({ describoId, grouped = false }) {
         let properties = this.properties.filter((p) => p.tgtEntityId === describoId);
-        if (grouped) return groupBy(properties, "property");
+        // if (grouped) return groupBy(properties, "property");
         return properties;
     }
 
@@ -338,6 +351,14 @@ export class CrateManager {
 
     updateEntity({ describoId, property, value }) {
         describoId = describoId ? describoId : this.currentEntity;
+
+        // verify the @id
+        if (property === "@id") {
+            let isValid = validateId(value);
+            if (isValid?.message.match(/Invalid identifier/)) {
+                value = `#${value}`;
+            }
+        }
         this.entities = this.entities.map((e) => {
             return e.describoId === describoId ? { ...e, [property]: value } : e;
         });
@@ -438,7 +459,7 @@ export class CrateManager {
     __purgeUnlinkedEntities() {
         let walk = walker.bind(this);
         let linkedEntities = [];
-        let rootDataset = this.getRootDataset();
+        let rootDataset = this.getEntity({ describoId: "RootDataset" });
 
         walk(rootDataset);
         function walker(entity) {
@@ -568,9 +589,11 @@ export function isURL(value) {
 }
 
 export function validateId(id, type) {
-    // if type matches File then whatever is provided is valid
-    type = isArray(type) ? type.join(", ") : type;
-    if (type.match(/file/i)) return true;
+    if (type) {
+        // if type matches File then whatever is provided is valid
+        type = isArray(type) ? type.join(", ") : type;
+        if (type.match(/file/i)) return true;
+    }
 
     // @id is relative
     if (id.match(/^\/.*/)) return true;
