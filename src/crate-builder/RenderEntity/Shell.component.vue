@@ -274,28 +274,14 @@ const $emit = defineEmits([
     "delete:entity",
 ]);
 
-watch(
-    () => props.entity,
-    (n, o) => {
-        if (n.describoId !== o.describoId) {
-            data.extraProperties = [];
-            data.entity = {};
-            data.tabs = [];
-        }
-        data.debouncedInit();
+watch([() => props.entity, () => props.profile], (n, o) => {
+    if (n.describoId !== o.describoId) {
+        data.extraProperties = [];
+        data.entity = {};
+        data.tabs = [];
     }
-);
-watch(
-    () => props.profile,
-    (n, o) => {
-        if (n.describoId !== o.describoId) {
-            data.extraProperties = [];
-            data.entity = {};
-            data.tabs = [];
-        }
-        data.debouncedInit();
-    }
-);
+    data.debouncedInit();
+});
 onBeforeMount(() => {
     provide("configuration", props.configuration);
 });
