@@ -65,7 +65,11 @@
 
             <!--render entities it links to  -->
             <div class="flex flex-row flex-wrap">
-                <div v-for="(entities, property) of data.entity.reverseConnections" :key="property">
+                <div
+                    v-for="(entities, property) of data.entity.reverseConnections"
+                    :key="property"
+                    class="flex flex-row flex-wrap"
+                >
                     <div v-for="entity of entities" :key="entity.tgtEntityId">
                         <render-entity-reverse-item-link-component
                             class="m-1"
@@ -189,6 +193,7 @@
                                         v-for="(entities, property) of data.tabs[0].entity
                                             .reverseConnections"
                                         :key="property"
+                                        class="flex flex-row flex-wrap"
                                     >
                                         <div v-for="entity of entities" :key="entity.tgtEntityId">
                                             <render-entity-reverse-item-link-component
@@ -225,6 +230,10 @@ import { ProfileManager } from "../profile-manager.js";
 
 const props = defineProps({
     crateManager: {
+        type: Object,
+        required: true,
+    },
+    profile: {
         type: Object,
         required: true,
     },
@@ -267,6 +276,17 @@ const $emit = defineEmits([
 
 watch(
     () => props.entity,
+    (n, o) => {
+        if (n.describoId !== o.describoId) {
+            data.extraProperties = [];
+            data.entity = {};
+            data.tabs = [];
+        }
+        data.debouncedInit();
+    }
+);
+watch(
+    () => props.profile,
     (n, o) => {
         if (n.describoId !== o.describoId) {
             data.extraProperties = [];

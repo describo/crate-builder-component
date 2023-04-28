@@ -3,6 +3,7 @@
         <render-entity-component
             v-if="!data.error && props.crate"
             :crate-manager="data.crateManager"
+            :profile="data.profile"
             :entity="data.entity"
             :configuration="data.configuration"
             @load:entity="data.debouncedSetCurrentEntity"
@@ -100,12 +101,24 @@ const data = reactive({
     debouncedInit: debounce(init, 400),
     debouncedSetCurrentEntity: debounce(setCurrentEntity, 500),
     crateManager: {},
+    profile: {},
 });
 
-watch([() => props.crate, () => props.profile], () => {
-    data.ready = false;
-    data.debouncedInit();
-});
+watch(
+    () => props.crate,
+    () => {
+        data.ready = false;
+        data.debouncedInit();
+    }
+);
+watch(
+    () => props.profile,
+    () => {
+        data.ready = false;
+        data.profile = isEmpty(props.profile) ? {} : cloneDeep(props.profile);
+        data.crateManager.profile = data.profile;
+    }
+);
 watch(
     () => $route?.query?.id,
     (n) => {
