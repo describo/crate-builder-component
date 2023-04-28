@@ -147,17 +147,17 @@ export class ProfileManager {
         // if (isArray(type)) type = type.join(", ");
         let propertyDefinition;
         let entityDefinition = this.getTypeDefinition({ entity });
-        console.debug("ENTITY definition:", JSON.stringify(entityDefinition, null, 2));
+        // console.debug("ENTITY definition:", JSON.stringify(entityDefinition, null, 2));
         if (entityDefinition) {
             // we found an entity definition in the profile - do we have a property definition?
             propertyDefinition = entityDefinition.inputs.filter(
                 (p) => p.name.toLowerCase() === property.toLowerCase()
             );
             if (propertyDefinition.length) {
-                console.debug(
-                    "PROFILE property definition:",
-                    JSON.stringify(propertyDefinition, null, 2)
-                );
+                // console.debug(
+                //     "PROFILE property definition:",
+                //     JSON.stringify(propertyDefinition, null, 2)
+                // );
                 propertyDefinition = cloneDeep(propertyDefinition[0]);
                 if (!has(propertyDefinition, "multiple")) propertyDefinition.multiple = true;
             }
@@ -171,10 +171,10 @@ export class ProfileManager {
                 (p) => p.name.toLowerCase() === property.toLowerCase()
             );
             if (propertyDefinition.length) {
-                console.debug(
-                    "SCHEMA ORG property definition:",
-                    JSON.stringify(propertyDefinition, null, 2)
-                );
+                // console.debug(
+                //     "SCHEMA ORG property definition:",
+                //     JSON.stringify(propertyDefinition, null, 2)
+                // );
                 propertyDefinition = cloneDeep(propertyDefinition[0]);
                 if (!has(propertyDefinition, "multiple")) propertyDefinition.mutliple = true;
             }
@@ -182,10 +182,10 @@ export class ProfileManager {
 
         // unable to locate a property definition in schema.org - create a default one
         if (isEmpty(propertyDefinition)) {
-            console.debug(
-                "DEFAULT property definition:",
-                JSON.stringify(propertyDefinition, null, 2)
-            );
+            // console.debug(
+            //     "DEFAULT property definition:",
+            //     JSON.stringify(propertyDefinition, null, 2)
+            // );
             propertyDefinition = {
                 type: ["Text"],
                 help: "",
