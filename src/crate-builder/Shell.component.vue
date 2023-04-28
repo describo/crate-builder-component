@@ -206,11 +206,26 @@ async function setCurrentEntity({ describoId = undefined, name = undefined, id =
     if (!describoId && !name && !id) return;
     let entity = {};
     if (name === "RootDataset") {
-        entity = data.crateManager.getRootDataset();
+        entity = data.crateManager.getEntity({
+            describoId: "RootDataset",
+            loadEntityProperties: false,
+            resolveLinkedEntities: false,
+            groupProperties: false,
+        });
     } else if (describoId) {
-        entity = data.crateManager.getEntity({ describoId });
+        entity = data.crateManager.getEntity({
+            describoId,
+            loadEntityProperties: false,
+            resolveLinkedEntities: false,
+            groupProperties: false,
+        });
     } else if (id) {
-        entity = data.crateManager.getEntity({ id });
+        entity = data.crateManager.getEntity({
+            id,
+            loadEntityProperties: false,
+            resolveLinkedEntities: false,
+            groupProperties: false,
+        });
     }
     if (entity && entity.describoId !== data.entity.describoId) {
         updateRoute({ entity });
