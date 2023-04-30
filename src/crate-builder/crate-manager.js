@@ -354,8 +354,8 @@ export class CrateManager {
 
         // verify the @id
         if (property === "@id") {
-            let isValid = validateId(value);
-            if (isValid?.message.match(/Invalid identifier/)) {
+            let { isValid, message } = validateId(value);
+            if (!isValid && message?.match(/Invalid identifier/)) {
                 value = `#${value}`;
             }
         }
@@ -592,31 +592,31 @@ export function validateId(id, type) {
     if (type) {
         // if type matches File then whatever is provided is valid
         type = isArray(type) ? type.join(", ") : type;
-        if (type.match(/file/i)) return true;
+        if (type.match(/file/i)) return { isValid: true };
     }
 
     // @id is relative
-    if (id.match(/^\/.*/)) return true;
+    if (id.match(/^\/.*/)) return { isValid: true };
 
     // @id starting with . is valid
-    if (id.match(/^\..*/)) return true;
+    if (id.match(/^\..*/)) return { isValid: true };
 
     // @id starting with # is valid
-    if (id.match(/^\#.*/)) return true;
+    if (id.match(/^\#.*/)) return { isValid: true };
 
     // @id with blank node is valid
-    if (id.match(/^\_:.*/)) return true;
+    if (id.match(/^\_:.*/)) return { isValid: true };
 
     // arcp URI's are valid
-    if (id.match(/arcp:\/\/name,.*/)) return true;
-    if (id.match(/arcp:\/\/uuid,.*/)) return true;
-    if (id.match(/arcp:\/\/ni,sha-256;,.*/)) return true;
+    if (id.match(/arcp:\/\/name,.*/)) return { isValid: true };
+    if (id.match(/arcp:\/\/uuid,.*/)) return { isValid: true };
+    if (id.match(/arcp:\/\/ni,sha-256;,.*/)) return { isValid: true };
 
     // otherewise check that the id is a valid IRI
     let result = validateIriPkg.validateIri(id, validateIriPkg.IriValidationStrategy.Strict);
     if (!result) {
         // it's valid
-        return true;
+        return { isValid: true };
     } else if (result?.message?.match(/Invalid IRI according to RFC 3987:/)) {
         // otherwise
         const message = `${result.message.replace(
@@ -624,6 +624,6 @@ export function validateId(id, type) {
             "Invalid identifier"
         )}. See https://github.com/describo/crate-builder-component/blob/master/README.identifiers.md for more information.`;
         result.message = message;
+        return { isValid: false, message };
     }
-    return result;
 }
