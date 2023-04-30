@@ -29,7 +29,6 @@
             </el-select>
         </div>
         <describo-crate-builder
-            v-loading="data.loading"
             @ready="data.loading = false"
             :crate="data.selectedCrate"
             :profile="data.selectedProfile"
