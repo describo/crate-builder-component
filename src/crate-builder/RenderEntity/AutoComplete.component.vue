@@ -142,7 +142,6 @@ async function querySearch(queryString) {
                 reason: "External Lookup Timeout",
             }),
         ];
-
         lookupMapping.templates = 1;
         lookupMapping.external = 2;
     }
@@ -181,10 +180,10 @@ async function querySearch(queryString) {
                 label: "Associate an Organization defined in the Research Organization Registry",
                 entities: results.map((entity) => ({ ...entity, type: "ror" })),
             });
-        } else if (key === "lookups" && results?.length) {
+        } else if (key === "external" && results?.length) {
             matches.push({
                 label: "Associate an entity from a data pack",
-                entities: lookups.map((entity) => ({ ...entity, type: "datapack" })),
+                entities: results.map((entity) => ({ ...entity, type: "datapack" })),
             });
         }
     }

@@ -440,7 +440,7 @@ export class CrateManager {
             srcEntityId = this.getRootDataset().describoId;
         }
 
-        let flattened = this.flatten({ json });
+        let flattened = this.flatten(json);
         let entities = flattened.map((entity) => {
             return this.__addEntity({ entity });
         });
