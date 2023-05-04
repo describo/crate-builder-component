@@ -31,8 +31,8 @@ import isFunction from "lodash-es/isFunction";
 import debounce from "lodash-es/debounce";
 import { CrateManager } from "./crate-manager.js";
 import { useRouter, useRoute } from "vue-router";
-let $router = useRouter();
-let $route = useRoute();
+
+let $route, $router;
 
 const props = defineProps({
     crate: {
@@ -198,6 +198,10 @@ function configure() {
         if (isFunction(props.lookup.dataPacks)) {
             configuration.enableDataPackLookups = true;
         }
+    }
+    if (configuration.enableInternalRouting) {
+        $router = useRouter();
+        $route = useRoute();
     }
     return configuration;
 }
