@@ -199,7 +199,7 @@ function configure() {
             configuration.enableDataPackLookups = true;
         }
     }
-    if (configuration.enableInternalRouting) {
+    if (props.enableInternalRouting) {
         $router = useRouter();
         $route = useRoute();
     }
