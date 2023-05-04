@@ -74,7 +74,7 @@
 </template>
 
 <script setup>
-import { ElButton } from "element-plus";
+import { ElButton, vLoading } from "element-plus";
 import GeoComponent from "../primitives/Geo.component.vue";
 import TypeIconComponent from "./TypeIcon.component.vue";
 import DeletePropertyComponent from "./DeleteProperty.component.vue";

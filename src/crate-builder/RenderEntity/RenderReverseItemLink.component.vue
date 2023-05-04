@@ -14,6 +14,7 @@
 
 <script setup>
 import TypeIconComponent from "./TypeIcon.component.vue";
+import { vLoading } from "element-plus";
 import { reactive, onMounted, computed } from "vue";
 import isArray from "lodash-es/isArray";
 
