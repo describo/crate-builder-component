@@ -73,8 +73,7 @@
 <script setup>
 import { ElButton, ElRadio, ElSelect, ElOption, ElForm, ElFormItem, ElInput } from "element-plus";
 import "leaflet/dist/leaflet.css";
-// import * as Leaflet from "leaflet/dist/leaflet-src.esm.js";
-import * as Leaflet from "leaflet";
+import * as Leaflet from "leaflet/dist/leaflet-src.esm.js";
 import AreaSelectInit from "./Map.SelectArea.js";
 import { reactive, onMounted, onBeforeUnmount, inject } from "vue";
 AreaSelectInit(Leaflet);

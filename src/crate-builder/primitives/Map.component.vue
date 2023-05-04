@@ -4,8 +4,7 @@
 
 <script setup>
 import "leaflet/dist/leaflet.css";
-// import * as Leaflet from "leaflet/dist/leaflet-src.esm.js";
-import * as Leaflet from "leaflet";
+import * as Leaflet from "leaflet/dist/leaflet-src.esm.js";
 import groupBy from "lodash-es/groupBy";
 import { reactive, onMounted, onBeforeUnmount } from "vue";
 
@@ -73,7 +72,7 @@ function addFeatureGroup({ geoJSON, type }) {
         let fg = Leaflet.featureGroup([
             Leaflet.geoJSON(geoJSON, {
                 pointToLayer: function (feature, latlng) {
-                    return L.circleMarker(latlng);
+                    return Leaflet.circleMarker(latlng);
                 },
             }),
         ]);
@@ -85,7 +84,9 @@ function addFeatureGroup({ geoJSON, type }) {
             data.map.flyToBounds(fg.getBounds(), { maxZoom: 3, duration: 2 });
         }, 1500);
         return fg;
-    } catch (error) {}
+    } catch (error) {
+        console.log(error);
+    }
 }
 </script>
 

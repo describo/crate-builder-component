@@ -9,7 +9,6 @@
 
 // UMD
 export default function AreaSelectInit(L) {
-    console.log(L);
     var trueFn = function () {
         return true;
     };
@@ -357,5 +356,4 @@ export default function AreaSelectInit(L) {
 
     // register hook
     L.Map.addInitHook("addHandler", "selectArea", L.Map.SelectArea);
-    console.log(L.map);
 }
