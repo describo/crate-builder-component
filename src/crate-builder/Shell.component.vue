@@ -24,7 +24,7 @@
 
 <script setup>
 import RenderEntityComponent from "./RenderEntity/Shell.component.vue";
-import { onMounted, onBeforeMount, reactive, watch } from "vue";
+import { onMounted, onBeforeMount, onBeforeUnmount, reactive, watch } from "vue";
 import cloneDeep from "lodash-es/cloneDeep";
 import isEmpty from "lodash-es/isEmpty";
 import isFunction from "lodash-es/isFunction";
@@ -103,40 +103,59 @@ const data = reactive({
     crateManager: {},
     profile: {},
 });
+let watchers = [];
 
-watch(
-    () => props.crate,
-    () => {
-        data.ready = false;
-        data.debouncedInit();
-    }
-);
-watch(
-    () => props.profile,
-    () => {
-        data.ready = false;
-        data.profile = isEmpty(props.profile) ? {} : cloneDeep(props.profile);
-        data.crateManager.profile = data.profile;
-    }
-);
-watch(
-    () => $route?.query?.id,
-    (n) => {
-        data.debouncedSetCurrentEntity({ describoId: $route?.query?.id });
-    }
-);
-watch(
-    () => props.entityId,
-    (n) => {
-        data.debouncedSetCurrentEntity({ id: props.entityId });
-    }
-);
 onBeforeMount(() => {
     $router?.replace({ query: "" });
     data.configuration = reactive(configure());
+
+    if (props.enableInternalRouting) {
+        $router = useRouter();
+        $route = useRoute();
+        watchers.push(
+            watch(
+                () => $route?.query?.id,
+                (n, o) => {
+                    data.debouncedSetCurrentEntity({ describoId: $route?.query?.id });
+                }
+            )
+        );
+    }
+    watchers.push(
+        watch(
+            () => props.crate,
+            () => {
+                data.ready = false;
+                data.debouncedInit();
+            }
+        )
+    );
+    watchers.push(
+        watch(
+            () => props.profile,
+            () => {
+                data.ready = false;
+                data.profile = isEmpty(props.profile) ? {} : cloneDeep(props.profile);
+                data.crateManager.profile = data.profile;
+            }
+        )
+    );
+
+    watchers.push(
+        watch(
+            () => props.entityId,
+            (n) => {
+                data.debouncedSetCurrentEntity({ id: props.entityId });
+            }
+        )
+    );
 });
 onMounted(() => {
     data.debouncedInit();
+});
+onBeforeUnmount(() => {
+    watchers.forEach((unWatch) => unWatch());
+    watchers = [];
 });
 
 function init() {
@@ -199,10 +218,7 @@ function configure() {
             configuration.enableDataPackLookups = true;
         }
     }
-    if (props.enableInternalRouting) {
-        $router = useRouter();
-        $route = useRoute();
-    }
+
     return configuration;
 }
 async function setCurrentEntity({ describoId = undefined, name = undefined, id = undefined }) {
