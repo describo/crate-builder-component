@@ -4,6 +4,7 @@
 
 <script setup>
 import "leaflet/dist/leaflet.css";
+// import * as Leaflet from "leaflet/dist/leaflet-src.esm.js";
 import * as Leaflet from "leaflet";
 import groupBy from "lodash-es/groupBy";
 import { reactive, onMounted, onBeforeUnmount } from "vue";
@@ -68,21 +69,23 @@ function removeExistingLayers() {
 }
 
 function addFeatureGroup({ geoJSON, type }) {
-    let fg = Leaflet.featureGroup([
-        Leaflet.geoJSON(geoJSON, {
-            pointToLayer: function (feature, latlng) {
-                return L.circleMarker(latlng);
-            },
-        }),
-    ]);
-    fg.setStyle({ color: "#fff000" });
-    fg.addTo(data.map);
-    data.layers.push(fg);
-    setTimeout(() => {
-        data.map.flyToBounds(fg.getBounds(), { maxZoom: 3, duration: 2 });
-    }, 1500);
+    try {
+        let fg = Leaflet.featureGroup([
+            Leaflet.geoJSON(geoJSON, {
+                pointToLayer: function (feature, latlng) {
+                    return L.circleMarker(latlng);
+                },
+            }),
+        ]);
+        fg.setStyle({ color: "#000000" });
+        fg.addTo(data.map);
+        data.layers.push(fg);
 
-    return fg;
+        setTimeout(() => {
+            data.map.flyToBounds(fg.getBounds(), { maxZoom: 3, duration: 2 });
+        }, 1500);
+        return fg;
+    } catch (error) {}
 }
 </script>
 

@@ -73,9 +73,11 @@
 <script setup>
 import { ElButton, ElRadio, ElSelect, ElOption, ElForm, ElFormItem, ElInput } from "element-plus";
 import "leaflet/dist/leaflet.css";
+// import * as Leaflet from "leaflet/dist/leaflet-src.esm.js";
 import * as Leaflet from "leaflet";
-import * as SelectArea from "../lib/Map.SelectArea";
+import AreaSelectInit from "./Map.SelectArea.js";
 import { reactive, onMounted, onBeforeUnmount, inject } from "vue";
+AreaSelectInit(Leaflet);
 
 const props = defineProps({
     crateManager: {
