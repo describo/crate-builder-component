@@ -7,6 +7,7 @@
 - [Building and publishing a release](#building-and-publishing-a-release)
 - [Repo structure](#repo-structure)
 - [Using the component in your app](#using-the-component-in-your-app)
+  - [Vite users](#vite-users)
   - [Profiles](#profiles)
   - [Tailwind CSS dependency](#tailwind-css-dependency)
   - [Vue Router Dependency](#vue-router-dependency)
@@ -65,6 +66,9 @@ Push the tag to github and create a release
 -   `git push origin master --tags`
 -   Go to the repo and create a release from the tag, documenting what is in it.
 -   Publish to npm: `npm publish`
+-   Create an issue in the
+    [React component issue tracker](https://github.com/describo/crate-builder-component-react/issues)
+    to inform that a new release of that component needs to be built and published to npm.
 
 # Repo structure
 
@@ -73,6 +77,40 @@ Push the tag to github and create a release
 -   The component is at `./src/crate-builder`.
 
 # Using the component in your app
+
+## Vite users
+
+Vite requires some extra configuration in order to use this component.
+
+```
+* npm install --save unplugin-auto-import unplugin-vue-components
+```
+
+-   vite.config.js
+
+```JS
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+import AutoImport from "unplugin-auto-import/vite";
+import Components from "unplugin-vue-components/vite";
+import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
+
+export default defineConfig({
+    plugins: [
+        vue(),
+        // ...
+        AutoImport({
+            resolvers: [ElementPlusResolver()],
+        }),
+        Components({
+            resolvers: [ElementPlusResolver()],
+        }),
+    ],
+    optimizeDeps: {
+        include: ["element-plus", "lodash", "@describo/crate-builder-component"],
+    },
+});
+```
 
 ## Profiles
 
@@ -84,10 +122,8 @@ profiles so be sure to follow the documentation linked above.
 
 ## Tailwind CSS dependency
 
-The component uses [tailwindcss](https://tailwindcss.com/) and the
-[Element Plus](https://element-plus.org/en-US/) component library. The library plugs in Element Plus
-when it is instantiated but in order for the CSS to be processed correctly, you need to
-`setup your app for tailwind` and add a `tailwind.config.js` that looks like:
+The component uses [tailwindcss](https://tailwindcss.com/) and in order for the CSS to be processed
+correctly, you need to `setup your app for tailwind` and add a `tailwind.config.js` that looks like:
 
 ```
 module.exports = {
@@ -112,7 +148,10 @@ _their_ documentation.
 
 ## Vue Router Dependency
 
-The app requires a functioning vue router setup in your app as shown following.
+The app can handle updating the route with the current active entity or that capability can be
+completely disabled (ie you want to do it yourself or maybe you're using the webcomponent build). Be
+sure to read the note about internal routing in the section:
+[Unreactive Properties](#unreactive-properties)
 
 ## Install the package
 
@@ -122,7 +161,7 @@ The app requires a functioning vue router setup in your app as shown following.
 
 -   Plug it into your Vue app. It will look something like:
 
-```
+```JS
 import { createApp } from "vue";
 import App from "./App.vue";
 import DescriboCrateBuilder from "@describo/crate-builder-component";
@@ -158,7 +197,7 @@ crate will be marked bad not be loaded.
 
 In it's most basic form, the component is plugged in as:
 
-```
+```JS
     <describo-crate-builder
         :crate="data.crate"
         :profile="data.profile">
@@ -169,7 +208,7 @@ Pass in the crate file and optionally a profile.
 
 # Full Usage - configuration and events
 
-```
+```JS
     <describo-crate-builder
         :crate="data.crate"
         :profile="data.profile"
@@ -209,7 +248,7 @@ inside the component.
 -   `lookup`: Pass in an instance of a class the component can use to lookup entity templates or
     datapacks. The signature of the class must be:
 
-```
+```JS
 export class Lookup {
     constructor() {
     }
