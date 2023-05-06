@@ -5,30 +5,30 @@
         <div class="w-2/3 xl:w-4/5 flex flex-row" v-if="!configuration.readonly">
             <div
                 v-if="
-                    entity.describoLabel === 'RootDataset' ||
-                    ['Dataset', 'File'].includes(entity['@type'])
+                    props.entity.describoLabel === 'RootDataset' ||
+                    ['Dataset', 'File'].includes(props.entity['@type'])
                 "
                 class=""
             >
-                {{ entity["@id"] }}
+                {{ props.entity["@id"] }}
             </div>
             <div v-else class="flex-grow">
                 <text-component
                     class="w-full"
                     type="text"
                     :property="data.property"
-                    :value="entity['@id']"
+                    :value="props.entity['@id']"
                     @save:property="save"
                 />
             </div>
         </div>
         <div class="w-2/3 xl:w-4/5 flex flex-row" v-else>
-            <div v-if="isURL(entity['@id'])">
-                <a class="text-blue-800" :href="entity['@id']" target="_blank">{{
-                    entity["@id"]
+            <div v-if="isURL(props.entity['@id'])">
+                <a class="text-blue-800" :href="props.entity['@id']" target="_blank">{{
+                    props.entity["@id"]
                 }}</a>
             </div>
-            <div v-else>{{ entity["@id"] }}</div>
+            <div v-else>{{ props.entity["@id"] }}</div>
         </div>
     </div>
 </template>
