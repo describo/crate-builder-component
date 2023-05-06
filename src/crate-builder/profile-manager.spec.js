@@ -102,134 +102,134 @@ describe("Test working with profiles", () => {
         let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
         expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing"]);
     });
-    test("get type definition - additional type property defined", () => {
-        const profile = {
-            classes: {
-                Dataset: {
-                    definition: "override",
-                    subClassOf: [],
-                    inputs: [
-                        {
-                            id: "https://schema.org/datePublished",
-                            name: "datePublished",
-                            label: "Attach a date",
-                            help: "",
-                            type: ["Date"],
-                            required: true,
-                            multiple: false,
-                        },
-                    ],
-                },
-                A: {
-                    definition: "override",
-                    subClassOf: [],
-                    inputs: [
-                        {
-                            id: "https://schema.org/dateModified",
-                            name: "dateModified",
-                            label: "Attach a date",
-                            help: "",
-                            type: ["Date"],
-                            required: true,
-                            multiple: false,
-                        },
-                    ],
-                },
-                B: {
-                    definition: "override",
-                    subClassOf: [],
-                    inputs: [
-                        {
-                            id: "https://schema.org/dateCreated",
-                            name: "dateCreated",
-                            label: "Attach a date",
-                            help: "",
-                            type: ["Date"],
-                            required: true,
-                            multiple: false,
-                        },
-                    ],
-                },
-            },
-        };
-        const profileManager = new ProfileManager({ profile });
-        const entity = { "@type": "Dataset", datasetType: ["A", "B"] };
-        let typeDefinition = profileManager.getTypeDefinition({ entity });
-        expect(typeDefinition.definition).toEqual("override");
-        expect(typeDefinition.inputs.length).toEqual(3);
+    // test("get type definition - additional type property defined", () => {
+    //     const profile = {
+    //         classes: {
+    //             Dataset: {
+    //                 definition: "override",
+    //                 subClassOf: [],
+    //                 inputs: [
+    //                     {
+    //                         id: "https://schema.org/datePublished",
+    //                         name: "datePublished",
+    //                         label: "Attach a date",
+    //                         help: "",
+    //                         type: ["Date"],
+    //                         required: true,
+    //                         multiple: false,
+    //                     },
+    //                 ],
+    //             },
+    //             A: {
+    //                 definition: "override",
+    //                 subClassOf: [],
+    //                 inputs: [
+    //                     {
+    //                         id: "https://schema.org/dateModified",
+    //                         name: "dateModified",
+    //                         label: "Attach a date",
+    //                         help: "",
+    //                         type: ["Date"],
+    //                         required: true,
+    //                         multiple: false,
+    //                     },
+    //                 ],
+    //             },
+    //             B: {
+    //                 definition: "override",
+    //                 subClassOf: [],
+    //                 inputs: [
+    //                     {
+    //                         id: "https://schema.org/dateCreated",
+    //                         name: "dateCreated",
+    //                         label: "Attach a date",
+    //                         help: "",
+    //                         type: ["Date"],
+    //                         required: true,
+    //                         multiple: false,
+    //                     },
+    //                 ],
+    //             },
+    //         },
+    //     };
+    //     const profileManager = new ProfileManager({ profile });
+    //     const entity = { "@type": "Dataset", datasetType: ["A", "B"] };
+    //     let typeDefinition = profileManager.getTypeDefinition({ entity });
+    //     expect(typeDefinition.definition).toEqual("override");
+    //     expect(typeDefinition.inputs.length).toEqual(3);
 
-        let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
-        expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing", "A", "B"]);
-    });
-    test("get type definition - additional type property defined; each with subclasses", () => {
-        const profile = {
-            classes: {
-                Dataset: {
-                    definition: "override",
-                    subClassOf: [],
-                    inputs: [
-                        {
-                            id: "https://schema.org/datePublished",
-                            name: "datePublished",
-                            label: "Attach a date",
-                            help: "",
-                            type: ["Date"],
-                            required: true,
-                            multiple: false,
-                        },
-                    ],
-                },
-                A: {
-                    definition: "override",
-                    subClassOf: ["C"],
-                    inputs: [
-                        {
-                            id: "https://schema.org/dateModified",
-                            name: "dateModified",
-                            label: "Attach a date",
-                            help: "",
-                            type: ["Date"],
-                            required: true,
-                            multiple: false,
-                        },
-                    ],
-                },
-                B: {
-                    definition: "override",
-                    subClassOf: ["D", "E", "F"],
-                    inputs: [
-                        {
-                            id: "https://schema.org/dateCreated",
-                            name: "dateCreated",
-                            label: "Attach a date",
-                            help: "",
-                            type: ["Date"],
-                            required: true,
-                            multiple: false,
-                        },
-                    ],
-                },
-            },
-        };
-        const profileManager = new ProfileManager({ profile });
-        const entity = { "@type": "Dataset", datasetType: ["A", "B"] };
-        let typeDefinition = profileManager.getTypeDefinition({ entity });
-        expect(typeDefinition.definition).toEqual("override");
-        expect(typeDefinition.inputs.length).toEqual(3);
+    //     let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
+    //     expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing", "A", "B"]);
+    // });
+    // test("get type definition - additional type property defined; each with subclasses", () => {
+    //     const profile = {
+    //         classes: {
+    //             Dataset: {
+    //                 definition: "override",
+    //                 subClassOf: [],
+    //                 inputs: [
+    //                     {
+    //                         id: "https://schema.org/datePublished",
+    //                         name: "datePublished",
+    //                         label: "Attach a date",
+    //                         help: "",
+    //                         type: ["Date"],
+    //                         required: true,
+    //                         multiple: false,
+    //                     },
+    //                 ],
+    //             },
+    //             A: {
+    //                 definition: "override",
+    //                 subClassOf: ["C"],
+    //                 inputs: [
+    //                     {
+    //                         id: "https://schema.org/dateModified",
+    //                         name: "dateModified",
+    //                         label: "Attach a date",
+    //                         help: "",
+    //                         type: ["Date"],
+    //                         required: true,
+    //                         multiple: false,
+    //                     },
+    //                 ],
+    //             },
+    //             B: {
+    //                 definition: "override",
+    //                 subClassOf: ["D", "E", "F"],
+    //                 inputs: [
+    //                     {
+    //                         id: "https://schema.org/dateCreated",
+    //                         name: "dateCreated",
+    //                         label: "Attach a date",
+    //                         help: "",
+    //                         type: ["Date"],
+    //                         required: true,
+    //                         multiple: false,
+    //                     },
+    //                 ],
+    //             },
+    //         },
+    //     };
+    //     const profileManager = new ProfileManager({ profile });
+    //     const entity = { "@type": "Dataset", datasetType: ["A", "B"] };
+    //     let typeDefinition = profileManager.getTypeDefinition({ entity });
+    //     expect(typeDefinition.definition).toEqual("override");
+    //     expect(typeDefinition.inputs.length).toEqual(3);
 
-        let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
-        expect(typeHierarchies).toEqual([
-            "Dataset",
-            "CreativeWork",
-            "Thing",
-            "A",
-            "C",
-            "B",
-            "D",
-            "E",
-            "F",
-        ]);
-    });
+    //     let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
+    //     expect(typeHierarchies).toEqual([
+    //         "Dataset",
+    //         "CreativeWork",
+    //         "Thing",
+    //         "A",
+    //         "C",
+    //         "B",
+    //         "D",
+    //         "E",
+    //         "F",
+    //     ]);
+    // });
     test("get layout information from profile", () => {
         const profile = {
             metadata: {},

@@ -1,25 +1,25 @@
 # Crate Builder Component
 
-- [Crate Builder Component](#crate-builder-component)
-- [Developing the plugin](#developing-the-plugin)
-  - [Storybook](#storybook)
-  - [Development application](#development-application)
-- [Building and publishing a release](#building-and-publishing-a-release)
-- [Repo structure](#repo-structure)
-- [Using the component in your app](#using-the-component-in-your-app)
-  - [Vite users](#vite-users)
-  - [Profiles](#profiles)
-  - [Tailwind CSS dependency](#tailwind-css-dependency)
-  - [Vue Router Dependency](#vue-router-dependency)
-  - [Install the package](#install-the-package)
-  - [Wire it up](#wire-it-up)
-- [Identifiers and Types](#identifiers-and-types)
-- [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
-- [Full Usage - configuration and events](#full-usage---configuration-and-events)
-  - [Configuration](#configuration)
-    - [Reactive Properties](#reactive-properties)
-    - [Unreactive Properties](#unreactive-properties)
-  - [Events](#events)
+-   [Crate Builder Component](#crate-builder-component)
+-   [Developing the plugin](#developing-the-plugin)
+    -   [Storybook](#storybook)
+    -   [Development application](#development-application)
+-   [Building and publishing a release](#building-and-publishing-a-release)
+-   [Repo structure](#repo-structure)
+-   [Using the component in your app](#using-the-component-in-your-app)
+    -   [Install the package](#install-the-package)
+    -   [Vite users](#vite-users)
+    -   [Profiles](#profiles)
+    -   [Tailwind CSS dependency](#tailwind-css-dependency)
+    -   [Vue Router Dependency](#vue-router-dependency)
+    -   [Wire it up](#wire-it-up)
+-   [Identifiers and Types](#identifiers-and-types)
+-   [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
+-   [Full Usage - configuration and events](#full-usage---configuration-and-events)
+    -   [Configuration](#configuration)
+        -   [Reactive Properties](#reactive-properties)
+        -   [Unreactive Properties](#unreactive-properties)
+    -   [Events](#events)
 
 This is the core UI component for assembling an RO-Crate inside Describo. It is a self contained
 VueJS component that can be used inside your app. If you use this component, your app is responsible
@@ -78,12 +78,16 @@ Push the tag to github and create a release
 
 # Using the component in your app
 
+## Install the package
+
+-   `npm install --save @describo/crate-builder-component`
+
 ## Vite users
 
 Vite requires some extra configuration in order to use this component.
 
 ```
-* npm install --save unplugin-auto-import unplugin-vue-components
+* npm install --save unplugin-auto-import unplugin-vue-components element-plus
 ```
 
 -   vite.config.js
@@ -152,10 +156,6 @@ The app can handle updating the route with the current active entity or that cap
 completely disabled (ie you want to do it yourself or maybe you're using the webcomponent build). Be
 sure to read the note about internal routing in the section:
 [Unreactive Properties](#unreactive-properties)
-
-## Install the package
-
--   `npm install --save @describo/crate-builder-component`
 
 ## Wire it up
 

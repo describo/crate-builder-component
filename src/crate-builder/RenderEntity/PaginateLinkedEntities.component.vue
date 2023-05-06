@@ -60,7 +60,7 @@ const $emit = defineEmits(["load:entity", "save:property", "delete:property"]);
 const data = reactive({
     filter: undefined,
     total: props.entities.length,
-    pageSize: 50,
+    pageSize: 20,
     currentPage: 1,
     entities: [],
 });

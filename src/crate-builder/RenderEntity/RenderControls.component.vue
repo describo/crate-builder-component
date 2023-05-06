@@ -182,7 +182,7 @@ const data = reactive({
     },
 });
 let isRootDataset = computed(() => {
-    return props.entity.describoLabel === "RootDataset";
+    return props.entity.describoId === "RootDataset";
 });
 let definition = computed(() => {
     let type = isArray(props.entity["@type"])

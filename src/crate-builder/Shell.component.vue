@@ -1,5 +1,10 @@
 <template>
     <div class="flex flex-col">
+        <el-progress
+            :percentage="parseFloat(data.progress.percent)"
+            :show-text="false"
+            v-if="data.loading"
+        />
         <render-entity-component
             v-if="!data.error && props.crate"
             :crate-manager="data.crateManager"
@@ -89,19 +94,30 @@ const props = defineProps({
     },
 });
 
-const $emit = defineEmits(["ready", "error", "navigation", "save:crate", "save:crate:template"]);
+const $emit = defineEmits([
+    "load",
+    "ready",
+    "error",
+    "navigation",
+    "save:crate",
+    "save:crate:template",
+]);
 
 const data = reactive({
     ready: false,
     error: false,
     errors: [],
-    crate: [],
+    crate: {},
     profile: {},
     entity: {},
     debouncedInit: debounce(init, 400),
     debouncedSetCurrentEntity: debounce(setCurrentEntity, 500),
     crateManager: {},
     profile: {},
+    progress: {
+        percent: 0,
+    },
+    loading: false,
 });
 let watchers = [];
 
@@ -158,9 +174,11 @@ onBeforeUnmount(() => {
     watchers = [];
 });
 
-function init() {
+async function init() {
     updateRoute({ entity: {} });
     if (!props.crate || isEmpty(props.crate)) {
+        data.crate = {};
+        data.entity = {};
         return;
     }
     data.error = false;
@@ -178,8 +196,11 @@ function init() {
     data.crateManager = new CrateManager();
     data.crateManager.lookup = props.lookup;
     try {
-        data.crateManager.load({ crate, profile });
+        if (crate["@graph"].length > 500) data.loading = true;
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        await data.crateManager.load({ crate, profile, progress: data.progress });
     } catch (error) {
+        console.log(error);
         $emit("error", {
             errors: data.crateManager.errors,
         });
@@ -222,7 +243,6 @@ function configure() {
     return configuration;
 }
 async function setCurrentEntity({ describoId = undefined, name = undefined, id = undefined }) {
-    if (!data.crateManager.getEntity) return;
     if (!describoId && !name && !id) return;
     let entity = {};
     if (name === "RootDataset") {
@@ -247,10 +267,10 @@ async function setCurrentEntity({ describoId = undefined, name = undefined, id =
             groupProperties: false,
         });
     }
-    if (entity && entity.describoId !== data.entity.describoId) {
+
+    if (!isEmpty(entity) && entity.describoId !== data.entity.describoId) {
         updateRoute({ entity });
         console.debug(`Render Entity Parent, load entity:`, { ...entity });
-        data.crateManager.setCurrentEntity({ describoId: entity.describoId });
         data.entity = { ...entity };
     }
 }
@@ -264,6 +284,8 @@ function updateRoute({ entity }) {
     }
 }
 function ready() {
+    data.loading = false;
+    data.progress = { percent: 0 };
     data.ready = true;
     $emit("ready");
 }

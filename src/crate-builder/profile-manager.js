@@ -37,7 +37,7 @@ export class ProfileManager {
     getEntityTypeHierarchy({ entity }) {
         let types = entity["@type"];
         if (!isArray(types)) types = entity["@type"].split(",").map((t) => t.trim());
-        types = [...types, ...this.getAdditionalEntityTypes({ entity })];
+        // types = [...types, ...this.getAdditionalEntityTypes({ entity })];
         types = this.mapTypeHierarchies({ types });
         return types;
     }
@@ -67,7 +67,7 @@ export class ProfileManager {
             typeDefinition = cloneDeep(this.profile?.classes?.[type]);
         } else if (schemaOrgTypeDefinitions?.[type]) {
             //   no  - find it in schema.org
-            typeDefinition = schemaOrgTypeDefinitions?.[type];
+            typeDefinition = cloneDeep(schemaOrgTypeDefinitions?.[type]);
             typeDefinition.definition = "inherit";
 
             /**
@@ -84,19 +84,19 @@ export class ProfileManager {
         }
         if (!typeDefinition.inputs) typeDefinition.inputs = [];
 
-        /**
-         * Get the hierarchy for the type definition we're interested in
-         *  and then go join in any inputs we find on any of those types
-         *  in the profile.
-         */
-        let types = this.getAdditionalEntityTypes({ entity });
-        if (types) {
-            let inputs = types.map((type) => this.getInputsFromProfile({ type }));
-            inputs = flattenDeep(inputs);
-            inputs = uniqBy(inputs, "id");
-            typeDefinition.inputs = [...typeDefinition.inputs, ...inputs];
-        }
-        typeDefinition.inputs = compact(typeDefinition.inputs);
+        // /**
+        //  * Get the hierarchy for the type definition we're interested in
+        //  *  and then go join in any inputs we find on any of those types
+        //  *  in the profile.
+        //  */
+        // let types = this.getAdditionalEntityTypes({ entity });
+        // if (types) {
+        //     let inputs = types.map((type) => this.getInputsFromProfile({ type }));
+        //     inputs = flattenDeep(inputs);
+        //     inputs = uniqBy(inputs, "id");
+        //     typeDefinition.inputs = [...typeDefinition.inputs, ...inputs];
+        // }
+        // typeDefinition.inputs = compact(typeDefinition.inputs);
 
         // return { inputs: typeDefinition.inputs };
         return typeDefinition;
@@ -114,28 +114,28 @@ export class ProfileManager {
      *
      *  But only if the type is a singleton otherwise this gets too complex.
      */
-    getAdditionalEntityTypes({ entity }) {
-        let types = entity["@type"];
-        if (!isArray(types)) types = types.split(",").map((t) => t.trim());
+    // getAdditionalEntityTypes({ entity }) {
+    //     let types = entity["@type"];
+    //     if (!isArray(types)) types = types.split(",").map((t) => t.trim());
 
-        if (types.length === 1) {
-            let typeProperty = `${types[0].toLowerCase()}Type`;
-            // look it up as a property on the entity
-            if (typeProperty in entity) {
-                let types = isArray(entity[typeProperty])
-                    ? entity[typeProperty]
-                    : [entity[typeProperty]];
-                return types;
-            }
+    //     if (types.length === 1) {
+    //         let typeProperty = `${types[0].toLowerCase()}Type`;
+    //         // look it up as a property on the entity
+    //         if (typeProperty in entity) {
+    //             let types = isArray(entity[typeProperty])
+    //                 ? entity[typeProperty]
+    //                 : [entity[typeProperty]];
+    //             return types;
+    //         }
 
-            // lookup up in the properties array
-            if ("properties" in entity) {
-                let properties = entity.properties[typeProperty];
-                if (properties) return properties.map((p) => p?.tgtEntity.name);
-            }
-        }
-        return [];
-    }
+    //         // lookup up in the properties array
+    //         if ("properties" in entity) {
+    //             let properties = entity.properties[typeProperty];
+    //             if (properties) return properties.map((p) => p?.tgtEntity.name);
+    //         }
+    //     }
+    //     return [];
+    // }
 
     /**
      *

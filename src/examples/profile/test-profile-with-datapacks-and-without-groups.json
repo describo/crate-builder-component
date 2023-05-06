@@ -22,7 +22,6 @@
                 {
                     "id": "https://schema.org/also",
                     "name": "also",
-                    "label": "Language",
                     "help": "Attach a language",
                     "type": ["Language"],
                     "required": true,

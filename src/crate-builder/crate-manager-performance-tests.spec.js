@@ -46,7 +46,7 @@ describe.skip("Test loading large crates and see how it performs", () => {
 
             t0 = performance.now();
             let crateManager = new CrateManager({ crate });
-            crateManager.load({ crate });
+            await crateManager.load({ crate });
             t1 = performance.now();
             runtime.init = round(t1 - t0, 2);
 
@@ -97,7 +97,7 @@ describe.skip("Test operations on large entity arrays", () => {
             }
 
             let crateManager = new CrateManager({ crate });
-            crateManager.load({ crate });
+            await crateManager.load({ crate });
 
             let t0 = performance.now();
             groupBy(crateManager.entities, "@id");

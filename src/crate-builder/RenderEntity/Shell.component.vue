@@ -275,7 +275,7 @@ const $emit = defineEmits([
 ]);
 
 watch([() => props.entity, () => props.profile], (n, o) => {
-    if (n.describoId !== o.describoId) {
+    if (n[0].describoId !== o[0].describoId) {
         data.extraProperties = [];
         data.entity = {};
         data.tabs = [];
@@ -322,7 +322,7 @@ function init() {
     }
     let properties = {};
     let propertyNames = [];
-    Object.keys(entity.properties).map((k) => (propertyNames[k.toLowerCase()] = k));
+    Object.keys(entity.properties).forEach((k) => (propertyNames[k.toLowerCase()] = k));
     Object.keys(entity.properties)
         .map((k) => k.toLowerCase())
         .sort()
@@ -420,7 +420,7 @@ function saveCrate() {
 function createProperty(patch) {
     console.debug("Render Entity component: emit(create:property)", patch);
     if (props.configuration.mode === "embedded") {
-        props.crateManager.addProperty({ ...patch });
+        props.crateManager.addProperty({ describoId: props.entity.describoId, ...patch });
     } else {
         $emit("add:property", { ...patch, entityId: props.entity.describoId });
     }
@@ -432,7 +432,7 @@ function createProperty(patch) {
 function saveProperty(patch) {
     console.debug("Render Entity component: emit(save:property)", patch);
     if (props.configuration.mode === "embedded") {
-        props.crateManager.updateProperty({ ...patch });
+        props.crateManager.updateProperty({ describoId: props.entity.describoId, ...patch });
     } else {
         $emit("save:property", patch);
     }
@@ -444,7 +444,10 @@ function saveProperty(patch) {
 function deleteProperty(data) {
     console.debug("Render Entity component: emit(delete:property)", data);
     if (props.configuration.mode === "embedded") {
-        props.crateManager.deleteProperty({ propertyId: data.propertyId });
+        props.crateManager.deleteProperty({
+            describoId: props.entity.describoId,
+            propertyId: data.propertyId,
+        });
     } else {
         $emit("delete:property", { propertyId: data.propertyId });
     }
@@ -459,7 +462,11 @@ function createEntity(data) {
     console.debug("Render Entity component: emit(create:entity)", data);
     if (props.configuration.mode === "embedded") {
         if (dataType === "datapack") {
-            props.crateManager.ingestAndLink({ property, json: data });
+            props.crateManager.ingestAndLink({
+                srcEntityId: props.entity.describoId,
+                property,
+                json: data,
+            });
         } else {
             let entity = props.crateManager.addEntity({ entity: data.json });
             props.crateManager.linkEntity({
@@ -490,6 +497,7 @@ function linkEntity(data) {
     console.debug("Render Entity component: emit(link:entity)", data);
     if (props.configuration.mode === "embedded") {
         props.crateManager.linkEntity({
+            srcEntityId: props.entity.describoId,
             property: data.property,
             tgtEntityId: data.json.describoId,
         });
@@ -500,6 +508,7 @@ function linkEntity(data) {
     saveCrate();
 }
 function deleteEntity(data) {
+    if (data.describoId === "RootDataset") return;
     console.debug("Render Entity component: emit(delete:entity)", data);
     if (props.configuration.mode === "embedded") {
         props.crateManager.deleteEntity(data);

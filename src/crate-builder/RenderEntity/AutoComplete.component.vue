@@ -104,7 +104,7 @@ async function querySearch(queryString) {
     let newEntity = [
         {
             type: "new",
-            "@id": `#${queryString}`,
+            "@id": `${queryString}`,
             "@type": props.type,
             name: `${queryString}`,
         },
