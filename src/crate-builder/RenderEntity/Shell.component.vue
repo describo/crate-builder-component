@@ -489,7 +489,7 @@ function deleteEntity(data) {
     console.debug("Render Entity component: emit(delete:entity)", data);
     if (props.configuration.mode === "embedded") {
         props.crateManager.deleteEntity(data);
-        init();
+        $emit("load:entity", { describoId: "RootDataset" });
     } else {
         $emit("delete:entity", data);
     }

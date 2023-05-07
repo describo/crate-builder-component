@@ -212,9 +212,7 @@ function addPropertyPlaceholder(property) {
 function deleteEntity({ describoId }) {
     if (data.dialog.browseEntities) {
         // if the browse dialog is showing
-        $emit("delete:entity", {
-            describoId,
-        });
+        $emit("delete:entity", { describoId });
     } else {
         // otherwise it's the delete entity button that was pressed
         $emit("delete:entity", {
