@@ -157,7 +157,7 @@ export class CrateManager {
         groupProperties = false,
     }) {
         // can't resolve linked entities without loading properties
-        if (resolveLinkedEntities && !loadEntityProperties) loadEntityProperties = true;
+        if (!loadEntityProperties && resolveLinkedEntities) resolveLinkedEntities = false;
 
         let entity = this.em.get({ srcEntityId: id ?? describoId });
         if (!entity?.describoId) return;
@@ -434,9 +434,9 @@ export class Entity {
         }
 
         if (property === "@id") {
-            let isValid = validateId({ id: value });
-            if (isValid?.message.match(/Invalid identifier/)) {
-                value = `#${value}`;
+            let result = validateId({ id: value });
+            if (!result.isValid) {
+                value = `#${encodeURIComponent(value)}`;
             }
         }
         let idx = this.entitiesBy.describoId[srcEntityId] ?? this.entitiesBy.atId[srcEntityId];

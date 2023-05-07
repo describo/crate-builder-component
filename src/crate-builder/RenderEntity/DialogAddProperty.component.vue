@@ -1,11 +1,10 @@
 <template>
     <div class="flex flex-col space-y-2">
-        <div class="flex flex-row">
-            <div>Add a property to this entity</div>
-            <div class="flex-grow"></div>
+        <div class="flex flex-row space-x-2">
             <div>
                 <el-button @click="close" type="primary"><i class="fas fa-times"></i></el-button>
             </div>
+            <div class="pt-1">Add a property to this entity</div>
         </div>
         <div>
             <el-input
