@@ -1,6 +1,6 @@
 <template>
     <div ref="container" class="flex flex-row">
-        <div class="flex flex-col w-2/3 border-r pr-4 overflow-scroll" :style="metadataPanelHeight">
+        <div class="flex flex-col w-2/3 border-r pr-4 overflow-scroll" :style="panelHeight">
             <!-- <pre>{{ data.entity }}</pre> -->
             <div v-if="!data.tabs.length">
                 <!-- render controls -->
@@ -173,7 +173,7 @@
                 </div>
             </div>
         </div>
-        <div class="w-1/3 p-2">
+        <div class="w-1/3 p-2 overflow-scroll" :style="panelHeight">
             <div class="text-lg underline">Links to this entity:</div>
             <RenderReverseConnectionsComponent
                 class="my-2"
@@ -262,7 +262,7 @@ onMounted(() => {
     data.containerTop = container.value.getBoundingClientRect().top + 20;
 });
 
-let metadataPanelHeight = computed(() => {
+let panelHeight = computed(() => {
     if (data.containerTop) return { height: `${window.innerHeight - data.containerTop}px` };
 });
 
