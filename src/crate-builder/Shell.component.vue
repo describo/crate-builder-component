@@ -28,6 +28,7 @@
 </template>
 
 <script setup>
+import { ElProgress } from "element-plus";
 import RenderEntityComponent from "./RenderEntity/Shell.component.vue";
 import { onMounted, onBeforeMount, onBeforeUnmount, reactive, watch } from "vue";
 import cloneDeep from "lodash-es/cloneDeep";

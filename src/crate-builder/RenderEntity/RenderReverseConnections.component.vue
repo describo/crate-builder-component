@@ -27,6 +27,7 @@
 </template>
 
 <script setup>
+import { ElPagination, ElInput } from "element-plus";
 import RenderReverseItemLinkComponent from "./RenderReverseItemLink.component.vue";
 import { computed, reactive } from "vue";
 import isPlainObject from "lodash-es/isPlainObject";
