@@ -77,8 +77,8 @@ function verifySelectValuesAreValidPlainObjects(values) {
     let valid = true;
     values.forEach((v) => {
         if (!isPlainObject(v)) valid = false;
-        let result = validateId(v["@id"], v["@type"]);
-        if (result?.message) valid = false;
+        let { isValid } = validateId({ id: v["@id"], type: v["@type"] });
+        if (!isValid) valid = false;
         if (!"@id" in v) valid = false;
         if (!"@type" in v) valid = false;
         if (!"name" in v) valid = false;
