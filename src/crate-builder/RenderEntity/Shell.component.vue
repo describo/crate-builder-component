@@ -1,6 +1,9 @@
 <template>
-    <div ref="container" class="flex flex-row">
-        <div class="flex flex-col w-2/3 border-r pr-4 overflow-scroll" :style="panelHeight">
+    <div class="flex flex-row">
+        <div
+            class="flex flex-col pr-4"
+            :class="{ 'w-4/6': data.reverseSidebarVisible, 'w-full': !data.reverseSidebarVisible }"
+        >
             <!-- <pre>{{ data.entity }}</pre> -->
             <div v-if="!data.tabs.length">
                 <!-- render controls -->
@@ -173,10 +176,23 @@
                 </div>
             </div>
         </div>
-        <div class="w-1/3 p-2 overflow-scroll" :style="panelHeight">
-            <div class="text-lg underline">Links to this entity:</div>
+        <!--show reverse links panel  -->
+        <div
+            v-if="props.configuration.enableReverseLinkBrowser"
+            class="p-2 h-12 rounded text-2xl bg-gray-200 text-blue-600"
+            @click="data.reverseSidebarVisible = !data.reverseSidebarVisible"
+        >
+            <div v-show="!data.reverseSidebarVisible">
+                <i class="fa-solid fa-chevron-left"></i>
+                <!-- <i class="fa-solid fa-link"></i> -->
+            </div>
+            <div v-show="data.reverseSidebarVisible">
+                <i class="fa-solid fa-chevron-right"></i>
+            </div>
+        </div>
+        <!-- reverse links pane -->
+        <div v-if="data.reverseSidebarVisible" class="bg-white px-2 overflow-scroll w-2/6">
             <RenderReverseConnectionsComponent
-                class="my-2"
                 :crate-manager="props.crateManager"
                 :connections="data.entity.reverseConnections"
                 @load:entity="loadEntity"
@@ -218,6 +234,7 @@ const props = defineProps({
 });
 
 const data = reactive({
+    reverseSidebarVisible: false,
     hideProperty: ["describoId"],
     classDefinition: undefined,
     entity: {},
@@ -227,7 +244,6 @@ const data = reactive({
     extraProperties: [],
     savedProperty: undefined,
     savedPropertyTimeout: 1000,
-    containerTop: undefined,
 });
 const container = ref(null);
 
@@ -259,11 +275,6 @@ onBeforeMount(() => {
 });
 onMounted(() => {
     data.debouncedInit();
-    data.containerTop = container.value.getBoundingClientRect().top + 20;
-});
-
-let panelHeight = computed(() => {
-    if (data.containerTop) return { height: `${window.innerHeight - data.containerTop}px` };
 });
 
 function init() {

@@ -11,6 +11,7 @@
             :enable-crate-preview="data.enableCratePreview"
             :enable-browse-entities="data.enableBrowseEntities"
             :enable-template-save="data.enableTemplateSave"
+            :enable-reverse-link-browser="data.enableReverseLinkBrowser"
             @ready="ready"
             @error="error"
             @save:crate="saveCrate"
@@ -65,6 +66,7 @@ function init() {
         enableCratePreview: $this?.config?.enableCratePreview ?? true,
         enableBrowseEntities: $this?.config?.enableBrowseEntities ?? true,
         enableTemplateSave: $this?.config?.enableTemplateSave ?? false,
+        enableReverseLinkBrowser: $this?.config?.enableTemplateSave ?? true,
         readonly: $this?.config?.readonly ?? false,
         webComponent: $this?.config?.webComponent ?? true,
         enableInternalRouting: $this?.config?.enableInternalRouting ?? false,

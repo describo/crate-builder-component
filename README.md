@@ -277,6 +277,8 @@ from there.**
     web component or just not used), routing is turned off anyway. Most likely you want to leave the
     component to deal with this or listen out for the `navigation` event and handle it yourself if
     the component can't.
+-   `enableReverseLinkBrowser`: true : false: `(default: true)`: enable / disable the reverse link
+    browser. If enabled, it can be shown as a right sidebar as required.
 -   `readonly`: true | false: `(default: false)` : if set to true all of the controls to edit that
     the data are turned off. The crate is set into a mode where it is readonly.
 -   `webComponent`: true | false: `(default: true)` : Setting this to true alters the behaviour of

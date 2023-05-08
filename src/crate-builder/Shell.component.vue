@@ -83,6 +83,11 @@ const props = defineProps({
         default: true,
         validator: (val) => [true, false].includes(val),
     },
+    enableReverseLinkBrowser: {
+        type: Boolean,
+        default: true,
+        validator: (val) => [true, false].includes(val),
+    },
     readonly: {
         type: Boolean,
         default: false,
@@ -227,6 +232,7 @@ function configure() {
         enableCratePreview: props.enableCratePreview,
         enableBrowseEntities: props.enableBrowseEntities,
         enableTemplateSave: props.enableTemplateSave,
+        enableReverseLinkBrowser: props.enableReverseLinkBrowser,
         readonly: props.readonly,
         webComponent: props.webComponent,
         enableTemplateLookups: false,
