@@ -15,7 +15,7 @@
                 <el-badge is-dot class="animate-pulse -ml-1 -mt-2" v-if="isRequired && !isValid">
                 </el-badge>
             </div>
-            <div class="text-gray-600 font-light text-xs pr-1">{{ data.help }}</div>
+            <render-property-help-component :help="data.help" />
             <div
                 v-if="!data.propertyDefinition && profileWarnMissingProperty"
                 class="text-red-600 text-xs"
@@ -98,7 +98,8 @@
 </template>
 
 <script setup>
-import { ElButton, ElBadge } from "element-plus";
+import { ElBadge } from "element-plus";
+import RenderPropertyHelpComponent from "./RenderPropertyHelp.component.vue";
 import RenderEntityPropertyInstanceComponent from "./RenderEntityPropertyInstance.component.vue";
 import PaginateLinkedEntitiesComponent from "./PaginateLinkedEntities.component.vue";
 import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";
