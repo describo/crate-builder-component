@@ -50,6 +50,7 @@ import profile1 from "../examples/profile/test-profile-without-groups.json";
 import profile2 from "../examples/profile/test-profile-with-groups.json";
 import profile3 from "../examples/profile/test-profile-with-datapacks-and-without-groups.json";
 import profile4 from "../examples/profile/nyingarn-item-profile.json";
+import profile5 from "../examples/profile/profile-with-all-primitives.json";
 const lookup = new Lookup();
 
 const data = reactive({
@@ -70,6 +71,7 @@ const data = reactive({
         { name: "Profile +groups", value: profile2 },
         { name: "Profile +datapacks, -groups", value: profile3 },
         { name: "Profile Nyingarn Item", value: profile4 },
+        { name: "All Primitives", value: profile5 },
     ],
     selectedCrate: undefined,
     selectedProfile: undefined,
