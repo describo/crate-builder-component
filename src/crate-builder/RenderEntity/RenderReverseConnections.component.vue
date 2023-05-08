@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full p-2 border border-solid bg-gray-200 rounded">
+    <div class="w-full p-2">
         <div class="flex flex-row">
             <div class="text-lg">Links to this entity:</div>
             <div class="flex-grow"></div>

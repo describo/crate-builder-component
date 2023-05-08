@@ -1,9 +1,6 @@
 <template>
     <div class="flex flex-row">
-        <div
-            class="flex flex-col pr-4"
-            :class="{ 'w-4/6': data.reverseSidebarVisible, 'w-full': !data.reverseSidebarVisible }"
-        >
+        <div class="flex flex-col pr-4 w-full">
             <!-- <pre>{{ data.entity }}</pre> -->
             <div v-if="!data.tabs.length">
                 <!-- render controls -->
@@ -178,7 +175,7 @@
         </div>
         <!--show reverse links panel  -->
         <div
-            v-if="props.configuration.enableReverseLinkBrowser"
+            v-if="props.configuration.enableReverseLinkBrowser && !data.reverseSidebarVisible"
             class="p-2 h-12 rounded text-2xl bg-gray-200 text-blue-600"
             @click="data.reverseSidebarVisible = !data.reverseSidebarVisible"
         >
@@ -190,14 +187,20 @@
                 <i class="fa-solid fa-chevron-right"></i>
             </div>
         </div>
-        <!-- reverse links pane -->
-        <div v-if="data.reverseSidebarVisible" class="bg-white px-2 overflow-scroll w-2/6">
-            <RenderReverseConnectionsComponent
-                :crate-manager="props.crateManager"
-                :connections="data.entity.reverseConnections"
-                @load:entity="loadEntity"
-            />
-        </div>
+        <!-- reverse links panel as a drawer-->
+        <el-drawer
+            v-model="data.reverseSidebarVisible"
+            direction="rtl"
+            @close="data.reverseSidebarVisible = false"
+        >
+            <template #default>
+                <RenderReverseConnectionsComponent
+                    :crate-manager="props.crateManager"
+                    :connections="data.entity.reverseConnections"
+                    @load:entity="loadEntity"
+                />
+            </template>
+        </el-drawer>
     </div>
 </template>
 
