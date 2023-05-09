@@ -1,0 +1,39 @@
+{
+    "metadata": {
+        "name": "Describo Test Profile to resolve complex entities like relationships and actions",
+        "description": "",
+        "version": 0.1,
+        "warnMissingProperty": true
+    },
+    "resolve": {
+        "Relationship": ["source", "target"],
+        "Action": ["object", "participant", "agent"]
+    },
+    "classes": {
+        "Dataset": {
+            "definition": "override",
+            "subClassOf": [],
+            "inputs": []
+        },
+        "Person": {
+            "definition": "inherit",
+            "subClassOf": [],
+            "inputs": []
+        },
+        "Organisation": {
+            "definition": "override",
+            "subClassOf": [],
+            "inputs": [
+                {
+                    "id": "https://schema.org/name",
+                    "name": "name",
+                    "label": "name",
+                    "help": "The name of the organisation",
+                    "required": true,
+                    "multiple": false,
+                    "type": ["Text"]
+                }
+            ]
+        }
+    }
+}
