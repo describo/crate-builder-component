@@ -1,7 +1,11 @@
 <template>
     <div v-loading="data.loading">
         <!-- if the entity does NOT have geography -->
-        <div v-if="!showMap" class="flex flex-row space-x-2">
+        <div
+            v-if="!showMap"
+            class="flex flex-row space-x-2"
+            :class="{ 'p-2 hover:bg-slate-200 hover:rounded': data.resolvedEntities.length }"
+        >
             <!--render the linking element  -->
             <div
                 class="flex flex-row rounded"
