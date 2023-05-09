@@ -20,7 +20,7 @@
         },
         {
             "@id": "#relationship",
-            "@type": ["Relationship"],
+            "@type": "Relationship, RelatedEntity",
             "source": { "@id": "#person1" },
             "target": { "@id": "#thing1" }
         },
