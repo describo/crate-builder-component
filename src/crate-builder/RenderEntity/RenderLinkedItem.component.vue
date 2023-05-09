@@ -27,7 +27,7 @@
                         />
                         <div>{{ data.entity.tgtEntity["@type"] }}</div>
                     </div>
-                    <div class="text-lg">
+                    <div class="text-base">
                         <span v-if="data.entity.tgtEntity.name">{{
                             data.entity.tgtEntity.name
                         }}</span>

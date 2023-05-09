@@ -9,7 +9,7 @@
                 <type-icon-component class="text-gray-700" :type="props.entity['@type']" />
                 <div>&nbsp;{{ props.entity["@type"] }}:&nbsp; {{ props.entity["@id"] }}</div>
             </div>
-            <div class="text-lg">
+            <div class="text-base">
                 {{ props.entity.name }}
             </div>
         </div>
