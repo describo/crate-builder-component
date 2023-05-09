@@ -6,10 +6,10 @@
     >
         <div class="text-gray-800 flex flex-col">
             <div class="flex flex-row text-sm">
-                <type-icon-component class="mr-2 text-gray-700" :type="props.entity['@type']" />
-                {{ props.entity["@type"] }}:&nbsp; {{ props.entity["@id"] }}
+                <type-icon-component class="text-gray-700" :type="props.entity['@type']" />
+                <div>&nbsp;{{ props.entity["@type"] }}:&nbsp; {{ props.entity["@id"] }}</div>
             </div>
-            <div class="">
+            <div class="text-lg">
                 {{ props.entity.name }}
             </div>
         </div>

@@ -15,11 +15,13 @@
             >
                 <div class="text-sm flex flex-row space-x-1">
                     <type-icon-component
-                        class="mr-2 text-gray-700"
+                        class="text-gray-700"
                         :type="data.entity.tgtEntity['@type']"
                         v-if="data.entity.tgtEntity['@type']"
                     />
                     <div>{{ data.entity.tgtEntity["@type"] }}:</div>
+                </div>
+                <div class="text-lg">
                     <span v-if="data.entity.tgtEntity.name">{{ data.entity.tgtEntity.name }}</span>
                     <span v-else>{{ data.entity.tgtEntity["@id"] }}</span>
                 </div>
