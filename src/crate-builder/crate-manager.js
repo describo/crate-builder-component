@@ -600,7 +600,7 @@ export class Entity {
         // set type as string if it's an array
         if (isArray(entity["@type"])) entity["@type"] = entity["@type"].join(", ");
 
-        if (!entity.describoId) entity.describoId = id;
+        if (!entity.describoId) entity.describoId = id.replace("#", "");
         return entity;
     }
 }
