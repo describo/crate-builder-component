@@ -181,9 +181,7 @@ function resolveComplexEntities() {
     let profile = props.crateManager.profile;
     if (profile && profile?.resolve) {
         const typesToResolve = Object.keys(profile.resolve);
-        const type = !isArray(data.entity.tgtEntity["@type"])
-            ? [data.entity.tgtEntity["@type"]]
-            : data.entity.tgtEntity["@type"];
+        const type = data.entity.tgtEntity["@type"].split(",").map((t) => t.trim());
 
         const specificTypesToResolve = intersection(typesToResolve, type);
         for (let type of specificTypesToResolve) {
