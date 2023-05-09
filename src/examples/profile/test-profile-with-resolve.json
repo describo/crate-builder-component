@@ -7,7 +7,7 @@
     },
     "resolve": {
         "Relationship": ["source", "target"],
-        "Action": ["object", "participant", "agent"]
+        "CreateAction": ["object", "participant", "agent"]
     },
     "classes": {
         "Dataset": {
