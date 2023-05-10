@@ -206,6 +206,7 @@ export class ProfileManager {
      *  the parent types that this is a subClassOf
      */
     mapTypeHierarchies({ types }) {
+        types = cloneDeep(types);
         if (isString(types)) {
             types = types.split(",");
             types = types.map((t) => t.trim());
