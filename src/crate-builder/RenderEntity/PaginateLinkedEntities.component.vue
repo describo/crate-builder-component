@@ -22,7 +22,7 @@
             <div
                 v-for="(instance, idx) of data.entities"
                 :key="instance.propertyId"
-                class="flex flex-row m-1"
+                class="flex flex-row"
             >
                 <RenderLinkedItemComponent
                     :index="idx"

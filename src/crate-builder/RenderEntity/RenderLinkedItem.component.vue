@@ -3,8 +3,8 @@
         <!-- if the entity does NOT have geography -->
         <div
             v-if="!showMap"
-            class="flex flex-row space-x-2"
-            :class="{ 'p-2 hover:bg-slate-200 hover:rounded': data.resolvedEntities.length }"
+            class="flex flex-row space-x-2 m-1"
+            :class="{ 'my-2 mx-3': entity.tgtEntity.associations.length }"
         >
             <!--render the linking element  -->
             <div
@@ -16,22 +16,20 @@
             >
                 <div
                     class="flex flex-col p-3 cursor-pointer"
-                    @click="loadEntity(data.entity.tgtEntity.describoId)"
-                    v-if="data.entity.tgtEntity"
+                    @click="loadEntity(entity.tgtEntity.describoId)"
+                    v-if="entity.tgtEntity"
                 >
                     <div class="text-sm flex flex-row space-x-1">
                         <type-icon-component
                             class="text-gray-700"
-                            :type="data.entity.tgtEntity['@type']"
-                            v-if="data.entity.tgtEntity['@type']"
+                            :type="entity.tgtEntity['@type']"
+                            v-if="entity.tgtEntity['@type']"
                         />
-                        <div>{{ data.entity.tgtEntity["@type"] }}</div>
+                        <div>{{ entity.tgtEntity["@type"] }}</div>
                     </div>
                     <div class="text-base">
-                        <span v-if="data.entity.tgtEntity.name">{{
-                            data.entity.tgtEntity.name
-                        }}</span>
-                        <span v-else>{{ data.entity.tgtEntity["@id"] }}</span>
+                        <span v-if="entity.tgtEntity.name">{{ entity.tgtEntity.name }}</span>
+                        <span v-else>{{ entity.tgtEntity["@id"] }}</span>
                     </div>
                 </div>
                 <delete-property-component
@@ -42,31 +40,42 @@
                     @delete:property="deleteProperty"
                 />
             </div>
-
-            <!-- if this is a complex entity, render the resolved entity links-->
-            <div v-if="data.resolvedEntities.length" class="border-l pl-2 flex-col space-y-2">
+            <!-- if this target has associations, render them -->
+            <div
+                v-if="entity.tgtEntity.associations && entity.tgtEntity.associations.length"
+                class="flex-col space-y-2"
+            >
                 <div
-                    v-for="instance of data.resolvedEntities"
+                    v-for="instance of entity.tgtEntity.associations"
                     @click="loadEntity(instance.entity.describoId)"
                     :key="instance.property"
-                    class="bg-purple-200 rounded cursor-pointer hover:bg-cyan-200"
+                    class="cursor-pointer"
                 >
-                    <div class="flex flex-row space-x-2 rounded p-2">
-                        <div class="">
-                            {{ instance.property }}&nbsp;<i class="fa-solid fa-arrow-right"></i>
-                        </div>
-                        <div class="flex flex-row space-x-2">
-                            <div class="flex flex-row space-x-1">
-                                <type-icon-component
-                                    class="text-gray-700"
-                                    :type="instance.entity['@type']"
-                                    v-if="instance.entity['@type']"
-                                />
-                                <div>{{ instance.entity["@type"] }}:</div>
-                            </div>
+                    <div class="flex flex-row -mx-3">
+                        <div class="bg-purple-200 w-4 h-4 rounded-lg mt-2"></div>
+                        <div class="bg-purple-200 w-5 h-2 mt-3 -mx-1"></div>
+                        <div
+                            class="bg-purple-200 hover:bg-cyan-200 flex flex-row p-2 rounded space-x-2"
+                        >
                             <div class="">
-                                <span v-if="instance.entity.name">{{ instance.entity.name }}</span>
-                                <span v-else>{{ instance.entity["@id"] }}</span>
+                                {{ instance.property }}
+                            </div>
+                            <div><i class="fa-solid fa-arrow-right"></i></div>
+                            <div class="flex flex-row space-x-2">
+                                <div class="flex flex-row space-x-1">
+                                    <type-icon-component
+                                        class="text-gray-700"
+                                        :type="instance.entity['@type']"
+                                        v-if="instance.entity['@type']"
+                                    />
+                                    <div>{{ instance.entity["@type"] }}:</div>
+                                </div>
+                                <div class="">
+                                    <span v-if="instance.entity.name">{{
+                                        instance.entity.name
+                                    }}</span>
+                                    <span v-else>{{ instance.entity["@id"] }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -123,8 +132,6 @@ import TypeIconComponent from "./TypeIcon.component.vue";
 import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import MapComponent from "../primitives/Map.component.vue";
 import { computed, reactive, inject, watch, onMounted } from "vue";
-import intersection from "lodash-es/intersection";
-import isArray from "lodash-es/isArray";
 const configuration = inject("configuration");
 
 const emit = defineEmits(["load:entity", "create:property", "save:property", "delete:property"]);
@@ -144,22 +151,13 @@ const props = defineProps({
 });
 const data = reactive({
     loading: false,
-    entity: { ...props.entity },
     editLocation: false,
     resolvedEntities: [],
 });
 let showMap = computed(() => (data.entity?.tgtEntity?.["@type"]?.match(/Geo/) ? true : false));
+let entity = computed(() => props.entity);
 let type = "unlink";
-resolveComplexEntities();
 
-onMounted(() => {
-    watch(
-        () => props.crateManager.profile,
-        () => {
-            resolveComplexEntities();
-        }
-    );
-});
 function loadEntity(describoId) {
     data.loading = true;
     // console.debug("Renderer Linked Item Component : emit(load:entity)", props.entity.tgtEntityId);
@@ -167,45 +165,6 @@ function loadEntity(describoId) {
     setTimeout(() => {
         data.loading = false;
     }, 500);
-}
-
-/**
- * This method resolves the links from complex entities.
- *
- * If the primary entity being displayed has a type listed in the resolve section of a profile,
- *  then the properties defined in that resolves will be used to as entry points to find the
- *  entities linked from here.
- */
-function resolveComplexEntities() {
-    data.resolvedEntities = [];
-    let profile = props.crateManager.profile;
-    if (profile && profile?.resolve) {
-        const typesToResolve = Object.keys(profile.resolve);
-        const type = data.entity.tgtEntity["@type"].split(",").map((t) => t.trim());
-
-        const specificTypesToResolve = intersection(typesToResolve, type);
-        for (let type of specificTypesToResolve) {
-            const propertiesToResolve = profile.resolve[type];
-            let complexEntity = props.crateManager.getEntity({
-                describoId: data.entity.tgtEntity.describoId,
-            });
-
-            for (let resolveEntityProperty of complexEntity.properties) {
-                if (propertiesToResolve.includes(resolveEntityProperty.property)) {
-                    if (resolveEntityProperty.tgtEntityId) {
-                        let resolvedEntity = props.crateManager.getEntity({
-                            describoId: resolveEntityProperty.tgtEntityId,
-                            loadEntityProperties: false,
-                        });
-                        data.resolvedEntities.push({
-                            property: resolveEntityProperty.property,
-                            entity: resolvedEntity,
-                        });
-                    }
-                }
-            }
-        }
-    }
 }
 function editLocation() {
     data.editLocation = true;

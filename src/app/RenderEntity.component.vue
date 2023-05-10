@@ -2,6 +2,7 @@
     <div class="flex flex-col space-y-2">
         <RenderEntityComponent
             :crate-manager="data.crateManager"
+            :profile="data.crateManager.profile"
             :entity="data.selectedEntity"
             :configuration="data.configuration"
             @load:entity="loadEntity"
@@ -35,6 +36,9 @@ const data = reactive({
                 description: "A profile with entries for each of the supported datatypes",
                 version: 0.1,
                 warnMissingProperty: true,
+            },
+            resolve: {
+                RelatedEntity: ["source", "target"],
             },
             layouts: {
                 "Organisation, School": [
@@ -85,131 +89,124 @@ const data = reactive({
         enableDataPackLookups: false,
         mode: "online",
     },
-    entities: {
-        A: {
-            describoId: "A",
-            "@id": "A",
-            "@type": "Entity",
-            name: "A",
+    entities: [
+        {
+            describoId: "RootDataset",
+            "@id": "./",
+            "@type": ["Dataset"],
             properties: {
-                entityType: [
+                relationship: [
                     {
-                        propertyId: "A1",
-                        srcEntityId: "A",
-                        property: "entityType",
-                        tgtEntityId: "D",
-                        tgtEntity: { "@id": "D", "@type": "EntityType", name: "School" },
-                    },
-                    {
-                        propertyId: "A2",
-                        srcEntityId: "A",
-                        property: "entityType",
-                        tgtEntityId: "E",
-                        tgtEntity: { "@id": "E", "@type": "EntityType", name: "Organisation" },
-                    },
-                ],
-                link: [
-                    {
-                        propertyId: "A3",
-                        srcEntityId: "A",
-                        property: "link",
-                        tgtEntityId: "B",
-                        tgtEntity: { "@id": "B", "@type": "Entity", name: "B" },
-                    },
-                ],
-                text: [
-                    {
-                        propertyId: "A4",
-                        srcEntityId: "A",
-                        property: "text",
-                        value: "A: some text",
+                        propertyId: "aa",
+                        srcEntityId: "RootDataset",
+                        property: "relationship",
+                        tgtEntityId: "1",
+                        tgtEntity: {
+                            describoId: "1",
+                            "@id": "#relationship",
+                            "@type": "Relationship, RelatedEntity",
+                            associations: [
+                                {
+                                    property: "source",
+                                    entity: {
+                                        describoId: "2",
+                                        "@id": "#person1",
+                                        "@type": "Person",
+                                        associations: [],
+                                    },
+                                },
+                                {
+                                    property: "target",
+                                    entity: {
+                                        describoId: "3",
+                                        "@id": "#thing1",
+                                        "@type": "Thing",
+                                    },
+                                },
+                            ],
+                        },
                     },
                 ],
             },
         },
-        B: {
-            describoId: "B",
-            "@id": "B",
-            "@type": "Entity",
-            name: "B",
+        {
+            describoId: "1",
+            "@id": "#relationship",
+            "@type": "Relationship, RelatedEntity",
             properties: {
-                entityType: [
+                source: [
                     {
-                        propertyId: "B1",
-                        srcEntityId: "B",
-                        property: "entityType",
-                        tgtEntityId: "D",
-                        tgtEntity: { "@id": "D", "@type": "EntityType", name: "School" },
+                        propertyId: "ba",
+                        srcEntityId: "1",
+                        property: "source",
+                        tgtEntityId: "2",
+                        tgtEntity: {
+                            describoId: "2",
+                            "@id": "#person1",
+                            "@type": "Person",
+                            associations: [],
+                        },
                     },
                 ],
-                link: [
+                target: [
                     {
-                        propertyId: "B2",
-                        srcEntityId: "B",
-                        property: "link",
-                        tgtEntityId: "C",
-                        tgtEntity: { "@id": "C", "@type": "Entity", name: "C" },
-                    },
-                ],
-                text: [
-                    {
-                        propertyId: "B2",
-                        srcEntityId: "B",
-                        property: "text",
-                        value: "B: some text",
+                        propertyId: "bb",
+                        srcEntityId: "1",
+                        property: "target",
+                        tgtEntityId: "3",
+                        tgtEntity: {
+                            describoId: "3",
+                            "@id": "#thing1",
+                            "@type": "Thing",
+                            associations: [],
+                        },
                     },
                 ],
             },
         },
-        C: {
-            describoId: "C",
-            "@id": "C",
-            "@type": "Entity",
-            name: "C",
+        {
+            describoId: "2",
+            "@id": "#person1",
+            "@type": ["Person"],
             properties: {
-                entityType: [
+                sourceOf: [
                     {
-                        propertyId: "C2",
-                        srcEntityId: "C",
-                        property: "entityType",
-                        tgtEntityId: "E",
-                        tgtEntity: { "@id": "E", "@type": "EntityType", name: "Organisation" },
-                    },
-                ],
-                link: [
-                    {
-                        propertyId: "C2",
-                        srcEntityId: "C",
-                        property: "link",
-                        tgtEntityId: "A",
-                        tgtEntity: { "@id": "A", "@type": "Entity", name: "A" },
-                    },
-                ],
-                text: [
-                    {
-                        propertyId: "C2",
-                        srcEntityId: "C",
-                        property: "text",
-                        value: "C: some text",
+                        propertyId: "ca",
+                        srcEntityId: "2",
+                        property: "sourceOf",
+                        tgtEntityId: "1",
+                        tgtEntity: {
+                            describoId: "1",
+                            "@id": "#relationship",
+                            "@type": "Relationship, RelatedEntity",
+                            associations: [{ property: "source", entity: {} }],
+                        },
                     },
                 ],
             },
         },
-        D: {
-            describoId: "D",
-            "@id": "D",
-            "@type": "EntityType",
-            name: "School",
-            properties: {},
+        {
+            describoId: "3",
+            "@id": "#thing1",
+            "@type": ["Thing"],
+            properties: {
+                targetOf: [
+                    {
+                        propertyId: "da",
+                        srcEntityId: "3",
+                        property: "targetOf",
+                        tgtEntityId: "1",
+                        tgtEntity: {
+                            describoId: "1",
+                            "@id": "#relationship",
+                            "@type": "Relationship, RelatedEntity",
+                            associations: [],
+                        },
+                    },
+                ],
+            },
         },
-        E: {
-            describoId: "E",
-            "@id": "E",
-            "@type": "EntityType",
-            name: "Organisation",
-            properties: {},
-        },
-    },
+    ],
     selectedEntity: {},
 });
 watch(
@@ -220,13 +217,13 @@ watch(
     }
 );
 onBeforeMount(() => {
-    loadEntity({ describoId: "A" });
+    loadEntity({ describoId: "RootDataset" });
 });
 
-function loadEntity(entity) {
+function loadEntity({ describoId }) {
     // console.log("load:entity", entity);
-    data.selectedEntity = data.entities[entity.describoId];
-    $router.push({ query: { describoId: entity.describoId } });
+    data.selectedEntity = data.entities.filter((e) => e.describoId === describoId)[0];
+    $router.push({ query: { describoId } });
 }
 
 function saveProperty(data) {

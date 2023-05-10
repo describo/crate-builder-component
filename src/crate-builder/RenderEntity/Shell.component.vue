@@ -50,7 +50,7 @@
                         <render-entity-property-component
                             class="my-2"
                             :crate-manager="props.crateManager"
-                            :entity="props.entity"
+                            :entity="data.entity"
                             :property="property"
                             :values="values"
                             @load:entity="loadEntity"
@@ -212,7 +212,7 @@ import RenderEntityNameComponent from "./RenderEntityName.component.vue";
 import RenderEntityPropertyComponent from "./RenderEntityProperty.component.vue";
 import RenderReverseConnectionsComponent from "./RenderReverseConnections.component.vue";
 import RenderControlsComponent from "./RenderControls.component.vue";
-import { reactive, computed, ref, onMounted, onBeforeMount, watch, provide } from "vue";
+import { reactive, onMounted, onBeforeMount, watch, provide } from "vue";
 import debounce from "lodash-es/debounce";
 import cloneDeep from "lodash-es/cloneDeep";
 import { ProfileManager } from "../profile-manager.js";
@@ -248,7 +248,6 @@ const data = reactive({
     savedProperty: undefined,
     savedPropertyTimeout: 1000,
 });
-const container = ref(null);
 
 const $emit = defineEmits([
     "ready",

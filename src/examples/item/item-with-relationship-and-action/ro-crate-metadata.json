@@ -16,7 +16,7 @@
             "@id": "./",
             "@type": ["Dataset"],
             "relationship": { "@id": "#relationship" },
-            "actions": [{ "@id": "#createAction1" }]
+            "actions": [{ "@id": "#createAction1" }, { "@id": "#relationship" }]
         },
         {
             "@id": "#relationship",

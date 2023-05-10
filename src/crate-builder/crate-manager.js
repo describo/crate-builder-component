@@ -8,6 +8,7 @@ import groupBy from "lodash-es/groupBy";
 import cloneDeep from "lodash-es/cloneDeep";
 import flattenDeep from "lodash-es/flattenDeep";
 import compact from "lodash-es/compact";
+import intersection from "lodash-es/intersection";
 import validatorIsURL from "validator/es/lib/isURL.js";
 import validateIriPkg from "./lib/validate-iri";
 import cuid2 from "./lib/cuid2";
@@ -154,10 +155,14 @@ export class CrateManager {
         describoId,
         loadEntityProperties = true,
         resolveLinkedEntities = true,
+        resolveLinkedEntityAssociations = true,
         groupProperties = false,
     }) {
         // can't resolve linked entities without loading properties
         if (!loadEntityProperties && resolveLinkedEntities) resolveLinkedEntities = false;
+        // can't resolve linked entity associations without first resolving linked entities
+        if (!resolveLinkedEntities && resolveLinkedEntityAssociations)
+            resolveLinkedEntityAssociations = false;
 
         let entity = this.em.get({ srcEntityId: id ?? describoId });
         if (!entity?.describoId) return;
@@ -170,12 +175,18 @@ export class CrateManager {
             );
         }
         if (resolveLinkedEntities) {
+            // resolve links from this enttity to others
             entity.properties = entity.properties.map((p) => {
                 return {
                     ...p,
-                    tgtEntity: this.em.get({ srcEntityId: p?.tgtEntityId }),
+                    tgtEntity: {
+                        ...this.em.get({ srcEntityId: p?.tgtEntityId }),
+                        associations: [],
+                    },
                 };
             });
+
+            //  resolve links back to this entity @reverse
             entity.reverseConnections = entity.reverseConnections.map((p) => {
                 return {
                     ...p,
@@ -183,11 +194,48 @@ export class CrateManager {
                 };
             });
         }
+        if (resolveLinkedEntityAssociations) {
+            this.resolveLinkedEntityAssociations({ entity });
+        }
         if (groupProperties) {
             entity.properties = groupBy(entity.properties, "property");
             entity.reverseConnections = groupBy(entity.reverseConnections, "property");
         }
+
         return entity;
+    }
+
+    resolveLinkedEntityAssociations({ entity }) {
+        let profile = this.profile;
+        if (!profile || !profile?.resolve) return;
+
+        const typesToResolve = Object.keys(profile.resolve);
+        for (let entityProperty of entity.properties) {
+            let tgtEntity = entityProperty.tgtEntity;
+            const type = tgtEntity["@type"]?.split(",").map((t) => t.trim());
+            const specificTypesToResolve = intersection(typesToResolve, type);
+
+            let associations = [];
+            for (let type of specificTypesToResolve) {
+                const propertiesToResolve = profile.resolve[type];
+                let e = this.getEntity({
+                    describoId: tgtEntity.describoId,
+                });
+                let properties = e.properties;
+                for (let entityProperty of properties) {
+                    if (propertiesToResolve.includes(entityProperty.property)) {
+                        associations.push({
+                            property: entityProperty.property,
+                            entity: this.getEntity({
+                                describoId: entityProperty.tgtEntityId,
+                                loadEntityProperties: false,
+                            }),
+                        });
+                    }
+                }
+            }
+            tgtEntity.associations = associations;
+        }
     }
 
     getEntitiesBrowseList() {

@@ -68,11 +68,7 @@
             <!-- render all the links in a wrapping row -->
             <div class="mt-2" v-if="data.linkInstances.length">
                 <div v-if="data.linkInstances.length <= 30" class="flex flex-row flex-wrap">
-                    <div
-                        v-for="(instance, idx) of data.linkInstances"
-                        :key="instance.propertyId"
-                        class="m-1"
-                    >
+                    <div v-for="(instance, idx) of data.linkInstances" :key="instance.propertyId">
                         <render-linked-item-component
                             :index="idx"
                             :crate-manager="props.crateManager"
@@ -106,7 +102,16 @@ import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";
 import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import AddComponent from "./Add.component.vue";
 import DisplayPropertyNameComponent from "./DisplayPropertyName.component.vue";
-import { ref, reactive, computed, onMounted, onBeforeMount, watch, inject } from "vue";
+import {
+    ref,
+    reactive,
+    computed,
+    onMounted,
+    onBeforeMount,
+    onBeforeUnmount,
+    watch,
+    inject,
+} from "vue";
 import cloneDeep from "lodash-es/cloneDeep";
 import orderBy from "lodash-es/orderBy";
 import debounce from "lodash-es/debounce";
@@ -137,25 +142,29 @@ const data = reactive({
     simpleInstances: [],
     linkInstances: [],
     debouncedGetProfileDefinitionForProperty: debounce(getProfileDefinitionForProperty, 200),
+    watchers: [],
 });
 
-watch(
-    () => props.property,
-    () => {
-        data.debouncedGetProfileDefinitionForProperty();
-    }
-);
-watch(
-    () => props.values.length,
-    () => {
-        sortInstances();
-    }
-);
 onBeforeMount(() => {
     sortInstances();
 });
 onMounted(() => {
     data.debouncedGetProfileDefinitionForProperty();
+    data.watchers[0] = watch(
+        () => props.property,
+        () => {
+            data.debouncedGetProfileDefinitionForProperty();
+        }
+    );
+    data.watchers[1] = watch(
+        () => props.values,
+        () => {
+            sortInstances();
+        }
+    );
+});
+onBeforeUnmount(() => {
+    data.watchers.forEach((watcher) => watcher());
 });
 
 function getProfileDefinitionForProperty() {
@@ -178,7 +187,6 @@ const emit = defineEmits([
     "save:property",
     "delete:property",
 ]);
-const showHelp = ref(false);
 const isValid = computed(() => {
     return props.values.length ? true : false;
 });
