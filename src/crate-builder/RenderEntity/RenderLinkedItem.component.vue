@@ -52,8 +52,8 @@
                     class="cursor-pointer"
                 >
                     <div class="flex flex-row -mx-3">
-                        <div class="bg-purple-200 w-4 h-4 rounded-lg mt-2"></div>
-                        <div class="bg-purple-200 w-5 h-2 mt-3 -mx-1"></div>
+                        <div class="bg-slate-700 w-3 h-3 rounded-lg mt-4"></div>
+                        <div class="bg-slate-700 w-6 h-1 mt-5 -mx-1"></div>
                         <div
                             class="bg-purple-200 hover:bg-cyan-200 flex flex-row p-2 rounded space-x-2"
                         >
