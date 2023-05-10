@@ -7,7 +7,10 @@
     },
     "resolve": [
         { "types": ["Relationship", "Related"], "properties": ["source", "target"] },
-        { "types": ["CreateAction", "EditAction"], "properties": ["object", "participant"] }
+        {
+            "types": ["CreateAction", "EditAction"],
+            "properties": ["object", "participant", "agent"]
+        }
     ],
     "classes": {
         "Dataset": {
