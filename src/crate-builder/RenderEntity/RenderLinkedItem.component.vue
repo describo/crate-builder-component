@@ -56,6 +56,10 @@
                         <div class="bg-slate-700 w-6 h-1 mt-5 -mx-1"></div>
                         <div
                             class="bg-purple-200 hover:bg-cyan-200 flex flex-row p-2 rounded space-x-2"
+                            :class="{
+                                'hover:bg-cyan-200': !configuration.readonly,
+                                'hover:bg-yellow-300': configuration.readonly,
+                            }"
                         >
                             <div class="">
                                 {{ instance.property }}
