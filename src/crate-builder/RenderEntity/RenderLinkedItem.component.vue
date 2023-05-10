@@ -163,12 +163,10 @@ let entity = computed(() => props.entity);
 let type = "unlink";
 
 function loadEntity(describoId) {
+    if (describoId === entity.describoId) return;
     data.loading = true;
     // console.debug("Renderer Linked Item Component : emit(load:entity)", props.entity.tgtEntityId);
     emit("load:entity", { describoId });
-    setTimeout(() => {
-        data.loading = false;
-    }, 500);
 }
 function editLocation() {
     data.editLocation = true;
