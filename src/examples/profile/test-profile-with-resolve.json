@@ -5,11 +5,10 @@
         "version": 0.1,
         "warnMissingProperty": true
     },
-    "resolve": {
-        "Relationship": ["source", "target"],
-        "Related": ["source", "target"],
-        "CreateAction": ["object", "participant", "agent"]
-    },
+    "resolve": [
+        { "types": ["Relationship", "Related"], "properties": ["source", "target"] },
+        { "types": ["CreateAction", "EditAction"], "properties": ["object", "participant"] }
+    ],
     "classes": {
         "Dataset": {
             "definition": "override",
