@@ -209,7 +209,15 @@ export class CrateManager {
         let profile = this.profile;
         if (!profile || !profile?.resolve) return;
 
-        const typesToResolve = Object.keys(profile.resolve);
+        let resolveConfiguration = profile.resolve;
+        const resolvers = {};
+        resolveConfiguration.forEach((c) => {
+            c.types.forEach((type) => {
+                resolvers[type] = c.properties;
+            });
+        });
+
+        const typesToResolve = Object.keys(resolvers);
         for (let entityProperty of entity.properties) {
             let tgtEntity = entityProperty.tgtEntity;
             const type = tgtEntity["@type"]?.split(",").map((t) => t.trim());
@@ -217,7 +225,7 @@ export class CrateManager {
 
             let associations = [];
             for (let type of specificTypesToResolve) {
-                const propertiesToResolve = profile.resolve[type];
+                const propertiesToResolve = resolvers[type];
                 let e = this.getEntity({
                     describoId: tgtEntity.describoId,
                 });
