@@ -205,7 +205,7 @@
 </template>
 
 <script setup>
-import { ElTabs, ElTabPane } from "element-plus";
+import { ElTabs, ElTabPane, ElDrawer } from "element-plus";
 import RenderEntityIdComponent from "./RenderEntityId.component.vue";
 import RenderEntityTypeComponent from "./RenderEntityType.component.vue";
 import RenderEntityNameComponent from "./RenderEntityName.component.vue";
