@@ -8,7 +8,8 @@
         <div class="w-1/3 xl:w-1/5 flex flex-col">
             <div>
                 <display-property-name-component
-                    :label="data.propertyDefinition.label ?? props.property"
+                    :property="props.property"
+                    :label="data.propertyDefinition.label"
                     class="inline-block"
                     :class="{ 'text-red-600': isRequired && !isValid }"
                 />

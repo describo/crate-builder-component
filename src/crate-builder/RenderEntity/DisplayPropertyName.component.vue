@@ -7,14 +7,19 @@ import startCase from "lodash-es/startCase";
 import { computed } from "vue";
 
 const props = defineProps({
-    label: { type: String, required: true },
+    property: { type: String },
+    label: { type: String },
 });
 const labelDisplay = computed(() => {
-    if (props?.label?.match(/:/)) {
-        let [namespace, label] = props.label.split(":");
+    // if we have a label then use it as is
+    if (props?.label) return props.label;
+
+    // otherwise sort out the property
+    if (props?.property?.match(/:/)) {
+        let [namespace, label] = props.property.split(":");
         return `${namespace}:${startCase(label)}`;
     } else {
-        return startCase(props.label);
+        return startCase(props.property);
     }
 });
 </script>
