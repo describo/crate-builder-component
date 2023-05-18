@@ -326,7 +326,7 @@ function init() {
         data.entity = { ...entity, ...layout.entity };
     } else if (layout.tabs) {
         data.entity = {};
-        data.tabs = cloneDeep(layout.tabs);
+        data.tabs = layout.tabs.filter((t) => t?.inputs?.length);
     }
     $emit("ready");
 }
@@ -370,12 +370,18 @@ function applyLayout({ layouts, hide = [], entity }) {
                     return {
                         ...tab,
                         entity: sectionEntity,
+                        inputs: Object.keys(sectionEntity.properties),
                     };
                 }
                 return tab;
             });
         } else {
-            tabs.push({ name: "...", description: "", entity: sectionEntity });
+            tabs.push({
+                name: "...",
+                description: "",
+                entity: sectionEntity,
+                inputs: Object.keys(sectionEntity.properties),
+            });
         }
     }
 
