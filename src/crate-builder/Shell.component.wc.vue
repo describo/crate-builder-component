@@ -12,6 +12,7 @@
             :enable-browse-entities="data.enableBrowseEntities"
             :enable-template-save="data.enableTemplateSave"
             :enable-reverse-link-browser="data.enableReverseLinkBrowser"
+            :purge-unlinked-entities="data.purgeUnlinkedEntities"
             @ready="ready"
             @error="error"
             @save:crate="saveCrate"
@@ -67,6 +68,7 @@ function init() {
         enableBrowseEntities: $this?.config?.enableBrowseEntities ?? true,
         enableTemplateSave: $this?.config?.enableTemplateSave ?? false,
         enableReverseLinkBrowser: $this?.config?.enableTemplateSave ?? true,
+        purgeUnlinkedEntities: $this?.config.purgeUnlinkedEntities ?? true,
         readonly: $this?.config?.readonly ?? false,
         webComponent: $this?.config?.webComponent ?? true,
         enableInternalRouting: $this?.config?.enableInternalRouting ?? false,

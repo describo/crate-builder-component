@@ -88,6 +88,11 @@ const props = defineProps({
         default: true,
         validator: (val) => [true, false].includes(val),
     },
+    purgeUnlinkedEntities: {
+        type: Boolean,
+        default: true,
+        validator: (val) => [true, false].includes(val),
+    },
     readonly: {
         type: Boolean,
         default: false,
@@ -235,6 +240,7 @@ function configure() {
         enableReverseLinkBrowser: props.enableReverseLinkBrowser,
         readonly: props.readonly,
         webComponent: props.webComponent,
+        purgeUnlinkedEntities: props.purgeUnlinkedEntities,
         enableTemplateLookups: false,
         enableDataPackLookups: false,
     };
@@ -298,7 +304,10 @@ function ready() {
 }
 async function saveCrate() {
     await new Promise((resolve) => setTimeout(resolve, 300));
-    const crate = data.crateManager.exportCrate();
+    if (props.purgeUnlinkedEntities) {
+        data.crateManager.__purgeUnlinkedEntities();
+    }
+    let crate = data.crateManager.exportCrate();
     $emit("save:crate", { crate });
 }
 async function saveCrateAsTemplate(template) {

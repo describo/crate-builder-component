@@ -219,7 +219,10 @@ Pass in the crate file and optionally a profile.
         :enable-browse-entities="true"
         :enable-template-save="true"
         :enable-internal-routing="true"
+        :enable-reverse-link-browser="true"
+        :purge-unlinked-entities="true"
         :readonly="false"
+        :webcomponent="false"
         @save:crate="saveCrate"
         @save:crate:template="saveTemplate"
         @save:entity:template="saveTemplate">
@@ -279,9 +282,11 @@ from there.**
     the component can't.
 -   `enableReverseLinkBrowser`: true : false: `(default: true)`: enable / disable the reverse link
     browser. If enabled, it can be shown as a right sidebar as required.
+-   `purgeUnlinkedEntities`: true : false: `(default: true)`: purge unlinked entities from the crate
+    before emitting the crate for saving
 -   `readonly`: true | false: `(default: false)` : if set to true all of the controls to edit that
     the data are turned off. The crate is set into a mode where it is readonly.
--   `webComponent`: true | false: `(default: true)` : Setting this to true alters the behaviour of
+-   `webComponent`: true | false: `(default: false)` : Setting this to true alters the behaviour of
     some components when the crate builder is used as a web component.
 
 ## Events

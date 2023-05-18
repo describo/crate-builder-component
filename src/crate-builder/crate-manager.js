@@ -364,12 +364,11 @@ export class CrateManager {
             });
         }
 
-        this.entities = this.entities.filter((entity) =>
-            linkedEntities.includes(entity.describoId)
-        );
-        this.properties = this.properties.filter((property) =>
-            linkedEntities.includes(property.srcEntityId)
-        );
+        this.em.entities.forEach((entity) => {
+            if (!linkedEntities.includes(entity.describoId)) {
+                this.em.delete({ srcEntityId: entity.describoId });
+            }
+        });
     }
 
     __rehydrateEntity({ describoId }) {
@@ -517,7 +516,7 @@ export class Entity {
 
         let properties = this.pm.get({ srcEntityId });
         properties?.forEach((p) => {
-            this.pm.delete({ srcEntityId, propertyId: p.propertyId });
+            if (p?.propertyId) this.pm.delete({ srcEntityId, propertyId: p.propertyId });
         });
 
         delete this.entitiesBy.atId[entity["@id"]];
@@ -731,17 +730,19 @@ export class Property {
         this.propertiesByEntityId[srcEntityId] = this.propertiesByEntityId[srcEntityId].filter(
             (idx) => {
                 const property = this.properties[idx];
-                if (property.propertyId !== propertyId) return idx;
-                if (property.tgtEntityId) {
-                    const tgtEntityId = property.tgtEntityId;
-                    this.propertiesByEntityId[tgtEntityId] = this.propertiesByEntityId[
-                        tgtEntityId
-                    ].filter((idx) => {
-                        const property = this.properties[idx];
-                        if (property.propertyId !== propertyId) return idx;
-                    });
+                if (property) {
+                    if (property.propertyId !== propertyId) return idx;
+                    if (property.tgtEntityId) {
+                        const tgtEntityId = property.tgtEntityId;
+                        this.propertiesByEntityId[tgtEntityId] = this.propertiesByEntityId[
+                            tgtEntityId
+                        ].filter((idx) => {
+                            const property = this.properties[idx];
+                            if (property.propertyId !== propertyId) return idx;
+                        });
+                    }
+                    delete this.properties[idx];
                 }
-                delete this.properties[idx];
             }
         );
         if (isEmpty(this.propertiesByEntityId[srcEntityId])) {
