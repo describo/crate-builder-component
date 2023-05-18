@@ -1,6 +1,4 @@
 import isArray from "lodash-es/isArray";
-import esb from "elastic-builder";
-
 const defaultFields = ["@id", "name"];
 
 export class lookup {
@@ -20,19 +18,7 @@ export class lookup {
             datapacks = [];
         }
 
-        let query = new esb.RequestBodySearch()
-            .from(0)
-            .size(10)
-            .query(
-                new esb.BoolQuery().must([
-                    esb.matchQuery("@type.keyword", type).operator("and"),
-                    esb.boolQuery().should(
-                        fields.map((field) => {
-                            return esb.matchQuery(field, queryString).operator("and");
-                        })
-                    ),
-                ])
-            );
+        let query = assembleQuery(type, fields, queryString);
         // console.log("***", JSON.stringify(query, null, 2));
         let { documents } = await this.lookup.dataPacks({
             type,
@@ -70,4 +56,48 @@ export function awaitTimeout(delay, reason) {
 
 export async function wrapPromise(promise, delay, reason = { reason: "Lookup Timeout" }) {
     return Promise.race([promise, awaitTimeout(delay, reason)]);
+}
+
+/**
+ *
+ * Why oh why are we doing this by hand?!
+ *
+ * Because we can't use the component in another application that uses vite due
+ *  to the mixed CJS and ESM import rubbish when we use elastic-builder... /sigh
+ */
+function assembleQuery(type, fields, queryString) {
+    let query = {
+        from: 0,
+        size: 10,
+        query: {
+            bool: {
+                must: [
+                    {
+                        match: {
+                            "@type.keyword": {
+                                query: type,
+                                operator: "and",
+                            },
+                        },
+                    },
+                ],
+            },
+        },
+    };
+
+    let shouldMatches = [];
+    fields.forEach((field) => {
+        shouldMatches.push({
+            match: {
+                [field]: { query: queryString, operator: "and" },
+            },
+        });
+    });
+
+    query.query.bool.must.push({
+        bool: {
+            should: shouldMatches,
+        },
+    });
+    return query;
 }
