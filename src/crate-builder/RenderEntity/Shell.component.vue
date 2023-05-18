@@ -176,7 +176,7 @@
         <!--show reverse links panel  -->
         <div
             v-if="props.configuration.enableReverseLinkBrowser && !data.reverseSidebarVisible"
-            class="p-2 h-12 rounded text-2xl bg-gray-200 text-blue-600"
+            class="p-2 h-12 rounded text-2xl bg-gray-200 text-blue-600 cursor-pointer"
             @click="data.reverseSidebarVisible = !data.reverseSidebarVisible"
         >
             <div v-show="!data.reverseSidebarVisible">
@@ -191,6 +191,7 @@
         <el-drawer
             v-model="data.reverseSidebarVisible"
             direction="rtl"
+            size="40%"
             @close="data.reverseSidebarVisible = false"
         >
             <template #default>

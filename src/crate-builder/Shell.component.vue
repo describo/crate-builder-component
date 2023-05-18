@@ -11,7 +11,7 @@
             :profile="data.profile"
             :entity="data.entity"
             :configuration="data.configuration"
-            @load:entity="data.debouncedSetCurrentEntity"
+            @load:entity="setCurrentEntity"
             @ready="ready"
             @save:crate="saveCrate"
             @save:crate:template="saveCrateAsTemplate"
@@ -114,6 +114,11 @@ const $emit = defineEmits([
     "save:crate:template",
 ]);
 
+if (props.enableInternalRouting) {
+    $router = useRouter();
+    $route = useRoute();
+}
+
 const data = reactive({
     ready: false,
     error: false,
@@ -121,8 +126,7 @@ const data = reactive({
     crate: {},
     profile: {},
     entity: {},
-    debouncedInit: debounce(init, 400),
-    debouncedSetCurrentEntity: debounce(setCurrentEntity, 500),
+    debouncedInit: debounce(init, 200),
     crateManager: {},
     profile: {},
     progress: {
@@ -135,15 +139,18 @@ let watchers = [];
 onBeforeMount(() => {
     $router?.replace({ query: "" });
     data.configuration = reactive(configure());
+});
+onMounted(async () => {
+    await init();
 
     if (props.enableInternalRouting) {
-        $router = useRouter();
-        $route = useRoute();
         watchers.push(
             watch(
                 () => $route?.query?.id,
                 (n, o) => {
-                    data.debouncedSetCurrentEntity({ describoId: $route?.query?.id });
+                    if (n && n !== o) {
+                        setCurrentEntity({ describoId: $route?.query?.id });
+                    }
                 }
             )
         );
@@ -153,7 +160,7 @@ onBeforeMount(() => {
             () => props.crate,
             () => {
                 data.ready = false;
-                data.debouncedInit();
+                init();
             }
         )
     );
@@ -172,13 +179,10 @@ onBeforeMount(() => {
         watch(
             () => props.entityId,
             (n) => {
-                data.debouncedSetCurrentEntity({ id: props.entityId });
+                data.setCurrentEntity({ id: props.entityId });
             }
         )
     );
-});
-onMounted(() => {
-    data.debouncedInit();
 });
 onBeforeUnmount(() => {
     watchers.forEach((unWatch) => unWatch());
@@ -186,7 +190,6 @@ onBeforeUnmount(() => {
 });
 
 async function init() {
-    updateRoute({ entity: {} });
     if (!props.crate || isEmpty(props.crate)) {
         data.crate = {};
         data.entity = {};
@@ -207,8 +210,10 @@ async function init() {
     data.crateManager = new CrateManager();
     data.crateManager.lookup = props.lookup;
     try {
-        if (crate["@graph"].length > 500) data.loading = true;
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        if (crate["@graph"].length > 500) {
+            data.loading = true;
+            await new Promise((resolve) => setTimeout(resolve, 100));
+        }
         await data.crateManager.load({ crate, profile, progress: data.progress });
     } catch (error) {
         console.log(error);
@@ -225,7 +230,7 @@ async function init() {
         setCurrentEntity({ id: props.entityId });
     } else {
         data.entity = {};
-        setCurrentEntity({ name: "RootDataset" });
+        setCurrentEntity({ describoId: "RootDataset" });
     }
 
     ready();
@@ -256,7 +261,12 @@ function configure() {
     return configuration;
 }
 async function setCurrentEntity({ describoId = undefined, name = undefined, id = undefined }) {
+    // return if nothing requested
     if (!describoId && !name && !id) return;
+
+    // return if we're already on that entity
+    if (describoId === data.entity.describoId) return;
+
     let entity = {};
     if (name === "RootDataset") {
         entity = data.crateManager.getEntity({

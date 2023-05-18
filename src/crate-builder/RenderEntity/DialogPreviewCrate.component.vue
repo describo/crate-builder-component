@@ -1,31 +1,12 @@
 <template>
-    <el-dialog
-        v-model="data.visible"
-        title="Manage Collection Entities"
-        width="95%"
-        top="5vh"
-        :before-close="close"
-        :show-close="false"
-    >
-        <template #header>
-            <div class="flex flex-row">
-                <div>Preview Crate</div>
-                <div class="flex-grow"></div>
-                <div>
-                    <el-button @click="close" type="primary">
-                        <i class="fas fa-times"></i>
-                    </el-button>
-                </div>
-            </div>
-        </template>
-        <div class="crate-preview overflow-scroll text-sm">
-            <pre>{{ data.crate }}</pre>
-        </div>
-    </el-dialog>
+    <div class="text-sm">
+        <pre v-if="data.crate['@graph']">{{ data.crate }}</pre>
+        <div v-else>loading...</div>
+    </div>
 </template>
 
 <script setup>
-import { ElButton, ElDialog } from "element-plus";
+import { vLoading } from "element-plus";
 import { reactive, onMounted, onBeforeUnmount } from "vue";
 
 const props = defineProps({
@@ -36,23 +17,16 @@ const props = defineProps({
 });
 const emit = defineEmits(["close"]);
 const data = reactive({
-    crate: props.crateManager.exportCrate({}),
-    visible: false,
+    crate: {},
+    loading: false,
 });
-onMounted(() => {
-    data.visible = true;
+onMounted(async () => {
+    data.loading = true;
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    data.crate = props.crateManager.exportCrate({});
+    data.loading = false;
 });
 onBeforeUnmount(() => {
     data.visible = false;
 });
-
-function close() {
-    emit("close");
-}
 </script>
-
-<style scoped>
-.crate-preview {
-    height: 70vh;
-}
-</style>

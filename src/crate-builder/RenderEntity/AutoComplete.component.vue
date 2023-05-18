@@ -48,12 +48,10 @@
 <script setup>
 import { ElButton, ElSelect, ElOption, ElOptionGroup, vLoading } from "element-plus";
 import { reactive, watch, inject } from "vue";
-import isArray from "lodash-es/isArray";
 import debounce from "lodash-es/debounce";
-
-import { Query, BoolQuery } from "@coedl/elastic-query-builder";
-import { matchQuery } from "@coedl/elastic-query-builder/queries";
 const configuration = inject("configuration");
+
+import { lookup as esbLookup, wrapPromise } from "./auto-complete.lib";
 
 const props = defineProps({
     crateManager: {
@@ -100,6 +98,11 @@ async function querySearch(queryString) {
     console.debug(`Query Search: '${queryString}'`);
     data.loading = true;
 
+    const lookup = new esbLookup({
+        config: props.crateManager.profile?.lookup,
+        lookup: props.crateManager.lookup,
+    });
+
     // construct a definition for a new entity
     let newEntity = [
         {
@@ -126,7 +129,7 @@ async function querySearch(queryString) {
         ];
         lookupMapping.internal = 0;
     }
-    if (props.crateManager.lookup) {
+    if (props.crateManager.lookup.dataPacks) {
         lookups = [
             ...lookups,
 
@@ -138,7 +141,7 @@ async function querySearch(queryString) {
                 }),
                 data.promiseTimeout
             ),
-            wrapPromise(lookup({ queryString }), data.promiseTimeout, {
+            wrapPromise(lookup.entitiesByType(props.type, queryString), data.promiseTimeout, {
                 reason: "External Lookup Timeout",
             }),
         ];
@@ -147,7 +150,7 @@ async function querySearch(queryString) {
     }
     if (["Organisation", "Organization"].includes(props.type)) {
         lookups.push(
-            wrapPromise(lookupROR({ queryString }), data.promiseTimeout, {
+            wrapPromise(lookup.ror(queryString), data.promiseTimeout, {
                 reason: "ROR Lookup Timeout",
             })
         );
@@ -182,7 +185,7 @@ async function querySearch(queryString) {
             });
         } else if (key === "external" && results?.length) {
             matches.push({
-                label: "Associate an entity from a data pack",
+                label: "Associate an entity from a data source",
                 entities: results.map((entity) => ({ ...entity, type: "datapack" })),
             });
         }
@@ -204,61 +207,5 @@ function handleSelect(entity) {
             $emit("create:entity", { json: entity });
         }
     }
-}
-
-async function lookup({ queryString }) {
-    let documents = [];
-    if (!configuration.enableDataPackLookups) return documents;
-    if (!props.crateManager?.profile?.lookup) return documents;
-
-    let type = isArray(props.type) ? props.type.join(", ") : props.type;
-    if (!type || !props.crateManager?.profile?.lookup?.[type]) return documents;
-
-    let { fields, datapack } = props.crateManager?.profile?.lookup?.[type];
-    let query = new Query({ size: 10 });
-    query.append(
-        new BoolQuery().must([
-            matchQuery({ field: "@type.keyword", value: type }),
-            new BoolQuery().should(
-                fields.map((field) => matchQuery({ field, value: queryString }))
-            ),
-        ])
-    );
-    ({ documents } = await props.crateManager?.lookup?.dataPacks({
-        type: props.type,
-        elasticQuery: query,
-        fields,
-        datapack,
-        queryString,
-        limit: 10,
-    }));
-    return documents;
-}
-
-async function lookupROR({ queryString }) {
-    const api = "https://api.ror.org/organizations";
-    let response = await fetch(`${api}?query.advanced=${queryString}`);
-    if (response.status === 200) {
-        response = await response.json();
-        response = response.items.slice(0, 10).map((item) => {
-            return {
-                "@id": item.id,
-                "@type": "Organization",
-                name: item.name,
-            };
-        });
-        return response;
-    }
-    return [];
-}
-
-function awaitTimeout(delay, reason) {
-    return new Promise((resolve, reject) =>
-        setTimeout(() => (reason === undefined ? resolve() : resolve(reason)), delay)
-    );
-}
-
-async function wrapPromise(promise, delay, reason = { reason: "Lookup Timeout" }) {
-    return Promise.race([promise, awaitTimeout(delay, reason)]);
 }
 </script>

@@ -1,11 +1,13 @@
 <template>
-    <div :id="props.entity.describoId" class="map-style"></div>
+    <div :id="mapId" class="map-style"></div>
 </template>
 
 <script setup>
 import "leaflet/dist/leaflet.css";
 import * as Leaflet from "leaflet/dist/leaflet-src.esm.js";
 import groupBy from "lodash-es/groupBy";
+import cuid2 from "../lib/cuid2";
+const createId = cuid2.init({ length: 32 });
 import { reactive, onMounted, onBeforeUnmount } from "vue";
 
 const props = defineProps({
@@ -29,10 +31,11 @@ onBeforeUnmount(() => {
     data.map.off();
     data.map.remove();
 });
+const mapId = createId();
 
 async function init() {
     const entity = props.crateManager.getEntity({ describoId: props.entity.describoId });
-    data.map = new Leaflet.map(props.entity.describoId);
+    data.map = new Leaflet.map(mapId);
 
     // we need to give leaflet and vue and the dom a couple seconds before barreling on
     await new Promise((resolve) => setTimeout(resolve, 200));

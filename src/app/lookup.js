@@ -31,7 +31,7 @@ export class Lookup {
         type = undefined,
         queryString = undefined,
         fields = undefined,
-        datapack = undefined,
+        datapacks = undefined,
         limit = 10,
     }) {
         if (elasticQuery) {

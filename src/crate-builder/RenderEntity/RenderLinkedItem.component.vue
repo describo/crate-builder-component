@@ -92,11 +92,11 @@
             <div class="flex flex-row" v-if="!data.editLocation">
                 <div class="flex flex-col">
                     <div class="bg-blue-200 p-2 cursor-pointer">
-                        {{ data.entity.tgtEntity.name }}
+                        {{ props.entity.tgtEntity.name }}
                     </div>
                     <map-component
                         :crate-manager="props.crateManager"
-                        :entity="data.entity.tgtEntity"
+                        :entity="props.entity.tgtEntity"
                     />
                 </div>
                 <div
@@ -108,22 +108,7 @@
                         :property="props.entity"
                         @delete:property="deleteProperty"
                     />
-                    <div>
-                        <el-button type="primary" @click="editLocation" class="inline-block">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </el-button>
-                    </div>
                 </div>
-            </div>
-            <div v-if="data.editLocation">
-                <geo-component
-                    class="bg-blue-200"
-                    :crate-manager="props.crateManager"
-                    :property="data.entity.property"
-                    :entity="data.entity.tgtEntity"
-                    mode="feature"
-                    @save:property="saveProperty"
-                />
             </div>
         </div>
     </div>
@@ -155,10 +140,10 @@ const props = defineProps({
 });
 const data = reactive({
     loading: false,
-    editLocation: false,
-    resolvedEntities: [],
 });
-let showMap = computed(() => (data.entity?.tgtEntity?.["@type"]?.match(/Geo/) ? true : false));
+let showMap = computed(() => {
+    return props.entity?.tgtEntity?.["@type"]?.match(/Geo/) ? true : false;
+});
 let entity = computed(() => props.entity);
 let type = "unlink";
 
@@ -167,15 +152,6 @@ function loadEntity(describoId) {
     data.loading = true;
     // console.debug("Renderer Linked Item Component : emit(load:entity)", props.entity.tgtEntityId);
     emit("load:entity", { describoId });
-}
-function editLocation() {
-    data.editLocation = true;
-}
-function saveProperty(property) {
-    // console.debug("Renderer Linked Item Component : emit(save:property)", property);
-    emit("save:property", property);
-    data.editLocation = false;
-    // console.debug("data.editLocation", data.editLocation);
 }
 function deleteProperty(target) {
     data.loading = true;

@@ -1,11 +1,5 @@
 <template>
-    <div class="flex flex-col space-y-2">
-        <div class="flex flex-row space-x-2">
-            <div>
-                <el-button @click="close" type="primary"><i class="fas fa-times"></i></el-button>
-            </div>
-            <div class="pt-1">Add a property to this entity</div>
-        </div>
+    <div class="flex flex-col space-y-4">
         <div>
             <el-input
                 v-model="data.filter"
@@ -13,27 +7,21 @@
                 clearable
             ></el-input>
         </div>
-        <div class="flex flex-row space-x-2">
-            <div class="flex-grow">
-                <div class="h-48 overflow-scroll border p-4 bg-white flex flex-col space-y-1">
-                    <div
-                        v-for="(item, idx) in inputs"
-                        :key="idx"
-                        class="cursor-pointer p-1 hover:bg-gray-100"
-                        @click="handlePropertySelection(item)"
-                    >
-                        <div class="flex flex-row">
-                            <div class="w-64 text-gray-600" v-if="item.label">
-                                {{ item.label }}
-                            </div>
-                            <div class="w-64 text-gray-600" v-else>
-                                {{ item.name }}
-                            </div>
-                            <div class="text-gray-500 w-full">
-                                {{ item.help }}
-                            </div>
-                        </div>
-                    </div>
+        <div
+            v-for="(item, idx) in inputs"
+            :key="idx"
+            class="cursor-pointer p-1 hover:bg-blue-100 hover:rounded active:bg-blue-400"
+            @click="handlePropertySelection(item)"
+        >
+            <div class="flex flex-col text-black">
+                <div v-if="item.label">
+                    {{ item.label }}
+                </div>
+                <div v-else class="text-black">
+                    {{ item.name }}
+                </div>
+                <div class="text-gray-600 w-full">
+                    {{ item.help }}
                 </div>
             </div>
         </div>
@@ -77,10 +65,6 @@ let inputs = computed(() => {
     });
 });
 
-function close() {
-    data.selectedProperty = undefined;
-    emit("close");
-}
 function handlePropertySelection(item) {
     emit("add:property:placeholder", { property: item.name });
 }

@@ -100,27 +100,51 @@
             </div>
             <!-- /navbar: controls -->
         </div>
-        <add-property-dialog
-            class="bg-indigo-200 p-6 rounded"
-            v-if="data.dialog.addProperty"
-            :crate-manager="props.crateManager"
-            :entity="props.entity"
+        <el-drawer
+            v-model="data.dialog.addProperty"
+            direction="ltr"
+            :destroy-on-close="true"
+            size="50%"
             @close="data.dialog.addProperty = false"
-            @add:property:placeholder="addPropertyPlaceholder"
-        />
-        <edit-context-dialog
-            class="bg-indigo-200 p-6 rounded"
-            v-if="data.dialog.editContext"
-            :crate-manager="props.crateManager"
+        >
+            <template #header> <div>Add properties to this entity</div></template>
+            <template #default>
+                <add-property-dialog
+                    :crate-manager="props.crateManager"
+                    :entity="props.entity"
+                    @add:property:placeholder="addPropertyPlaceholder"
+                />
+            </template>
+        </el-drawer>
+
+        <el-drawer
+            v-model="data.dialog.editContext"
+            direction="ltr"
+            size="70%"
             @close="data.dialog.editContext = false"
-            @update:context="updateContext"
-        />
-        <preview-crate-dialog
-            class="bg-indigo-200 p-6 rounded"
-            v-if="data.dialog.previewCrate"
-            :crate-manager="props.crateManager"
+        >
+            <template #header> <div>Edit Context</div></template>
+            <template #default>
+                <edit-context-dialog
+                    :crate-manager="props.crateManager"
+                    @update:context="updateContext"
+                />
+            </template>
+        </el-drawer>
+
+        <el-drawer
+            v-model="data.dialog.previewCrate"
+            direction="ltr"
+            :destroy-on-close="true"
+            size="60%"
             @close="data.dialog.previewCrate = false"
-        />
+        >
+            <template #header> <div>Preview Crate</div></template>
+            <template #default>
+                <preview-crate-dialog :crate-manager="props.crateManager" />
+            </template>
+        </el-drawer>
+
         <save-crate-as-template-dialog
             class="bg-indigo-200 p-6 rounded"
             v-if="data.dialog.saveCrateAsTemplate"

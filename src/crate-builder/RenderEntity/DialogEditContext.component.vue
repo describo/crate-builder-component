@@ -1,24 +1,17 @@
 <template>
     <div class="flex flex-col space-y-2">
         <div class="flex flex-row space-x-1">
-            <div>Edit the context of this crate</div>
-            <div class="flex-grow"></div>
             <div>
                 <el-button @click="save" type="primary">
                     <i class="fa-solid fa-floppy-disk"></i>
                     &nbsp;save
                 </el-button>
             </div>
-            <div>
-                <el-button @click="close" type="primary"><i class="fas fa-times"></i></el-button>
-            </div>
         </div>
         <div class="text-sm text-red-600" v-if="data.error">
             The context is not a valid JSON data structure.
         </div>
-        <div class="">
-            <div ref="codemirror" class="cm-editor"></div>
-        </div>
+        <div ref="codemirror" class=""></div>
     </div>
 </template>
 
@@ -62,9 +55,6 @@ function setupCodeMirror() {
         state: initialState,
         parent: codemirror.value,
     });
-}
-function close() {
-    emit("close");
 }
 function save() {
     try {
