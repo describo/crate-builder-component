@@ -37,6 +37,7 @@ const data = reactive({
         ScholarlyArticle: "fa-scroll",
         Script: "fa-code",
         SoftwareApplication: "fa-code",
+        URL: "fa-link",
         Workflow: "fa-project-diagram",
         WorkflowSketch: "fa-project-diagram",
     },
