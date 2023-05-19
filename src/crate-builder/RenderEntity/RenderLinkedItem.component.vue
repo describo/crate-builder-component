@@ -26,8 +26,9 @@
                             v-if="entity.tgtEntity['@type']"
                         />
                         <div>{{ entity.tgtEntity["@type"] }}</div>
+                        <div class="text-sm">({{ entity.tgtEntity["@id"] }})</div>
                     </div>
-                    <div class="text-base">
+                    <div class="text-base mt-2">
                         <span v-if="entity.tgtEntity.name">{{ entity.tgtEntity.name }}</span>
                         <span v-else>{{ entity.tgtEntity["@id"] }}</span>
                     </div>
