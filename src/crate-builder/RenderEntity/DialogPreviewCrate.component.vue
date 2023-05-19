@@ -6,7 +6,6 @@
 </template>
 
 <script setup>
-import { vLoading } from "element-plus";
 import { reactive, onMounted, onBeforeUnmount } from "vue";
 
 const props = defineProps({

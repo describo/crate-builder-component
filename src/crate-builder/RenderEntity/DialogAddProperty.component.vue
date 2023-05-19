@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import { ElButton, ElInput } from "element-plus";
+import { ElInput } from "element-plus";
 import { reactive, computed, watch } from "vue";
 import { ProfileManager } from "../profile-manager";
 
