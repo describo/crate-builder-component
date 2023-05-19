@@ -34,13 +34,7 @@ export class lookup {
     async entities(type, queryString) {
         if (!queryString) return;
         type = isArray(type) ? type.join(", ") : type;
-        let fields, datapacks;
-        try {
-            ({ fields, datapacks } = this.config?.[type]);
-        } catch (error) {
-            fields = defaultFields;
-            datapacks = [];
-        }
+        let fields = defaultFields;
 
         let query = assembleQuery(type, fields, queryString);
         // console.log("***", JSON.stringify(query, null, 2));
@@ -48,7 +42,6 @@ export class lookup {
             type,
             elasticQuery: query,
             fields,
-            datapacks,
             queryString,
             limit: 10,
         });
