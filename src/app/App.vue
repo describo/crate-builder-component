@@ -1,5 +1,5 @@
 <template>
-    <el-tabs v-model="data.activeTab" class="p-4">
+    <el-tabs v-model="data.activeTab" class="p-2">
         <el-tab-pane label="Embedded Component" name="component">
             <EmbeddedComponent v-if="data.activeTab === 'component'" />
         </el-tab-pane>
