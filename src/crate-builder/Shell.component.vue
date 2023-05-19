@@ -30,7 +30,14 @@
 <script setup>
 import { ElProgress } from "element-plus";
 import RenderEntityComponent from "./RenderEntity/Shell.component.vue";
-import { onMounted, onBeforeMount, onBeforeUnmount, reactive, watch } from "vue";
+import {
+    onMounted,
+    onBeforeMount,
+    onBeforeUnmount,
+    reactive,
+    watch,
+    getCurrentInstance,
+} from "vue";
 import cloneDeep from "lodash-es/cloneDeep";
 import isEmpty from "lodash-es/isEmpty";
 import isFunction from "lodash-es/isFunction";
@@ -115,8 +122,10 @@ const $emit = defineEmits([
 ]);
 
 if (props.enableInternalRouting) {
-    $router = useRouter();
-    $route = useRoute();
+    if (getCurrentInstance().appContext.config.globalProperties.$router) {
+        $router = useRouter();
+        $route = useRoute();
+    }
 }
 
 const data = reactive({
