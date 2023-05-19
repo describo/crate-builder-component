@@ -36,6 +36,7 @@
         "@codemirror/state": "^6.2.0",
         "@codemirror/theme-one-dark": "^6.1.2",
         "@describo/data-packs": "^0.10.0",
+        "@elastic/elasticsearch": "^8.7.0",
         "@element-plus/theme-chalk": "^2.2.16",
         "@fortawesome/fontawesome-free": "^6.4.0",
         "@fortawesome/fontawesome-svg-core": "^6.4.0",
