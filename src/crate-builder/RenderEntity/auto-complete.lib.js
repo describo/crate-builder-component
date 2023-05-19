@@ -7,7 +7,7 @@ export class lookup {
         this.lookup = lookup;
     }
 
-    async entitiesByType(type, queryString) {
+    async datapacks(type, queryString) {
         if (!queryString) return;
         type = isArray(type) ? type.join(", ") : type;
         let fields, datapacks;
@@ -28,7 +28,31 @@ export class lookup {
             queryString,
             limit: 10,
         });
-        return documents ?? [];
+        return stringifyDocumentType(documents) ?? [];
+    }
+
+    async entities(type, queryString) {
+        if (!queryString) return;
+        type = isArray(type) ? type.join(", ") : type;
+        let fields, datapacks;
+        try {
+            ({ fields, datapacks } = this.config?.[type]);
+        } catch (error) {
+            fields = defaultFields;
+            datapacks = [];
+        }
+
+        let query = assembleQuery(type, fields, queryString);
+        // console.log("***", JSON.stringify(query, null, 2));
+        let { documents } = await this.lookup?.entities({
+            type,
+            elasticQuery: query,
+            fields,
+            datapacks,
+            queryString,
+            limit: 10,
+        });
+        return stringifyDocumentType(documents) ?? [];
     }
 
     async ror(queryString) {
@@ -100,4 +124,13 @@ function assembleQuery(type, fields, queryString) {
         },
     });
     return query;
+}
+
+function stringifyDocumentType(documents) {
+    return documents.map((d) => {
+        if (isArray(d["@type"])) {
+            d["@type"] = d["@type"].join(", ");
+        }
+        return d;
+    });
 }

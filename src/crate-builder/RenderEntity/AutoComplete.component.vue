@@ -141,12 +141,16 @@ async function querySearch(queryString) {
                 }),
                 data.promiseTimeout
             ),
-            wrapPromise(lookup.entitiesByType(props.type, queryString), data.promiseTimeout, {
+            wrapPromise(lookup.entities(props.type, queryString), data.promiseTimeout, {
+                reason: "External Lookup Timeout",
+            }),
+            wrapPromise(lookup.datapacks(props.type, queryString), data.promiseTimeout, {
                 reason: "External Lookup Timeout",
             }),
         ];
         lookupMapping.templates = 1;
-        lookupMapping.external = 2;
+        lookupMapping.entities = 2;
+        lookupMapping.datapacks = 3;
     }
     if (["Organisation", "Organization"].includes(props.type)) {
         lookups.push(
@@ -183,9 +187,14 @@ async function querySearch(queryString) {
                 label: "Associate an Organization defined in the Research Organization Registry",
                 entities: results.map((entity) => ({ ...entity, type: "ror" })),
             });
-        } else if (key === "external" && results?.length) {
+        } else if (key === "entities" && results?.length) {
             matches.push({
-                label: "Associate an entity from a data source",
+                label: "Associate a user created entity",
+                entities: results.map((entity) => ({ ...entity, type: "datapack" })),
+            });
+        } else if (key === "datapacks" && results?.length) {
+            matches.push({
+                label: "Associate a verified entity from a datapack",
                 entities: results.map((entity) => ({ ...entity, type: "datapack" })),
             });
         }
