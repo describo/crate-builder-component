@@ -248,8 +248,8 @@ the component.
 The properties are NOT reactive. If you change them in the outer application they will not update
 inside the component.
 
--   `lookup`: Pass in an instance of a class the component can use to lookup entity templates or
-    datapacks. The signature of the class must be:
+-   `lookup`: Pass in an instance of a class the component can use to lookup entity templates,
+    datapacks or entities. The signature of the class must be:
 
 ```JS
 export class Lookup {
@@ -260,9 +260,25 @@ export class Lookup {
     }
     dataPacks({ query, fields, datapack, queryString}) {
         // code to lookup data in a datapack somehow
+    },
+    entities({ query, fields, datapack, queryString}) {
+        // code to lookup entities somehow
     }
 }
 ```
+
+> What is the difference between datapack lookups and entity lookups?
+>
+> A datapack is a bundle of JSON-LD data that has typically been curated by a specialist who has
+> expertise in that area. Consider a datapack of countries. The data in the pack is likely to be
+> correct as it has not been user generated.
+>
+> On the other hand, entity lookups support lookups to repositories where user generated metadata
+> has been deposited. In this case, if a user creates an entry for a country, their 'version' of the
+> country would overwrite the datapack version if they are both stored in the same index.
+>
+> By separating these two lookups the application providing the lookups can route the queries to the
+> different indexes based on the type of query being requested.
 
 **See [./src/app/lookup.js](./src/app/lookup.js) for an example. In fact, you probably want to start
 from there.**
