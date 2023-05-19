@@ -7,7 +7,7 @@ export class lookup {
         this.lookup = lookup;
     }
 
-    async datapacks(type, queryString) {
+    async dataPacks(type, queryString) {
         if (!queryString) return;
         type = isArray(type) ? type.join(", ") : type;
         let fields, datapacks;
@@ -53,6 +53,14 @@ export class lookup {
             limit: 10,
         });
         return stringifyDocumentType(documents) ?? [];
+    }
+
+    async entityTemplates(type, queryString, limit = 5) {
+        this.lookup.entityTemplates({
+            type,
+            filter: queryString,
+            limit,
+        });
     }
 
     async ror(queryString) {

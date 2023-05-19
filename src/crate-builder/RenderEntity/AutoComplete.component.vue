@@ -116,6 +116,8 @@ async function querySearch(queryString) {
     // lookup entities in the crate (internal), in templates, and in datapacks (lookups)
     const lookupMapping = {};
     let lookups = [];
+
+    // wire up handler to find matching entities in the crate
     if (props.crateManager.findMatchingEntities) {
         lookups = [
             wrapPromise(
@@ -129,29 +131,39 @@ async function querySearch(queryString) {
         ];
         lookupMapping.internal = 0;
     }
-    if (props.crateManager.lookup.dataPacks) {
-        lookups = [
-            ...lookups,
 
-            wrapPromise(
-                props.crateManager?.lookup?.entityTemplates({
-                    type: props.type,
-                    filter: queryString,
-                    limit: 5,
-                }),
-                data.promiseTimeout
-            ),
+    // wire up handler to lookup datapacks externally
+    if (props.crateManager.lookup.dataPacks) {
+        lookups.push(
+            wrapPromise(lookup.dataPacks(props.type, queryString), data.promiseTimeout, {
+                reason: "External Lookup Timeout",
+            })
+        );
+        lookupMapping.datapacks = lookups.length - 1;
+    }
+
+    // wire up handler to lookup entityTemplates externally
+    if (props.crateManager.lookup.entityTemplates) {
+        lookups.push(
+            wrapPromise(lookup.entityTemplates(props.type, queryString), data.promiseTimeout, {
+                reason: "External Lookup Timeout",
+            })
+        );
+        lookupMapping.templates = lookups.length - 1;
+    }
+
+    // wire up handler to lookup entities externally
+    if (props.crateManager.lookup.entities) {
+        lookups.push(
             wrapPromise(lookup.entities(props.type, queryString), data.promiseTimeout, {
                 reason: "External Lookup Timeout",
-            }),
-            wrapPromise(lookup.datapacks(props.type, queryString), data.promiseTimeout, {
-                reason: "External Lookup Timeout",
-            }),
-        ];
-        lookupMapping.templates = 1;
-        lookupMapping.entities = 2;
-        lookupMapping.datapacks = 3;
+            })
+        );
+
+        lookupMapping.entities = lookups.length - 1;
     }
+
+    // wire up handler lookup organisations in ROR
     if (["Organisation", "Organization"].includes(props.type)) {
         lookups.push(
             wrapPromise(lookup.ror(queryString), data.promiseTimeout, {
