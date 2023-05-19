@@ -188,7 +188,7 @@ onMounted(async () => {
         watch(
             () => props.entityId,
             (n) => {
-                data.setCurrentEntity({ id: props.entityId });
+                setCurrentEntity({ id: props.entityId });
             }
         )
     );
