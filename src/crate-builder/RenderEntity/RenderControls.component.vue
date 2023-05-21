@@ -181,7 +181,7 @@
 </template>
 
 <script setup>
-import { ElDrawer, ElButton } from "element-plus";
+import { ElDrawer, ElPopconfirm, ElButton } from "element-plus";
 import AddPropertyDialog from "./DialogAddProperty.component.vue";
 import SaveCrateAsTemplateDialog from "./DialogSaveCrateAsTemplate.component.vue";
 import EditContextDialog from "./DialogEditContext.component.vue";
