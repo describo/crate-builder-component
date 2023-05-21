@@ -116,8 +116,7 @@
 </template>
 
 <script setup>
-import { ElButton, vLoading } from "element-plus";
-import GeoComponent from "../primitives/Geo.component.vue";
+import { vLoading } from "element-plus";
 import TypeIconComponent from "./TypeIcon.component.vue";
 import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import MapComponent from "../primitives/Map.component.vue";
@@ -126,10 +125,6 @@ const configuration = inject("configuration");
 
 const emit = defineEmits(["load:entity", "create:property", "save:property", "delete:property"]);
 const props = defineProps({
-    index: {
-        type: Number,
-        required: true,
-    },
     crateManager: {
         type: Object,
         required: true,
