@@ -192,6 +192,7 @@
             v-model="data.reverseSidebarVisible"
             direction="rtl"
             size="40%"
+            destroy-on-close
             @close="data.reverseSidebarVisible = false"
         >
             <template #default>

@@ -29,7 +29,7 @@
 <script setup>
 import { ElPagination, ElInput } from "element-plus";
 import RenderReverseItemLinkComponent from "./RenderReverseItemLink.component.vue";
-import { computed, reactive } from "vue";
+import { computed, reactive, onMounted } from "vue";
 import isPlainObject from "lodash-es/isPlainObject";
 
 const props = defineProps({
@@ -49,11 +49,21 @@ const data = reactive({
     currentPage: 1,
     total: 0,
     query: "",
+    entities: [],
 });
 const $emit = defineEmits(["load:entity"]);
 
+onMounted(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await resolveConnections();
+});
+
 let connections = computed(() => {
     let offset = (data.currentPage - 1) * data.pageSize;
+    return data.entities.slice(offset, offset + data.pageSize);
+});
+
+async function resolveConnections() {
     if (isPlainObject(props.connections)) {
         let sources = {};
         for (let property of Object.keys(props.connections)) {
@@ -89,12 +99,15 @@ let connections = computed(() => {
         }
         data.visible = entities.length > 0;
         data.total = entities.length;
-        return entities.slice(offset, offset + data.pageSize);
+        data.entities = entities;
     }
-});
+}
 
 function loadEntity(data) {
     $emit("load:entity", data);
+    setTimeout(() => {
+        resolveConnections();
+    }, 1000);
 }
 
 function changePage(page) {
