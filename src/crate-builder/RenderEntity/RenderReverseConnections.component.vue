@@ -43,7 +43,6 @@ const props = defineProps({
 });
 const data = reactive({
     visible: false,
-    collapse: false,
     filterInputModel: "",
     pageSize: 10,
     currentPage: 1,
@@ -60,7 +59,15 @@ onMounted(async () => {
 
 let connections = computed(() => {
     let offset = (data.currentPage - 1) * data.pageSize;
-    return data.entities.slice(offset, offset + data.pageSize);
+    const re = new RegExp(data.query, "i");
+    let entities = data.entities.filter((entity) => {
+        if (entity["@id"].match(re) || entity["@type"].match(re) || entity.name.match(re)) {
+            return entity;
+        }
+    });
+
+    data.total = entities.length;
+    return entities.slice(offset, offset + data.pageSize);
 });
 
 async function resolveConnections() {
