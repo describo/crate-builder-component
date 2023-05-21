@@ -152,14 +152,23 @@
             @close="data.dialog.saveCrateAsTemplate = false"
             @save:crate:template="saveCrateAsTemplate"
         />
-        <browse-entities-dialog
-            class="bg-indigo-200 p-6 rounded"
-            v-if="data.dialog.browseEntities"
-            :crate-manager="props.crateManager"
+
+        <el-drawer
+            v-model="data.dialog.browseEntities"
+            direction="ltr"
+            :destroy-on-close="true"
+            size="60%"
             @close="data.dialog.browseEntities = false"
-            @load:entity="loadEntity"
-            @delete:entity="deleteEntity"
-        />
+        >
+            <template #header> <div>Browse entities</div></template>
+            <template #default>
+                <browse-entities-dialog
+                    :crate-manager="props.crateManager"
+                    @load:entity="loadEntity"
+                    @delete:entity="deleteEntity"
+                />
+            </template>
+        </el-drawer>
     </div>
 </template>
 
