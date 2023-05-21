@@ -85,17 +85,25 @@
                 </div>
                 <div v-if="!isRootDataset">
                     <!-- delete entity -->
-                    <el-button @click="deleteEntity" type="danger">
-                        <div class="inline-block">
-                            <i class="fas fa-trash"></i>
-                        </div>
-                        <div
-                            class="inline-block ml-1 xl:inline-block xl:ml-1"
-                            :class="{ hidden: entity.etype === 'File' }"
-                        >
-                            Delete Entity
-                        </div>
-                    </el-button>
+                    <el-popconfirm
+                        title="Are you sure you want to delete this entity?"
+                        @confirm="deleteEntity"
+                        width="400px"
+                    >
+                        <template #reference>
+                            <el-button type="danger">
+                                <div class="inline-block">
+                                    <i class="fas fa-trash"></i>
+                                </div>
+                                <div
+                                    class="inline-block ml-1 xl:inline-block xl:ml-1"
+                                    :class="{ hidden: entity.etype === 'File' }"
+                                >
+                                    Delete Entity
+                                </div>
+                            </el-button>
+                        </template>
+                    </el-popconfirm>
                 </div>
             </div>
             <!-- /navbar: controls -->
