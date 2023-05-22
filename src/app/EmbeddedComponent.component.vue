@@ -34,6 +34,14 @@
             :profile="data.selectedProfile"
             :lookup="lookup"
             :readonly="false"
+            :enable-context-editor="true"
+            :enable-crate-preview="true"
+            :enable-browse-entities="true"
+            :enable-template-save="true"
+            :enable-internal-routing="true"
+            :enable-reverse-link-browser="true"
+            :purge-unlinked-entities="true"
+            :webcomponent="false"
         />
     </div>
 </template>
