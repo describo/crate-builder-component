@@ -747,9 +747,7 @@ export class Property {
                     if (isEmpty(this.propertiesByEntityId[tgtEntityId])) {
                         delete this.propertiesByEntityId[tgtEntityId];
                     }
-                    delete this.lookup[srcEntityId][property.property][tgtEntityId];
-                } else {
-                    delete this.lookup[srcEntityId][property.property][value];
+                    delete this.lookup[srcEntityId]?.[property?.property]?.[tgtEntityId];
                 }
                 delete this.properties[idx];
             }
