@@ -5,8 +5,8 @@
                 class="w-full"
                 type="text"
                 v-model="data.internalValue"
-                @blur="save"
-                @change="save"
+                @blur="data.throttledSave"
+                @change="data.throttledSave"
                 resize="vertical"
             ></el-input>
             <el-button @click="save" type="success" :disabled="!data.isValidUrl">
@@ -24,6 +24,8 @@
 import { ElButton, ElInput } from "element-plus";
 import { reactive, watch } from "vue";
 import { isURL } from "../crate-manager.js";
+import throttle from "lodash-es/throttle.js";
+
 const props = defineProps({
     property: {
         type: String,
@@ -37,6 +39,7 @@ const $emit = defineEmits(["create:entity"]);
 const data = reactive({
     internalValue: props.value,
     isValidUrl: props.value ? isURL(props.value) : true,
+    throttledSave: throttle(save, 1000),
 });
 
 watch(

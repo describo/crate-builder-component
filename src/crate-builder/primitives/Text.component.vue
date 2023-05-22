@@ -5,8 +5,8 @@
                 class="w-full"
                 :type="type"
                 v-model="data.internalValue"
-                @blur="save"
-                @change="save"
+                @blur="data.throttledSave"
+                @change="data.throttledSave"
                 resize="vertical"
                 :rows="5"
                 :placeholder="props.placeholder"
@@ -25,6 +25,7 @@
 <script setup>
 import { ElInput, ElButton } from "element-plus";
 import { reactive, watch } from "vue";
+import throttle from "lodash-es/throttle.js";
 
 const props = defineProps({
     type: {
@@ -52,6 +53,7 @@ const data = reactive({
     internalValue: props.value,
     currentValue: props.value,
     isValidType: ["text", "textarea"].includes(props.type),
+    throttledSave: throttle(save, 1000),
 });
 watch(
     () => props.value,

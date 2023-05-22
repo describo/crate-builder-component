@@ -4,8 +4,8 @@
             class="w-full"
             type="text"
             v-model="data.internalValue"
-            @blur="save"
-            @change="save"
+            @blur="data.throttledSave"
+            @change="data.throttledSave"
             resize="vertical"
             placeholder="Please provide a time."
         ></el-input>
@@ -19,6 +19,8 @@
 <script setup>
 import { ElInput } from "element-plus";
 import { reactive, watch } from "vue";
+import throttle from "lodash-es/throttle.js";
+
 const props = defineProps({
     property: {
         type: String,
@@ -32,6 +34,7 @@ const $emit = defineEmits(["save:property"]);
 const data = reactive({
     internalValue: props.value,
     isValidTime: checkTimeIsValid(props.value),
+    throttledSave: throttle(save, 1000),
 });
 
 watch(
