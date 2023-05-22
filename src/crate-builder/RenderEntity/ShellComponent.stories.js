@@ -10,6 +10,7 @@ export default {
         sp: { action: "saveProperty" },
         dp: { action: "deleteProperty" },
         ie: { action: "ingestEntity" },
+        ue: { action: "updateEntity" },
         de: { action: "deleteEntity" },
         sct: { action: "saveCrateTemplate" },
         set: { action: "saveEntityTemplate" },
@@ -39,7 +40,7 @@ const Template = (args, { argTypes }) => ({
 });
 
 const crateManager = new CrateManager();
-crateManager.profile = {
+const profile = {
     metadata: {
         name: "Describo Test Profile with groups",
         description: "A profile with entries for each of the supported datatypes",
@@ -98,9 +99,11 @@ crateManager.profile = {
         },
     },
 };
+crateManager.profile = profile;
 
 const args = {
     crateManager,
+    profile,
     configuration: {
         mode: "online",
         enableContextEditor: false,
@@ -120,6 +123,7 @@ SimpleEntity.args = {
         "@id": "A",
         "@type": "Entity",
         name: "A",
+        properties: [],
     },
 };
 
@@ -143,6 +147,7 @@ SimpleEntityWithOneEntityType.args = {
                         "@id": "tx",
                         "@type": "Entity",
                         name: `School`,
+                        associations: [],
                     },
                 },
             ],
@@ -170,6 +175,7 @@ SimpleEntityWithEntityTypeArray.args = {
                         "@id": "tx1",
                         "@type": "Entity",
                         name: `School`,
+                        associations: [],
                     },
                 },
                 {
@@ -182,6 +188,7 @@ SimpleEntityWithEntityTypeArray.args = {
                         "@id": "tx2",
                         "@type": "Entity",
                         name: `Public School`,
+                        associations: [],
                     },
                 },
             ],

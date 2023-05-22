@@ -45,14 +45,17 @@ const Template = (args, { argTypes }) => ({
 //         name: ".completed-resources.json",
 //     },
 // };
+const crateManager = {};
 
 export const ValidEntityInputWithOneEntity = Template.bind({});
 ValidEntityInputWithOneEntity.args = {
+    crateManager,
     entities: generateEntities(1),
 };
 
 export const ValidEntityInputWithOneHundredEntities = Template.bind({});
 ValidEntityInputWithOneHundredEntities.args = {
+    crateManager,
     entities: generateEntities(100),
 };
 
@@ -70,6 +73,7 @@ function generateEntities(limit) {
                 "@type": "File",
                 "@reverse": { hasPart: { "@id": "./" } },
                 name: `/path/to/file/${chance.word()}`,
+                associations: [],
             },
         };
     });
