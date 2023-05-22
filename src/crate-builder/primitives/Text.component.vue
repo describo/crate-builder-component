@@ -42,7 +42,7 @@ const props = defineProps({
         required: true,
     },
     value: {
-        type: String,
+        type: [String, Number],
     },
     placeholder: {
         type: String,

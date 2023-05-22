@@ -134,12 +134,12 @@ function isText(string) {
 }
 function isNumber(string) {
     string = string + "";
-    return (
+    let result =
         (isDecimal(string) || isInt(string) || isFloat(string) || isNumeric(string)) &&
         (definitionIncludes("Number") ||
             definitionIncludes("Float") ||
-            definitionIncludes("Integer"))
-    );
+            definitionIncludes("Integer"));
+    return result;
 }
 function isValue() {
     return props?.definition?.type === "Value";

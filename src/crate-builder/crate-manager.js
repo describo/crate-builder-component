@@ -402,7 +402,8 @@ export class CrateManager {
 }
 
 export function isURL(value) {
-    if (!value) return;
+    if (!value) return false;
+    if (isNumber(value)) return false;
     if (value.match(/arcp:\/\/name,.*/)) return true;
     if (value.match(/arcp:\/\/uuid,.*/)) return true;
     if (value.match(/arcp:\/\/ni,sha-256;,.*/)) return true;
