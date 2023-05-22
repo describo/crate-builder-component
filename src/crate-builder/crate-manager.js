@@ -727,24 +727,30 @@ export class Property {
     }
 
     delete({ srcEntityId, propertyId }) {
-        this.propertiesByEntityId[srcEntityId] = this.propertiesByEntityId[srcEntityId].filter(
-            (idx) => {
-                const property = this.properties[idx];
-                if (property) {
-                    if (property.propertyId !== propertyId) return idx;
-                    if (property.tgtEntityId) {
-                        const tgtEntityId = property.tgtEntityId;
-                        this.propertiesByEntityId[tgtEntityId] = this.propertiesByEntityId[
-                            tgtEntityId
-                        ].filter((idx) => {
-                            const property = this.properties[idx];
-                            if (property.propertyId !== propertyId) return idx;
-                        });
-                    }
-                    delete this.properties[idx];
+        let propertiesToKeep = [];
+        for (let idx of this.propertiesByEntityId[srcEntityId]) {
+            const property = this.properties[idx];
+            if (property) {
+                if (property.propertyId !== propertyId) {
+                    propertiesToKeep.push(idx);
+                    continue;
                 }
+                if (property.tgtEntityId) {
+                    const tgtEntityId = property.tgtEntityId;
+                    this.propertiesByEntityId[tgtEntityId] = this.propertiesByEntityId[
+                        tgtEntityId
+                    ].filter((idx) => {
+                        const property = this.properties[idx];
+                        if (property.propertyId !== propertyId) return idx;
+                    });
+                    if (isEmpty(this.propertiesByEntityId[tgtEntityId])) {
+                        delete this.propertiesByEntityId[tgtEntityId];
+                    }
+                }
+                delete this.properties[idx];
             }
-        );
+        }
+        this.propertiesByEntityId[srcEntityId] = propertiesToKeep;
         if (isEmpty(this.propertiesByEntityId[srcEntityId])) {
             delete this.propertiesByEntityId[srcEntityId];
         }
