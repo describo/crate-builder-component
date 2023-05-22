@@ -293,7 +293,7 @@ export class CrateManager {
     }
 
     updateProperty({ describoId, propertyId, value }) {
-        console.debug("Crate Mgr, updateProperty", propertyId, value);
+        // console.debug("Crate Mgr, updateProperty", propertyId, value);
         this.em.updateProperty({ srcEntityId: describoId, propertyId, value });
     }
 
@@ -531,7 +531,7 @@ export class Entity {
             entity[property] = flattenDeep([entity[property]]);
 
             for (let instance of entity[property]) {
-                if (isString(instance)) {
+                if (!isArray(instance) && !isPlainObject(instance)) {
                     this.setProperty({ srcEntityId: entity.describoId, property, value: instance });
                 } else if (isPlainObject(instance)) {
                     let tgtEntity = this.get({ srcEntityId: instance["@id"] });
@@ -746,6 +746,9 @@ export class Property {
                     if (isEmpty(this.propertiesByEntityId[tgtEntityId])) {
                         delete this.propertiesByEntityId[tgtEntityId];
                     }
+                    delete this.lookup[srcEntityId][property.property][tgtEntityId];
+                } else {
+                    delete this.lookup[srcEntityId][property.property][value];
                 }
                 delete this.properties[idx];
             }
