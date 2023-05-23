@@ -671,9 +671,11 @@ export class Property {
     set({ srcEntityId, property, value, tgtEntityId }) {
         this.__addLookupEntry({ srcEntityId, property, value, tgtEntityId });
 
-        // if this property is already on the stack - return it
-        let exists = this.__propertyExists({ srcEntityId, property, value, tgtEntityId });
-        if (exists) return exists;
+        // if this property is an association and is already on the stack - return it
+        if (tgtEntityId) {
+            let exists = this.__propertyExists({ srcEntityId, property, value, tgtEntityId });
+            if (exists) return exists;
+        }
 
         // otherwise create the property and push it onto the stack
         let data = {
@@ -776,10 +778,10 @@ export class Property {
     }
 
     __propertyExists({ srcEntityId, property, value, tgtEntityId }) {
-        if (this.lookup[srcEntityId][property][value]) {
+        if (this.lookup[srcEntityId][property][value] !== undefined) {
             const idx = this.lookup[srcEntityId][property][value];
             return this.properties[idx];
-        } else if (this.lookup[srcEntityId][property][tgtEntityId]) {
+        } else if (this.lookup[srcEntityId][property][tgtEntityId] !== undefined) {
             const idx = this.lookup[srcEntityId][property][tgtEntityId];
             return this.properties[idx];
         } else {
