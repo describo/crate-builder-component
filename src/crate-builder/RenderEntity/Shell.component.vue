@@ -214,7 +214,7 @@ import RenderEntityNameComponent from "./RenderEntityName.component.vue";
 import RenderEntityPropertyComponent from "./RenderEntityProperty.component.vue";
 import RenderReverseConnectionsComponent from "./RenderReverseConnections.component.vue";
 import RenderControlsComponent from "./RenderControls.component.vue";
-import { reactive, onMounted, onBeforeMount, watch, provide } from "vue";
+import { reactive, onMounted, onBeforeMount, onBeforeUnmount, watch, provide } from "vue";
 import debounce from "lodash-es/debounce";
 import cloneDeep from "lodash-es/cloneDeep";
 import { ProfileManager } from "../profile-manager.js";
@@ -249,6 +249,7 @@ const data = reactive({
     extraProperties: [],
     savedProperty: undefined,
     savedPropertyTimeout: 1000,
+    watchers: [],
 });
 
 const $emit = defineEmits([
@@ -266,22 +267,33 @@ const $emit = defineEmits([
     "delete:entity",
 ]);
 
-watch([() => props.entity, () => props.profile], (n, o) => {
-    if (n[0].describoId !== o[0].describoId) {
-        data.extraProperties = [];
-        data.entity = {};
-        data.tabs = [];
-    }
-    data.debouncedInit();
-});
 onBeforeMount(() => {
     provide("configuration", props.configuration);
 });
 onMounted(() => {
-    data.debouncedInit();
+    init();
+    data.watchers[0] = watch(
+        () => props.entity,
+        (n, o) => {
+            if (n.describoId !== o.describoId) {
+                data.extraProperties = [];
+            }
+            init();
+        }
+    );
+    data.watchers[1] = watch(
+        () => props.profile,
+        () => {
+            init();
+        }
+    );
+});
+onBeforeUnmount(() => {
+    data.watchers.forEach((watcher) => watcher());
 });
 
 function init() {
+    data.activeTab = "About";
     if (!props.entity.describoId) return;
     const profileManager = new ProfileManager({ profile: props.crateManager.profile });
 
