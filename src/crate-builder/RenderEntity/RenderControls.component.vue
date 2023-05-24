@@ -163,7 +163,7 @@
 
         <el-drawer
             v-model="data.dialog.browseEntities"
-            direction="ltr"
+            direction="rtl"
             :destroy-on-close="true"
             size="60%"
             @close="data.dialog.browseEntities = false"

@@ -17,16 +17,14 @@
             </div>
             <div v-for="entity of entities" :key="entity.describoId">
                 <div
-                    class="flex flex-row rounded active:bg-yellow-500"
+                    class="flex flex-row rounded active:bg-yellow-500 cursor-pointer"
                     :class="{
                         'bg-yellow-200 hover:bg-cyan-200': !configuration.readonly,
                         'bg-blue-200 hover:bg-yellow-300': configuration.readonly,
                     }"
+                    @click="loadEntity(entity.describoId)"
                 >
-                    <div
-                        class="flex flex-col p-3 cursor-pointer"
-                        @click="loadEntity(entity.describoId)"
-                    >
+                    <div class="flex flex-col p-3">
                         <div class="text-sm flex flex-row space-x-1">
                             <type-icon-component
                                 class="text-gray-700"
