@@ -29,9 +29,8 @@ describe("Test working with profiles", () => {
         };
         const entity = { "@type": "Dataset" };
         const profileManager = new ProfileManager({ profile });
-        let typeDefinition = profileManager.getTypeDefinition({ entity });
-        expect(typeDefinition.definition).toEqual("override");
-        expect(typeDefinition.inputs.length).toEqual(1);
+        let inputs = profileManager.getInputsFromProfile({ entity });
+        expect(inputs.length).toEqual(1);
 
         let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
         expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing"]);
@@ -59,20 +58,61 @@ describe("Test working with profiles", () => {
         };
         const entity = { "@type": ["Dataset"] };
         const profileManager = new ProfileManager({ profile });
-        let typeDefinition = profileManager.getTypeDefinition({ entity });
-        expect(typeDefinition.definition).toEqual("override");
-        expect(typeDefinition.inputs.length).toEqual(1);
+        let inputs = profileManager.getInputsFromProfile({ entity });
+        expect(inputs.length).toEqual(1);
 
         let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
         expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing"]);
+    });
+    test("get inputs from the profile - handle type Array", () => {
+        const profile = {
+            metadata: {},
+            classes: {
+                Dataset: {
+                    definition: "override",
+                    subClassOf: [],
+                    inputs: [
+                        {
+                            id: "https://schema.org/date",
+                            name: "date",
+                            label: "Attach a date",
+                            help: "",
+                            type: ["Date"],
+                            required: true,
+                            multiple: false,
+                        },
+                    ],
+                },
+                Other: {
+                    definition: "override",
+                    subClassOf: [],
+                    inputs: [
+                        {
+                            id: "https://schema.org/description",
+                            name: "description",
+                            help: "",
+                            type: ["Text"],
+                            required: true,
+                            multiple: false,
+                        },
+                    ],
+                },
+            },
+        };
+        const entity = { "@type": ["Dataset", "Other"] };
+        const profileManager = new ProfileManager({ profile });
+        let inputs = profileManager.getInputsFromProfile({ entity });
+        expect(inputs.length).toEqual(2);
+
+        let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
+        expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing", "Other"]);
     });
     test("get type definition - no profile, look in schema.org", () => {
         const profile = undefined;
         const profileManager = new ProfileManager({ profile });
         const entity = { "@type": ["Dataset"] };
-        let typeDefinition = profileManager.getTypeDefinition({ entity });
-        expect(typeDefinition.definition).toEqual("inherit");
-        expect(typeDefinition.inputs.length).toEqual(0);
+        let inputs = profileManager.getInputsFromProfile({ entity });
+        expect(inputs.length).toEqual(0);
 
         let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
         expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing"]);
@@ -81,9 +121,8 @@ describe("Test working with profiles", () => {
         const profile = undefined;
         const profileManager = new ProfileManager({ profile });
         const entity = { "@type": "Dataset" };
-        let typeDefinition = profileManager.getTypeDefinition({ entity });
-        expect(typeDefinition.definition).toEqual("inherit");
-        expect(typeDefinition.inputs.length).toEqual(0);
+        let inputs = profileManager.getInputsFromProfile({ entity });
+        expect(inputs.length).toEqual(0);
 
         let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
         expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing"]);
@@ -95,141 +134,12 @@ describe("Test working with profiles", () => {
         };
         const profileManager = new ProfileManager({ profile });
         const entity = { "@type": "Dataset" };
-        let typeDefinition = profileManager.getTypeDefinition({ entity });
-        expect(typeDefinition.definition).toEqual("inherit");
-        expect(typeDefinition.inputs.length).toEqual(0);
+        let inputs = profileManager.getInputsFromProfile({ entity });
+        expect(inputs.length).toEqual(0);
 
         let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
         expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing"]);
     });
-    // test("get type definition - additional type property defined", () => {
-    //     const profile = {
-    //         classes: {
-    //             Dataset: {
-    //                 definition: "override",
-    //                 subClassOf: [],
-    //                 inputs: [
-    //                     {
-    //                         id: "https://schema.org/datePublished",
-    //                         name: "datePublished",
-    //                         label: "Attach a date",
-    //                         help: "",
-    //                         type: ["Date"],
-    //                         required: true,
-    //                         multiple: false,
-    //                     },
-    //                 ],
-    //             },
-    //             A: {
-    //                 definition: "override",
-    //                 subClassOf: [],
-    //                 inputs: [
-    //                     {
-    //                         id: "https://schema.org/dateModified",
-    //                         name: "dateModified",
-    //                         label: "Attach a date",
-    //                         help: "",
-    //                         type: ["Date"],
-    //                         required: true,
-    //                         multiple: false,
-    //                     },
-    //                 ],
-    //             },
-    //             B: {
-    //                 definition: "override",
-    //                 subClassOf: [],
-    //                 inputs: [
-    //                     {
-    //                         id: "https://schema.org/dateCreated",
-    //                         name: "dateCreated",
-    //                         label: "Attach a date",
-    //                         help: "",
-    //                         type: ["Date"],
-    //                         required: true,
-    //                         multiple: false,
-    //                     },
-    //                 ],
-    //             },
-    //         },
-    //     };
-    //     const profileManager = new ProfileManager({ profile });
-    //     const entity = { "@type": "Dataset", datasetType: ["A", "B"] };
-    //     let typeDefinition = profileManager.getTypeDefinition({ entity });
-    //     expect(typeDefinition.definition).toEqual("override");
-    //     expect(typeDefinition.inputs.length).toEqual(3);
-
-    //     let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
-    //     expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing", "A", "B"]);
-    // });
-    // test("get type definition - additional type property defined; each with subclasses", () => {
-    //     const profile = {
-    //         classes: {
-    //             Dataset: {
-    //                 definition: "override",
-    //                 subClassOf: [],
-    //                 inputs: [
-    //                     {
-    //                         id: "https://schema.org/datePublished",
-    //                         name: "datePublished",
-    //                         label: "Attach a date",
-    //                         help: "",
-    //                         type: ["Date"],
-    //                         required: true,
-    //                         multiple: false,
-    //                     },
-    //                 ],
-    //             },
-    //             A: {
-    //                 definition: "override",
-    //                 subClassOf: ["C"],
-    //                 inputs: [
-    //                     {
-    //                         id: "https://schema.org/dateModified",
-    //                         name: "dateModified",
-    //                         label: "Attach a date",
-    //                         help: "",
-    //                         type: ["Date"],
-    //                         required: true,
-    //                         multiple: false,
-    //                     },
-    //                 ],
-    //             },
-    //             B: {
-    //                 definition: "override",
-    //                 subClassOf: ["D", "E", "F"],
-    //                 inputs: [
-    //                     {
-    //                         id: "https://schema.org/dateCreated",
-    //                         name: "dateCreated",
-    //                         label: "Attach a date",
-    //                         help: "",
-    //                         type: ["Date"],
-    //                         required: true,
-    //                         multiple: false,
-    //                     },
-    //                 ],
-    //             },
-    //         },
-    //     };
-    //     const profileManager = new ProfileManager({ profile });
-    //     const entity = { "@type": "Dataset", datasetType: ["A", "B"] };
-    //     let typeDefinition = profileManager.getTypeDefinition({ entity });
-    //     expect(typeDefinition.definition).toEqual("override");
-    //     expect(typeDefinition.inputs.length).toEqual(3);
-
-    //     let typeHierarchies = profileManager.getEntityTypeHierarchy({ entity });
-    //     expect(typeHierarchies).toEqual([
-    //         "Dataset",
-    //         "CreativeWork",
-    //         "Thing",
-    //         "A",
-    //         "C",
-    //         "B",
-    //         "D",
-    //         "E",
-    //         "F",
-    //     ]);
-    // });
     test("get layout information from profile", () => {
         const profile = {
             metadata: {},
@@ -412,7 +322,7 @@ describe("Test working with profiles", () => {
         };
         const profileManager = new ProfileManager({ profile });
         let types = profileManager.mapTypeHierarchies({ types: ["Thing"] });
-        let { inputs } = profileManager.getInputs({ types: ["Thing"] });
+        let { inputs } = profileManager.getAllInputs({ types: ["Thing"] });
         inputs = inputs.map((input) => input.id);
         expect(inputs).toEqual(["https://schema.org/date"]);
         expect(inputs.length).toEqual(1);
@@ -439,7 +349,7 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let { inputs } = profileManager.getInputs({ types: ["Thing"] });
+        let { inputs } = profileManager.getAllInputs({ types: ["Thing"] });
         inputs = inputs.map((input) => input.id);
         expect(inputs).toEqual([
             "http://schema.org/additionalType",
@@ -494,7 +404,7 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let { inputs } = profileManager.getInputs({ types: ["Thing"] });
+        let { inputs } = profileManager.getAllInputs({ types: ["Thing"] });
         inputs = inputs.map((input) => input.id);
         expect(inputs).toEqual(["https://schema.org/date"]);
         expect(inputs.length).toEqual(1);
@@ -535,7 +445,7 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let { inputs } = profileManager.getInputs({ types: ["Thing"] });
+        let { inputs } = profileManager.getAllInputs({ types: ["Thing"] });
         inputs = inputs.map((input) => input.id);
         expect(inputs.sort()).toEqual([
             "https://schema.org/date",
@@ -555,7 +465,7 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let { inputs } = profileManager.getInputs({ types: ["Thing", "Intangible"] });
+        let { inputs } = profileManager.getAllInputs({ types: ["Thing", "Intangible"] });
         inputs = inputs.map((input) => input.id);
         expect(inputs).toEqual([
             "http://schema.org/additionalType",
@@ -584,7 +494,7 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let { inputs } = profileManager.getInputs({ types: ["Thing", "MedicalEntity"] });
+        let { inputs } = profileManager.getAllInputs({ types: ["Thing", "MedicalEntity"] });
         inputs = inputs.map((input) => input.id);
         expect(inputs).toEqual([
             "http://schema.org/additionalType",
@@ -610,21 +520,3 @@ describe("Test working with profiles", () => {
         ]);
     });
 });
-
-function getBaseCrate() {
-    return {
-        "@context": ["https://w3id.org/ro/crate/1.1/context"],
-        "@graph": [
-            {
-                "@id": "ro-crate-metadata.json",
-                "@type": "CreativeWork",
-                conformsTo: {
-                    "@id": "https://w3id.org/ro/crate/1.1/context",
-                },
-                about: {
-                    "@id": "./",
-                },
-            },
-        ],
-    };
-}

@@ -57,7 +57,7 @@ watch(
 let inputs = computed(() => {
     if (!props.entity["@type"]) return [];
     const profileManager = new ProfileManager({ profile: props.crateManager.profile });
-    let { inputs } = profileManager.getInputs({ types: props.entity["@type"] });
+    let { inputs } = profileManager.getAllInputs({ types: props.entity["@type"] });
     if (!data.filter) return inputs;
     return inputs.filter((i) => {
         let re = new RegExp(data.filter, "i");

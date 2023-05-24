@@ -297,9 +297,8 @@ function init() {
         entity = props.entity;
     }
 
-    const typeDefinition = profileManager.getTypeDefinition({ entity });
-
-    typeDefinition?.inputs.forEach((input) => {
+    const inputs = profileManager.getInputsFromProfile({ entity });
+    inputs.forEach((input) => {
         if (input.name === "name") return;
         if (entity.properties[input.name]) {
             entity.properties[input.name] = entity.properties[input.name];
