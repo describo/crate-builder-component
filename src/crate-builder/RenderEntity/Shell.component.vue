@@ -108,7 +108,7 @@
                                 </div>
                             </template>
 
-                            <span v-if="data.activeTab === tab.name">
+                            <span>
                                 <div v-if="tab.name === 'About'">
                                     <!-- render entity id -->
                                     <render-entity-id-component
@@ -327,7 +327,8 @@ function init() {
         data.entity = { ...entity, ...layout.entity };
     } else if (layout.tabs) {
         data.entity = {};
-        data.tabs = layout.tabs.filter((t) => t?.inputs?.length);
+        // data.tabs = layout.tabs.filter((t) => t?.inputs?.length);
+        data.tabs = layout.tabs;
     }
     $emit("ready");
 }
@@ -391,7 +392,7 @@ function applyLayout({ layouts, hide = [], entity }) {
     if (!aboutTab.length) {
         let sectionEntity = cloneDeep(entity);
         delete sectionEntity.properties;
-        tabs = [{ name: "About", entity: sectionEntity }, ...tabs];
+        tabs = [{ name: "About", inputs: [], entity: sectionEntity }, ...tabs];
     }
 
     return { tabs };
