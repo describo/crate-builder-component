@@ -49,7 +49,7 @@
 
 <script setup>
 import { ElInput, ElPagination } from "element-plus";
-import { reactive, computed, onMounted, onBeforeUnmount, inject } from "vue";
+import { reactive, computed, inject } from "vue";
 import TypeIconComponent from "./TypeIcon.component.vue";
 const configuration = inject("configuration");
 
@@ -60,7 +60,6 @@ const props = defineProps({
     },
 });
 const data = reactive({
-    visible: false,
     collapse: false,
     filterInputModel: "",
     pageSize: 10,
@@ -73,30 +72,20 @@ const emit = defineEmits(["load:entity"]);
 
 let entities = computed(() => {
     let offset = (data.currentPage - 1) * data.pageSize;
-    const re = new RegExp(data.query, "i");
-    let entities = data.entities.filter((entity) => {
-        if (entity["@id"].match(re) || entity["@type"].match(re) || entity.name.match(re)) {
-            return entity;
-        }
-    });
-
-    data.total = entities.length;
-    return entities.slice(offset, offset + data.pageSize);
+    if (data.query) {
+        const re = new RegExp(data.query, "i");
+        let entities = props.crateManager.em.entities.filter((entity) => {
+            if (entity["@id"].match(re) || entity["@type"].match(re) || entity.name.match(re)) {
+                return entity;
+            }
+        });
+        data.total = entities.length;
+        return entities.slice(offset, offset + data.pageSize);
+    } else {
+        data.total = props.crateManager.em.entities.length;
+        return props.crateManager.em.entities.slice(offset, offset + data.pageSize);
+    }
 });
-
-onMounted(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    await load();
-});
-onBeforeUnmount(() => {
-    data.visible = false;
-});
-
-async function load() {
-    data.entities = props.crateManager.getEntitiesBrowseList();
-    data.total = data.entities.length;
-    data.visible = true;
-}
 
 function changePage(page) {
     data.currentPage = page;
