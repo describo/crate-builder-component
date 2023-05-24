@@ -339,21 +339,26 @@ export class CrateManager {
 
     __purgeUnlinkedEntities() {
         let walk = walker.bind(this);
-        let linkedEntities = [];
-        let rootDataset = this.getEntity({ describoId: "RootDataset" });
+        let linkedEntities = {};
+        let rootDataset = this.getEntity({
+            describoId: "RootDataset",
+            resolveLinkedEntities: false,
+        });
 
         walk(rootDataset);
         function walker(entity) {
-            linkedEntities.push(entity.describoId);
+            linkedEntities[entity.describoId] = true;
             entity.properties.forEach((p) => {
-                if (p.tgtEntityId && !linkedEntities.includes(p.tgtEntityId)) {
-                    walk(this.getEntity({ describoId: p.tgtEntityId }));
+                if (p.tgtEntityId && !linkedEntities[p.tgtEntityId]) {
+                    walk(
+                        this.getEntity({ describoId: p.tgtEntityId, resolveLinkedEntities: false })
+                    );
                 }
             });
         }
 
         this.em.entities.forEach((entity) => {
-            if (!linkedEntities.includes(entity.describoId)) {
+            if (!linkedEntities[entity.describoId]) {
                 this.em.delete({ srcEntityId: entity.describoId });
             }
         });
