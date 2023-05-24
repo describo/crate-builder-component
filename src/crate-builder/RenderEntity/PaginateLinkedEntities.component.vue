@@ -33,9 +33,9 @@
                     @delete:property="deleteProperty"
                 />
             </div>
-            <div class="text-4xl ml-2 pt-5 text-blue-500" v-if="data.total > data.pageSize">
+            <!-- <div class="text-4xl ml-2 pt-5 text-blue-500" v-if="data.total > data.pageSize">
                 <i class="fa-solid fa-ellipsis"></i>
-            </div>
+            </div> -->
         </div>
     </div>
 </template>
@@ -60,7 +60,7 @@ const $emit = defineEmits(["load:entity", "save:property", "delete:property"]);
 const data = reactive({
     filter: undefined,
     total: props.entities.length,
-    pageSize: 20,
+    pageSize: 10,
     currentPage: 1,
     entities: [],
 });
