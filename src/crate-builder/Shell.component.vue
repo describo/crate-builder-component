@@ -5,9 +5,11 @@
             :show-text="false"
             v-if="data.loading"
         />
-      <p>message: {{ $t('hello') }}</p>
+
+        <p>message1: {{ $t('hello', {count: 1}) }}</p>
+        <p>message2: {{ $t('hello', {count: 2}) }}</p>
         <render-entity-component
-            v-if="!data.error && props.crate"
+            v-if="(!data.error && props.crate) || languageChanged"
             :crate-manager="data.crateManager"
             :profile="data.profile"
             :entity="data.entity"
@@ -28,18 +30,6 @@
     </div>
 </template>
 
-
-<i18n>
-{
-  "en": {
-    "hello": "hello world!"
-  },
-  "ja": {
-    "hello": "こんにちは、世界！"
-  }
-}
-</i18n>
-
 <script setup>
 import { ElProgress } from "element-plus";
 import RenderEntityComponent from "./RenderEntity/Shell.component.vue";
@@ -58,11 +48,18 @@ import isFunction from "lodash-es/isFunction";
 import debounce from "lodash-es/debounce";
 import { CrateManager } from "./crate-manager.js";
 import { useRouter, useRoute } from "vue-router";
-import i18n from "./i18n"
+import {$t, i18next} from "./i18n"
+import { nextTick, ref } from 'vue';
 
 let $route, $router;
-inject(i18n);
-console.log("i18n", i18n);
+
+const languageChanged = ref(true);
+const forceRenderOnLanguageChanged = async () => {
+    languageChanged.value = false;
+    await nextTick();
+    languageChanged.value = true;
+};
+
 
 const props = defineProps({
     crate: {
@@ -126,6 +123,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
         validator: (val) => [true, false].includes(val),
+    },
+    language: {
+      type: String,
+      default: "en",
     },
 });
 
@@ -209,6 +210,16 @@ onMounted(async () => {
             }
         )
     );
+
+    watchers.push(
+        watch(
+            () => props.language,
+            (n) => {
+                i18next.changeLanguage(props.language);
+                forceRenderOnLanguageChanged();
+            }
+        )
+    )
 });
 onBeforeUnmount(() => {
     watchers.forEach((unWatch) => unWatch());
@@ -275,7 +286,12 @@ function configure() {
         purgeUnlinkedEntities: props.purgeUnlinkedEntities,
         enableTemplateLookups: false,
         enableDataPackLookups: false,
+        language: props.language,
     };
+
+    console.log("language", props, configuration)
+    i18next.changeLanguage(configuration.language)
+
     if (props.lookup) {
         if (isFunction(props.lookup.entityTemplates)) {
             configuration.enableTemplateLookups = true;

@@ -27,6 +27,20 @@
                     :value="item.name"
                 />
             </el-select>
+            <el-select
+                v-model="data.select.language"
+                @change="setLanguage"
+                placeholder="Select a language"
+                clearable
+            >
+                <el-option
+                    v-for="item in data.languages"
+                    :key="item.name"
+                    :label="item.name"
+                    :value="item.name"
+                />
+            </el-select>
+
         </div>
         <describo-crate-builder
             @ready="data.loading = false"
@@ -41,7 +55,8 @@
             :enable-internal-routing="true"
             :enable-reverse-link-browser="true"
             :purge-unlinked-entities="true"
-            :webcomponent="false"
+            :web-component="false"
+            :language="data.selectedLanguage"
         />
     </div>
 </template>
@@ -68,6 +83,7 @@ const data = reactive({
     select: {
         crate: undefined,
         profile: undefined,
+        language: undefined,
     },
     crates: [
         { name: "blank", value: crateFile1 },
@@ -85,8 +101,14 @@ const data = reactive({
         { name: "All primitives", value: profile5 },
         { name: "Test profile with resolve", value: profile6 },
     ],
+    languages: [
+        { name: "English", value: "en" },
+        { name: "Magyar", value: "hu" },
+    ],
+
     selectedCrate: undefined,
     selectedProfile: undefined,
+    selectedLanguage: "hu"
 });
 
 function setCrate(name) {
@@ -97,4 +119,8 @@ function setCrate(name) {
 function setProfile(name) {
     data.selectedProfile = name ? data.profiles.filter((p) => p.name === name)[0].value : undefined;
 }
+function setLanguage(name) {
+    data.selectedLanguage = name ? data.languages.filter((p) => p.name === name)[0].value : undefined;
+}
+
 </script>

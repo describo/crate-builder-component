@@ -1,7 +1,17 @@
-import { createI18n } from "vue-i18n";
+import i18next from 'i18next';
+import en from "./locales/en.js"
+import hu from "./locales/hu.js"
 
-export default createI18n({
-  locale: "en", // import.meta.env.VITE_DEFAULT_LOCALE, // <--- 1
-  fallbackLocale: "ru", // <--- 2
-  legacy: false, // <--- 3
-})
+i18next.init({
+  debug: true,
+  resources: {
+    en, hu
+  }
+});
+
+const $t = i18next.t
+
+export {
+  $t,
+  i18next
+}
