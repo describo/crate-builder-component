@@ -53,12 +53,14 @@
         "validate-iri": "^1.0.1",
         "validator": "^13.9.0",
         "vue": "^3.3.4",
+        "vue-i18n": "^9.2.2",
         "vue-router": "^4.2.1",
         "vuex": "^4.1.0"
     },
     "devDependencies": {
         "@babel/core": "^7.21.8",
         "@babel/preset-env": "^7.21.5",
+        "@intlify/unplugin-vue-i18n": "^0.10.0",
         "@rollup/plugin-node-resolve": "^15.0.2",
         "@storybook/addon-actions": "^7.0.13",
         "@storybook/addon-docs": "^7.0.13",

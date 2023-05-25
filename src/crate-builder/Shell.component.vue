@@ -5,6 +5,7 @@
             :show-text="false"
             v-if="data.loading"
         />
+      <p>message: {{ $t('hello') }}</p>
         <render-entity-component
             v-if="!data.error && props.crate"
             :crate-manager="data.crateManager"
@@ -27,6 +28,18 @@
     </div>
 </template>
 
+
+<i18n>
+{
+  "en": {
+    "hello": "hello world!"
+  },
+  "ja": {
+    "hello": "こんにちは、世界！"
+  }
+}
+</i18n>
+
 <script setup>
 import { ElProgress } from "element-plus";
 import RenderEntityComponent from "./RenderEntity/Shell.component.vue";
@@ -37,6 +50,7 @@ import {
     reactive,
     watch,
     getCurrentInstance,
+    inject
 } from "vue";
 import cloneDeep from "lodash-es/cloneDeep";
 import isEmpty from "lodash-es/isEmpty";
@@ -44,8 +58,11 @@ import isFunction from "lodash-es/isFunction";
 import debounce from "lodash-es/debounce";
 import { CrateManager } from "./crate-manager.js";
 import { useRouter, useRoute } from "vue-router";
+import i18n from "./i18n"
 
 let $route, $router;
+inject(i18n);
+console.log("i18n", i18n);
 
 const props = defineProps({
     crate: {
@@ -199,6 +216,7 @@ onBeforeUnmount(() => {
 });
 
 async function init() {
+
     if (!props.crate || isEmpty(props.crate)) {
         data.crate = {};
         data.entity = {};
