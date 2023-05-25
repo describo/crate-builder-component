@@ -71,7 +71,7 @@ export class ProfileManager {
         if (isEmpty(propertyDefinition)) {
             // const types = flattenDeep(this.mapTypeHierarchies(type));
             // let inputs = this.collectInputs({ types });
-            let { inputs } = this.getAllInputs({ types: this.getEntityTypeHierarchy({ entity }) });
+            let { inputs } = this.getAllInputs({ entity });
             propertyDefinition = inputs.filter(
                 (p) => p.name.toLowerCase() === property.toLowerCase()
             );
@@ -140,16 +140,13 @@ export class ProfileManager {
 
     /**
      *
-     * Given a type, get the inputs defined in the profile for that type
+     * Given an entity, get the inputs defined in the profile
      *
      */
     getInputsFromProfile({ entity }) {
         let types = entity["@type"];
-        if (!isArray(types)) types = [entity["@type"]];
+        if (isString(types)) types = types.split(",").map((t) => t.trim());
 
-        let typeDefinition = {
-            definition: "override",
-        };
         let inputs = [];
         for (let type of types) {
             if (this.profile?.classes?.[type]) {
@@ -157,16 +154,18 @@ export class ProfileManager {
                 inputs = [...inputs, ...cloneDeep(this.profile?.classes?.[type].inputs)];
             }
         }
-        return inputs;
+        return uniqBy(inputs, "id");
     }
 
-    getAllInputs({ types }) {
+    /**
+     *
+     * Given an entity, get all available inputs by joining profile with schema.org
+     *
+     */
+    getAllInputs({ entity }) {
         getInputs = getInputs.bind(this);
-        const hierarchy = difference(this.mapTypeHierarchies({ types }), types);
+        const hierarchy = this.getEntityTypeHierarchy({ entity });
         let inputs = [];
-        for (let type of types) {
-            inputs.push(getInputs(type));
-        }
         for (let type of hierarchy) {
             inputs.push(getInputs(type));
         }

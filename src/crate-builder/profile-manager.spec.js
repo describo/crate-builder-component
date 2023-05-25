@@ -95,6 +95,15 @@ describe("Test working with profiles", () => {
                             required: true,
                             multiple: false,
                         },
+                        {
+                            id: "https://schema.org/date",
+                            name: "date",
+                            label: "Attach a date",
+                            help: "",
+                            type: ["Date"],
+                            required: true,
+                            multiple: false,
+                        },
                     ],
                 },
             },
@@ -322,7 +331,7 @@ describe("Test working with profiles", () => {
         };
         const profileManager = new ProfileManager({ profile });
         let types = profileManager.mapTypeHierarchies({ types: ["Thing"] });
-        let { inputs } = profileManager.getAllInputs({ types: ["Thing"] });
+        let { inputs } = profileManager.getAllInputs({ entity: { "@type": ["Thing"] } });
         inputs = inputs.map((input) => input.id);
         expect(inputs).toEqual(["https://schema.org/date"]);
         expect(inputs.length).toEqual(1);
@@ -349,7 +358,7 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let { inputs } = profileManager.getAllInputs({ types: ["Thing"] });
+        let { inputs } = profileManager.getAllInputs({ entity: { "@type": ["Thing"] } });
         inputs = inputs.map((input) => input.id);
         expect(inputs).toEqual([
             "http://schema.org/additionalType",
@@ -404,7 +413,7 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let { inputs } = profileManager.getAllInputs({ types: ["Thing"] });
+        let { inputs } = profileManager.getAllInputs({ entity: { "@type": ["Thing"] } });
         inputs = inputs.map((input) => input.id);
         expect(inputs).toEqual(["https://schema.org/date"]);
         expect(inputs.length).toEqual(1);
@@ -445,7 +454,7 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let { inputs } = profileManager.getAllInputs({ types: ["Thing"] });
+        let { inputs } = profileManager.getAllInputs({ entity: { "@type": ["Thing"] } });
         inputs = inputs.map((input) => input.id);
         expect(inputs.sort()).toEqual([
             "https://schema.org/date",
@@ -465,7 +474,9 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let { inputs } = profileManager.getAllInputs({ types: ["Thing", "Intangible"] });
+        let { inputs } = profileManager.getAllInputs({
+            entity: { "@type": ["Thing", "Intangible"] },
+        });
         inputs = inputs.map((input) => input.id);
         expect(inputs).toEqual([
             "http://schema.org/additionalType",
@@ -494,7 +505,9 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let { inputs } = profileManager.getAllInputs({ types: ["Thing", "MedicalEntity"] });
+        let { inputs } = profileManager.getAllInputs({
+            entity: { "@type": ["Thing", "MedicalEntity"] },
+        });
         inputs = inputs.map((input) => input.id);
         expect(inputs).toEqual([
             "http://schema.org/additionalType",
