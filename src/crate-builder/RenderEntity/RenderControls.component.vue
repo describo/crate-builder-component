@@ -227,13 +227,7 @@ let isRootDataset = computed(() => {
 });
 let definition = computed(() => {
     if (!props.entity?.["@type"]) return "inherit";
-
-    // try to get all types from the profile,
-    // if there's an override then set to override - otherwise inherit
-    //   be exclusive rather than inclusive
-    let types = props.entity["@type"].split(",").map((t) => t.trim());
-    let directive = types.map((type) => props.crateManager?.profile?.classes?.[type]?.definition);
-    return directive.includes("override") ? "override" : "inherit";
+    return props.crateManager.profile.getTypeDefinition({ entity: props.entity });
 });
 function toggle(dialog) {
     data.dialog[dialog] = !data.dialog[dialog];
