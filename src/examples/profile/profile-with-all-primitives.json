@@ -7,7 +7,7 @@
     },
     "classes": {
         "Dataset": {
-            "definition": "override",
+            "definition": "inherit",
             "subClassOf": [],
             "inputs": [
                 {
@@ -138,6 +138,21 @@
                     "required": true,
                     "multiple": true,
                     "type": ["Geo"]
+                }
+            ]
+        },
+        "RepositoryCollection": {
+            "definition": "override",
+            "subClassOf": [],
+            "inputs": [
+                {
+                    "id": "https://schema.org/text",
+                    "name": "text",
+                    "label": "text",
+                    "help": "help message",
+                    "required": true,
+                    "multiple": true,
+                    "type": ["Text"]
                 }
             ]
         }
