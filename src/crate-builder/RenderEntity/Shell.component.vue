@@ -271,7 +271,7 @@ onBeforeMount(() => {
     provide("configuration", props.configuration);
 });
 onMounted(() => {
-    // init();
+    init();
     data.watchers[0] = watch(
         () => props.entity,
         (n, o) => {

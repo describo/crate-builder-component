@@ -200,7 +200,8 @@ export class ProfileManager {
      * be exclusive rather than inclusive
      */
     getTypeDefinition({ entity }) {
-        let types = entity["@type"].split(",").map((t) => t.trim());
+        let types = entity["@type"];
+        if (isString(entity["@type"])) types = entity["@type"].split(",").map((t) => t.trim());
         let directive = types.map((type) => this.profile.classes?.[type]?.definition);
         return directive.includes("override") ? "override" : "inherit";
     }
