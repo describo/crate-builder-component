@@ -11,7 +11,7 @@
                     v-if="configuration.mode === 'embedded'"
                 >
                     <i class="fa-solid fa-house"></i>
-                    &nbsp; Root Dataset
+                    &nbsp; {{ $t("root_dataset_label") }}
                 </el-button>
             </div>
             <div>
@@ -22,28 +22,28 @@
                     :disabled="definition !== 'inherit'"
                 >
                     <i class="fas fa-code"></i>
-                    &nbsp; Add
+                    &nbsp; {{ $t("add_label") }}
                 </el-button>
             </div>
             <div v-if="configuration.enableContextEditor">
                 <!-- edit context -->
                 <el-button @click="toggle('editContext')" type="primary">
                     <i class="fa-solid fa-pen-to-square"></i>
-                    &nbsp;Edit Context
+                    &nbsp;{{ $t("edit_context_label") }}
                 </el-button>
             </div>
             <div v-if="configuration.enableCratePreview">
                 <!-- preview crate -->
                 <el-button @click="toggle('previewCrate')" type="primary">
                     <i class="fa-solid fa-eye"></i>
-                    &nbsp;Preview
+                    &nbsp;{{ $t("preview_label") }}
                 </el-button>
             </div>
             <div v-if="configuration.enableBrowseEntities">
                 <!-- browse crate entities -->
                 <el-button @click="toggle('browseEntities')" type="primary">
                     <i class="fa-solid fa-layer-group"></i>
-                    &nbsp;Browse Entities
+                    &nbsp;{{ $t("browse_entities_label") }}
                 </el-button>
             </div>
             <div class="flex flex-row space-x-1">
@@ -61,7 +61,7 @@
                             class="inline-block ml-1 xl:inline-block xl:ml-1"
                             :class="{ hidden: entity.etype === 'File' }"
                         >
-                            Save Crate as Template
+                            {{ $t("save_crate_as_template_label") }}
                         </div>
                     </el-button>
                 </div>
@@ -79,14 +79,16 @@
                             class="inline-block ml-1 xl:inline-block xl:ml-1"
                             :class="{ hidden: entity.etype === 'File' }"
                         >
-                            Save Entity Template
+                            {{ $t("save_entity_template_label") }}
                         </div>
                     </el-button>
                 </div>
                 <div v-if="!isRootDataset">
                     <!-- delete entity -->
                     <el-popconfirm
-                        title="Are you sure you want to delete this entity?"
+                        :title="$t('are_you_sure_to_delete')"
+                        :confirm-button-text="$t('are_you_sure_to_delete_yes')"
+                        :cancel-button-text="$t('are_you_sure_to_delete_no')"
                         @confirm="deleteEntity"
                         width="400px"
                     >
@@ -99,7 +101,7 @@
                                     class="inline-block ml-1 xl:inline-block xl:ml-1"
                                     :class="{ hidden: entity.etype === 'File' }"
                                 >
-                                    Delete Entity
+                                    {{ $t("delete_entity_label") }}
                                 </div>
                             </el-button>
                         </template>
@@ -115,7 +117,7 @@
             size="50%"
             @close="data.dialog.addProperty = false"
         >
-            <template #header> <div>Add properties to this entity</div></template>
+            <template #header> <div>{{ $t("add_properties_to_this_entity") }}</div></template>
             <template #default>
                 <add-property-dialog
                     :crate-manager="props.crateManager"
@@ -131,7 +133,7 @@
             size="70%"
             @close="data.dialog.editContext = false"
         >
-            <template #header> <div>Edit Context</div></template>
+            <template #header> <div>{{ $t("edit_context") }}</div></template>
             <template #default>
                 <edit-context-dialog
                     :crate-manager="props.crateManager"
@@ -147,7 +149,7 @@
             size="60%"
             @close="data.dialog.previewCrate = false"
         >
-            <template #header> <div>Preview Crate</div></template>
+            <template #header> <div>{{ $t("preview_crate") }}</div></template>
             <template #default>
                 <preview-crate-dialog :crate-manager="props.crateManager" />
             </template>
@@ -168,7 +170,7 @@
             size="60%"
             @close="data.dialog.browseEntities = false"
         >
-            <template #header> <div>Browse entities</div></template>
+            <template #header> <div>{{ $t("browse_entities") }}</div></template>
             <template #default>
                 <browse-entities-dialog
                     :crate-manager="props.crateManager"
@@ -189,6 +191,7 @@ import PreviewCrateDialog from "./DialogPreviewCrate.component.vue";
 import BrowseEntitiesDialog from "./DialogBrowseEntities.component.vue";
 import { reactive, computed, inject } from "vue";
 import isArray from "lodash-es/isArray";
+import {$t} from '../i18n'
 const configuration = inject("configuration");
 
 const props = defineProps({
