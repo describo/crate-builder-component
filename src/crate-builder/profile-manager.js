@@ -199,7 +199,7 @@ export class ProfileManager {
      * if there's an override then set to override - otherwise inherit
      * be exclusive rather than inclusive
      */
-    getTypeDefinition(entity) {
+    getTypeDefinition({ entity }) {
         let types = entity["@type"].split(",").map((t) => t.trim());
         let directive = types.map((type) => this.profile.classes?.[type]?.definition);
         return directive.includes("override") ? "override" : "inherit";

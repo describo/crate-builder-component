@@ -271,7 +271,7 @@ onBeforeMount(() => {
     provide("configuration", props.configuration);
 });
 onMounted(() => {
-    init();
+    // init();
     data.watchers[0] = watch(
         () => props.entity,
         (n, o) => {
@@ -293,9 +293,10 @@ onBeforeUnmount(() => {
 });
 
 function init() {
-    data.activeTab = "About";
     if (!props.entity.describoId) return;
+    data.activeTab = "About";
     const profileManager = new ProfileManager({ profile: props.crateManager.profile });
+    props.crateManager.profileManager = profileManager;
 
     let entity;
     if (props.configuration.mode === "embedded") {

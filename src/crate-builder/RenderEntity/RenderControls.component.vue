@@ -226,8 +226,9 @@ let isRootDataset = computed(() => {
     return props.entity.describoId === "RootDataset";
 });
 let definition = computed(() => {
-    if (!props.entity?.["@type"]) return "inherit";
-    return props.crateManager.profile.getTypeDefinition({ entity: props.entity });
+    if (!props.entity?.["@type"] || !props.crateManager.profileManager?.getTypeDefinition)
+        return "inherit";
+    return props.crateManager.profileManager.getTypeDefinition({ entity: props.entity });
 });
 function toggle(dialog) {
     data.dialog[dialog] = !data.dialog[dialog];
