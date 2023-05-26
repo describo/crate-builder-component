@@ -114,7 +114,7 @@ function loadEntity(data) {
     $emit("load:entity", data);
     setTimeout(() => {
         resolveConnections();
-    }, 1000);
+    }, 200);
 }
 
 function changePage(page) {

@@ -368,17 +368,6 @@ describe("Test interacting with the crate", () => {
         let template = crateManager.exportEntityTemplate({ describoId: e.describoId });
         expect(template).toMatchObject(entity);
     });
-    test("add a simple entity to the crate and get browse list", () => {
-        let entity = {
-            "@id": chance.url(),
-            "@type": "Person",
-            name: chance.sentence(),
-        };
-        let e = crateManager.addEntity({ entity });
-
-        let list = crateManager.getEntitiesBrowseList();
-        expect(list.length).toEqual(2);
-    });
     test("add a complex entity to the crate and export as a template", () => {
         let rootDataset = crateManager.getRootDataset();
         let entity = {

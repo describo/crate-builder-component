@@ -68,8 +68,7 @@ export class CrateManager {
         });
         this.rootDescriptor.about["@id"] = "./";
 
-        const reportAt = 100;
-
+        let reportAt = 200;
         // for each entity, populate entities and properties structs
         i = 0;
         let entities = [];
@@ -78,7 +77,7 @@ export class CrateManager {
             i += 1;
             if (i % reportAt === 0) {
                 progress.percent = (i / (totalEntities * 2)) * 100;
-                await new Promise((resolve) => setTimeout(resolve, 20));
+                await new Promise((resolve) => setTimeout(resolve, 2));
             }
             let { describoId } = this.em.set(entity);
             entity.describoId = describoId;
@@ -87,16 +86,17 @@ export class CrateManager {
         progress.percent = (i / (totalEntities * 2)) * 100;
         // console.log(entities);
 
+        reportAt = 1000;
         for (let entity of entities) {
             i += 1;
             this.em.processEntityProperties(entity);
             if (i % reportAt === 0) {
                 progress.percent = (i / (totalEntities * 2)) * 100;
-                await new Promise((resolve) => setTimeout(resolve, 10));
+                await new Promise((resolve) => setTimeout(resolve, 2));
             }
         }
         progress.percent = (i / (totalEntities * 2)) * 100;
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 5));
         // console.log(JSON.stringify(this.em, null, 2));
     }
 
@@ -246,18 +246,6 @@ export class CrateManager {
         }
     }
 
-    getEntitiesBrowseList() {
-        let entities = this.em.entities.map((entity) => {
-            entity = this.getEntity(entity);
-            entity.isConnected = entity.properties.length || entity.reverseConnections.length;
-
-            delete entity.properties;
-            delete entity.reverseConnections;
-            return entity;
-        });
-        return entities;
-    }
-
     findMatchingEntities({ limit = 5, query = undefined, type = undefined }) {
         return this.em.find({ limit, query, type });
     }
@@ -351,21 +339,26 @@ export class CrateManager {
 
     __purgeUnlinkedEntities() {
         let walk = walker.bind(this);
-        let linkedEntities = [];
-        let rootDataset = this.getEntity({ describoId: "RootDataset" });
+        let linkedEntities = {};
+        let rootDataset = this.getEntity({
+            describoId: "RootDataset",
+            resolveLinkedEntities: false,
+        });
 
         walk(rootDataset);
         function walker(entity) {
-            linkedEntities.push(entity.describoId);
+            linkedEntities[entity.describoId] = true;
             entity.properties.forEach((p) => {
-                if (p.tgtEntityId && !linkedEntities.includes(p.tgtEntityId)) {
-                    walk(this.getEntity({ describoId: p.tgtEntityId }));
+                if (p.tgtEntityId && !linkedEntities[p.tgtEntityId]) {
+                    walk(
+                        this.getEntity({ describoId: p.tgtEntityId, resolveLinkedEntities: false })
+                    );
                 }
             });
         }
 
         this.em.entities.forEach((entity) => {
-            if (!linkedEntities.includes(entity.describoId)) {
+            if (!linkedEntities[entity.describoId]) {
                 this.em.delete({ srcEntityId: entity.describoId });
             }
         });

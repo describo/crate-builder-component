@@ -52,7 +52,7 @@
                     :key="instance.property"
                     class="cursor-pointer"
                 >
-                    <div class="flex flex-row -mx-3">
+                    <div class="flex flex-row -mx-3 text-base">
                         <div class="bg-slate-700 w-3 h-3 rounded-lg mt-4"></div>
                         <div class="bg-slate-700 w-6 h-1 mt-5 -mx-1"></div>
                         <div

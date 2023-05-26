@@ -356,7 +356,7 @@ function ready() {
     $emit("ready");
 }
 async function saveCrate() {
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 10));
     if (props.purgeUnlinkedEntities) {
         data.crateManager.__purgeUnlinkedEntities();
     }

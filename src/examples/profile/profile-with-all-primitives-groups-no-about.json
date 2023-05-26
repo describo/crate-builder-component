@@ -5,9 +5,18 @@
         "version": 0.1,
         "warnMissingProperty": true
     },
+    "layouts": {
+        "Dataset": [
+            {
+                "name": "Main",
+                "description": "",
+                "inputs": ["text", "textarea", "url"]
+            }
+        ]
+    },
     "classes": {
         "Dataset": {
-            "definition": "inherit",
+            "definition": "override",
             "subClassOf": [],
             "inputs": [
                 {
@@ -138,21 +147,6 @@
                     "required": true,
                     "multiple": true,
                     "type": ["Geo"]
-                }
-            ]
-        },
-        "RepositoryCollection": {
-            "definition": "override",
-            "subClassOf": [],
-            "inputs": [
-                {
-                    "id": "https://schema.org/text",
-                    "name": "text",
-                    "label": "text",
-                    "help": "help message",
-                    "required": true,
-                    "multiple": true,
-                    "type": ["Text"]
                 }
             ]
         }

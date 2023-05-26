@@ -165,7 +165,7 @@
 
         <el-drawer
             v-model="data.dialog.browseEntities"
-            direction="ltr"
+            direction="rtl"
             :destroy-on-close="true"
             size="60%"
             @close="data.dialog.browseEntities = false"
@@ -229,12 +229,9 @@ let isRootDataset = computed(() => {
     return props.entity.describoId === "RootDataset";
 });
 let definition = computed(() => {
-    let type = isArray(props.entity["@type"])
-        ? props.entity["@type"].join(", ")
-        : props.entity["@type"];
-    let classDefinition = props.crateManager?.profile?.classes?.[type];
-    if (!classDefinition) classDefinition = { definition: "inherit" };
-    return classDefinition?.definition;
+    if (!props.entity?.["@type"] || !props.crateManager.profileManager?.getTypeDefinition)
+        return "inherit";
+    return props.crateManager.profileManager.getTypeDefinition({ entity: props.entity });
 });
 function toggle(dialog) {
     data.dialog[dialog] = !data.dialog[dialog];

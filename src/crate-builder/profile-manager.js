@@ -44,101 +44,6 @@ export class ProfileManager {
 
     /**
      *
-     * This method returns a definition object for the entity of type '@type'
-     *
-     *   If the entity is defined in the profile, then that definition is returned
-     *   Otherwise, we look in schema.org for a definition
-     *   And if that fails, we return a placeholder that inherits form schema.org thing
-     *
-     *   If the entity has a property matching the string `{entity name lowercased}Type`
-     *    then we also look up any entities defined on that property in the profile and join
-     *    their inputs into the type definition for the main entity @type.
-     */
-    getTypeDefinition({ entity }) {
-        let type = entity["@type"];
-        if (isArray(type)) type = type.join(", ");
-
-        // let typeDefinitions = [];
-
-        // do we have a definition in the profile?
-        let typeDefinition;
-        if (this.profile?.classes?.[type]) {
-            //   yes - get it
-            typeDefinition = cloneDeep(this.profile?.classes?.[type]);
-        } else if (schemaOrgTypeDefinitions?.[type]) {
-            //   no  - find it in schema.org
-            typeDefinition = cloneDeep(schemaOrgTypeDefinitions?.[type]);
-            typeDefinition.definition = "inherit";
-
-            /**
-             * We set the inputs to an empty array here otherwise we get
-             *  all of them on the page which we don't want. By setting to inherit
-             *  the user can choose to add inputs.
-             */
-            typeDefinition.inputs = [];
-        } else {
-            typeDefinition = {
-                definition: "inherit",
-                inputs: [],
-            };
-        }
-        if (!typeDefinition.inputs) typeDefinition.inputs = [];
-
-        // /**
-        //  * Get the hierarchy for the type definition we're interested in
-        //  *  and then go join in any inputs we find on any of those types
-        //  *  in the profile.
-        //  */
-        // let types = this.getAdditionalEntityTypes({ entity });
-        // if (types) {
-        //     let inputs = types.map((type) => this.getInputsFromProfile({ type }));
-        //     inputs = flattenDeep(inputs);
-        //     inputs = uniqBy(inputs, "id");
-        //     typeDefinition.inputs = [...typeDefinition.inputs, ...inputs];
-        // }
-        // typeDefinition.inputs = compact(typeDefinition.inputs);
-
-        // return { inputs: typeDefinition.inputs };
-        return typeDefinition;
-    }
-
-    /**
-     *
-     * If the entity has a property matching the string `{entity name lowercased}Type`
-     *  then we also look up any entities defined on that property in the profile and join
-     *  their inputs into the type definition for the main entity @type.
-     *
-     * So, for example, entity['@type'] = 'Entity'.
-     * If there is a property `entityType` on the entity, then also load
-     *   the inputs from that type definition
-     *
-     *  But only if the type is a singleton otherwise this gets too complex.
-     */
-    // getAdditionalEntityTypes({ entity }) {
-    //     let types = entity["@type"];
-    //     if (!isArray(types)) types = types.split(",").map((t) => t.trim());
-
-    //     if (types.length === 1) {
-    //         let typeProperty = `${types[0].toLowerCase()}Type`;
-    //         // look it up as a property on the entity
-    //         if (typeProperty in entity) {
-    //             let types = isArray(entity[typeProperty])
-    //                 ? entity[typeProperty]
-    //                 : [entity[typeProperty]];
-    //             return types;
-    //         }
-
-    //         // lookup up in the properties array
-    //         if ("properties" in entity) {
-    //             let properties = entity.properties[typeProperty];
-    //             if (properties) return properties.map((p) => p?.tgtEntity.name);
-    //         }
-    //     }
-    //     return [];
-    // }
-
-    /**
-     *
      * Given an entity, try to find a definition for the property in the profile or
      *  right across the hierarchy
      *
@@ -146,11 +51,11 @@ export class ProfileManager {
     getPropertyDefinition({ property, entity }) {
         // if (isArray(type)) type = type.join(", ");
         let propertyDefinition;
-        let entityDefinition = this.getTypeDefinition({ entity });
+        let inputs = this.getInputsFromProfile({ entity });
         // console.debug("ENTITY definition:", JSON.stringify(entityDefinition, null, 2));
-        if (entityDefinition) {
+        if (inputs.length) {
             // we found an entity definition in the profile - do we have a property definition?
-            propertyDefinition = entityDefinition.inputs.filter(
+            propertyDefinition = inputs.filter(
                 (p) => p.name.toLowerCase() === property.toLowerCase()
             );
             if (propertyDefinition.length) {
@@ -166,7 +71,7 @@ export class ProfileManager {
         if (isEmpty(propertyDefinition)) {
             // const types = flattenDeep(this.mapTypeHierarchies(type));
             // let inputs = this.collectInputs({ types });
-            let { inputs } = this.getInputs({ types: this.getEntityTypeHierarchy({ entity }) });
+            let { inputs } = this.getAllInputs({ entity });
             propertyDefinition = inputs.filter(
                 (p) => p.name.toLowerCase() === property.toLowerCase()
             );
@@ -235,22 +140,32 @@ export class ProfileManager {
 
     /**
      *
-     * Given a type, get the inputs defined in the profile for that type
+     * Given an entity, get the inputs defined in the profile
      *
      */
-    getInputsFromProfile({ type }) {
-        if (this.profile?.classes?.[type]) {
-            return this.profile?.classes?.[type].inputs;
-        }
-    }
+    getInputsFromProfile({ entity }) {
+        let types = entity["@type"];
+        if (isString(types)) types = types.split(",").map((t) => t.trim());
 
-    getInputs({ types }) {
-        getInputs = getInputs.bind(this);
-        const hierarchy = difference(this.mapTypeHierarchies({ types }), types);
         let inputs = [];
         for (let type of types) {
-            inputs.push(getInputs(type));
+            if (this.profile?.classes?.[type]) {
+                //   yes - get it
+                inputs = [...inputs, ...cloneDeep(this.profile?.classes?.[type].inputs)];
+            }
         }
+        return uniqBy(inputs, "id");
+    }
+
+    /**
+     *
+     * Given an entity, get all available inputs by joining the profile with schema.org
+     *
+     */
+    getAllInputs({ entity }) {
+        getInputs = getInputs.bind(this);
+        const hierarchy = this.getEntityTypeHierarchy({ entity });
+        let inputs = [];
         for (let type of hierarchy) {
             inputs.push(getInputs(type));
         }
@@ -276,5 +191,18 @@ export class ProfileManager {
             }
             return inputs;
         }
+    }
+
+    /**
+     *
+     * try to get all types from the profile,
+     * if there's an override then set to override - otherwise inherit
+     * be exclusive rather than inclusive
+     */
+    getTypeDefinition({ entity }) {
+        let types = entity["@type"];
+        if (isString(entity["@type"])) types = entity["@type"].split(",").map((t) => t.trim());
+        let directive = types.map((type) => this.profile.classes?.[type]?.definition);
+        return directive.includes("override") ? "override" : "inherit";
     }
 }

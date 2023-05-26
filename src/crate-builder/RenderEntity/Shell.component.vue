@@ -108,7 +108,7 @@
                                 </div>
                             </template>
 
-                            <span v-if="data.activeTab === tab.name">
+                            <span>
                                 <div v-if="tab.name === 'About'">
                                     <!-- render entity id -->
                                     <render-entity-id-component
@@ -214,7 +214,7 @@ import RenderEntityNameComponent from "./RenderEntityName.component.vue";
 import RenderEntityPropertyComponent from "./RenderEntityProperty.component.vue";
 import RenderReverseConnectionsComponent from "./RenderReverseConnections.component.vue";
 import RenderControlsComponent from "./RenderControls.component.vue";
-import { reactive, onMounted, onBeforeMount, watch, provide } from "vue";
+import { reactive, onMounted, onBeforeMount, onBeforeUnmount, watch, provide } from "vue";
 import debounce from "lodash-es/debounce";
 import cloneDeep from "lodash-es/cloneDeep";
 import { ProfileManager } from "../profile-manager.js";
@@ -249,6 +249,7 @@ const data = reactive({
     extraProperties: [],
     savedProperty: undefined,
     savedPropertyTimeout: 1000,
+    watchers: [],
 });
 
 const $emit = defineEmits([
@@ -266,24 +267,36 @@ const $emit = defineEmits([
     "delete:entity",
 ]);
 
-watch([() => props.entity, () => props.profile], (n, o) => {
-    if (n[0].describoId !== o[0].describoId) {
-        data.extraProperties = [];
-        data.entity = {};
-        data.tabs = [];
-    }
-    data.debouncedInit();
-});
 onBeforeMount(() => {
     provide("configuration", props.configuration);
 });
 onMounted(() => {
-    data.debouncedInit();
+    init();
+    data.watchers[0] = watch(
+        () => props.entity,
+        (n, o) => {
+            if (n.describoId !== o.describoId) {
+                data.extraProperties = [];
+            }
+            init();
+        }
+    );
+    data.watchers[1] = watch(
+        () => props.profile,
+        () => {
+            init();
+        }
+    );
+});
+onBeforeUnmount(() => {
+    data.watchers.forEach((watcher) => watcher());
 });
 
 function init() {
     if (!props.entity.describoId) return;
+    data.activeTab = "About";
     const profileManager = new ProfileManager({ profile: props.crateManager.profile });
+    props.crateManager.profileManager = profileManager;
 
     let entity;
     if (props.configuration.mode === "embedded") {
@@ -297,9 +310,8 @@ function init() {
         entity = props.entity;
     }
 
-    const typeDefinition = profileManager.getTypeDefinition({ entity });
-
-    typeDefinition?.inputs.forEach((input) => {
+    const inputs = profileManager.getInputsFromProfile({ entity });
+    inputs.forEach((input) => {
         if (input.name === "name") return;
         if (entity.properties[input.name]) {
             entity.properties[input.name] = entity.properties[input.name];
@@ -328,7 +340,8 @@ function init() {
         data.entity = { ...entity, ...layout.entity };
     } else if (layout.tabs) {
         data.entity = {};
-        data.tabs = layout.tabs.filter((t) => t?.inputs?.length);
+        // data.tabs = layout.tabs.filter((t) => t?.inputs?.length);
+        data.tabs = layout.tabs;
     }
     $emit("ready");
 }
@@ -392,7 +405,7 @@ function applyLayout({ layouts, hide = [], entity }) {
     if (!aboutTab.length) {
         let sectionEntity = cloneDeep(entity);
         delete sectionEntity.properties;
-        tabs = [{ name: "About", entity: sectionEntity }, ...tabs];
+        tabs = [{ name: "About", inputs: [], entity: sectionEntity }, ...tabs];
     }
 
     return { tabs };
