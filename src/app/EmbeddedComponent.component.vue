@@ -114,7 +114,7 @@ const data = reactive({
 
     selectedCrate: undefined,
     selectedProfile: undefined,
-    selectedLanguage: "hu"
+    selectedLanguage: "en"
 });
 
 function setCrate(name) {

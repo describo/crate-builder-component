@@ -12,7 +12,7 @@
                 <el-input
                     v-model="data.filterInputModel"
                     @change="filterConnections"
-                    placeholder="Search for a connection"
+                    :placeholder="$t('search_for_connection')"
                 ></el-input>
             </div>
             <div v-for="entity of entities" :key="entity.describoId">
@@ -49,6 +49,8 @@
 import { ElInput, ElPagination } from "element-plus";
 import { reactive, computed, inject } from "vue";
 import TypeIconComponent from "./TypeIcon.component.vue";
+import {$t} from '../i18n'
+
 const configuration = inject("configuration");
 
 const props = defineProps({

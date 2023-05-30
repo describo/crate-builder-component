@@ -14,8 +14,7 @@
             </el-button>
         </div>
         <div class="text-xs" v-if="!data.isValidUrl">
-            The entry needs to be a valid url. The accepted protocols are: http, https, ftp, ftps
-            and arcp.
+            {{ $t('invalid_url_value') }}
         </div>
     </div>
 </template>
@@ -25,6 +24,7 @@ import { ElButton, ElInput } from "element-plus";
 import { reactive, watch } from "vue";
 import { isURL } from "../crate-manager.js";
 import throttle from "lodash-es/throttle.js";
+import {$t} from '../i18n'
 
 const props = defineProps({
     property: {

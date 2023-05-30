@@ -4,7 +4,7 @@
             v-if="data.hasValidValues && data.isValidValue"
             class="w-full"
             v-model="data.internalValue"
-            placeholder="Select"
+            :placeholder="$t('select')"
             filterable
             :filter-method="filter"
             @change="save"
@@ -14,12 +14,10 @@
             </el-option>
         </el-select>
         <div v-if="!data.isValidValue" class="text-xs text-gray-700">
-            The value '{{ props.value }}' provided to this component is of the wrong from. It can
-            only be a valid URL.
+            {{ $t('invalid_selecturl_value', {value: props.value}) }}
         </div>
         <div v-if="!data.hasValidValues" class="text-xs text-gray-700">
-            The definition provided to this component has values of the wrong from. It can only be
-            an array of strings which are each valid URLs.
+            {{ $t('invalid_selecturl_values') }}
         </div>
     </div>
 </template>
@@ -31,6 +29,7 @@ import isArray from "lodash-es/isArray";
 import isString from "lodash-es/isString";
 import uniq from "lodash-es/uniq";
 import { isURL } from "../crate-manager.js";
+import {$t} from '../i18n'
 
 const props = defineProps({
     property: {

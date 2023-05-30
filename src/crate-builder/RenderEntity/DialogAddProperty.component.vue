@@ -3,7 +3,7 @@
         <div>
             <el-input
                 v-model="data.filter"
-                placeholder="filter the attribute set"
+                :placeholder="$t('filter_attribute_set')"
                 clearable
             ></el-input>
         </div>
@@ -32,6 +32,7 @@
 import { ElInput } from "element-plus";
 import { reactive, computed, watch } from "vue";
 import { ProfileManager } from "../profile-manager";
+import {$t} from '../i18n'
 
 const props = defineProps({
     crateManager: {

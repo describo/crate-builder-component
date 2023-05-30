@@ -16,7 +16,7 @@
                 <el-input
                     v-model="data.filterInputModel"
                     @change="filterConnections"
-                    placeholder="Search for a connection"
+                    :placeholder="$t('search_for_connection')"
                 ></el-input>
             </div>
             <div v-for="entity of connections" :key="entity.describoId">
@@ -31,6 +31,7 @@ import { ElPagination, ElInput } from "element-plus";
 import RenderReverseItemLinkComponent from "./RenderReverseItemLink.component.vue";
 import { computed, reactive, onMounted } from "vue";
 import isPlainObject from "lodash-es/isPlainObject";
+import {$t} from '../i18n'
 
 const props = defineProps({
     crateManager: {

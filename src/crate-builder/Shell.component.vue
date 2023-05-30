@@ -5,9 +5,6 @@
             :show-text="false"
             v-if="data.loading"
         />
-
-        <p>message1: {{ $t('hello', {count: 1}) }}</p>
-        <p>message2: {{ $t('hello', {count: 2}) }}</p>
         <render-entity-component
             v-if="(!data.error && props.crate) || languageChanged"
             :crate-manager="data.crateManager"

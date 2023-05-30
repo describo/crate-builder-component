@@ -4,7 +4,7 @@
             v-if="data.hasValidValues"
             class="w-full"
             v-model="data.internalValue"
-            placeholder="Select"
+            :placeholder="$t('select')"
             filterable
             @change="save"
         >
@@ -17,8 +17,7 @@
             </el-option>
         </el-select>
         <div v-else class="text-xs text-gray-700">
-            The definition provided to this component has values of the wrong from. It can only be
-            an array of strings
+            {{ $t('invalid_select_value') }}
         </div>
     </div>
 </template>
@@ -29,6 +28,7 @@ import { reactive, watch } from "vue";
 import isArray from "lodash-es/isArray";
 import isString from "lodash-es/isString";
 import uniq from "lodash-es/uniq";
+import {$t} from '../i18n'
 
 const props = defineProps({
     property: {

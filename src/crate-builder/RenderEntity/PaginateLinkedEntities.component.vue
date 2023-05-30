@@ -4,7 +4,7 @@
             <div class="flex-grow">
                 <el-input
                     v-model="data.filter"
-                    placeholder="Filter the entities"
+                    :placeholder="$t('filter_the_entities')"
                     clearable
                     @change="filterAndChunkEntitiesForDisplay"
                     @blur="filterAndChunkEntitiesForDisplay"
@@ -44,6 +44,7 @@
 import { ElInput, ElPagination } from "element-plus";
 import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";
 import { reactive, watch } from "vue";
+import {$t} from '../i18n'
 
 const props = defineProps({
     crateManager: {

@@ -1,12 +1,13 @@
 <template>
     <div class="text-sm">
         <pre v-if="data.crate['@graph']">{{ data.crate }}</pre>
-        <div v-else>loading...</div>
+        <div v-else>{{ $t('preview_loading') }}</div>
     </div>
 </template>
 
 <script setup>
 import { reactive, onMounted, onBeforeUnmount } from "vue";
+import {$t} from '../i18n'
 
 const props = defineProps({
     crateManager: {

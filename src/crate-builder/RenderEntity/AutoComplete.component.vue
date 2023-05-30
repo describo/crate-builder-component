@@ -3,7 +3,7 @@
         <el-select
             class="w-full"
             v-model="data.selection"
-            placeholder="select an existing entity or create a new one"
+            :placeholder="$t('select_existing_or_create_new')"
             filterable
             clearable
             default-first-option
@@ -25,7 +25,7 @@
                     <div class="text-gray-700">
                         <div v-if="item.type === 'new'">
                             <el-button type="success" size="default" class="flex flex-row">
-                                <div>Create new {{ item["@type"] }}:&nbsp;</div>
+                                <div>{{ $t('create_new_of_type', {type: item["@type"]}) }}:&nbsp;</div>
                                 <div>{{ item.name }}</div>
                             </el-button>
                         </div>
@@ -49,6 +49,8 @@
 import { ElButton, ElSelect, ElOption, ElOptionGroup, vLoading } from "element-plus";
 import { reactive, watch, inject } from "vue";
 import debounce from "lodash-es/debounce";
+import {$t} from '../i18n'
+
 const configuration = inject("configuration");
 
 import { Lookup, wrapPromise } from "./auto-complete.lib";
@@ -163,12 +165,12 @@ async function querySearch(queryString) {
     for (let response of responses) {
         if (response.endpoint === "internal" && response.documents?.length) {
             matches.push({
-                label: "Associate an entity already defined in this crate",
+                label: $t('associate_existing_entity'),
                 entities: response.documents.map((e) => ({ ...e, type: "internal" })).slice(0, 5),
             });
         } else if (response.endpoint === "templates" && response.documents?.length) {
             matches.push({
-                label: "Associate an entity from saved templates",
+                label: $t('associate_entity_from_template'),
                 entities: response.documents.map((template) => ({
                     ...template.entity,
                     type: "template",
@@ -176,17 +178,17 @@ async function querySearch(queryString) {
             });
         } else if (response.endpoint === "ror" && response.documents?.length) {
             matches.push({
-                label: "Associate an Organization defined in the Research Organization Registry",
+                label: $t('associate_organization_from_ror'),
                 entities: response.documents.map((entity) => ({ ...entity, type: "ror" })),
             });
         } else if (response.endpoint === "entities" && response.documents?.length) {
             matches.push({
-                label: "Associate a user created entity",
+                label: $t('associate_user_created_entity'),
                 entities: response.documents.map((entity) => ({ ...entity, type: "datapack" })),
             });
         } else if (response.endpoint === "datapacks" && response.documents?.length) {
             matches.push({
-                label: "Associate a verified entity from a datapack",
+                label: $t('associate_from_datapack'),
                 entities: response.documents.map((entity) => ({ ...entity, type: "datapack" })),
             });
         }

@@ -8,27 +8,27 @@
                 'w-2/3': props.mode === 'entity' && data.existingEntities.length,
             }"
         >
-            <div>Define a location by selection on the map</div>
+            <div>{{ $t('define_location')}}</div>
             <div class="flex flex-col">
                 <div class="flex flex-row space-x-4 py-1">
                     <div>
                         <el-button @click="centerMap" type="primary">
-                            <i class="fa-solid fa-crosshairs"></i>&nbsp; center map
+                            <i class="fa-solid fa-crosshairs"></i>&nbsp; {{ $t('center_map') }}
                         </el-button>
                     </div>
                     <div class="flex flex-col">
                         <el-radio v-model="data.mode" label="box" @change="updateHandlers">
-                            select region
+                            {{ $t('select_region') }}
                         </el-radio>
                         <el-radio v-model="data.mode" label="point" @change="updateHandlers">
-                            select point
+                            {{ $t('select_point') }}
                         </el-radio>
                     </div>
                     <div v-if="data.mode === 'box'" class="pt-1 text-gray-600">
-                        Press the shift key and drag the mouse to select an area
+                        {{ $t('press_shift_drag_to_select') }}
                     </div>
                     <div v-if="data.mode === 'point'" class="pt-1 text-gray-600">
-                        Click on the map to select a point
+                        {{ $t('click_on_map_to_select_point') }}
                     </div>
                 </div>
                 <el-form
@@ -37,10 +37,10 @@
                     :model="data.form"
                     @submit.prevent.native="emitFeature"
                 >
-                    <el-form-item label="Location Name">
+                    <el-form-item :label="$t('location_name')">
                         <el-input
                             v-model="data.locationName"
-                            placeholder="Please provide a name for this location"
+                            :placeholder="$t('provide_name_for_location')"
                         ></el-input>
                         <div v-if="data.error" class="text-sm text-red-700">{{ data.error }}</div>
                     </el-form-item>
@@ -50,11 +50,11 @@
         </div>
         <div class="w-1/3 p-4" v-if="props.mode === 'entity' && data.existingEntities.length">
             <div class="flex flex-col p-2">
-                <div>Select existing location defined in the crate</div>
+                <div>{{ $t('select_existing_location') }}</div>
                 <el-select
                     v-model="data.selectValue"
                     class="m-2"
-                    placeholder="Select"
+                    :placeholder="$t('select')"
                     size="large"
                     @change="emitSelection"
                 >
@@ -76,6 +76,8 @@ import "leaflet/dist/leaflet.css";
 import * as Leaflet from "leaflet/dist/leaflet-src.esm.js";
 import AreaSelectInit from "./Map.SelectArea.js";
 import { reactive, onMounted, onBeforeUnmount, inject } from "vue";
+import {$t} from '../i18n'
+
 AreaSelectInit(Leaflet);
 
 const props = defineProps({
@@ -247,7 +249,7 @@ function handlePointSelect(e) {
 
 function emitFeature() {
     if (props.mode === "entity" && (!data.locationName || !data.feature.geojson)) {
-        data.error = `You need to provide a name for this location`;
+        data.error = $t('provide_name_for_location_error');
         return;
     }
     data.error = undefined;

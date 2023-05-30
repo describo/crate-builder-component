@@ -3,15 +3,14 @@
         <el-date-picker
             v-model="data.internalValue"
             type="date"
-            placeholder="Pick a date"
+            :placeholder="$t('pick_a_date')"
             format="YYYY-MM-DD"
             @change="save"
             :clearable="true"
         >
         </el-date-picker>
         <div class="text-xs text-gray-700" v-if="!data.isValidDate">
-            The supplied date '{{ props.value }}' is invalid. Date format is: YYYY-MM-DD or an ISO
-            String. e.g. 2021-03-22 or 2022-09-28T02:20:56.521Z.
+            {{ $t('invalid_date_value', {value: props.value}) }}
         </div>
     </div>
 </template>
@@ -21,6 +20,7 @@ import { ElDatePicker } from "element-plus";
 import { reactive, watch } from "vue";
 import startOfDay from "date-fns/esm/startOfDay";
 import { checkDateIsValid } from "./date-libs";
+import {$t} from '../i18n'
 
 const props = defineProps({
     property: {
