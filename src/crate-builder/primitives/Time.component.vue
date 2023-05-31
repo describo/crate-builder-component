@@ -7,11 +7,10 @@
             @blur="data.throttledSave"
             @change="data.throttledSave"
             resize="vertical"
-            placeholder="Please provide a time."
+            :placeholder="$t('provide_time')"
         ></el-input>
         <div class="text-xs text-gray-700" v-if="!data.isValidTime">
-            The supplied time '{{ data.internalValue }}' is invalid. Time format is: HH:mm::ss.
-            e.g.09:03:59
+            {{ $t('invalid_time_value') }}
         </div>
     </div>
 </template>
@@ -20,6 +19,7 @@
 import { ElInput } from "element-plus";
 import { reactive, watch } from "vue";
 import throttle from "lodash-es/throttle.js";
+import {$t} from '../i18n'
 
 const props = defineProps({
     property: {

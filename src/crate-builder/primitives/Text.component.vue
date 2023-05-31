@@ -16,8 +16,7 @@
             </el-button>
         </div>
         <div v-else class="text-xs text-gray-700">
-            The type '{{ props.type }}' is not valid for this component. It can only be 'text' or
-            'textarea'
+            {{ $t('invalid_type_for_text', {type: props.type}) }}
         </div>
     </div>
 </template>
@@ -26,6 +25,7 @@
 import { ElInput, ElButton } from "element-plus";
 import { reactive, watch } from "vue";
 import throttle from "lodash-es/throttle.js";
+import {$t} from '../i18n'
 
 const props = defineProps({
     type: {

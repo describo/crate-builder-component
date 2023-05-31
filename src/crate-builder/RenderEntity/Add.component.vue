@@ -24,7 +24,7 @@
                     :property="props.property"
                     type="text"
                     @save:property="createProperty"
-                    placeholder="Add text"
+                    :placeholder="$t('add_text')"
                 />
                 <text-component
                     v-if="data.addType === 'TextArea'"
@@ -93,8 +93,7 @@
                 >
                     <div class="w-full">
                         <div class="text-xs">
-                            Associate an existing '{{ data.addType }}' (lookup by identifier or
-                            name) or create a new '{{ data.addType }}' by typing a name for it.
+                            {{$t('associate_existing_prompt', {addType: data.addType})}}
                         </div>
                         <autocomplete-component
                             :crate-manager="props.crateManager"
@@ -124,6 +123,7 @@ import SelectObjectComponent from "../primitives/SelectObject.component.vue";
 import GeoComponent from "../primitives/Geo.component.vue";
 import AutocompleteComponent from "./AutoComplete.component.vue";
 import { reactive, computed } from "vue";
+import {$t} from '../i18n'
 
 const props = defineProps({
     crateManager: {

@@ -4,7 +4,7 @@
             <div>
                 <el-button @click="save" type="primary">
                     <i class="fa-solid fa-floppy-disk"></i>
-                    &nbsp;save
+                    &nbsp;{{ $t('save_label') }}
                 </el-button>
             </div>
         </div>
@@ -23,6 +23,7 @@ import { javascript } from "@codemirror/lang-javascript";
 import { oneDark } from "@codemirror/theme-one-dark";
 
 import { reactive, ref, watch } from "vue";
+import {$t} from '../i18n'
 
 const props = defineProps({
     crateManager: {

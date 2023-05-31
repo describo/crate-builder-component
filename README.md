@@ -283,27 +283,29 @@ export class Lookup {
 **See [./src/app/lookup.js](./src/app/lookup.js) for an example. In fact, you probably want to start
 from there.**
 
--   `enable-context-editor`: true | false: `(default: true)` : enable / disable the context editor
+- `enable-context-editor`: true | false: `(default: true)` : enable / disable the context editor
     control
--   `enable-crate-preview`: true | false: `(default: true)` : enable / disable the crate preview
+- `enable-crate-preview`: true | false: `(default: true)` : enable / disable the crate preview
     control
--   `enable-browse-entities`: true | false: `(default: true)` : enable / disable the browse entities
+- `enable-browse-entities`: true | false: `(default: true)` : enable / disable the browse entities
     control
--   `enable-template-save`: true | false: `(default: false)` : enable / disable the entity and crate
+- `enable-template-save`: true | false: `(default: false)` : enable / disable the entity and crate
     template saving controls
--   `enableInternalRouting`: true | false: `(default: false)`: enable / disable the internal router
+- `enableInternalRouting`: true | false: `(default: false)`: enable / disable the internal router
     which updates the location whenever an entity is selected. If no router is found (ie inside a
     web component or just not used), routing is turned off anyway. Most likely you want to leave the
     component to deal with this or listen out for the `navigation` event and handle it yourself if
     the component can't.
--   `enableReverseLinkBrowser`: true : false: `(default: true)`: enable / disable the reverse link
+- `enableReverseLinkBrowser`: true : false: `(default: true)`: enable / disable the reverse link
     browser. If enabled, it can be shown as a right sidebar as required.
--   `purgeUnlinkedEntities`: true : false: `(default: true)`: purge unlinked entities from the crate
+- `purgeUnlinkedEntities`: true : false: `(default: true)`: purge unlinked entities from the crate
     before emitting the crate for saving
--   `readonly`: true | false: `(default: false)` : if set to true all of the controls to edit that
+- `readonly`: true | false: `(default: false)` : if set to true all of the controls to edit that
     the data are turned off. The crate is set into a mode where it is readonly.
--   `webComponent`: true | false: `(default: false)` : Setting this to true alters the behaviour of
+- `webComponent`: true | false: `(default: false)` : Setting this to true alters the behaviour of
     some components when the crate builder is used as a web component.
+- `language`: en | hu `(default: en)` : Sets the component's localization to the given language. Currently English 
+    (en) and Hungarian (hu) are supported. 
 
 ## Events
 
