@@ -284,6 +284,7 @@ onMounted(() => {
     data.watchers[1] = watch(
         () => props.profile,
         () => {
+            data.activeTab = "About";
             init();
         }
     );
@@ -294,7 +295,6 @@ onBeforeUnmount(() => {
 
 function init() {
     if (!props.entity.describoId) return;
-    data.activeTab = "About";
     const profileManager = new ProfileManager({ profile: props.crateManager.profile });
     props.crateManager.profileManager = profileManager;
 
