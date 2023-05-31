@@ -13,6 +13,7 @@
             :enable-template-save="data.enableTemplateSave"
             :enable-reverse-link-browser="data.enableReverseLinkBrowser"
             :purge-unlinked-entities="data.purgeUnlinkedEntities"
+            :language="data.language"
             @ready="ready"
             @error="error"
             @save:crate="saveCrate"
@@ -72,6 +73,7 @@ function init() {
         readonly: $this?.config?.readonly ?? false,
         webComponent: $this?.config?.webComponent ?? true,
         enableInternalRouting: $this?.config?.enableInternalRouting ?? false,
+        language: $this?.config?.language ?? "en",
     };
 }
 

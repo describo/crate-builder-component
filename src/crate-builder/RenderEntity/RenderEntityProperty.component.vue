@@ -21,7 +21,7 @@
                 v-if="!data.propertyDefinition && profileWarnMissingProperty"
                 class="text-red-600 text-xs"
             >
-                (not defined in profile)
+                ({{ $t('not_defined_in_profile') }})
             </div>
         </div>
         <div class="w-2/3 xl:w-4/5 flex flex-col flex-grow">
@@ -117,6 +117,8 @@ import cloneDeep from "lodash-es/cloneDeep";
 import orderBy from "lodash-es/orderBy";
 import debounce from "lodash-es/debounce";
 import { ProfileManager } from "../profile-manager.js";
+import {$t} from '../i18n'
+
 const configuration = inject("configuration");
 
 const props = defineProps({

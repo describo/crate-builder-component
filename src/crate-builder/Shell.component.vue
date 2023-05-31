@@ -6,7 +6,7 @@
             v-if="data.loading"
         />
         <render-entity-component
-            v-if="!data.error && props.crate"
+            v-if="(!data.error && props.crate) || languageChanged"
             :crate-manager="data.crateManager"
             :profile="data.profile"
             :entity="data.entity"
@@ -37,6 +37,7 @@ import {
     reactive,
     watch,
     getCurrentInstance,
+    inject
 } from "vue";
 import cloneDeep from "lodash-es/cloneDeep";
 import isEmpty from "lodash-es/isEmpty";
@@ -44,8 +45,18 @@ import isFunction from "lodash-es/isFunction";
 import debounce from "lodash-es/debounce";
 import { CrateManager } from "./crate-manager.js";
 import { useRouter, useRoute } from "vue-router";
+import {$t, i18next} from "./i18n"
+import { nextTick, ref } from 'vue';
 
 let $route, $router;
+
+const languageChanged = ref(true);
+const forceRenderOnLanguageChanged = async () => {
+    languageChanged.value = false;
+    await nextTick();
+    languageChanged.value = true;
+};
+
 
 const props = defineProps({
     crate: {
@@ -109,6 +120,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
         validator: (val) => [true, false].includes(val),
+    },
+    language: {
+      type: String,
+      default: "en",
     },
 });
 
@@ -192,6 +207,16 @@ onMounted(async () => {
             }
         )
     );
+
+    watchers.push(
+        watch(
+            () => props.language,
+            (n) => {
+                i18next.changeLanguage(props.language);
+                forceRenderOnLanguageChanged();
+            }
+        )
+    )
 });
 onBeforeUnmount(() => {
     watchers.forEach((unWatch) => unWatch());
@@ -199,6 +224,7 @@ onBeforeUnmount(() => {
 });
 
 async function init() {
+
     if (!props.crate || isEmpty(props.crate)) {
         data.crate = {};
         data.entity = {};
@@ -257,7 +283,12 @@ function configure() {
         purgeUnlinkedEntities: props.purgeUnlinkedEntities,
         enableTemplateLookups: false,
         enableDataPackLookups: false,
+        language: props.language,
     };
+
+    console.log("language", props, configuration)
+    i18next.changeLanguage(configuration.language)
+
     if (props.lookup) {
         if (isFunction(props.lookup.entityTemplates)) {
             configuration.enableTemplateLookups = true;

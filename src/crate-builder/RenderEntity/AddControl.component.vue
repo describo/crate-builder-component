@@ -14,7 +14,7 @@
         <div v-else>
             <el-select
                 v-model="data.selectedType"
-                placeholder="Select a type to add"
+                :placeholder="$t('select_a_type_to_add')"
                 @change="add"
                 clearable
                 class="w-full"
@@ -35,6 +35,8 @@
 import { ElButton, ElSelect, ElOption } from "element-plus";
 import isArray from "lodash-es/isArray";
 import { reactive, onMounted, watch } from "vue";
+import {$t} from '../i18n'
+
 const props = defineProps({
     types: {
         type: [String, Array],

@@ -19,6 +19,7 @@
         "load:datapacks": "sleep 10 && node ./load-data-packs.cjs",
         "stop:elastic": "docker compose stop ; docker compose rm -f",
         "storybook": "storybook dev -p 6006",
+        "storybook:hu": "STORYBOOK_LANG=hu storybook dev -p 6006",
         "build-storybook": "storybook build"
     },
     "repository": {
@@ -44,6 +45,7 @@
         "codemirror": "^6.0.1",
         "date-fns": "^2.30.0",
         "element-plus": "^2.3.5",
+        "i18next": "^22.5.0",
         "leaflet": "^1.9.4",
         "leaflet-area-select": "^1.0.5",
         "lodash": "^4.17.21",

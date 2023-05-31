@@ -8,8 +8,7 @@
             resize="vertical"
         ></el-input>
         <div class="text-xs text-gray-700" v-if="!data.isValidNumber">
-            The supplied number '{{ data.internalValue }}' is invalid. The value must be a valid
-            number passed in as a String or a Number.
+            {{ $t('invalid_number_value', {value: data.internalValue}) }}
         </div>
     </div>
 </template>
@@ -19,6 +18,7 @@ import { ElInput } from "element-plus";
 import debounce from "lodash-es/debounce";
 import { reactive, watch } from "vue";
 import isNumeric from "validator/es/lib/isNumeric";
+import {$t} from '../i18n'
 
 const props = defineProps({
     property: {

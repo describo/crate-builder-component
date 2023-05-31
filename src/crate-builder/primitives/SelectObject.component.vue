@@ -4,7 +4,7 @@
             v-if="data.hasValidValues"
             class="w-full"
             v-model="data.internalValue"
-            placeholder="Select"
+            :placeholder="$t('select')"
             filterable
             :filter-method="filter"
             @change="save"
@@ -20,9 +20,7 @@
             </el-option>
         </el-select>
         <div v-if="!data.hasValidValues" class="text-xs text-gray-700">
-            The definition provided to this component has values of the wrong from. It can only be
-            an array of JSON-LD objects and each object, at a minimum, must have '@id', '@type' and
-            'name' defined.
+            {{ $t('invalid_selectobject_values') }}
         </div>
     </div>
 </template>
@@ -32,6 +30,7 @@ import { ElSelect, ElOption } from "element-plus";
 import { reactive, watch } from "vue";
 import isPlainObject from "lodash-es/isPlainObject";
 import { validateId } from "../crate-manager.js";
+import {$t} from '../i18n'
 
 const props = defineProps({
     property: {

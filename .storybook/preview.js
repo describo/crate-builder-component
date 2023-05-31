@@ -4,6 +4,8 @@ import ElementPlus from "element-plus";
 import "@element-plus/theme-chalk/dist/index.css";
 import "@fortawesome/fontawesome-free/js/all";
 import { config } from "@fortawesome/fontawesome-svg-core";
+import {i18next} from '../src/crate-builder/i18n';
+
 config.autoReplaceSvg = "nest";
 
 setup((app) => {
@@ -18,6 +20,8 @@ setup((app) => {
         enableTemplateLookups: false,
         enableDataPackLookups: false,
     });
+    // Change language to match env var STORYBOOK_LANG or fall back to en
+    i18next.changeLanguage(process.env.STORYBOOK_LANG ?? "en");
 });
 
 // export const parameters = {
