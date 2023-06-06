@@ -37,7 +37,8 @@
 import TextComponent from "../primitives/Text.component.vue";
 import { reactive, watch, inject } from "vue";
 import { isURL } from "../crate-manager.js";
-const configuration = inject("configuration");
+import { configurationKey } from "./keys.js";
+const configuration = inject(configurationKey);
 
 const props = defineProps({
     entity: {

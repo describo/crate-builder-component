@@ -214,7 +214,8 @@ import RenderEntityNameComponent from "./RenderEntityName.component.vue";
 import RenderEntityPropertyComponent from "./RenderEntityProperty.component.vue";
 import RenderReverseConnectionsComponent from "./RenderReverseConnections.component.vue";
 import RenderControlsComponent from "./RenderControls.component.vue";
-import { reactive, onMounted, onBeforeMount, onBeforeUnmount, watch, provide } from "vue";
+import { configurationKey } from "./keys.js";
+import { reactive, computed, onMounted, onBeforeMount, onBeforeUnmount, watch, provide } from "vue";
 import debounce from "lodash-es/debounce";
 import cloneDeep from "lodash-es/cloneDeep";
 import { ProfileManager } from "../profile-manager.js";
@@ -268,7 +269,10 @@ const $emit = defineEmits([
 ]);
 
 onBeforeMount(() => {
-    provide("configuration", props.configuration);
+    provide(
+        configurationKey,
+        computed(() => props.configuration)
+    );
 });
 onMounted(() => {
     init();
@@ -294,6 +298,9 @@ onBeforeUnmount(() => {
 });
 
 function init() {
+    if (props.entity.describoId !== data.entity.describoId) {
+        window.scrollTo(0, 0);
+    }
     if (!props.entity.describoId) return;
     const profileManager = new ProfileManager({ profile: props.crateManager.profile });
     props.crateManager.profileManager = profileManager;
@@ -343,6 +350,7 @@ function init() {
         // data.tabs = layout.tabs.filter((t) => t?.inputs?.length);
         data.tabs = layout.tabs;
     }
+
     $emit("ready");
 }
 function applyLayout({ layouts, hide = [], entity }) {
@@ -544,16 +552,8 @@ function updateContext(data) {
 function addTemplate() {}
 </script>
 
-<style scoped>
+<style>
 .tab-label-width {
     width: 200px;
-}
-
-.reverse-connections-panel {
-    height: 700px;
-}
-
-.metadata-panel {
-    height: calc(100vh - 200px);
 }
 </style>

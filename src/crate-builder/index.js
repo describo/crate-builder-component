@@ -8,7 +8,6 @@ import DescriboCrateBuilder from "./Shell.component.vue";
 
 export default {
     install(Vue, options) {
-        console.log("install", Vue, options)
         Vue.component("DescriboCrateBuilder", DescriboCrateBuilder);
     },
 };

@@ -1,9 +1,9 @@
 <template>
     <div class="flex flex-row">
         <div class="w-1/3 xl:w-1/5 flex flex-col">
-            <div>{{ $t('name_field_label') }}</div>
+            <div>{{ $t("name_field_label") }}</div>
             <div class="text-gray-600 font-light text-xs pr-1">
-                {{ $t('name_field_help') }}
+                {{ $t("name_field_help") }}
             </div>
         </div>
         <div class="w-2/3 xl:w-4/5 flex flex-col" v-if="!configuration.readonly">
@@ -26,9 +26,9 @@
 <script setup>
 import TextComponent from "../primitives/Text.component.vue";
 import { reactive, watch, inject } from "vue";
-import {$t} from '../i18n'
-
-const configuration = inject("configuration");
+import { configurationKey } from "./keys.js";
+import { $t } from "../i18n";
+const configuration = inject(configurationKey);
 
 let props = defineProps({
     entity: {

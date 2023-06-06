@@ -49,9 +49,9 @@
 import { ElInput, ElPagination } from "element-plus";
 import { reactive, computed, inject } from "vue";
 import TypeIconComponent from "./TypeIcon.component.vue";
-import {$t} from '../i18n'
-
-const configuration = inject("configuration");
+import { $t } from "../i18n";
+import { configurationKey } from "./keys.js";
+const configuration = inject(configurationKey);
 
 const props = defineProps({
     crateManager: {

@@ -27,27 +27,25 @@
                     :value="item.name"
                 />
             </el-select>
-            <el-select
-                v-model="data.select.language"
-                @change="setLanguage"
-                placeholder="Select a language"
-                clearable
-            >
+            <el-select v-model="data.selectedLanguage" placeholder="Select a language">
                 <el-option
                     v-for="item in data.languages"
                     :key="item.name"
                     :label="item.name"
-                    :value="item.name"
+                    :value="item.value"
                 />
             </el-select>
-
+            <el-select v-model="data.readonly" placeholder="Select a language">
+                <el-option :key="true" label="Readonly: True" :value="true" />
+                <el-option :key="false" label="Readonly: False" :value="false" />
+            </el-select>
         </div>
         <describo-crate-builder
             @ready="data.loading = false"
             :crate="data.selectedCrate"
             :profile="data.selectedProfile"
             :lookup="lookup"
-            :readonly="false"
+            :readonly="data.readonly"
             :enable-context-editor="true"
             :enable-crate-preview="true"
             :enable-browse-entities="true"
@@ -86,8 +84,8 @@ const data = reactive({
     select: {
         crate: undefined,
         profile: undefined,
-        language: undefined,
     },
+    readonly: false,
     crates: [
         { name: "blank", value: crateFile1 },
         { name: "Multiple Types", value: crateFile7 },
@@ -114,7 +112,7 @@ const data = reactive({
 
     selectedCrate: undefined,
     selectedProfile: undefined,
-    selectedLanguage: "en"
+    selectedLanguage: "en",
 });
 
 function setCrate(name) {
@@ -125,8 +123,9 @@ function setCrate(name) {
 function setProfile(name) {
     data.selectedProfile = name ? data.profiles.filter((p) => p.name === name)[0].value : undefined;
 }
-function setLanguage(name) {
-    data.selectedLanguage = name ? data.languages.filter((p) => p.name === name)[0].value : undefined;
+function setLanguage(value) {
+    data.selectedLanguage = value
+        ? data.languages.filter((p) => p.name === value)[0].value
+        : undefined;
 }
-
 </script>

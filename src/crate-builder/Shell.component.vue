@@ -1,12 +1,7 @@
 <template>
     <div class="flex flex-col">
-        <el-progress
-            :percentage="parseFloat(data.progress.percent)"
-            :show-text="false"
-            v-if="data.loading"
-        />
         <render-entity-component
-            v-if="(!data.error && props.crate) || languageChanged"
+            v-if="!data.error && props.crate"
             :crate-manager="data.crateManager"
             :profile="data.profile"
             :entity="data.entity"
@@ -28,7 +23,6 @@
 </template>
 
 <script setup>
-import { ElProgress } from "element-plus";
 import RenderEntityComponent from "./RenderEntity/Shell.component.vue";
 import {
     onMounted,
@@ -37,7 +31,7 @@ import {
     reactive,
     watch,
     getCurrentInstance,
-    inject
+    inject,
 } from "vue";
 import cloneDeep from "lodash-es/cloneDeep";
 import isEmpty from "lodash-es/isEmpty";
@@ -45,18 +39,9 @@ import isFunction from "lodash-es/isFunction";
 import debounce from "lodash-es/debounce";
 import { CrateManager } from "./crate-manager.js";
 import { useRouter, useRoute } from "vue-router";
-import {$t, i18next} from "./i18n"
-import { nextTick, ref } from 'vue';
+import { $t, i18next } from "./i18n";
 
 let $route, $router;
-
-const languageChanged = ref(true);
-const forceRenderOnLanguageChanged = async () => {
-    languageChanged.value = false;
-    await nextTick();
-    languageChanged.value = true;
-};
-
 
 const props = defineProps({
     crate: {
@@ -122,8 +107,8 @@ const props = defineProps({
         validator: (val) => [true, false].includes(val),
     },
     language: {
-      type: String,
-      default: "en",
+        type: String,
+        default: "en",
     },
 });
 
@@ -162,7 +147,7 @@ let watchers = [];
 
 onBeforeMount(() => {
     $router?.replace({ query: "" });
-    data.configuration = reactive(configure());
+    data.configuration = configure();
 });
 onMounted(async () => {
     await init();
@@ -210,13 +195,22 @@ onMounted(async () => {
 
     watchers.push(
         watch(
-            () => props.language,
-            (n) => {
+            [
+                () => props.enableContextEditor,
+                () => props.enableCratePreview,
+                () => props.enableBrowseEntities,
+                () => props.enableTemplateSave,
+                () => props.enableReverseLinkBrowser,
+                () => props.purgeUnlinkedEntities,
+                () => props.readonly,
+                () => props.language,
+            ],
+            () => {
+                data.configuration = configure();
                 i18next.changeLanguage(props.language);
-                forceRenderOnLanguageChanged();
             }
         )
-    )
+    );
 });
 onBeforeUnmount(() => {
     watchers.forEach((unWatch) => unWatch());
@@ -224,7 +218,6 @@ onBeforeUnmount(() => {
 });
 
 async function init() {
-
     if (!props.crate || isEmpty(props.crate)) {
         data.crate = {};
         data.entity = {};
@@ -286,8 +279,7 @@ function configure() {
         language: props.language,
     };
 
-    console.log("language", props, configuration)
-    i18next.changeLanguage(configuration.language)
+    i18next.changeLanguage(configuration.language);
 
     if (props.lookup) {
         if (isFunction(props.lookup.entityTemplates)) {

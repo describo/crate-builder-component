@@ -1,5 +1,5 @@
 <template>
-    <div v-loading="data.loading">
+    <div>
         <!-- if the entity does NOT have geography -->
         <div
             v-if="!showMap"
@@ -90,7 +90,7 @@
 
         <!-- if the entity has geography then show the map -->
         <div v-if="showMap">
-            <div class="flex flex-row" v-if="!data.editLocation">
+            <div class="flex flex-row">
                 <div class="flex flex-col">
                     <div class="bg-blue-200 p-2 cursor-pointer">
                         {{ props.entity.tgtEntity.name }}
@@ -116,12 +116,12 @@
 </template>
 
 <script setup>
-import { vLoading } from "element-plus";
 import TypeIconComponent from "./TypeIcon.component.vue";
 import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import MapComponent from "../primitives/Map.component.vue";
-import { computed, reactive, inject, watch, onMounted } from "vue";
-const configuration = inject("configuration");
+import { computed, inject } from "vue";
+import { configurationKey } from "./keys.js";
+const configuration = inject(configurationKey);
 
 const emit = defineEmits(["load:entity", "create:property", "save:property", "delete:property"]);
 const props = defineProps({
@@ -134,9 +134,6 @@ const props = defineProps({
         required: true,
     },
 });
-const data = reactive({
-    loading: false,
-});
 let showMap = computed(() => {
     return props.entity?.tgtEntity?.["@type"]?.match(/Geo/) ? true : false;
 });
@@ -144,8 +141,6 @@ let entity = computed(() => props.entity);
 let type = "unlink";
 
 function loadEntity(describoId) {
-    if (describoId === entity.describoId) return;
-    data.loading = true;
     // console.debug("Renderer Linked Item Component : emit(load:entity)", props.entity.tgtEntityId);
     emit("load:entity", { describoId });
 }

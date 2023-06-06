@@ -6,8 +6,7 @@
                     v-model="data.filter"
                     :placeholder="$t('filter_the_entities')"
                     clearable
-                    @change="filterAndChunkEntitiesForDisplay"
-                    @blur="filterAndChunkEntitiesForDisplay"
+                    @input="filterAndChunkEntitiesForDisplay"
                 />
             </div>
             <el-pagination
@@ -44,7 +43,7 @@
 import { ElInput, ElPagination } from "element-plus";
 import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";
 import { reactive, watch } from "vue";
-import {$t} from '../i18n'
+import { $t } from "../i18n";
 
 const props = defineProps({
     crateManager: {

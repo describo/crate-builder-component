@@ -16,7 +16,7 @@
             </el-button>
         </div>
         <div v-else class="text-xs text-gray-700">
-            {{ $t('invalid_type_for_text', {type: props.type}) }}
+            {{ $t("invalid_type_for_text", { type: props.type }) }}
         </div>
     </div>
 </template>
@@ -25,7 +25,8 @@
 import { ElInput, ElButton } from "element-plus";
 import { reactive, watch } from "vue";
 import throttle from "lodash-es/throttle.js";
-import {$t} from '../i18n'
+import isBoolean from "lodash-es/isBoolean.js";
+import { $t } from "../i18n";
 
 const props = defineProps({
     type: {
@@ -42,7 +43,7 @@ const props = defineProps({
         required: true,
     },
     value: {
-        type: [String, Number],
+        // type: [String, Number, Boolean],
     },
     placeholder: {
         type: String,
@@ -50,8 +51,8 @@ const props = defineProps({
 });
 const $emit = defineEmits(["save:property"]);
 const data = reactive({
-    internalValue: props.value,
-    currentValue: props.value,
+    internalValue: isBoolean(props.value) ? String(props.value) : props.value,
+    currentValue: isBoolean(props.value) ? String(props.value) : props.value,
     isValidType: ["text", "textarea"].includes(props.type),
     throttledSave: throttle(save, 1000),
 });

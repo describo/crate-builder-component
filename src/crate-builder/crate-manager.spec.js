@@ -89,8 +89,7 @@ describe("Test loading / exporting crate files", () => {
                 delete e["@reverse"];
                 return e;
             })[0];
-        let originalRootDataset = crate["@graph"].filter((e) => e["@id"] === "./")[0];
-        expect(rootDataset).toEqual(originalRootDataset);
+        expect(rootDataset).toEqual({ "@id": "./", "@type": ["Dataset"], name: "Dataset" });
     });
     test("with root dataset, multiple types", async () => {
         let crate = getBaseCrate();
@@ -110,8 +109,11 @@ describe("Test loading / exporting crate files", () => {
                 delete e["@reverse"];
                 return e;
             })[0];
-        let originalRootDataset = crate["@graph"].filter((e) => e["@id"] === "./")[0];
-        expect(rootDataset).toEqual(originalRootDataset);
+        expect(rootDataset).toEqual({
+            "@id": "./",
+            "@type": ["Dataset", "Something Else"],
+            name: "Dataset",
+        });
     });
     test("with root dataset and one text property", async () => {
         let crate = getBaseCrate();
@@ -315,7 +317,7 @@ describe("Test interacting with the crate", () => {
         };
         e = crateManager.addEntity({ entity });
         expect(e["@type"]).toEqual("Thing");
-        expect(e["@id"]).toMatch(/^#[a-z,0-9]{32}/);
+        expect(e["@id"]).toMatch(/^e.*/);
 
         entity = {
             "@id": "./",

@@ -1,6 +1,9 @@
 <template>
     <div>
-        <div class="flex flex-row space-x-1 py-2 mb-2 border-b-2 border-gray-700">
+        <div
+            class="flex flex-row space-x-1 py-2 mb-2 border-b-2 border-gray-700"
+            :key="configuration.language"
+        >
             <!-- navbar : controls -->
             <div>
                 <!-- go to root dataset -->
@@ -117,7 +120,9 @@
             size="50%"
             @close="data.dialog.addProperty = false"
         >
-            <template #header> <div>{{ $t("add_properties_to_this_entity") }}</div></template>
+            <template #header>
+                <div>{{ $t("add_properties_to_this_entity") }}</div></template
+            >
             <template #default>
                 <add-property-dialog
                     :crate-manager="props.crateManager"
@@ -133,7 +138,9 @@
             size="70%"
             @close="data.dialog.editContext = false"
         >
-            <template #header> <div>{{ $t("edit_context") }}</div></template>
+            <template #header>
+                <div>{{ $t("edit_context") }}</div></template
+            >
             <template #default>
                 <edit-context-dialog
                     :crate-manager="props.crateManager"
@@ -149,7 +156,9 @@
             size="60%"
             @close="data.dialog.previewCrate = false"
         >
-            <template #header> <div>{{ $t("preview_crate") }}</div></template>
+            <template #header>
+                <div>{{ $t("preview_crate") }}</div></template
+            >
             <template #default>
                 <preview-crate-dialog :crate-manager="props.crateManager" />
             </template>
@@ -170,7 +179,9 @@
             size="60%"
             @close="data.dialog.browseEntities = false"
         >
-            <template #header> <div>{{ $t("browse_entities") }}</div></template>
+            <template #header>
+                <div>{{ $t("browse_entities") }}</div></template
+            >
             <template #default>
                 <browse-entities-dialog
                     :crate-manager="props.crateManager"
@@ -190,9 +201,9 @@ import EditContextDialog from "./DialogEditContext.component.vue";
 import PreviewCrateDialog from "./DialogPreviewCrate.component.vue";
 import BrowseEntitiesDialog from "./DialogBrowseEntities.component.vue";
 import { reactive, computed, inject } from "vue";
-import isArray from "lodash-es/isArray";
-import {$t} from '../i18n'
-const configuration = inject("configuration");
+import { configurationKey } from "./keys.js";
+import { $t } from "../i18n";
+const configuration = inject(configurationKey);
 
 const props = defineProps({
     crateManager: {

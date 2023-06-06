@@ -21,7 +21,7 @@
                 v-if="!data.propertyDefinition && profileWarnMissingProperty"
                 class="text-red-600 text-xs"
             >
-                ({{ $t('not_defined_in_profile') }})
+                ({{ $t("not_defined_in_profile") }})
             </div>
         </div>
         <div class="w-2/3 xl:w-4/5 flex flex-col flex-grow">
@@ -103,23 +103,14 @@ import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";
 import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import AddComponent from "./Add.component.vue";
 import DisplayPropertyNameComponent from "./DisplayPropertyName.component.vue";
-import {
-    ref,
-    reactive,
-    computed,
-    onMounted,
-    onBeforeMount,
-    onBeforeUnmount,
-    watch,
-    inject,
-} from "vue";
+import { configurationKey } from "./keys.js";
+import { reactive, computed, onMounted, onBeforeMount, onBeforeUnmount, watch, inject } from "vue";
 import cloneDeep from "lodash-es/cloneDeep";
 import orderBy from "lodash-es/orderBy";
 import debounce from "lodash-es/debounce";
 import { ProfileManager } from "../profile-manager.js";
-import {$t} from '../i18n'
-
-const configuration = inject("configuration");
+import { $t } from "../i18n";
+const configuration = inject(configurationKey);
 
 const props = defineProps({
     crateManager: {

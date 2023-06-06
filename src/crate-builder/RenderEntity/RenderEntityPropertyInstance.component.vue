@@ -72,10 +72,10 @@ import isDecimal from "validator/es/lib/isDecimal";
 import isInt from "validator/es/lib/isInt";
 import isFloat from "validator/es/lib/isFloat";
 import isNumeric from "validator/es/lib/isNumeric";
-
 import { computed, inject } from "vue";
 import { isURL } from "../crate-manager.js";
-const configuration = inject("configuration");
+import { configurationKey } from "./keys.js";
+const configuration = inject(configurationKey);
 
 const props = defineProps({
     crateManager: {

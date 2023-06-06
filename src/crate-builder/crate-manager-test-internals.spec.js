@@ -295,7 +295,7 @@ describe("Test entity definition normalisation", () => {
             "@type": "Dataset",
             name: "e1",
         };
-        entity = ee.__normalise(entity);
+        entity = ee.__normalise(entity, "e0");
         expect(entity).toMatchObject({ "@id": "#1", "@type": "Dataset", name: "e1" });
     });
     test(`test normalising known, good definition with describoId defined`, () => {
@@ -306,7 +306,7 @@ describe("Test entity definition normalisation", () => {
             "@type": "Dataset",
             name: "e1",
         };
-        entity = ee.__normalise(entity);
+        entity = ee.__normalise(entity, "e0");
         expect(entity).toMatchObject({
             describoId: "RootDataset",
             "@id": "#1",
@@ -320,7 +320,7 @@ describe("Test entity definition normalisation", () => {
             "@type": "Dataset",
             name: "e1",
         };
-        entity = ee.__normalise(entity);
+        entity = ee.__normalise(entity, "e0");
         expect(entity).toMatchObject({ "@id": entity["@id"], "@type": "Dataset", name: "e1" });
     });
     test(`test normalising @id not string`, () => {
@@ -331,7 +331,7 @@ describe("Test entity definition normalisation", () => {
             name: "e1",
         };
         try {
-            entity = ee.__normalise(entity);
+            entity = ee.__normalise(entity, "e0");
         } catch (error) {
             expect(error.message).toBeDefined;
         }
@@ -342,7 +342,7 @@ describe("Test entity definition normalisation", () => {
             name: "e1",
         };
         try {
-            entity = ee.__normalise(entity);
+            entity = ee.__normalise(entity, "e1");
         } catch (error) {
             expect(error.message).toBeDefined;
         }
@@ -353,7 +353,7 @@ describe("Test entity definition normalisation", () => {
             name: "e1",
         };
         try {
-            entity = ee.__normalise(entity);
+            entity = ee.__normalise(entity, "e2");
         } catch (error) {
             expect(error.message).toBeDefined;
         }
@@ -365,7 +365,7 @@ describe("Test entity definition normalisation", () => {
             "@type": "Dataset",
             name: "e1",
         };
-        entity = ee.__normalise(entity);
+        entity = ee.__normalise(entity, "e0");
         expect(entity).toMatchObject({
             "@id": "https://schema.org/Dataset",
             "@type": "Dataset",
@@ -378,7 +378,7 @@ describe("Test entity definition normalisation", () => {
             "@id": "https://schema.org/Dataset",
             "@type": "Dataset",
         };
-        entity = ee.__normalise(entity);
+        entity = ee.__normalise(entity, "e0");
         expect(entity).toMatchObject({
             "@id": "https://schema.org/Dataset",
             "@type": "Dataset",
@@ -391,7 +391,7 @@ describe("Test entity definition normalisation", () => {
             "@id": "https://schema.org/Dataset",
             name: "e1",
         };
-        entity = ee.__normalise(entity);
+        entity = ee.__normalise(entity, "e0");
         expect(entity).toMatchObject({
             "@id": "https://schema.org/Dataset",
             "@type": "URL",
@@ -402,7 +402,7 @@ describe("Test entity definition normalisation", () => {
             "@id": "#1",
             name: "e1",
         };
-        entity = ee.__normalise(entity);
+        entity = ee.__normalise(entity, "e0");
         expect(entity).toMatchObject({
             "@id": "#1",
             "@type": "Thing",
@@ -414,7 +414,7 @@ describe("Test entity definition normalisation", () => {
             "@type": ["Dataset", "Thing"],
             name: "e1",
         };
-        entity = ee.__normalise(entity);
+        entity = ee.__normalise(entity, "e0");
         expect(entity).toMatchObject({
             "@id": "#1",
             "@type": "Dataset, Thing",

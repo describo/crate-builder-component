@@ -4,6 +4,7 @@ import isArray from "lodash-es/isArray";
 import isPlainObject from "lodash-es/isPlainObject";
 import isEmpty from "lodash-es/isEmpty";
 import isUndefined from "lodash-es/isUndefined";
+import isBoolean from "lodash-es/isBoolean";
 import groupBy from "lodash-es/groupBy";
 import cloneDeep from "lodash-es/cloneDeep";
 import flattenDeep from "lodash-es/flattenDeep";
@@ -11,8 +12,6 @@ import compact from "lodash-es/compact";
 import intersection from "lodash-es/intersection";
 import validatorIsURL from "validator/es/lib/isURL.js";
 import validateIriPkg from "./lib/validate-iri";
-import cuid2 from "./lib/cuid2";
-const createId = cuid2.init({ length: 32 });
 
 const urlProtocols = ["http", "https", "ftp", "ftps"];
 export class CrateManager {
@@ -28,76 +27,52 @@ export class CrateManager {
         this.errors = [];
         this.rootDescriptor;
         let graph = [];
-        let i, e;
-        for ([i, e] of crate["@graph"].entries()) {
-            if (e["@id"] === "ro-crate-metadata.json") {
-                this.rootDescriptor = { ...e };
+
+        for (let i = 0; i < crate["@graph"].length; i++) {
+            const entity = crate["@graph"][i];
+            if (entity["@id"] === "ro-crate-metadata.json") {
+                this.rootDescriptor = { ...entity };
             } else {
                 //  ensure every entity has a defined type
-                if (!e?.["@type"]) {
+                if (!entity?.["@type"]) {
                     this.errors.push({
                         message: `The entity does not have '@type' defined.`,
-                        entity: e,
+                        entity,
                     });
                     continue;
                 }
 
                 // then see if @id is a valid IRI
-                let { isValid, message } = validateId({ id: e["@id"], type: e["@type"] });
+                let { isValid, message } = validateId({ id: entity["@id"], type: entity["@type"] });
                 if (!isValid) {
                     this.errors.push({
                         message,
-                        entity: e,
+                        entity,
                     });
                 }
 
-                graph.push(e);
+                graph.push(entity);
             }
         }
-        const totalEntities = i;
 
         if (this.errors.length) throw new Error(`The crate is invalid.`);
 
-        // and then on the second pass we mark the root dataset
-        //   so in total - one less pass over the entire graph
-        graph = graph.map((e) => {
-            // mark root dataset
-            return e["@id"] === this.rootDescriptor.about["@id"]
-                ? { ...e, describoId: "RootDataset", "@id": "./" }
-                : e;
-        });
-        this.rootDescriptor.about["@id"] = "./";
-
-        let reportAt = 200;
-        // for each entity, populate entities and properties structs
-        i = 0;
         let entities = [];
         for (let entity of graph) {
-            // let entities = graph.map((entity) => {
-            i += 1;
-            if (i % reportAt === 0) {
-                progress.percent = (i / (totalEntities * 2)) * 100;
-                await new Promise((resolve) => setTimeout(resolve, 2));
+            if (entity["@id"] === this.rootDescriptor.about["@id"]) {
+                entity.describoId = "RootDataset";
+                entity["@id"] = "./";
             }
+
             let { describoId } = this.em.set(entity);
             entity.describoId = describoId;
             entities.push(entity);
         }
-        progress.percent = (i / (totalEntities * 2)) * 100;
-        // console.log(entities);
+        this.rootDescriptor.about = { "@id": "./" };
 
-        reportAt = 1000;
         for (let entity of entities) {
-            i += 1;
             this.em.processEntityProperties(entity);
-            if (i % reportAt === 0) {
-                progress.percent = (i / (totalEntities * 2)) * 100;
-                await new Promise((resolve) => setTimeout(resolve, 2));
-            }
         }
-        progress.percent = (i / (totalEntities * 2)) * 100;
-        await new Promise((resolve) => setTimeout(resolve, 5));
-        // console.log(JSON.stringify(this.em, null, 2));
     }
 
     verify({ crate }) {
@@ -397,6 +372,7 @@ export class CrateManager {
 export function isURL(value) {
     if (!value) return false;
     if (isNumber(value)) return false;
+    if (isBoolean(value)) return false;
     if (value.match(/arcp:\/\/name,.*/)) return true;
     if (value.match(/arcp:\/\/uuid,.*/)) return true;
     if (value.match(/arcp:\/\/ni,sha-256;,.*/)) return true;
@@ -459,7 +435,7 @@ export class Entity {
     }
 
     set(entity) {
-        entity = this.__normalise(entity);
+        entity = this.__normalise(entity, `e${this.entities.length}`);
         entity = this.__confirmNoClash(entity);
 
         // if this entity is already on the stack - return it
@@ -608,7 +584,7 @@ export class Entity {
         if (idx !== undefined && entity["@id"] !== "./") {
             let entityLookup = this.entities[idx];
             if (entityLookup["@type"] !== entity["@type"]) {
-                const id = `#${createId()}`;
+                const id = `e${this.entities.length}`;
                 entity["@id"] = id;
                 entity.describoId = id;
             }
@@ -616,8 +592,7 @@ export class Entity {
         return entity;
     }
 
-    __normalise(entity) {
-        const id = `#${createId()}`;
+    __normalise(entity, id) {
         if (
             !isString(entity["@type"]) &&
             !isArray(entity["@type"]) &&
@@ -672,7 +647,7 @@ export class Property {
 
         // otherwise create the property and push it onto the stack
         let data = {
-            propertyId: createId(),
+            propertyId: `#p${this.properties.length}`,
             srcEntityId,
             property,
             value,
