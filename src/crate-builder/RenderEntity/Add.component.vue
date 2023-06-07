@@ -1,8 +1,11 @@
 <template>
     <div class="flex flex-col">
-        <div class="flex flex-row space-x-1">
-            <add-control-component :types="types" @add="add" @close="close" />
-        </div>
+        <add-control-component
+            :types="types"
+            :selected-type="data.addType"
+            @add="add"
+            @close="close"
+        />
 
         <div class="flex flex-row mt-1">
             <div
@@ -83,7 +86,7 @@
                     v-if="data.addType"
                 >
                     <div class="w-full">
-                        <div class="text-xs">
+                        <div class="">
                             {{ $t("associate_existing_prompt", { addType: data.addType }) }}
                         </div>
                         <autocomplete-component
@@ -100,7 +103,6 @@
 </template>
 
 <script setup>
-import { ElButton } from "element-plus";
 import AddControlComponent from "./AddControl.component.vue";
 import TextComponent from "../primitives/Text.component.vue";
 import DateComponent from "../primitives/Date.component.vue";
