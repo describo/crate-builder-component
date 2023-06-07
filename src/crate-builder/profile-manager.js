@@ -36,8 +36,6 @@ export class ProfileManager {
      */
     getEntityTypeHierarchy({ entity }) {
         let types = entity["@type"];
-        if (!isArray(types)) types = entity["@type"].split(",").map((t) => t.trim());
-        // types = [...types, ...this.getAdditionalEntityTypes({ entity })];
         types = this.mapTypeHierarchies({ types });
         return types;
     }
@@ -49,7 +47,6 @@ export class ProfileManager {
      *
      */
     getPropertyDefinition({ property, entity }) {
-        // if (isArray(type)) type = type.join(", ");
         let propertyDefinition;
         let inputs = this.getInputsFromProfile({ entity });
         // console.debug("ENTITY definition:", JSON.stringify(entityDefinition, null, 2));
@@ -112,10 +109,6 @@ export class ProfileManager {
      */
     mapTypeHierarchies({ types }) {
         types = cloneDeep(types);
-        if (isString(types)) {
-            types = types.split(",");
-            types = types.map((t) => t.trim());
-        }
         if (!types.includes("Thing")) types.push("Thing");
 
         types = flattenDeep(types.map((type) => [type, this.profile?.classes?.[type]?.subClassOf]));
@@ -145,7 +138,6 @@ export class ProfileManager {
      */
     getInputsFromProfile({ entity }) {
         let types = entity["@type"];
-        if (isString(types)) types = types.split(",").map((t) => t.trim());
 
         let inputs = [];
         for (let type of types) {
@@ -201,7 +193,6 @@ export class ProfileManager {
      */
     getTypeDefinition({ entity }) {
         let types = entity["@type"];
-        if (isString(entity["@type"])) types = entity["@type"].split(",").map((t) => t.trim());
         let directive = types.map((type) => this.profile.classes?.[type]?.definition);
         return directive.includes("override") ? "override" : "inherit";
     }

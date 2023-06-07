@@ -31,20 +31,13 @@ import { $t } from "../i18n";
 const props = defineProps({
     type: {
         type: String,
-        default: "textarea",
-        // We can't really validate this as text is the catchall regardless of what
-        //   the data type is supposed to be for any given field
-        // validator: (value) => {
-        //     return ["text", "textarea", "url"].includes(value.toLowerCase());
-        // },
+        default: "text",
     },
     property: {
         type: String,
         required: true,
     },
-    value: {
-        // type: [String, Number, Boolean],
-    },
+    value: {},
     placeholder: {
         type: String,
     },

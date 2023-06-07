@@ -1,16 +1,7 @@
 <template>
     <div class="flex flex-col">
-        <div class="flex flex-row space-x-1" v-if="props.definition.type">
-            <add-control-component
-                v-if="props.definition && props.definition.type !== 'Value'"
-                :types="props.definition.type"
-                @add="add"
-            />
-            <div v-if="data.addType">
-                <el-button text bg class="my-1" @click="data.addType = undefined">
-                    <i class="fa-solid fa-xmark"></i>
-                </el-button>
-            </div>
+        <div class="flex flex-row space-x-1">
+            <add-control-component :types="types" @add="add" @close="close" />
         </div>
 
         <div class="flex flex-row mt-1">
@@ -93,7 +84,7 @@
                 >
                     <div class="w-full">
                         <div class="text-xs">
-                            {{$t('associate_existing_prompt', {addType: data.addType})}}
+                            {{ $t("associate_existing_prompt", { addType: data.addType }) }}
                         </div>
                         <autocomplete-component
                             :crate-manager="props.crateManager"
@@ -123,7 +114,7 @@ import SelectObjectComponent from "../primitives/SelectObject.component.vue";
 import GeoComponent from "../primitives/Geo.component.vue";
 import AutocompleteComponent from "./AutoComplete.component.vue";
 import { reactive, computed } from "vue";
-import {$t} from '../i18n'
+import { $t } from "../i18n";
 
 const props = defineProps({
     crateManager: {
@@ -165,6 +156,10 @@ const data = reactive({
         "GeoShape",
     ],
     addType: undefined,
+});
+let types = computed(() => {
+    if (!props.definition.type || props.definition.type === "Value") return "";
+    return props.definition.type;
 });
 let addSimpleType = computed(() => {
     return data.simpleTypes.includes(data.addType);

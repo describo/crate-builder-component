@@ -1,13 +1,19 @@
 <template>
     <div class="flex flex-row space-x-1">
         <div class="flex flex-row flex-wrap space-x-1" v-if="data.allowedTypes.length < 8">
-            <div v-for="(type, idx) of data.allowedTypes" :key="idx" class="my-1">
+            <div v-for="(type, idx) of data.allowedTypes" :key="idx">
                 <el-button
-                    @click="add(type)"
+                    @click="toggle(type)"
                     type="primary"
                     class="focus:outline-none focus:border-2 focus:border-green-600"
                 >
-                    <i class="fas fa-plus"></i>&nbsp;{{ type }}
+                    <div v-show="!data.selectedType">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div v-show="data.selectedType">
+                        <i class="fas fa-times"></i>
+                    </div>
+                    &nbsp;{{ type }}
                 </el-button>
             </div>
         </div>
@@ -15,7 +21,7 @@
             <el-select
                 v-model="data.selectedType"
                 :placeholder="$t('select_a_type_to_add')"
-                @change="add"
+                @change="toggle"
                 clearable
                 class="w-full"
             >
@@ -35,7 +41,7 @@
 import { ElButton, ElSelect, ElOption } from "element-plus";
 import isArray from "lodash-es/isArray";
 import { reactive, onMounted, watch } from "vue";
-import {$t} from '../i18n'
+import { $t } from "../i18n";
 
 const props = defineProps({
     types: {
@@ -67,8 +73,12 @@ function init() {
     let allowedTypes = types.filter((type) => !data.typeExclusions.includes(type));
     data.allowedTypes = allowedTypes;
 }
-function add(type) {
+function toggle(type) {
+    if (data.selectedType === type) {
+        emit("close");
+    } else {
+        emit("add", { type });
+    }
     data.selectedType = undefined;
-    emit("add", { type });
 }
 </script>

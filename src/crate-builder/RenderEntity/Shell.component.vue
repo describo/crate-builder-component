@@ -350,7 +350,6 @@ function init() {
         // data.tabs = layout.tabs.filter((t) => t?.inputs?.length);
         data.tabs = layout.tabs;
     }
-
     $emit("ready");
 }
 function applyLayout({ layouts, hide = [], entity }) {

@@ -1,26 +1,35 @@
 <template>
-    <div>
-        <i class="fa-solid fa-fw" :class="data.types[props.type]" v-if="data.types[props.type]"></i>
+    <div v-for="(etype, idx) of props.types" :key="idx">
+        <el-tag size="large">
+            <div class="text-gray-800 font-light flex flex-row space-x-1">
+                <div class="" v-if="data.types[etype]">
+                    <i class="fa-solid fa-fw" :class="data.types[etype]"></i>
+                </div>
+                <div class="">{{ etype }}</div>
+            </div>
+        </el-tag>
     </div>
 </template>
 
 <script setup>
 import { reactive } from "vue";
 const props = defineProps({
-    type: {
-        type: String,
+    types: {
+        type: Array,
         required: true,
     },
 });
 
 const data = reactive({
     types: {
+        Book: "fa-book-open",
         ContactPoint: "fa-address-card",
         CreateAction: "fa-plus",
         CreativeWork: "fa-image",
         Country: "fa-flag",
         Dataset: "fa-folder",
         DataDownload: "fa-download",
+        DerivedMaterial: "fa-download",
         File: "fa-file",
         GeoCoordinates: "fa-map-marker-alt",
         GeoShape: "fa-map-marker-alt",

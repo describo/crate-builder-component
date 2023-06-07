@@ -7,32 +7,11 @@
             :class="{ 'my-2 mx-3': entity.tgtEntity.associations.length }"
         >
             <!--render the linking element  -->
-            <div
-                class="flex flex-row rounded"
-                :class="{
-                    'bg-yellow-200 hover:bg-cyan-200': !configuration.readonly,
-                    'bg-blue-200 hover:bg-yellow-300': configuration.readonly,
-                }"
-            >
-                <div
-                    class="flex flex-col p-3 cursor-pointer"
-                    @click="loadEntity(entity.tgtEntity.describoId)"
-                    v-if="entity.tgtEntity"
-                >
-                    <div class="text-sm flex flex-row space-x-1">
-                        <type-icon-component
-                            class="text-gray-700"
-                            :type="entity.tgtEntity['@type']"
-                            v-if="entity.tgtEntity['@type']"
-                        />
-                        <div>{{ entity.tgtEntity["@type"] }}</div>
-                        <div class="text-sm">({{ entity.tgtEntity["@id"] }})</div>
-                    </div>
-                    <div class="text-base mt-2">
-                        <span v-if="entity.tgtEntity.name">{{ entity.tgtEntity.name }}</span>
-                        <span v-else>{{ entity.tgtEntity["@id"] }}</span>
-                    </div>
-                </div>
+            <div class="flex flex-row rounded bg-blue-200">
+                <RenderItemLinkComponent
+                    :entity="entity.tgtEntity"
+                    @load:entity="loadEntity(entity.tgtEntity.describoId)"
+                />
                 <delete-property-component
                     v-if="!configuration.readonly"
                     class="cursor-pointer rounded-r p-2"
@@ -57,25 +36,14 @@
                         <div class="bg-slate-700 w-6 h-1 mt-5 -mx-1"></div>
                         <div
                             class="bg-purple-200 hover:bg-cyan-200 flex flex-row p-2 rounded space-x-2"
-                            :class="{
-                                'hover:bg-cyan-200': !configuration.readonly,
-                                'hover:bg-yellow-300': configuration.readonly,
-                            }"
                         >
                             <div class="">
                                 {{ instance.property }}
                             </div>
                             <div><i class="fa-solid fa-arrow-right"></i></div>
-                            <div class="flex flex-row space-x-2">
-                                <div class="flex flex-row space-x-1">
-                                    <type-icon-component
-                                        class="text-gray-700"
-                                        :type="instance.entity['@type']"
-                                        v-if="instance.entity['@type']"
-                                    />
-                                    <div>{{ instance.entity["@type"] }}:</div>
-                                </div>
-                                <div class="">
+                            <div class="flex flex-row space-x-1">
+                                <!-- <div>{{ instance.entity["@type"].join(", ") }}:</div> -->
+                                <div>
                                     <span v-if="instance.entity.name">{{
                                         instance.entity.name
                                     }}</span>
@@ -116,7 +84,7 @@
 </template>
 
 <script setup>
-import TypeIconComponent from "./TypeIcon.component.vue";
+import RenderItemLinkComponent from "./RenderItemLink.component.vue";
 import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import MapComponent from "../primitives/Map.component.vue";
 import { computed, inject } from "vue";
@@ -135,9 +103,11 @@ const props = defineProps({
     },
 });
 let showMap = computed(() => {
-    return props.entity?.tgtEntity?.["@type"]?.match(/Geo/) ? true : false;
+    return props.entity?.tgtEntity?.["@type"].join(", ").match(/Geo/) ? true : false;
 });
-let entity = computed(() => props.entity);
+let entity = computed(() => {
+    return props.entity;
+});
 let type = "unlink";
 
 function loadEntity(describoId) {
@@ -145,8 +115,7 @@ function loadEntity(describoId) {
     emit("load:entity", { describoId });
 }
 function deleteProperty(target) {
-    data.loading = true;
     // console.debug("Renderer Linked Item Component : emit(delete:property)", target);
-    setTimeout(() => emit("delete:property", target), 200);
+    emit("delete:property", target);
 }
 </script>

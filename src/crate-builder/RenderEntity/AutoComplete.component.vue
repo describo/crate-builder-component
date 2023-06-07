@@ -25,7 +25,9 @@
                     <div class="text-gray-700">
                         <div v-if="item.type === 'new'">
                             <el-button type="success" size="default" class="flex flex-row">
-                                <div>{{ $t('create_new_of_type', {type: item["@type"]}) }}:&nbsp;</div>
+                                <div>
+                                    {{ $t("create_new_of_type", { type: item["@type"] }) }}:&nbsp;
+                                </div>
                                 <div>{{ item.name }}</div>
                             </el-button>
                         </div>
@@ -49,9 +51,9 @@
 import { ElButton, ElSelect, ElOption, ElOptionGroup, vLoading } from "element-plus";
 import { reactive, watch, inject } from "vue";
 import debounce from "lodash-es/debounce";
-import {$t} from '../i18n'
-
-const configuration = inject("configuration");
+import { $t } from "../i18n";
+import { configurationKey } from "./keys.js";
+const configuration = inject(configurationKey);
 
 import { Lookup, wrapPromise } from "./auto-complete.lib";
 
@@ -165,12 +167,12 @@ async function querySearch(queryString) {
     for (let response of responses) {
         if (response.endpoint === "internal" && response.documents?.length) {
             matches.push({
-                label: $t('associate_existing_entity'),
+                label: $t("associate_existing_entity"),
                 entities: response.documents.map((e) => ({ ...e, type: "internal" })).slice(0, 5),
             });
         } else if (response.endpoint === "templates" && response.documents?.length) {
             matches.push({
-                label: $t('associate_entity_from_template'),
+                label: $t("associate_entity_from_template"),
                 entities: response.documents.map((template) => ({
                     ...template.entity,
                     type: "template",
@@ -178,17 +180,17 @@ async function querySearch(queryString) {
             });
         } else if (response.endpoint === "ror" && response.documents?.length) {
             matches.push({
-                label: $t('associate_organization_from_ror'),
+                label: $t("associate_organization_from_ror"),
                 entities: response.documents.map((entity) => ({ ...entity, type: "ror" })),
             });
         } else if (response.endpoint === "entities" && response.documents?.length) {
             matches.push({
-                label: $t('associate_user_created_entity'),
+                label: $t("associate_user_created_entity"),
                 entities: response.documents.map((entity) => ({ ...entity, type: "datapack" })),
             });
         } else if (response.endpoint === "datapacks" && response.documents?.length) {
             matches.push({
-                label: $t('associate_from_datapack'),
+                label: $t("associate_from_datapack"),
                 entities: response.documents.map((entity) => ({ ...entity, type: "datapack" })),
             });
         }
@@ -204,6 +206,7 @@ async function querySearch(queryString) {
 }
 function handleSelect(entity) {
     if (entity) {
+        entity["@type"] = entity["@type"].split(", ").map((t) => t.trim());
         if (entity?.type === "internal") {
             $emit("link:entity", { json: entity });
         } else {

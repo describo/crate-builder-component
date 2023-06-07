@@ -103,7 +103,6 @@ export class CrateManager {
 
     exportEntityTemplate({ describoId }) {
         let entity = this.__rehydrateEntity({ describoId });
-        entity["@type"] = entity["@type"].join(", ");
 
         // remove all the internal stuff
         delete entity["@reverse"];
@@ -195,7 +194,7 @@ export class CrateManager {
         const typesToResolve = Object.keys(resolvers);
         for (let entityProperty of entity.properties) {
             let tgtEntity = entityProperty.tgtEntity;
-            const type = tgtEntity["@type"]?.split(",").map((t) => t.trim());
+            const type = tgtEntity["@type"];
             const specificTypesToResolve = intersection(typesToResolve, type);
 
             let associations = [];
@@ -231,6 +230,7 @@ export class CrateManager {
 
         // check there isn't a matching entity already
         let match = this.em.get({ srcEntityId: entity["@id"] });
+
         if (match && (match?.["@type"] === entity["@type"] || entity["@id"] === "./")) {
             // console.log(match);
             return match;
@@ -341,7 +341,7 @@ export class CrateManager {
 
     __rehydrateEntity({ describoId }) {
         let entity = this.getEntity({ describoId, groupProperties: true });
-        entity["@type"] = entity["@type"].split(", ");
+        // entity["@type"] = entity["@type"].split(", ");
 
         for (let property of Object.keys(entity.properties)) {
             entity[property] = entity.properties[property].map((p) => {
@@ -435,6 +435,7 @@ export class Entity {
     }
 
     set(entity) {
+        entity = cloneDeep(entity);
         entity = this.__normalise(entity, `e${this.entities.length}`);
         entity = this.__confirmNoClash(entity);
 
@@ -476,7 +477,8 @@ export class Entity {
     get({ srcEntityId }) {
         const idx = this.entitiesBy.describoId[srcEntityId] ?? this.entitiesBy.atId[srcEntityId];
         if (idx !== undefined) {
-            return cloneDeep(this.entities[idx]);
+            let entity = cloneDeep(this.entities[idx]);
+            return entity;
         }
     }
 
@@ -570,7 +572,7 @@ export class Entity {
             }
         });
         entities = entities.filter((e) => e.describoId !== "RootDataset");
-        return entities.slice(0, limit);
+        return cloneDeep(entities.slice(0, limit));
     }
 
     __entityExists(entity) {
@@ -581,13 +583,13 @@ export class Entity {
 
     __confirmNoClash(entity) {
         let idx = this.entitiesBy.atId[entity["@id"]];
-        if (idx !== undefined && entity["@id"] !== "./") {
-            let entityLookup = this.entities[idx];
-            if (entityLookup["@type"] !== entity["@type"]) {
-                const id = `e${this.entities.length}`;
-                entity["@id"] = id;
-                entity.describoId = id;
-            }
+        if (idx === undefined || entity["@id"] !== "./") return entity;
+
+        let entityLookup = this.entities[idx];
+        if (entityLookup["@type"] !== entity["@type"]) {
+            const id = `e${this.entities.length}`;
+            entity["@id"] = id;
+            entity.describoId = id;
         }
         return entity;
     }
@@ -619,10 +621,11 @@ export class Entity {
         if (!entity.name) entity.name = entity["@id"].replace(/^#/, "");
 
         // if no @type then set to URL or Thing
-        if (!entity["@type"]) entity["@type"] = isURL(entity["@id"]) ? "URL" : "Thing";
+        if (!entity["@type"]) entity["@type"] = isURL(entity["@id"]) ? ["URL"] : ["Thing"];
 
-        // set type as string if it's an array
-        if (isArray(entity["@type"])) entity["@type"] = entity["@type"].join(", ");
+        // set type as array if it's a string
+        if (isString(entity["@type"]))
+            entity["@type"] = entity["@type"].split(", ").map((t) => t.trim());
 
         if (!entity.describoId) entity.describoId = id.replace("#", "");
         return entity;

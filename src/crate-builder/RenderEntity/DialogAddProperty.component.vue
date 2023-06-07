@@ -14,11 +14,15 @@
             @click="handlePropertySelection(item)"
         >
             <div class="flex flex-col text-black">
-                <div v-if="item.label">
-                    {{ item.label }}
-                </div>
-                <div v-else class="text-black">
-                    {{ item.name }}
+                <div class="flex flex-row space-x-1">
+                    <div v-if="item.label">
+                        {{ item.label }}
+                    </div>
+                    <div v-else class="text-black">
+                        {{ item.name }}
+                    </div>
+                    <div><i class="fa-solid fa-arrow-right"></i></div>
+                    <div>{{ item.type.join(", ") }}</div>
                 </div>
                 <div class="text-gray-600 w-full">
                     {{ item.help }}
@@ -32,7 +36,7 @@
 import { ElInput } from "element-plus";
 import { reactive, computed, watch } from "vue";
 import { ProfileManager } from "../profile-manager";
-import {$t} from '../i18n'
+import { $t } from "../i18n";
 
 const props = defineProps({
     crateManager: {

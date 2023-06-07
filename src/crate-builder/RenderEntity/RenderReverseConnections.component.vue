@@ -15,12 +15,12 @@
             <div class="flex-grow">
                 <el-input
                     v-model="data.filterInputModel"
-                    @change="filterConnections"
+                    @input="filterConnections"
                     :placeholder="$t('search_for_connection')"
                 ></el-input>
             </div>
             <div v-for="entity of connections" :key="entity.describoId">
-                <RenderReverseItemLinkComponent :entity="entity" @load:entity="loadEntity" />
+                <RenderItemLinkComponent :entity="entity" @load:entity="loadEntity" />
             </div>
         </div>
     </div>
@@ -28,10 +28,10 @@
 
 <script setup>
 import { ElPagination, ElInput } from "element-plus";
-import RenderReverseItemLinkComponent from "./RenderReverseItemLink.component.vue";
+import RenderItemLinkComponent from "./RenderItemLink.component.vue";
 import { computed, reactive, onMounted } from "vue";
 import isPlainObject from "lodash-es/isPlainObject";
-import {$t} from '../i18n'
+import { $t } from "../i18n";
 
 const props = defineProps({
     crateManager: {
@@ -62,7 +62,11 @@ let connections = computed(() => {
     let offset = (data.currentPage - 1) * data.pageSize;
     const re = new RegExp(data.query, "i");
     let entities = data.entities.filter((entity) => {
-        if (entity["@id"].match(re) || entity["@type"].match(re) || entity.name.match(re)) {
+        if (
+            entity["@id"].match(re) ||
+            entity["@type"].join(", ").match(re) ||
+            entity.name.match(re)
+        ) {
             return entity;
         }
     });
