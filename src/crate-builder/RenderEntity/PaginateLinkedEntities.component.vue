@@ -3,6 +3,7 @@
         <div class="flex flex-row">
             <div class="flex-grow">
                 <el-input
+                    :key="configuration.language"
                     v-model="data.filter"
                     :placeholder="$t('filter_the_entities')"
                     clearable
@@ -32,9 +33,6 @@
                     @delete:property="deleteProperty"
                 />
             </div>
-            <!-- <div class="text-4xl ml-2 pt-5 text-blue-500" v-if="data.total > data.pageSize">
-                <i class="fa-solid fa-ellipsis"></i>
-            </div> -->
         </div>
     </div>
 </template>
@@ -42,8 +40,10 @@
 <script setup>
 import { ElInput, ElPagination } from "element-plus";
 import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";
-import { reactive, watch } from "vue";
+import { reactive, watch, inject } from "vue";
 import { $t } from "../i18n";
+import { configurationKey } from "./keys";
+const configuration = inject(configurationKey);
 
 const props = defineProps({
     crateManager: {
