@@ -16,10 +16,9 @@
 -   [Identifiers and Types](#identifiers-and-types)
 -   [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
 -   [Full Usage - configuration and events](#full-usage---configuration-and-events)
-    -   [Configuration](#configuration)
-        -   [Reactive Properties](#reactive-properties)
-        -   [Unreactive Properties](#unreactive-properties)
+    -   [Properties](#properties)
     -   [Events](#events)
+-   [Themes](#themes)
 
 This is the core UI component for assembling an RO-Crate inside Describo. It is a self contained
 VueJS component that can be used inside your app. If you use this component, your app is responsible
@@ -41,8 +40,8 @@ npm run storybook
 
 ## Development application
 
-When you want to see component in action as a whole, there is a small VueJS app in this codebase. To
-start up the dev environment:
+When you want to see the component in action as a whole, there is a small VueJS app in this
+codebase. To start up the dev environment:
 
 ```
 docker compose up (starts up an elastic search container for datapack lookups)
@@ -129,7 +128,7 @@ profiles so be sure to follow the documentation linked above.
 The component uses [tailwindcss](https://tailwindcss.com/) and in order for the CSS to be processed
 correctly, you need to `setup your app for tailwind` and add a `tailwind.config.js` that looks like:
 
-```
+```JS
 module.exports = {
     future: {},
     content: [
@@ -191,7 +190,7 @@ identifiers.
 [Read about how describo handles your crate when it loads and what is required of you.](./README.identifiers.md)
 
 In addition, every entity in your crate must have an `@type`. If any entity doesn't, then the whole
-crate will be marked bad not be loaded.
+crate will be marked bad and not be loaded.
 
 # Basic Usage - pass in crate and profile
 
@@ -229,12 +228,10 @@ Pass in the crate file and optionally a profile.
     </describo-crate-builder>
 ```
 
-## Configuration
+## Properties
 
-### Reactive Properties
-
-These properties are reactive. If you change them in the outer application they will update inside
-the component.
+All properties are reactive. If you change them in the outer application they will update inside the
+component.
 
 -   `crate`: The RO Crate data. Note - this is the JSON object `not` a path to a file to be loaded.
     Your app needs to do the loading.
@@ -242,12 +239,6 @@ the component.
     app needs to do the loading.
 -   `entityId`: Setting this property to an `@id` inside the crate will trigger the component to
     load that entity.
-
-### Unreactive Properties
-
-The properties are NOT reactive. If you change them in the outer application they will not update
-inside the component.
-
 -   `lookup`: Pass in an instance of a class the component can use to lookup entity templates,
     datapacks or entities. The signature of the class must be:
 
@@ -283,29 +274,29 @@ export class Lookup {
 **See [./src/app/lookup.js](./src/app/lookup.js) for an example. In fact, you probably want to start
 from there.**
 
-- `enable-context-editor`: true | false: `(default: true)` : enable / disable the context editor
+-   `enable-context-editor`: true | false: `(default: true)` : enable / disable the context editor
     control
-- `enable-crate-preview`: true | false: `(default: true)` : enable / disable the crate preview
+-   `enable-crate-preview`: true | false: `(default: true)` : enable / disable the crate preview
     control
-- `enable-browse-entities`: true | false: `(default: true)` : enable / disable the browse entities
+-   `enable-browse-entities`: true | false: `(default: true)` : enable / disable the browse entities
     control
-- `enable-template-save`: true | false: `(default: false)` : enable / disable the entity and crate
+-   `enable-template-save`: true | false: `(default: false)` : enable / disable the entity and crate
     template saving controls
-- `enableInternalRouting`: true | false: `(default: false)`: enable / disable the internal router
+-   `enableInternalRouting`: true | false: `(default: false)`: enable / disable the internal router
     which updates the location whenever an entity is selected. If no router is found (ie inside a
     web component or just not used), routing is turned off anyway. Most likely you want to leave the
     component to deal with this or listen out for the `navigation` event and handle it yourself if
     the component can't.
-- `enableReverseLinkBrowser`: true : false: `(default: true)`: enable / disable the reverse link
+-   `enableReverseLinkBrowser`: true : false: `(default: true)`: enable / disable the reverse link
     browser. If enabled, it can be shown as a right sidebar as required.
-- `purgeUnlinkedEntities`: true : false: `(default: true)`: purge unlinked entities from the crate
+-   `purgeUnlinkedEntities`: true : false: `(default: true)`: purge unlinked entities from the crate
     before emitting the crate for saving
-- `readonly`: true | false: `(default: false)` : if set to true all of the controls to edit that
+-   `readonly`: true | false: `(default: false)` : if set to true all of the controls to edit that
     the data are turned off. The crate is set into a mode where it is readonly.
-- `webComponent`: true | false: `(default: false)` : Setting this to true alters the behaviour of
+-   `webComponent`: true | false: `(default: false)` : Setting this to true alters the behaviour of
     some components when the crate builder is used as a web component.
-- `language`: en | hu `(default: en)` : Sets the component's localization to the given language. Currently English 
-    (en) and Hungarian (hu) are supported. 
+-   `language`: en | hu `(default: en)` : Sets the component's localization to the given language.
+    Currently English (en) and Hungarian (hu) are supported.
 
 ## Events
 
@@ -328,3 +319,19 @@ from there.**
 -   `@save:entity:template`: this event emits an entity template for re-use within this crate or
     others. It's up to your app to save it and make it available to the crate-builder via the
     `lookup` interface defined above.
+
+# Themes
+
+You can override some of the default styles in the application with anything from tailwind. To do
+this, provide your own styles after you import the component into your application:
+
+```JS
+import { createApp } from "vue";
+import App from "./App.vue";
+import DescriboCrateBuilder from "../crate-builder/index.js";
+import "./override-styles.css"; // <-- override the styling in this file.
+...
+```
+
+Copy the file [./src/app/override-styles.css](./src/app/override-styles.css) into your project, wire
+it up as shown above and then start overriding the styling of the component.
