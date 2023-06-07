@@ -1,6 +1,6 @@
 <template>
     <div
-        class="flex flex-col cursor-pointer bg-blue-200 rounded hover:bg-blue-300 hover:rounded-r-none py-2 px-4"
+        class="flex flex-col cursor-pointer bg-blue-200 rounded hover:bg-blue-300 hover:rounded-r-none py-2 px-4 describo-render-item-link"
         @click="loadEntity"
     >
         <div class="text-gray-700 flex flex-col space-y-2">

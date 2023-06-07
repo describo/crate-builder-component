@@ -1,0 +1,10 @@
+/* set styles here to override the colour of the linking elements */
+.describo-render-item-link {
+    @apply bg-yellow-200 hover:bg-yellow-400
+}
+
+/* set styles here to override the colour of the property rows*/
+.describo-property-background {
+    @apply hover:bg-orange-100 bg-purple-200
+
+}

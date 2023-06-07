@@ -7,7 +7,7 @@
             :class="{ 'my-2 mx-3': entity.tgtEntity.associations.length }"
         >
             <!--render the linking element  -->
-            <div class="flex flex-row rounded bg-blue-200">
+            <div class="flex flex-row rounded bg-blue-200 describo-render-item-link">
                 <RenderItemLinkComponent
                     :entity="entity.tgtEntity"
                     @load:entity="loadEntity(entity.tgtEntity.describoId)"

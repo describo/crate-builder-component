@@ -1,6 +1,6 @@
 <template>
     <div
-        class="flex flex-row flex-grow p-4"
+        class="flex flex-row flex-grow p-4 describo-property-background"
         :class="{
             'hover:bg-sky-100': !configuration.readonly,
         }"
