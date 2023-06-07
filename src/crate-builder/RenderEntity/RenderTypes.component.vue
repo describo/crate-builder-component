@@ -24,6 +24,7 @@ const data = reactive({
     types: {
         Book: "fa-book-open",
         ContactPoint: "fa-address-card",
+        ComputerLanguage: "fa-brands fa-js",
         CreateAction: "fa-plus",
         CreativeWork: "fa-image",
         Country: "fa-flag",
