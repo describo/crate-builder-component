@@ -28,6 +28,7 @@
 <script setup>
 import { ElInput, ElPagination } from "element-plus";
 import { reactive, computed, inject } from "vue";
+import compact from "lodash-es/compact";
 import RenderItemLinkComponent from "./RenderItemLink.component.vue";
 import { $t } from "../i18n";
 
@@ -50,9 +51,10 @@ const emit = defineEmits(["load:entity"]);
 
 let entities = computed(() => {
     let offset = (data.currentPage - 1) * data.pageSize;
+    let entities;
     if (data.query) {
         const re = new RegExp(data.query, "i");
-        let entities = props.crateManager.em.entities.filter((entity) => {
+        entities = props.crateManager.em.entities.filter((entity) => {
             if (
                 entity["@id"].match(re) ||
                 entity["@type"].join(", ").match(re) ||
@@ -61,12 +63,12 @@ let entities = computed(() => {
                 return entity;
             }
         });
-        data.total = entities.length;
-        return entities.slice(offset, offset + data.pageSize);
     } else {
-        data.total = props.crateManager.em.entities.length;
-        return props.crateManager.em.entities.slice(offset, offset + data.pageSize);
+        entities = props.crateManager.em.entities;
     }
+    entities = compact(entities);
+    data.total = entities.length;
+    return entities.slice(offset, offset + data.pageSize);
 });
 
 function changePage(page) {
