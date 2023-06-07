@@ -10,11 +10,11 @@
         <div
             v-for="(item, idx) in inputs"
             :key="idx"
-            class="cursor-pointer p-1 hover:bg-blue-100 hover:rounded active:bg-blue-400"
+            class="cursor-pointer p-2 hover:bg-blue-100 hover:rounded active:bg-blue-400"
             @click="handlePropertySelection(item)"
         >
             <div class="flex flex-col text-black">
-                <div class="flex flex-row space-x-1">
+                <div class="flex flex-row space-x-1 border-b border-gray-700">
                     <div v-if="item.label">
                         {{ item.label }}
                     </div>
