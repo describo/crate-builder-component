@@ -19,6 +19,7 @@
     -   [Properties](#properties)
     -   [Events](#events)
 -   [Themes](#themes)
+-   [Internationalisation](#internationalisation)
 
 This is the core UI component for assembling an RO-Crate inside Describo. It is a self contained
 VueJS component that can be used inside your app. If you use this component, your app is responsible
@@ -335,3 +336,18 @@ import "./override-styles.css"; // <-- override the styling in this file.
 
 Copy the file [./src/app/override-styles.css](./src/app/override-styles.css) into your project, wire
 it up as shown above and then start overriding the styling of the component.
+
+# Internationalisation
+
+To submit an internationalisation file please do the following:
+
+-   Fork the repository on github
+-   Copy the file [./src/crate-builder/locales/en.js](./src/crate-builder/locales/en.js) to the two
+    letter code of your language
+-   Translate all of the entries
+-   Commit your changes to a branch
+-   Submit a pull request to include this translation
+
+If you're not sure what all of this means, copy the file above to your computer and translate the
+entries. Then, submit an issue in the
+[issue tracker](https://github.com/describo/crate-builder-component/issues) and attach the file.
