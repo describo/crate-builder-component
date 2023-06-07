@@ -22,7 +22,7 @@
                         {{ item.name }}
                     </div>
                     <div><i class="fa-solid fa-arrow-right"></i></div>
-                    <div>{{ item.type.join(", ") }}</div>
+                    <div>{{ item.type.map((t) => `"${t}"`).join(", ") }}</div>
                 </div>
                 <div class="text-gray-600 w-full">
                     {{ item.help }}
