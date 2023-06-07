@@ -12,6 +12,7 @@
 </template>
 
 <script setup>
+import { ElTag } from "element-plus";
 import { reactive } from "vue";
 const props = defineProps({
     types: {
