@@ -1,7 +1,7 @@
 <template>
     <!-- <div class="flex flex-row space-x-1"> -->
     <div class="flex flex-row flex-wrap">
-        <div v-for="(type, idx) of data.allowedTypes" :key="idx">
+        <div v-for="(type, idx) of types" :key="idx">
             <el-button
                 @click="toggle(type)"
                 type="primary"
@@ -35,8 +35,7 @@
 <script setup>
 // import { ElButton, ElSelect, ElOption } from "element-plus";
 import { ElButton } from "element-plus";
-import isArray from "lodash-es/isArray";
-import { reactive, onMounted, watch, computed } from "vue";
+import { computed } from "vue";
 // import { $t } from "../i18n";
 
 const props = defineProps({
@@ -50,29 +49,9 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["add", "close"]);
-const data = reactive({
-    allowedTypes: [],
-    typeExclusions: ["File", "Dataset"],
-});
 let selectedType = computed(() => props.selectedType);
+let types = computed(() => props.types);
 
-watch(
-    () => props.types,
-    () => {
-        init();
-    }
-);
-onMounted(() => {
-    init();
-});
-function init() {
-    let types = props.types;
-    if (!isArray(types)) {
-        types = [types];
-    }
-    let allowedTypes = types.filter((type) => !data.typeExclusions.includes(type));
-    data.allowedTypes = allowedTypes.sort();
-}
 function toggle(type) {
     if (props.selectedType === type) {
         emit("close");
