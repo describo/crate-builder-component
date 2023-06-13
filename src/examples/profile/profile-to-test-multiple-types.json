@@ -1,7 +1,7 @@
 {
     "metadata": {
-        "name": "NYINGARN Profile",
-        "description": "Am item profile for the NYINGARN project",
+        "name": "Multiple Types, mixed inherit and override definition",
+        "description": "",
         "version": 0.1,
         "warnMissingProperty": true
     },
