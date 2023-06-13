@@ -80,7 +80,7 @@ const data = reactive({
     // },
     debouncedQuerySearch: debounce(
         (queryString) => {
-            if (configuration.webComponent) {
+            if (configuration.value.webComponent) {
                 data.selection = queryString;
             }
             return querySearch(queryString);
