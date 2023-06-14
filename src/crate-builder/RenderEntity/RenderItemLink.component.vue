@@ -1,9 +1,9 @@
 <template>
     <div
-        class="flex flex-col cursor-pointer bg-blue-200 rounded hover:bg-blue-300 hover:rounded-r-none py-2 px-4 describo-render-item-link"
+        class="flex flex-col cursor-pointer bg-blue-200 text-gray-700 hover:text-black rounded hover:bg-blue-300 hover:rounded-r-none py-2 px-4 describo-render-item-link"
         @click="loadEntity"
     >
-        <div class="text-gray-700 flex flex-col space-y-2">
+        <div class="flex flex-col space-y-2">
             <div class="border-b border-gray-500 text-sm flex-grow">
                 {{ decodeURIComponent(entity["@id"]) }}
             </div>
@@ -11,7 +11,7 @@
                 <div class="text-base flex flex-row space-x-1">
                     <RenderTypesComponent :types="entity['@type']" />
                 </div>
-                <div class="pt-1 hover:text-black">
+                <div class="pt-1">
                     {{ props.entity.name }}
                 </div>
             </div>
