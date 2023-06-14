@@ -216,7 +216,11 @@ function linkEntity(data) {
     emit("link:entity", data);
 }
 function saveProperty(data) {
-    emit("save:property", data);
+    if (data.value) {
+        emit("save:property", data);
+    } else {
+        emit("delete:property", data);
+    }
 }
 function deleteProperty(data) {
     emit("delete:property", data);
