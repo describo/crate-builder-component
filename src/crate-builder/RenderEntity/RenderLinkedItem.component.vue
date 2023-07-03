@@ -1,37 +1,31 @@
 <template>
-    <div>
+    <div
+        class="describo-render-item-link p-2 rounded bg-blue-200 hover:text-black hover:bg-blue-300 hover:rounded-r-none"
+    >
         <!-- if the entity does NOT have geography -->
         <div
             v-if="!showMap"
             class="flex flex-row space-x-2 m-1"
-            :class="{ 'my-2 mx-3': entity.tgtEntity.associations.length }"
+            :class="{ 'my-2 mx-3': entity?.tgtEntity?.associations.length }"
         >
             <!--render the linking element  -->
-            <div class="flex flex-row rounded bg-blue-200 describo-render-item-link">
-                <RenderItemLinkComponent
-                    :entity="entity.tgtEntity"
-                    @load:entity="loadEntity(entity.tgtEntity.describoId)"
-                />
-                <delete-property-component
+            <div class="flex flex-row">
+                <RenderItemLinkComponent :entity="entity.tgtEntity" @load:entity="loadEntity" />
+                <UnlinkEntityComponent
                     v-if="!configuration.readonly"
-                    class="cursor-pointer rounded-r p-2"
-                    :type="type"
-                    :property="props.entity"
-                    @delete:property="deleteProperty"
+                    :entity="entity.tgtEntity"
+                    @unlink:entity="unlinkEntity"
                 />
             </div>
             <!-- if this target has associations, render them -->
-            <div
-                v-if="entity.tgtEntity.associations && entity.tgtEntity.associations.length"
-                class="flex-col space-y-2"
-            >
+            <div v-if="entity?.tgtEntity?.associations.length" class="flex-col space-y-2">
                 <div
                     v-for="instance of entity.tgtEntity.associations"
-                    @click="loadEntity(instance.entity.describoId)"
-                    :key="instance.property"
+                    @click="loadEntity({ id: instance.entity['@id'] })"
+                    :key="instance.entity['@id']"
                     class="cursor-pointer"
                 >
-                    <div class="flex flex-row -mx-3 text-base">
+                    <div class="flex flex-row -mx-2 text-base">
                         <div class="bg-slate-700 w-3 h-3 rounded-lg mt-4"></div>
                         <div class="bg-slate-700 w-6 h-1 mt-5 -mx-1"></div>
                         <div
@@ -58,9 +52,9 @@
 
         <!-- if the entity has geography then show the map -->
         <div v-if="showMap">
-            <div class="flex flex-row">
+            <div class="flex flex-row space-x-2">
                 <div class="flex flex-col">
-                    <div class="bg-blue-200 p-2 cursor-pointer">
+                    <div>
                         {{ props.entity.tgtEntity.name }}
                     </div>
                     <map-component
@@ -68,16 +62,11 @@
                         :entity="props.entity.tgtEntity"
                     />
                 </div>
-                <div
-                    class="flex flex-col space-y-6 bg-yellow-200 cursor-pointer rounded-r p-2"
+                <UnlinkEntityComponent
                     v-if="!configuration.readonly"
-                >
-                    <delete-property-component
-                        :type="type"
-                        :property="props.entity"
-                        @delete:property="deleteProperty"
-                    />
-                </div>
+                    :entity="props.entity.tgtEntity"
+                    @unlink:entity="unlinkEntity"
+                />
             </div>
         </div>
     </div>
@@ -85,13 +74,13 @@
 
 <script setup>
 import RenderItemLinkComponent from "./RenderItemLink.component.vue";
-import DeletePropertyComponent from "./DeleteProperty.component.vue";
+import UnlinkEntityComponent from "./UnlinkEntity.component.vue";
 import MapComponent from "../primitives/Map.component.vue";
 import { computed, inject } from "vue";
 import { configurationKey } from "./keys.js";
 const configuration = inject(configurationKey);
 
-const emit = defineEmits(["load:entity", "create:property", "save:property", "delete:property"]);
+const $emit = defineEmits(["load:entity", "unlink:entity"]);
 const props = defineProps({
     crateManager: {
         type: Object,
@@ -101,6 +90,10 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+    property: {
+        type: String,
+        required: true,
+    },
 });
 let showMap = computed(() => {
     return props.entity?.tgtEntity?.["@type"].join(", ").match(/Geo/) ? true : false;
@@ -108,14 +101,11 @@ let showMap = computed(() => {
 let entity = computed(() => {
     return props.entity;
 });
-let type = "unlink";
 
-function loadEntity(describoId) {
-    // console.debug("Renderer Linked Item Component : emit(load:entity)", props.entity.tgtEntityId);
-    emit("load:entity", { describoId });
+function loadEntity(entity) {
+    $emit("load:entity", entity);
 }
-function deleteProperty(target) {
-    // console.debug("Renderer Linked Item Component : emit(delete:property)", target);
-    emit("delete:property", target);
+function unlinkEntity({ entity }) {
+    $emit("unlink:entity", { property: props.property, tgtEntityId: entity["@id"] });
 }
 </script>

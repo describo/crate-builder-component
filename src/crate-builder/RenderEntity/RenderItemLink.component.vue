@@ -1,8 +1,5 @@
 <template>
-    <div
-        class="flex flex-col cursor-pointer bg-blue-200 text-gray-700 hover:text-black rounded hover:bg-blue-300 hover:rounded-r-none py-2 px-4 describo-render-item-link"
-        @click="loadEntity"
-    >
+    <div class="flex flex-col cursor-pointer py-2 px-4" @click="loadEntity">
         <div class="flex flex-col space-y-2">
             <div class="border-b border-gray-500 text-sm flex-grow">
                 {{ decodeURIComponent(entity["@id"]) }}
@@ -31,6 +28,6 @@ const props = defineProps({
 const emit = defineEmits(["load:entity"]);
 
 function loadEntity() {
-    emit("load:entity", { id: props.entity.describoId });
+    emit("load:entity", { id: props.entity["@id"] });
 }
 </script>

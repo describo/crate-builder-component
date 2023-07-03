@@ -5,9 +5,6 @@
 <script setup>
 import "leaflet/dist/leaflet.css";
 import * as Leaflet from "leaflet/dist/leaflet-src.esm.js";
-import groupBy from "lodash-es/groupBy";
-import cuid2 from "../lib/cuid2";
-const createId = cuid2.init({ length: 32 });
 import { reactive, onMounted, onBeforeUnmount } from "vue";
 
 const props = defineProps({
@@ -31,11 +28,11 @@ onBeforeUnmount(() => {
     data.map.off();
     data.map.remove();
 });
-const mapId = createId();
+const mapId = btoa(props.entity["@id"]);
 
 async function init() {
-    const entity = props.crateManager.getEntity({ describoId: props.entity.describoId });
-    data.map = new Leaflet.map(mapId);
+    const entity = props.crateManager.getEntity({ id: props.entity["@id"] });
+    data.map = new Leaflet.map(mapId, { scrollWheelZoom: false, touchZoom: false });
 
     // we need to give leaflet and vue and the dom a couple seconds before barreling on
     await new Promise((resolve) => setTimeout(resolve, 200));
@@ -50,10 +47,8 @@ async function init() {
         noWrap: true,
     }).addTo(data.map);
 
-    let properties = groupBy(entity.properties, "property");
-
-    if (properties.geojson) {
-        let geojson = JSON.parse(properties.geojson[0].value);
+    if (entity["@properties"].geojson) {
+        let geojson = JSON.parse(entity["@properties"].geojson[0].value);
         removeExistingLayers();
 
         // we need to give leaflet and vue and the dom a couple seconds before barreling on

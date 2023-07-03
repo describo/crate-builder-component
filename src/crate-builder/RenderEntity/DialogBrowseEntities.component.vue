@@ -15,10 +15,11 @@
                     :placeholder="$t('search_for_connection')"
                 ></el-input>
             </div>
-            <div v-for="entity of entities" :key="entity.describoId">
+            <div v-for="entity of entities" :key="entity['@id']">
                 <RenderItemLinkComponent
                     :entity="entity"
-                    @load:entity="loadEntity(entity.describoId)"
+                    @load:entity="loadEntity(entity)"
+                    class="describo-render-item-link p-2 rounded bg-blue-200 hover:text-black hover:bg-blue-300"
                 />
             </div>
         </div>
@@ -80,7 +81,7 @@ function filterConnections(query) {
     data.query = query;
 }
 
-function loadEntity(describoId) {
-    emit("load:entity", { describoId });
+function loadEntity(entity) {
+    emit("load:entity", entity);
 }
 </script>

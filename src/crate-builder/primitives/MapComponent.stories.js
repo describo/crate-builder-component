@@ -1,81 +1,63 @@
 import MapComponent from "./Map.component.vue";
-// import {
-//     Title,
-//     Subtitle,
-//     Description,
-//     Primary,
-//     ArgsTable,
-//     Stories,
-//     PRIMARY_STORY,
-// } from "@storybook/addon-docs";
 
 export default {
     component: MapComponent,
-    parameters: {
-        docs: {
-            page: () => null,
-            // Can't get JSX working inside vite so this is a no go
-            // page: () => (
-            //     <>
-            //         <Title />
-            //         <Stories />
-            //     </>
-            // ),
-        },
-    },
+    argTypes: {},
 };
 
-const Template = (args) => ({
+const Template = (args, { argTypes }) => ({
     components: { MapComponent },
-    setup() {
-        return { ...args };
-    },
-    template: '<MapComponent entity="entity"  />',
+    props: Object.keys(argTypes),
+    template: '<MapComponent v-bind="$props" />',
 });
 
-const args = {
-    entity: {
-        describoId: "x",
+const entities = [
+    {
+        "@id": "#geo",
+        "@type": ["GeoCoordinates"],
+        name: "geocoordinates",
+        "@properties": {
+            geojson: [
+                {
+                    idx: 0,
+                    property: "geojson",
+                    value: '{"type":"Feature","properties":{"name":"Nyaki Nyaki / Njaki Njaki"},"geometry":{"type":"Point","coordinates":["118.75508272649","-32.390945191928"]}}',
+                },
+            ],
+        },
     },
-};
-
-// TODO: Write story to test box and long/lat
-
-// export const GeoBox = Template.bind({});
-// GeoBox.args = {
-//     entity: {
-//         describoId: "1",
-//         properties: [
-//             {
-//                 property: "box",
-//                 value: "-7.710991655433217,158.76561641693118 -47.040182144806664,109.54686641693117",
-//             },
-//         ],
-//     },
-// };
+    {
+        "@id": "#geo",
+        "@type": ["GeoShape"],
+        name: "geoshape",
+        "@properties": {
+            geojson: [
+                {
+                    idx: 0,
+                    property: "geojson",
+                    value: '{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[158.76561641693118,-7.710991655433217],[158.76561641693118,-47.040182144806664],[109.54686641693117,-47.040182144806664],[109.54686641693117,-7.710991655433217]]]}}',
+                },
+            ],
+        },
+    },
+];
 
 export const GeoJSONPoint = Template.bind({});
 GeoJSONPoint.args = {
-    entity: {
-        describoId: "1",
-        properties: [
-            {
-                property: "geojson",
-                value: '{"type":"Feature","properties":{"name":"Nyaki Nyaki / Njaki Njaki"},"geometry":{"type":"Point","coordinates":["118.75508272649","-32.390945191928"]}}',
-            },
-        ],
+    entity: entities[0],
+    crateManager: {
+        getEntity({ id }) {
+            return entities[0];
+        },
     },
 };
 
 export const GeoJSONArea = Template.bind({});
 GeoJSONArea.args = {
-    entity: {
-        describoId: "2",
-        properties: [
-            {
-                property: "geojson",
-                value: '{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[158.76561641693118,-7.710991655433217],[158.76561641693118,-47.040182144806664],[109.54686641693117,-47.040182144806664],[109.54686641693117,-7.710991655433217]]]}}',
-            },
-        ],
+    entity: entities[1],
+    crateManager: {
+        getEntity({ id }) {
+            return entities[1];
+        },
     },
 };

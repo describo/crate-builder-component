@@ -3,22 +3,21 @@
         <el-input
             class="w-full"
             type="number"
-            @input="data.debouncedSave()"
+            @change="save()"
             v-model="data.internalValue"
             resize="vertical"
         ></el-input>
-        <div class="text-xs text-gray-700" v-if="!data.isValidNumber">
-            {{ $t('invalid_number_value', {value: data.internalValue}) }}
+        <div class="text-xs text-gray-700" v-if="!isValidNumber">
+            {{ $t("invalid_number_value", { value: data.internalValue }) }}
         </div>
     </div>
 </template>
 
 <script setup>
 import { ElInput } from "element-plus";
-import debounce from "lodash-es/debounce";
-import { reactive, watch } from "vue";
+import { reactive, watch, computed } from "vue";
 import isNumeric from "validator/es/lib/isNumeric";
-import {$t} from '../i18n'
+import { $t } from "../i18n";
 
 const props = defineProps({
     property: {
@@ -33,9 +32,9 @@ const $emit = defineEmits(["save:property"]);
 const data = reactive({
     internalValue: props.value,
     isValidNumber: checkIsNumeric(props.value),
-    debouncedSave: debounce(save, 1000),
 });
 
+let isValidNumber = computed(() => checkIsNumeric(data.internalValue));
 watch(
     () => props.value,
     () => {

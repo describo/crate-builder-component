@@ -186,7 +186,6 @@
                 <browse-entities-dialog
                     :crate-manager="props.crateManager"
                     @load:entity="loadEntity"
-                    @delete:entity="deleteEntity"
                 />
             </template>
         </el-drawer>
@@ -237,7 +236,8 @@ const data = reactive({
     },
 });
 let isRootDataset = computed(() => {
-    return props.entity.describoId === "RootDataset";
+    let rootDataset = props.crateManager.getRootDataset({ stub: true });
+    return props.entity["@id"] === rootDataset["@id"];
 });
 let definition = computed(() => {
     if (!props.entity?.["@type"] || !props.crateManager.profileManager?.getTypeDefinition)
@@ -261,16 +261,11 @@ function loadEntity(data) {
 function addPropertyPlaceholder(property) {
     $emit("add:property:placeholder", property);
 }
-function deleteEntity({ describoId }) {
-    if (data.dialog.browseEntities) {
-        // if the browse dialog is showing
-        $emit("delete:entity", { describoId });
-    } else {
-        // otherwise it's the delete entity button that was pressed
-        $emit("delete:entity", {
-            describoId: props.entity.describoId,
-        });
-    }
+function deleteEntity() {
+    // otherwise it's the delete entity button that was pressed
+    $emit("delete:entity", {
+        id: props.entity["@id"],
+    });
 }
 function saveCrateAsTemplate(data) {
     $emit("save:crate:template", data);

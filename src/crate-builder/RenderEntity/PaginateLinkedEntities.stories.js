@@ -27,51 +27,29 @@ const Template = (args, { argTypes }) => ({
     `,
 });
 
-/**
- *
- * Linked entity structure
- *
- */
-// const entity = {
-//     propertyId: "1140b749-d1b3-4afb-b915-3890fd8762eb",
-//     srcEntityId: "ed91f36f-6ad4-49fd-91f1-6a44938c6cda",
-//     property: "hasPart",
-//     tgtEntityId: "1f281182-5d90-44c2-b4cc-9f06e052e36c",
-//     tgtEntity: {
-//         describoId: "1f281182-5d90-44c2-b4cc-9f06e052e36c",
-//         "@id": ".completed-resources.json",
-//         "@type": "File",
-//         "@reverse": { hasPart: { "@id": "./" } },
-//         name: ".completed-resources.json",
-//     },
-// };
 const crateManager = {};
 
 export const ValidEntityInputWithOneEntity = Template.bind({});
 ValidEntityInputWithOneEntity.args = {
     crateManager,
+    property: "something",
     entities: generateEntities(1),
 };
 
 export const ValidEntityInputWithOneHundredEntities = Template.bind({});
 ValidEntityInputWithOneHundredEntities.args = {
     crateManager,
+    property: "something",
     entities: generateEntities(100),
 };
 
 function generateEntities(limit) {
     return range(0, limit).map((i) => {
-        const tgtEntityId = chance.natural() + i;
         return {
-            propertyId: `propertyId-${i}`,
-            srcEntityId: `entity-${i}`,
-            property: "hasPart",
-            tgtEntityId,
+            idx: i,
             tgtEntity: {
-                describoId: tgtEntityId,
                 "@id": chance.url(),
-                "@type": "File",
-                "@reverse": { hasPart: { "@id": "./" } },
+                "@type": ["File"],
                 name: `/path/to/file/${chance.word()}`,
                 associations: [],
             },

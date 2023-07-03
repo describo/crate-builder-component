@@ -1,10 +1,5 @@
 <template>
-    <div
-        class="flex flex-row flex-grow p-4 describo-property-background"
-        :class="{
-            'hover:bg-sky-100': !configuration.readonly,
-        }"
-    >
+    <div class="flex flex-row flex-grow p-4 describo-property-background">
         <div class="w-1/3 xl:w-1/5 flex flex-col">
             <div>
                 <display-property-name-component
@@ -41,7 +36,7 @@
             <div class="flex flex-col space-y-1" v-if="data.simpleInstances.length">
                 <div
                     v-for="instance of data.simpleInstances"
-                    :key="instance.propertyId"
+                    :key="instance.idx"
                     class="flex flex-row"
                 >
                     <render-entity-property-instance-component
@@ -62,33 +57,19 @@
                         class="pl-2"
                         type="delete"
                         :property="instance"
-                        @delete:property="deleteProperty"
+                        @delete:property="deleteProperty(instance)"
                     />
                 </div>
             </div>
             <!-- render all the links in a wrapping row -->
             <div class="mt-2" v-if="data.linkInstances.length">
-                <div v-if="data.linkInstances.length <= 10" class="flex flex-row flex-wrap">
-                    <div v-for="(instance, idx) of data.linkInstances" :key="instance.propertyId">
-                        <render-linked-item-component
-                            :index="idx"
-                            :crate-manager="props.crateManager"
-                            :entity="instance"
-                            @load:entity="loadEntity"
-                            @save:property="saveProperty"
-                            @delete:property="deleteProperty"
-                        />
-                    </div>
-                </div>
-                <div v-else>
-                    <PaginateLinkedEntitiesComponent
-                        :crate-manager="props.crateManager"
-                        :entities="data.linkInstances"
-                        @load:entity="loadEntity"
-                        @save:property="saveProperty"
-                        @delete:property="deleteProperty"
-                    />
-                </div>
+                <PaginateLinkedEntitiesComponent
+                    :crate-manager="props.crateManager"
+                    :entities="data.linkInstances"
+                    :property="props.property"
+                    @load:entity="loadEntity"
+                    @unlink:entity="unlinkEntity"
+                />
             </div>
         </div>
     </div>
@@ -99,7 +80,6 @@ import { ElBadge } from "element-plus";
 import RenderPropertyHelpComponent from "./RenderPropertyHelp.component.vue";
 import RenderEntityPropertyInstanceComponent from "./RenderEntityPropertyInstance.component.vue";
 import PaginateLinkedEntitiesComponent from "./PaginateLinkedEntities.component.vue";
-import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";
 import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import AddComponent from "./Add.component.vue";
 import DisplayPropertyNameComponent from "./DisplayPropertyName.component.vue";
@@ -170,16 +150,14 @@ function getProfileDefinitionForProperty() {
     data.propertyDefinition = cloneDeep(propertyDefinition);
     data.help = propertyDefinition.help;
 }
-const emit = defineEmits([
-    "refresh",
+const $emit = defineEmits([
     "load:entity",
     "create:property",
     "create:entity",
-    "create:object",
     "link:entity",
-    "add:template",
     "save:property",
     "delete:property",
+    "unlink:entity",
 ]);
 const isValid = computed(() => {
     return props.values.length ? true : false;
@@ -199,30 +177,34 @@ const showAddControl = computed(() => {
 function sortInstances() {
     data.simpleInstances = props.values.filter((v) => v.value);
     data.linkInstances = orderBy(
-        props.values.filter((v) => v.tgtEntityId),
+        props.values.filter((v) => v?.tgtEntity),
         "@id"
     );
 }
 function loadEntity(data) {
-    emit("load:entity", data);
+    $emit("load:entity", data);
 }
 function createProperty(data) {
-    emit("create:property", data);
+    $emit("create:property", data);
 }
 function createEntity(data) {
-    emit("create:entity", data);
+    $emit("create:entity", data);
 }
 function linkEntity(data) {
-    emit("link:entity", data);
+    $emit("link:entity", data);
 }
 function saveProperty(data) {
-    if (data.value) {
-        emit("save:property", data);
-    } else {
-        emit("delete:property", data);
-    }
+    $emit("save:property", data);
 }
 function deleteProperty(data) {
-    emit("delete:property", data);
+    $emit("delete:property", {
+        property: props.property,
+        idx: data.idx,
+    });
+}
+function unlinkEntity(data) {
+    $emit("unlink:entity", {
+        ...data,
+    });
 }
 </script>

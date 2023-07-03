@@ -20,6 +20,14 @@
             "subClassOf": [],
             "inputs": [
                 {
+                    "id": "https://schema.org/author",
+                    "name": "author",
+                    "label": "Author",
+                    "required": true,
+                    "multiple": true,
+                    "type": ["Person", "Organisation"]
+                },
+                {
                     "id": "https://schema.org/text",
                     "name": "text",
                     "label": "text",

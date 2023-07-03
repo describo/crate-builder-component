@@ -21,11 +21,6 @@
 import RenderEntityComponent from "../crate-builder/RenderEntity/Shell.component.vue";
 
 import { reactive, onBeforeMount, watch } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import { Lookup } from "./lookup.js";
-const lookup = new Lookup();
-const $router = useRouter();
-const $route = useRoute();
 
 const data = reactive({
     loading: false,
@@ -78,6 +73,14 @@ const data = reactive({
                 },
             },
         },
+        getRootDataset() {
+            return data.entities[0];
+        },
+        getEntity({ id }) {
+            let entity = data.entities.filter((e) => e["@id"] === id)[0];
+            console.log(entity);
+            return entity;
+        },
     },
     configuration: {
         enableContextEditor: false,
@@ -91,73 +94,41 @@ const data = reactive({
     },
     entities: [
         {
-            describoId: "RootDataset",
             "@id": "./",
             "@type": ["Dataset"],
-            properties: {
+            "@properties": {
                 relationship: [
                     {
-                        propertyId: "aa",
-                        srcEntityId: "RootDataset",
-                        property: "relationship",
-                        tgtEntityId: "1",
+                        idx: 0,
                         tgtEntity: {
-                            describoId: "1",
                             "@id": "#relationship",
-                            "@type": "Relationship, RelatedEntity",
-                            associations: [
-                                {
-                                    property: "source",
-                                    entity: {
-                                        describoId: "2",
-                                        "@id": "#person1",
-                                        "@type": "Person",
-                                        associations: [],
-                                    },
-                                },
-                                {
-                                    property: "target",
-                                    entity: {
-                                        describoId: "3",
-                                        "@id": "#thing1",
-                                        "@type": "Thing",
-                                    },
-                                },
-                            ],
+                            "@type": ["Relationship", "RelatedEntity"],
+                            associations: [],
                         },
                     },
                 ],
             },
         },
         {
-            describoId: "1",
             "@id": "#relationship",
-            "@type": "Relationship, RelatedEntity",
-            properties: {
+            "@type": ["Relationship", "RelatedEntity"],
+            "@properties": {
                 source: [
                     {
-                        propertyId: "ba",
-                        srcEntityId: "1",
-                        property: "source",
-                        tgtEntityId: "2",
+                        idx: 0,
                         tgtEntity: {
-                            describoId: "2",
                             "@id": "#person1",
-                            "@type": "Person",
+                            "@type": ["Person"],
                             associations: [],
                         },
                     },
                 ],
                 target: [
                     {
-                        propertyId: "bb",
-                        srcEntityId: "1",
-                        property: "target",
-                        tgtEntityId: "3",
+                        idx: 0,
                         tgtEntity: {
-                            describoId: "3",
                             "@id": "#thing1",
-                            "@type": "Thing",
+                            "@type": ["Thing"],
                             associations: [],
                         },
                     },
@@ -165,41 +136,31 @@ const data = reactive({
             },
         },
         {
-            describoId: "2",
             "@id": "#person1",
             "@type": ["Person"],
-            properties: {
+            "@properties": {
                 sourceOf: [
                     {
-                        propertyId: "ca",
-                        srcEntityId: "2",
-                        property: "sourceOf",
-                        tgtEntityId: "1",
+                        idx: 0,
                         tgtEntity: {
-                            describoId: "1",
                             "@id": "#relationship",
-                            "@type": "Relationship, RelatedEntity",
-                            associations: [{ property: "source", entity: {} }],
+                            "@type": ["Relationship", "RelatedEntity"],
+                            associations: [],
                         },
                     },
                 ],
             },
         },
         {
-            describoId: "3",
             "@id": "#thing1",
             "@type": ["Thing"],
-            properties: {
+            "@properties": {
                 targetOf: [
                     {
-                        propertyId: "da",
-                        srcEntityId: "3",
-                        property: "targetOf",
-                        tgtEntityId: "1",
+                        idx: 0,
                         tgtEntity: {
-                            describoId: "1",
                             "@id": "#relationship",
-                            "@type": "Relationship, RelatedEntity",
+                            "@type": ["Relationship", "RelatedEntity"],
                             associations: [],
                         },
                     },
@@ -209,21 +170,12 @@ const data = reactive({
     ],
     selectedEntity: {},
 });
-watch(
-    () => $route.query.describoId,
-    (n, o) => {
-        if (data.selectedEntity.describoId !== $route.query.describoId)
-            loadEntity({ describoId: $route.query.describoId });
-    }
-);
 onBeforeMount(() => {
-    loadEntity({ describoId: "RootDataset" });
+    loadEntity({ id: "./" });
 });
 
-function loadEntity({ describoId }) {
-    // console.log("load:entity", entity);
-    data.selectedEntity = data.entities.filter((e) => e.describoId === describoId)[0];
-    $router.push({ query: { describoId } });
+function loadEntity({ id }) {
+    data.selectedEntity = data.entities.filter((e) => e["@id"] === id)[0];
 }
 
 function saveProperty(data) {

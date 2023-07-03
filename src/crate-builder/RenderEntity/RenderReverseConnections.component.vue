@@ -20,7 +20,11 @@
                 ></el-input>
             </div>
             <div v-for="entity of connections" :key="entity.describoId">
-                <RenderItemLinkComponent :entity="entity" @load:entity="loadEntity" />
+                <RenderItemLinkComponent
+                    :entity="entity"
+                    @load:entity="loadEntity"
+                    class="describo-render-item-link p-2 rounded bg-blue-200 hover:text-black hover:bg-blue-300"
+                />
             </div>
         </div>
     </div>
@@ -30,7 +34,8 @@
 import { ElPagination, ElInput } from "element-plus";
 import RenderItemLinkComponent from "./RenderItemLink.component.vue";
 import { computed, reactive, onMounted } from "vue";
-import isPlainObject from "lodash-es/isPlainObject";
+import isPlainObject from "lodash-es/isPlainObject.js";
+import uniqBy from "lodash-es/uniqBy.js";
 import { $t } from "../i18n";
 
 const props = defineProps({
@@ -54,7 +59,7 @@ const data = reactive({
 const $emit = defineEmits(["load:entity"]);
 
 onMounted(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 50));
     await resolveConnections();
 });
 
@@ -77,38 +82,17 @@ let connections = computed(() => {
 
 async function resolveConnections() {
     if (isPlainObject(props.connections)) {
-        let sources = {};
+        let entities = [];
         for (let property of Object.keys(props.connections)) {
-            let entities = props.connections[property];
-            for (let e of entities) {
-                e = props.crateManager.getEntity({
-                    describoId: e.srcEntityId,
-                    loadProperties: false,
-                });
-                if (!sources[e["@id"]]) {
-                    sources[e["@id"]] = {
-                        "@id": e["@id"],
-                        "@type": e["@type"],
-                        name: e.name,
-                        describoId: e.describoId,
-                        properties: [property],
-                    };
-                } else {
-                    sources[e["@id"]].properties.push(property);
-                }
-            }
+            entities = [...entities, ...props.connections[property]];
         }
 
-        let entities = [];
         const re = new RegExp(data.query, "i");
-        for (let entityId of Object.keys(sources)) {
-            const entity = sources[entityId];
-            if (entity["@id"].match(re) || entity["@type"].match(re) || entity.name.match(re)) {
-                entities.push({
-                    ...sources[entityId],
-                });
-            }
-        }
+        entities = entities.filter((entity) => {
+            if (!entity) return null;
+            return entity["@id"].match(re) || entity["@type"].match(re) || entity.name.match(re);
+        });
+        entities = uniqBy(entities, "@id");
         data.visible = entities.length > 0;
         data.total = entities.length;
         data.entities = entities;

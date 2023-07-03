@@ -21,10 +21,10 @@ SelectObjectComponentStory.args = {
     property: "select",
     definition: {
         values: [
-            { "@id": "id: a", "@type": "Thing", name: "a" },
-            { "@id": "id: b", "@type": "Thing", name: "b" },
-            { "@id": "id: c", "@type": "Thing", name: "c" },
-            { "@id": "id: d", "@type": "Thing", name: "d" },
+            { "@id": "#a", "@type": "Thing", name: "a" },
+            { "@id": "#b", "@type": "Thing", name: "b" },
+            { "@id": "#c", "@type": "Thing", name: "c" },
+            { "@id": "#d", "@type": "Thing", name: "d" },
         ],
     },
 };

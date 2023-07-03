@@ -27,7 +27,7 @@ describe("Test working with profiles", () => {
                 },
             },
         };
-        const entity = { "@type": "Dataset" };
+        const entity = { "@type": ["Dataset"] };
         const profileManager = new ProfileManager({ profile });
         let inputs = profileManager.getInputsFromProfile({ entity });
         expect(inputs.length).toEqual(1);
@@ -129,7 +129,7 @@ describe("Test working with profiles", () => {
     test("get type definition - no profile, handle type array, look in schema.org", () => {
         const profile = undefined;
         const profileManager = new ProfileManager({ profile });
-        const entity = { "@type": "Dataset" };
+        const entity = { "@type": ["Dataset"] };
         let inputs = profileManager.getInputsFromProfile({ entity });
         expect(inputs.length).toEqual(0);
 
@@ -142,7 +142,7 @@ describe("Test working with profiles", () => {
             classes: {},
         };
         const profileManager = new ProfileManager({ profile });
-        const entity = { "@type": "Dataset" };
+        const entity = { "@type": ["Dataset"] };
         let inputs = profileManager.getInputsFromProfile({ entity });
         expect(inputs.length).toEqual(0);
 
@@ -197,7 +197,7 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        const entity = { "@type": "Dataset" };
+        const entity = { "@type": ["Dataset"] };
         let { propertyDefinition } = profileManager.getPropertyDefinition({
             property: "date",
             entity,
@@ -206,7 +206,7 @@ describe("Test working with profiles", () => {
     });
     test("get property definition - not defined in profile, lookup schema.org", () => {
         const profileManager = new ProfileManager({ profile: undefined });
-        const entity = { "@type": "Dataset" };
+        const entity = { "@type": ["Dataset"] };
         let { propertyDefinition } = profileManager.getPropertyDefinition({
             property: "dateModified",
             entity,
@@ -236,7 +236,7 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        const entity = { "@type": "Dataset" };
+        const entity = { "@type": ["Dataset"] };
         let { propertyDefinition } = profileManager.getPropertyDefinition({
             property: "mojumbo",
             entity,

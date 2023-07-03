@@ -22,7 +22,7 @@ const Template = (args, { argTypes }) => ({
 });
 
 const crateManager = {
-    findMatchingEntities: () => [],
+    getEntities: () => [],
 };
 const help = "some help text";
 const multiple = true;
@@ -103,9 +103,9 @@ SelectObjectPrimitive.args = {
         multiple,
         required: true,
         values: [
-            { "@id": "1", "@type": "Dataset", name: "1" },
-            { "@id": "1", "@type": "Dataset", name: "2" },
-            { "@id": "1", "@type": "Dataset", name: "3" },
+            { "@id": "#1", "@type": "Dataset", name: "1" },
+            { "@id": "#2", "@type": "Dataset", name: "2" },
+            { "@id": "#3", "@type": "Dataset", name: "3" },
         ],
         type: ["SelectObject"],
     },

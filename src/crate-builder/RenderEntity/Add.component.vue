@@ -74,7 +74,6 @@
                     v-if="['Geo', 'GeoCoordinates', 'GeoShape'].includes(data.addType)"
                     :crate-manager="props.crateManager"
                     :property="props.property"
-                    mode="entity"
                     @create:entity="createEntity"
                     @link:entity="linkEntity"
                 />
@@ -136,7 +135,7 @@ const props = defineProps({
         default: false,
     },
 });
-const emit = defineEmits(["create:property", "create:entity", "link:entity"]);
+const $emit = defineEmits(["create:property", "create:entity", "link:entity"]);
 
 const data = reactive({
     simpleTypes: [
@@ -174,17 +173,17 @@ function add({ type }) {
 }
 function createProperty(data) {
     // console.debug("Add Component : emit(create:property)", data);
-    emit("create:property", data);
+    $emit("create:property", data);
     close();
 }
 function createEntity(data) {
     // console.debug("Add Component : emit(create:entity)", { ...data, property: props.property });
-    emit("create:entity", { ...data, property: props.property });
+    $emit("create:entity", { ...data, property: props.property });
     close();
 }
 function linkEntity(data) {
     // console.debug("Add Component : emit(link:entity)", { ...data, property: props.property });
-    emit("link:entity", { ...data, property: props.property });
+    $emit("link:entity", { ...data, property: props.property });
     close();
 }
 </script>

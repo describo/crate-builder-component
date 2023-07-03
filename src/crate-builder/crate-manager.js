@@ -1,14 +1,13 @@
-import isString from "lodash-es/isString";
-import isNumber from "lodash-es/isNumber";
-import isArray from "lodash-es/isArray";
-import isPlainObject from "lodash-es/isPlainObject";
-import isEmpty from "lodash-es/isEmpty";
-import isUndefined from "lodash-es/isUndefined";
-import isBoolean from "lodash-es/isBoolean";
-import groupBy from "lodash-es/groupBy";
-import cloneDeep from "lodash-es/cloneDeep";
-import flattenDeep from "lodash-es/flattenDeep";
-import compact from "lodash-es/compact";
+import isString from "lodash-es/isString.js";
+import isNumber from "lodash-es/isNumber.js";
+import isArray from "lodash-es/isArray.js";
+import isPlainObject from "lodash-es/isPlainObject.js";
+import isUndefined from "lodash-es/isUndefined.js";
+import isBoolean from "lodash-es/isBoolean.js";
+import cloneDeep from "lodash-es/cloneDeep.js";
+import flattenDeep from "lodash-es/flattenDeep.js";
+import compact from "lodash-es/compact.js";
+import uniq from "lodash-es/uniq.js";
 import intersection from "lodash-es/intersection";
 import validatorIsURL from "validator/es/lib/isURL.js";
 import validateIriPkg from "./lib/validate-iri";
@@ -18,16 +17,19 @@ export class CrateManager {
     constructor() {
         this.em = new Entity();
     }
-    async load({ crate, profile, progress = {} }) {
+    async load({ crate, profile }) {
         this.verify({ crate });
         this.profile = profile;
         this.context = crate["@context"];
 
-        /** Doing it this way means we partition on the first pass */
-        this.errors = [];
+        let errors = [];
         this.rootDescriptor;
-        let graph = [];
+        let entities = [];
 
+        // console.log("Total entities", crate["@graph"].length);
+        // console.time();
+
+        // check that the incoming entities look ok
         for (let i = 0; i < crate["@graph"].length; i++) {
             const entity = crate["@graph"][i];
             if (entity["@id"] === "ro-crate-metadata.json") {
@@ -35,44 +37,43 @@ export class CrateManager {
             } else {
                 //  ensure every entity has a defined type
                 if (!entity?.["@type"]) {
-                    this.errors.push({
+                    errors.push({
                         message: `The entity does not have '@type' defined.`,
                         entity,
                     });
                     continue;
                 }
 
-                // then see if @id is a valid IRI
+                // then see if @id is a valid identifier
                 let { isValid, message } = validateId({ id: entity["@id"], type: entity["@type"] });
                 if (!isValid) {
-                    this.errors.push({
+                    errors.push({
                         message,
                         entity,
                     });
                 }
 
-                graph.push(entity);
+                entities.push(entity);
             }
         }
 
-        if (this.errors.length) throw new Error(`The crate is invalid.`);
+        if (errors.length) {
+            this.errors = errors;
+            throw new Error(`The crate is invalid.`);
+        }
 
-        let entities = [];
-        for (let entity of graph) {
+        // ingest the entities
+        for (let entity of entities) {
             if (entity["@id"] === this.rootDescriptor.about["@id"]) {
-                entity.describoId = "RootDataset";
                 entity["@id"] = "./";
             }
 
-            let { describoId } = this.em.set(entity);
-            entity.describoId = describoId;
-            entities.push(entity);
+            entity = this.em.setEntity(entity);
         }
+        this.em.createMissingEntities();
         this.rootDescriptor.about = { "@id": "./" };
 
-        for (let entity of entities) {
-            this.em.processEntityProperties(entity);
-        }
+        // console.timeEnd();
     }
 
     verify({ crate }) {
@@ -92,281 +93,193 @@ export class CrateManager {
                 : cloneDeep(this.context),
             "@graph": [cloneDeep(this.rootDescriptor)],
         };
-
-        // this.__purgeUnlinkedEntities();
-        this.em.entities.forEach((entity) => {
-            entity = this.__rehydrateEntity({ describoId: entity.describoId });
-            crate["@graph"].push(entity);
-        });
+        crate["@graph"] = [cloneDeep(this.rootDescriptor), ...this.em.getEntities({})];
         return crate;
     }
 
-    exportEntityTemplate({ describoId }) {
-        let entity = this.__rehydrateEntity({ describoId });
+    exportEntityTemplate({ id }) {
+        let entity = this.em.getEntity({ id, exportForm: true });
+        return entity;
+    }
 
-        // remove all the internal stuff
-        delete entity["@reverse"];
+    getRootDataset(config) {
+        const stub = config?.stub ? config.stub : false;
+        if (this.rootDescriptor?.about?.["@id"]) {
+            return this.getEntity({ id: this.rootDescriptor.about["@id"], stub });
+        } else {
+            return {};
+        }
+    }
 
-        // iterate over all properties and remove anything that points to something else
-        Object.keys(entity).forEach((property) => {
-            if (isArray(entity[property])) {
-                entity[property] = entity[property].filter((instance) => {
-                    if (!isPlainObject(instance)) return instance;
-                });
-            } else if (isPlainObject(entity[property])) {
-                delete entity[property];
+    getEntities({ limit = 5, query = undefined, type = undefined }) {
+        return this.em.getEntities({ limit, query, type });
+    }
+
+    getEntity({ id, stub = false, resolveLinkedEntityAssociations = true }) {
+        let entity;
+        if (stub) {
+            entity = this.em.getEntityStub(id);
+        } else {
+            entity = this.em.getEntity({ id });
+            if (this?.profile?.resolve && resolveLinkedEntityAssociations) {
+                this._resolveLinkedEntityAssociations({ entity });
             }
+        }
+
+        return entity;
+    }
+
+    setEntity({ entity }) {
+        // clone it so we don't intefere with the reference being passed in
+        entity = cloneDeep(entity);
+        entity = normaliseEntityType({ entity });
+
+        // check there isn't a matching entity already
+        let match = this.em.getEntity({ id: entity["@id"] });
+
+        if (isMatchingEntity(entity, match)) {
+            return match;
+        }
+        return this.em.setEntity(entity);
+    }
+
+    updateEntity({ id, property, value }) {
+        if (!id) throw new Error(`'updateEntity' requires 'id' to be defined`);
+        if (!["@id", "@type", "name"].includes(property)) return;
+        if (property === "@id") {
+            this.em.updateEntityId({ id, value });
+        } else if (property === "@type") {
+            this.em.updateEntityType({ id, value });
+        } else if (property === "name") {
+            this.em.updateEntityName({ id, value });
+        }
+    }
+
+    deleteEntity({ id }) {
+        this.em.deleteEntity({ id });
+    }
+
+    linkEntity({ id = undefined, property, tgtEntityId }) {
+        if (!id) throw new Error(`'linkEntity' requires 'id' to be defined`);
+        if (!property) throw new Error(`'linkEntity' requires 'property' to be defined`);
+        if (!tgtEntityId) throw new Error(`'linkEntity' requires 'tgtEntityId' to be defined`);
+        this.em.setProperty({ id, property, tgtEntityId });
+    }
+
+    unlinkEntity({ id = undefined, property, tgtEntityId }) {
+        if (!id) throw new Error(`'unlinkEntity' requires 'id' to be defined`);
+        if (!property) throw new Error(`'unlinkEntity' requires 'property' to be defined`);
+        if (!tgtEntityId) throw new Error(`'unlinkEntity' requires 'tgtEntityId' to be defined`);
+        this.em.unlinkEntity({ id, property, tgtEntityId });
+    }
+
+    ingestAndLink({ id = undefined, property = undefined, json = {} }) {
+        if (!id) throw new Error(`ingestAndLink: 'id' must be defined`);
+        if (!property) throw new Error(`ingestAndLink: 'property' must be defined`);
+
+        let flattened = this._flatten(json);
+        flattened = flattened.map((entity) => {
+            return this.em.setEntity(entity);
         });
-        return entity;
+
+        this.linkEntity({ id, property, tgtEntityId: flattened[0]["@id"] });
     }
 
-    getRootDataset() {
-        return this.getEntity({ describoId: "RootDataset" });
+    setProperty({ id = undefined, property, value, tgtEntityId }) {
+        if (!id) throw new Error(`'setProperty' requires 'id' to be defined`);
+        this.em.setProperty({ id, property, value, tgtEntityId });
     }
 
-    getEntity({
-        id,
-        describoId,
-        loadEntityProperties = true,
-        resolveLinkedEntities = true,
-        resolveLinkedEntityAssociations = true,
-        groupProperties = false,
-    }) {
-        // can't resolve linked entities without loading properties
-        if (!loadEntityProperties && resolveLinkedEntities) resolveLinkedEntities = false;
-        // can't resolve linked entity associations without first resolving linked entities
-        if (!resolveLinkedEntities && resolveLinkedEntityAssociations)
-            resolveLinkedEntityAssociations = false;
+    updateProperty({ id = undefined, property, idx, value }) {
+        if (!id) throw new Error(`'updateProperty' requires 'id' to be defined`);
+        this.em.updateProperty({ id, property, idx, value });
+    }
 
-        let entity = this.em.get({ srcEntityId: id ?? describoId });
-        if (!entity?.describoId) return;
-
-        if (loadEntityProperties) {
-            let properties = this.em.getProperties({ srcEntityId: entity.describoId });
-            entity.properties = properties.filter((p) => p.srcEntityId === entity.describoId);
-            entity.reverseConnections = properties.filter(
-                (p) => p.tgtEntityId === entity.describoId
-            );
+    deleteProperty({ id = undefined, property, propertyIdx }) {
+        if (["@id", "@type", "name", "@reverse"].includes(property)) {
+            throw new Error(`You aren't allowed to delete '${property}'`);
         }
-        if (resolveLinkedEntities) {
-            // resolve links from this enttity to others
-            entity.properties = entity.properties.map((p) => {
-                return {
-                    ...p,
-                    tgtEntity: {
-                        ...this.em.get({ srcEntityId: p?.tgtEntityId }),
-                        associations: [],
-                    },
-                };
-            });
+        if (!id) throw new Error(`'deleteProperty' requires 'id' to be defined`);
+        this.em.deleteProperty({ id, property, propertyIdx });
+    }
 
-            //  resolve links back to this entity @reverse
-            entity.reverseConnections = entity.reverseConnections.map((p) => {
-                return {
-                    ...p,
-                    tgtEntity: this.em.get({ srcEntityId: p?.tgtEntityId }),
-                };
+    purgeUnlinkedEntities() {
+        this.em.purgeUnlinkedEntities();
+    }
+
+    _flatten(json) {
+        if (!isPlainObject(json)) {
+            throw new Error(`_flatten only takes an object.`);
+        }
+        json = cloneDeep(json);
+        let flattened = [];
+        flattened.push(json);
+        for (let property of Object.keys(json)) {
+            if (["@id", "@type", "name"].includes(property)) continue;
+            if (!isArray(json[property])) json[property] = [json[property]];
+            json[property].forEach((instance) => {
+                if (isPlainObject(instance)) flattened.push(this._flatten(instance));
+            });
+            json[property] = json[property].map((instance) => {
+                if (isPlainObject(instance)) return { "@id": instance["@id"] };
+                return instance;
             });
         }
-        if (resolveLinkedEntityAssociations) {
-            this.resolveLinkedEntityAssociations({ entity });
-        }
-        if (groupProperties) {
-            entity.properties = groupBy(entity.properties, "property");
-            entity.reverseConnections = groupBy(entity.reverseConnections, "property");
-        }
-
-        return entity;
+        return compact(flattenDeep(flattened));
     }
 
-    resolveLinkedEntityAssociations({ entity }) {
-        let profile = this.profile;
-        if (!profile || !profile?.resolve) return;
-
-        let resolveConfiguration = profile.resolve;
+    _resolveLinkedEntityAssociations({ entity }) {
+        let resolveConfiguration = this.profile.resolve;
         const resolvers = {};
         resolveConfiguration.forEach((c) => {
             c.types.forEach((type) => {
                 resolvers[type] = c.properties;
             });
         });
-
         const typesToResolve = Object.keys(resolvers);
-        for (let entityProperty of entity.properties) {
-            let tgtEntity = entityProperty.tgtEntity;
-            const type = tgtEntity["@type"];
-            const specificTypesToResolve = intersection(typesToResolve, type);
+        for (let property of Object.keys(entity["@properties"])) {
+            entity["@properties"][property] = entity["@properties"][property].map((instance) => {
+                if (!instance.tgtEntity) return instance;
 
-            let associations = [];
-            for (let type of specificTypesToResolve) {
-                const propertiesToResolve = resolvers[type];
-                let e = this.getEntity({
-                    describoId: tgtEntity.describoId,
-                });
-                let properties = e.properties;
-                for (let entityProperty of properties) {
-                    if (propertiesToResolve.includes(entityProperty.property)) {
-                        associations.push({
-                            property: entityProperty.property,
-                            entity: this.getEntity({
-                                describoId: entityProperty.tgtEntityId,
-                                loadEntityProperties: false,
-                            }),
-                        });
-                    }
-                }
-            }
-            tgtEntity.associations = associations;
-        }
-    }
-
-    findMatchingEntities({ limit = 5, query = undefined, type = undefined }) {
-        return this.em.find({ limit, query, type });
-    }
-
-    addEntity({ entity }) {
-        // clone it so we don't intefere with the reference being passed in
-        entity = cloneDeep(entity);
-
-        // check there isn't a matching entity already
-        let match = this.em.get({ srcEntityId: entity["@id"] });
-
-        if (match && (match?.["@type"] === entity["@type"] || entity["@id"] === "./")) {
-            // console.log(match);
-            return match;
-        } else {
-            let { describoId } = this.em.set(entity);
-            entity.describoId = describoId;
-
-            this.em.processEntityProperties(entity);
-            return entity;
-        }
-    }
-
-    deleteEntity({ describoId }) {
-        this.em.delete({ srcEntityId: describoId });
-    }
-
-    updateEntity({ describoId, property, value }) {
-        this.em.update({ srcEntityId: describoId, property, value });
-    }
-
-    addProperty({ describoId = undefined, property, value }) {
-        this.em.setProperty({ srcEntityId: describoId, property, value });
-    }
-
-    updateProperty({ describoId, propertyId, value }) {
-        // console.debug("Crate Mgr, updateProperty", propertyId, value);
-        this.em.updateProperty({ srcEntityId: describoId, propertyId, value });
-    }
-
-    deleteProperty({ describoId, propertyId }) {
-        console.debug("Crate Mgr, deleteProperty", propertyId);
-        this.em.deleteProperty({ srcEntityId: describoId, propertyId });
-    }
-
-    linkEntity({ srcEntityId, property, tgtEntityId }) {
-        this.em.setProperty({ srcEntityId, property, tgtEntityId });
-    }
-
-    unlinkEntity({ srcEntityId, propertyId, property, tgtEntityId }) {
-        this.em.deleteProperty({ srcEntityId, propertyId, property, tgtEntityId });
-    }
-
-    ingestAndLink({ srcEntityId = undefined, property = undefined, json = {} }) {
-        if (!property) throw new Error(`ingestAndLink: 'property' must be defined`);
-
-        let flattened = this.__flatten(json);
-
-        let entities = flattened.map((entity) => {
-            let { describoId } = this.em.set(entity);
-            entity.describoId = describoId;
-            return entity;
-        });
-
-        entities.forEach((entity) => {
-            this.em.processEntityProperties(entity);
-        });
-        this.linkEntity({ srcEntityId, property, tgtEntityId: entities[0].describoId });
-    }
-
-    __flatten({ json }) {
-        json = cloneDeep(json);
-        let flattened = [];
-        flattened.push(json);
-        Object.keys(json).forEach((property) => {
-            if (isPlainObject(json[property])) {
-                flattened.push(this.__flatten({ json: json[property] }));
-                flattened = compact(flattened);
-                json[property] = { "@id": json[property]["@id"] };
-            } else if (isArray(json[property])) {
-                json[property].forEach((instance) => {
-                    if (isPlainObject(instance)) flattened.push(this.__flatten({ json: instance }));
-                });
-                json[property] = json[property].map((instance) => {
-                    if (isPlainObject(instance)) return { "@id": instance["@id"] };
-                    return instance;
-                });
-            }
-        });
-        return compact(flattenDeep(flattened));
-    }
-
-    __purgeUnlinkedEntities() {
-        let walk = walker.bind(this);
-        let linkedEntities = {};
-        let rootDataset = this.getEntity({
-            describoId: "RootDataset",
-            resolveLinkedEntities: false,
-        });
-
-        walk(rootDataset);
-        function walker(entity) {
-            linkedEntities[entity.describoId] = true;
-            entity.properties.forEach((p) => {
-                if (p.tgtEntityId && !linkedEntities[p.tgtEntityId]) {
-                    walk(
-                        this.getEntity({ describoId: p.tgtEntityId, resolveLinkedEntities: false })
+                // for all entities linked of the source entity
+                //   if the type matches the `resolveConfiguration`
+                const specificTypesToResolve = intersection(
+                    typesToResolve,
+                    instance.tgtEntity["@type"]
+                );
+                const resolveAssociations = specificTypesToResolve.length > 0;
+                if (resolveAssociations) {
+                    // lookup the full entity
+                    let instanceFullEntity = this.getEntity({
+                        id: instance.tgtEntity["@id"],
+                        resolveLinkedEntityAssociations: false,
+                    });
+                    // get the list of properties to resolve
+                    const propertiesToResolve = flattenDeep(
+                        specificTypesToResolve.map((type) => resolvers[type])
                     );
+                    // for each property, resolve all the attached entities
+                    //  and store in the associations array on the source
+                    propertiesToResolve.forEach((property) => {
+                        instance.tgtEntity.associations.push(
+                            ...instanceFullEntity["@properties"][property].map((e) => ({
+                                property,
+                                entity: e.tgtEntity,
+                            }))
+                        );
+                    });
                 }
+                return instance;
             });
         }
-
-        this.em.entities.forEach((entity) => {
-            if (!linkedEntities[entity.describoId]) {
-                this.em.delete({ srcEntityId: entity.describoId });
-            }
-        });
     }
+}
 
-    __rehydrateEntity({ describoId }) {
-        let entity = this.getEntity({ describoId, groupProperties: true });
-        // entity["@type"] = entity["@type"].split(", ");
-
-        for (let property of Object.keys(entity.properties)) {
-            entity[property] = entity.properties[property].map((p) => {
-                if (p.value) return p.value;
-                if (p.tgtEntityId) return { "@id": p.tgtEntity["@id"] };
-            });
-            if (entity[property].length === 1) entity[property] = entity[property][0];
-        }
-        entity["@reverse"] = {};
-        for (let property of Object.keys(entity.reverseConnections)) {
-            entity["@reverse"][property] = entity.reverseConnections[property].map((p) => {
-                if (p.value) return p.value;
-                if (p.tgtEntityId)
-                    return { "@id": this.em.get({ srcEntityId: p.srcEntityId })["@id"] };
-            });
-            if (entity["@reverse"][property].length === 1)
-                entity["@reverse"][property] = entity["@reverse"][property][0];
-        }
-
-        this.em.describoProperties.forEach((p) => delete entity[p]);
-        delete entity.properties;
-        delete entity.reverseConnections;
-        if (!entity["@reverse"]) entity["@reverse"] = {};
-        return entity;
-    }
+export function isMatchingEntity(source, target) {
+    if (!source || !target) return false;
+    let sourceType = [...source["@type"]].sort();
+    let targetType = [...target["@type"]].sort();
+    return source["@id"] === target["@id"] && sourceType === targetType;
 }
 
 export function isURL(value) {
@@ -421,180 +334,475 @@ export function validateId({ id, type }) {
     }
 }
 
+export function normaliseEntityType({ entity }) {
+    if (!entity["@type"]) entity["@type"] = isURL(entity["@id"]) ? ["URL"] : ["Thing"];
+
+    if (isArray(entity["@type"])) return entity;
+    if (isBoolean(entity["@type"] || isNumber(entity["@type"]))) {
+        entity["@type"] = ["" + entity["@type"]];
+    }
+    if (isString(entity["@type"]))
+        entity["@type"] = entity["@type"].split(",").map((t) => t.trim());
+    return entity;
+}
+
 export class Entity {
     constructor() {
-        this.describoProperties = ["describoId"];
-        this.coreProperties = [...this.describoProperties, "@id", "@type", "@reverse", "name"];
+        this.coreProperties = ["@id", "@type", "@reverse", "@properties", "name"];
 
+        // an array of entities in the crate
         this.entities = [];
-        this.entitiesBy = {
-            atId: {},
-            describoId: {},
-        };
-        this.pm = new Property();
+
+        // a mapping of entity id to index in the #entities array
+        this.entitiesById = new Map();
+
+        // a mapping of reverse links to entities keyed on entityId and property, e.g.:
+        //  #reverse = {
+        //      "#person1": {
+        //          author: ["./"]
+        //      }
+        //  }
+        this.reverse = {};
+
+        // keep track of all entity @id's so we can add missing entities after load
+        this.entityIdentifiers = new Map();
     }
 
-    set(entity) {
+    getEntities({ limit, query = undefined, type = undefined }) {
+        if (query) {
+            query = query.toLowerCase();
+        }
+        let entities;
+        if (query || type) {
+            entities = this.entities.filter((e) => {
+                if (!e) return e;
+                let eid = e["@id"].toLowerCase();
+                let etype = isArray(e["@type"])
+                    ? e["@type"].join(", ").toLowerCase()
+                    : e["@type"].toLowerCase();
+                let name = e.name.toLowerCase();
+                if (type && !query) {
+                    type = type.toLowerCase();
+                    return etype.match(type);
+                } else if (query && !type) {
+                    return eid.match(query) || e.name.match(query);
+                } else if (query && type) {
+                    type = type.toLowerCase();
+                    return etype.match(type) && (eid.match(query) || name.match(query));
+                } else {
+                    return e;
+                }
+            });
+        } else {
+            entities = [...this.entities];
+        }
+
+        if (limit) {
+            entities = entities.slice(0, limit);
+        }
+        entities = entities.map((entity) => {
+            if (!entity) return;
+            entity = this._getEntity({ id: entity["@id"] });
+            entity = this._cleanup(entity);
+            entity = this._joinReverseLinks(entity, true);
+            return entity;
+        });
+        return compact(entities);
+    }
+
+    getEntity({ id, exportForm = false }) {
+        let entity = this._getEntity({ id });
+        if (entity) {
+            if (exportForm) {
+                entity = this._cleanup(entity);
+                entity = this._joinReverseLinks(entity, true);
+                return entity;
+            } else {
+                // group properties under an @properties key
+                entity["@properties"] = {};
+                for (let property of Object.keys(entity)) {
+                    let i = -1;
+                    if (this.coreProperties.includes(property)) continue;
+                    entity["@properties"][property] = entity[property].map((p) => {
+                        i++;
+                        if (p?.["@id"]) {
+                            let tgtEntity = this.getEntityStub(p["@id"]) ?? {};
+                            // let tgtEntity = {};
+                            tgtEntity.associations = [];
+                            return { idx: i, tgtEntity };
+                        } else {
+                            return { idx: i, property, value: p };
+                        }
+                    });
+                    delete entity[property];
+                }
+
+                //  if this entity has reverse links to it - join them in
+                entity = this._joinReverseLinks(entity);
+                return entity;
+            }
+        }
+    }
+
+    getEntityStub(id) {
+        let idx = this.entitiesById.get(id);
+        if (idx !== undefined && this.entities[idx]) {
+            let e = {};
+            ["@id", "@type", "name"].forEach((p) => {
+                e[p] = this.entities[idx][p];
+            });
+            return e;
+        }
+    }
+
+    setEntity(entity) {
         entity = cloneDeep(entity);
-        entity = this.__normalise(entity, `e${this.entities.length}`);
-        entity = this.__confirmNoClash(entity);
+
+        // ensure the entity data is sensible
+        entity = this._normalise(entity, `e${this.entities.length}`);
+        entity = this._confirmNoClash(entity);
 
         // if this entity is already on the stack - return it
-        let exists = this.__entityExists(entity);
+        let exists = this._getEntity({ id: entity["@id"] });
         if (exists) return exists;
 
-        entity = this.coreProperties
-            .map((p) => ({ [p]: entity[p] }))
-            .reduce((obj, entry) => ({ ...obj, ...entry }));
+        // set all properties, other than core props, to array
+        for (let property of Object.keys(entity)) {
+            if (this.coreProperties.includes(property)) continue;
+            if (!isArray(entity[property])) entity[property] = [entity[property]];
+        }
 
+        // push the entity onto the stack and add an index reference to it
         const idx = this.entities.push(entity) - 1;
-        this.entitiesBy.atId[entity["@id"]] = idx;
-        this.entitiesBy.describoId[entity.describoId] = idx;
+        this.entitiesById.set(entity["@id"], idx);
+
+        // create all the reverse links back to this entity
+        //  and track all of the associations so we can create the
+        //  the missing entities
+        this._indexAssociations({ entity });
 
         return entity;
     }
 
-    update({ srcEntityId, property, value }) {
-        if (!["@id", "@type", "name"].includes(property)) {
-            throw new Error(`This method can only update '@id', '@type' and 'name' properties`);
-        }
+    updateEntityId({ id, value }) {
+        let { isValid } = validateId({ id: value });
+        if (!isValid) value = `#${encodeURIComponent(value)}`;
 
-        if (property === "@id") {
-            let result = validateId({ id: value });
-            if (!result.isValid) {
-                value = `#${encodeURIComponent(value)}`;
+        const originalId = id;
+        const newId = value;
+
+        let entityIdx = this.entitiesById.get(originalId);
+        this.entities[entityIdx]["@id"] = newId;
+        this.entitiesById.set(newId, entityIdx);
+        this.reverse[newId] = cloneDeep(this.reverse[originalId]);
+
+        // walk all the reverse links from this entity
+        //   update all of the forward links back to it
+        if (this.reverse[newId]) {
+            for (let [property, entityIds] of Object.entries(this.reverse[newId])) {
+                for (let entityId of entityIds) {
+                    // get the related entity
+                    let relatedEntityIdx = this.entitiesById.get(entityId);
+
+                    // find the reference to the old id and update it
+                    this.entities[relatedEntityIdx][property] = this.entities[relatedEntityIdx][
+                        property
+                    ].map((instance) => {
+                        if (instance?.["@id"] === originalId) return { "@id": newId };
+                        return instance;
+                    });
+                }
             }
         }
-        let idx = this.entitiesBy.describoId[srcEntityId] ?? this.entitiesBy.atId[srcEntityId];
 
-        let entity = {
-            ...this.entities[idx],
-            [property]: value,
-        };
-        this.entities[idx] = entity;
+        // walk the properties of this entity
+        //   update the reverse links back to it
+        const entity = this.entities[entityIdx];
+        for (let [property, instances] of Object.entries(entity)) {
+            if (this.coreProperties.includes(property)) continue;
+            for (let instance of instances) {
+                if (instance?.["@id"]) {
+                    // push the new id
+                    this.reverse[instance["@id"]][property].push(newId);
+
+                    // remove the original id
+                    this.reverse[instance["@id"]][property] = this.reverse[instance["@id"]][
+                        property
+                    ].filter((id) => id !== originalId);
+
+                    // ensure there are no duplicates
+                    this.reverse[instance["@id"]][property] = uniq(
+                        this.reverse[instance["@id"]][property]
+                    );
+                }
+            }
+        }
+
+        delete this.reverse[originalId];
+        delete this.entitiesById.delete[id];
     }
 
-    get({ srcEntityId }) {
-        const idx = this.entitiesBy.describoId[srcEntityId] ?? this.entitiesBy.atId[srcEntityId];
+    updateEntityType({ id, value }) {
+        const idx = this.entitiesById.get(id);
+        this.entities[idx]["@type"] = uniq(value);
+    }
+
+    updateEntityName({ id, value }) {
+        const idx = this.entitiesById.get(id);
+        this.entities[idx].name = value;
+    }
+
+    deleteEntity({ id }) {
+        const idx = this.entitiesById.get(id);
         if (idx !== undefined) {
-            let entity = cloneDeep(this.entities[idx]);
-            return entity;
+            let entity = this.entities[idx];
+
+            // use #reverse to update all of the entities that link to this one
+            if (this.reverse[entity["@id"]]) {
+                for (let [property, values] of Object.entries(this.reverse[entity["@id"]])) {
+                    values.forEach((id) => {
+                        this.unlinkEntity({ id, property, tgtEntityId: entity["@id"] });
+                    });
+                }
+            }
+
+            // then - set the entity to null in the @entities map
+            this.entities[idx] = null;
+
+            // and wipe it from the index
+            this.entitiesById.delete(entity["@id"]);
         }
     }
 
-    delete({ srcEntityId }) {
-        const idx = this.entitiesBy.describoId[srcEntityId];
-        const entity = this.entities[idx];
-
-        let properties = this.pm.get({ srcEntityId });
-        properties?.forEach((p) => {
-            if (p?.propertyId) this.pm.delete({ srcEntityId, propertyId: p.propertyId });
-        });
-
-        delete this.entitiesBy.atId[entity["@id"]];
-        delete this.entitiesBy.describoId[entity.describoId];
-        delete this.entities[idx];
+    createMissingEntities() {
+        for (let [id] of this.entityIdentifiers) {
+            let idx = this.entitiesById.get(id);
+            if (idx === undefined) {
+                this.setEntity({ "@id": id });
+            }
+        }
     }
 
-    processEntityProperties(entity) {
-        for (let property of Object.keys(entity)) {
-            if (this.coreProperties.includes(property)) continue;
+    updateProperty({ id, property, idx, value }) {
+        const propertyIdx = idx;
+        idx = this.entitiesById.get(id);
+        if (idx !== undefined) {
+            this.entities[idx][property][propertyIdx] = value;
+        }
+    }
 
-            entity[property] = flattenDeep([entity[property]]);
+    setProperty({ id, property, value = undefined, tgtEntityId = undefined }) {
+        const idx = this.entitiesById.get(id);
 
-            for (let instance of entity[property]) {
-                if (!isArray(instance) && !isPlainObject(instance)) {
-                    this.setProperty({ srcEntityId: entity.describoId, property, value: instance });
-                } else if (isPlainObject(instance)) {
-                    let tgtEntity = this.get({ srcEntityId: instance["@id"] });
-                    if (!tgtEntity) {
-                        // we didn't find this entity so inject one - the set method will
-                        //  instantiate something relevant
-                        tgtEntity = this.set({ "@id": instance["@id"] });
-                    }
-                    this.setProperty({
-                        srcEntityId: entity.describoId,
-                        property,
-                        tgtEntityId: tgtEntity.describoId,
-                    });
+        if (!this.entities[idx][property]) this.entities[idx][property] = [];
+        // if a value then push onto the stack
+        if (value) {
+            this.entities[idx][property].push(value);
+            return;
+        }
+
+        // if a link to another entity
+        if (tgtEntityId) {
+            let exists =
+                this.entities[idx][property].filter((v) => v?.["@id"] === tgtEntityId).length > 0;
+            if (exists) return;
+
+            // push onto the stack if not exists
+            this.entities[idx][property].push({ "@id": tgtEntityId });
+
+            // setup the reverse link
+            if (!this.reverse[tgtEntityId]) {
+                this.reverse[tgtEntityId] = {};
+            }
+            if (!this.reverse[tgtEntityId][property]) {
+                this.reverse[tgtEntityId][property] = [];
+            }
+            this.reverse[tgtEntityId][property].push(id);
+            // console.log(this.#reverse[tgtEntityId], property, this.#reverse[tgtEntityId][property]);
+        }
+        // console.log("#reverse : set property", JSON.stringify(this.#reverse, null, 2));
+    }
+
+    deleteProperty({ id, property, propertyIdx }) {
+        if (this.coreProperties.includes(property)) {
+            throw new Error(`You aren't allowed to delete '${property}'`);
+        }
+        let idx = this.entitiesById.get(id);
+        if (idx !== undefined) {
+            let entity = cloneDeep(this.entities[idx]);
+            let removedProperty = entity[property].splice(propertyIdx, 1)[0];
+            if (!entity[property].length) delete entity[property];
+            this.entities[idx] = entity;
+
+            // if this is a linking property, use it to update the reverse links
+            //   of that entity which is linked here
+            if (removedProperty["@id"]) {
+                this.reverse[removedProperty["@id"]][property] = this.reverse[
+                    removedProperty["@id"]
+                ][property].filter((i) => i !== id);
+                if (this.reverse[removedProperty["@id"]][property].length === 0) {
+                    delete this.reverse[removedProperty["@id"]][property];
                 }
             }
         }
     }
 
-    setProperty({ srcEntityId, property, value, tgtEntityId }) {
-        this.pm.set({
-            srcEntityId,
-            property,
-            value,
-            tgtEntityId,
-        });
-    }
-
-    getProperty({ srcEntityId, propertyId }) {
-        let properties = this.pm.get({ srcEntityId });
-        return properties.filter((p) => p.propertyId === propertyId)[0];
-    }
-
-    getProperties({ srcEntityId }) {
-        let properties = this.pm.get({ srcEntityId });
-        return compact(properties);
-    }
-
-    updateProperty({ srcEntityId, propertyId, value }) {
-        this.pm.update({ srcEntityId, propertyId, value });
-    }
-
-    deleteProperty({ srcEntityId, propertyId, property, tgtEntityId }) {
-        if (property && tgtEntityId) {
-            propertyId = this.pm.get({ srcEntityId, property, tgtEntityId })[0].propertyId;
+    unlinkEntity({ id, property, tgtEntityId }) {
+        let idx = this.entitiesById.get(id);
+        if (idx !== undefined) {
+            let entity = cloneDeep(this.entities[idx]);
+            entity[property] = entity[property].filter((instance) => {
+                if (!isPlainObject(instance)) return instance;
+                if (isPlainObject(instance) && "@id" in instance && instance["@id"] !== tgtEntityId)
+                    return instance;
+            });
+            if (entity[property].length === 0) delete entity[property];
+            this.entities[idx] = entity;
         }
-        this.pm.delete({ srcEntityId, propertyId });
+
+        this.reverse[tgtEntityId][property] = this.reverse[tgtEntityId][property].filter(
+            (i) => i != id
+        );
     }
 
-    find({ limit = 5, query = undefined, type = undefined }) {
-        if (query) {
-            query = query.toLowerCase();
+    purgeUnlinkedEntities() {
+        let linkedEntities = { "./": true };
+        let idx = this.entitiesById.get("./");
+        if (idx !== undefined) {
+            let entity = this.entities[idx];
+            walker = walker.bind(this);
+            walker(entity);
+
+            this.entities = this.entities.map((entity) => {
+                if (!entity) return null;
+                if (!linkedEntities[entity["@id"]]) return null;
+                return entity;
+            });
         }
-        let entities = this.entities.filter((e) => {
-            let eid = e["@id"].toLowerCase();
-            let etype = isArray(e["@type"])
-                ? e["@type"].join(", ").toLowerCase()
-                : e["@type"].toLowerCase();
-            type = type.toLowerCase();
-            let name = e.name.toLowerCase();
-            if (type && !query) {
-                return etype.match(type);
-            } else if (query && !type) {
-                return eid.match(query) || e.name.match(query);
-            } else if (query && type) {
-                return etype.match(type) && (eid.match(query) || name.match(query));
+        function walker(entity) {
+            linkedEntities[entity["@id"]] = true;
+            for (let property of Object.keys(entity)) {
+                if (this.coreProperties.includes(property)) continue;
+                entity[property].forEach((instance) => {
+                    if (instance?.["@id"] && !linkedEntities[instance["@id"]]) {
+                        let idx = this.entitiesById.get(instance["@id"]);
+                        if (idx !== undefined) {
+                            let entity = this.entities[idx];
+                            walker(entity);
+                        }
+                    }
+                });
             }
-        });
-        entities = entities.filter((e) => e.describoId !== "RootDataset");
-        return cloneDeep(entities.slice(0, limit));
+        }
+        // this.entities = this.entities.map((entity) => {
+        //     if (!entity) return null;
+        //     if (entity["@id"] === "./") return entity;
+        //     if (!this.reverse[entity["@id"]]) return null;
+
+        //     let connections = Object.keys(this.reverse[entity["@id"]]).map(
+        //         (property) => this.reverse[entity["@id"]][property]
+        //     );
+        //     connections = flattenDeep(connections);
+        //     connections = compact(connections);
+
+        //     let intermediatesKnown = connections.map((id) => {
+        //         let e = this.getEntityStub(id);
+        //         if (!e || !this.reverse[e["@id"]]) return id;
+        //         let c = Object.keys(this.reverse[e["@id"]]).map(
+        //             (property) => this.reverse[e["@id"]][property]
+        //         );
+        //         c = flattenDeep(c);
+        //         c = compact(c);
+        //         return c;
+        //     });
+        //     intermediatesKnown = flattenDeep(intermediatesKnown);
+        //     return connections.length && intermediatesKnown.length ? entity : null;
+        // });
     }
 
-    __entityExists(entity) {
-        let idx = this.entitiesBy.atId[entity["@id"]];
-        if (idx !== undefined) return this.entities[idx];
+    _getEntity({ id }) {
+        let idx = this.entitiesById.get(id);
+        if (idx !== undefined) {
+            return cloneDeep(this.entities[idx]);
+        }
         return false;
     }
 
-    __confirmNoClash(entity) {
-        let idx = this.entitiesBy.atId[entity["@id"]];
+    _cleanup(entity) {
+        for (let property of Object.keys(entity)) {
+            if (["@id", "@type", "name"].includes(property)) continue;
+            if (entity[property].length === 1) entity[property] = entity[property][0];
+            if (entity[property].length === 0) delete entity[property];
+        }
+        return entity;
+    }
+
+    _confirmNoClash(entity) {
+        let idx = this.entitiesById.get(entity["@id"]);
         if (idx === undefined || entity["@id"] !== "./") return entity;
 
         let entityLookup = this.entities[idx];
         if (entityLookup["@type"] !== entity["@type"]) {
             const id = `e${this.entities.length}`;
-            entity["@id"] = id;
-            entity.describoId = id;
+            entity["@id"] = `#${id}`;
         }
         return entity;
     }
 
-    __normalise(entity, id) {
+    _indexAssociations({ entity }) {
+        // remove the context entity id from the map tracking
+        //  all id's as we don't need to create this entity
+        if (this.entityIdentifiers.has(entity["@id"])) {
+            this.entityIdentifiers.delete(entity["@id"]);
+        }
+
+        this._walkProperties(entity, (instance, property) => {
+            // Create the @reverse links from the referenced entities
+            //   back to this one - the context entity
+            if (!this.reverse[instance["@id"]]) {
+                this.reverse[instance["@id"]] = {};
+            }
+            if (!this.reverse[instance["@id"]][property]) {
+                this.reverse[instance["@id"]][property] = [];
+            }
+            this.reverse[instance["@id"]][property].push(entity["@id"]);
+
+            // keep track of all entity identifiers referenced from this entity
+            //   so that we can go through and create stub entries for anything not
+            //   in the crate. This is typically URL references outside the create
+            //   which we can create as URL entities so that we have a
+            //   referentially complete graph.
+            this.entityIdentifiers.set(instance["@id"], true);
+        });
+    }
+
+    _joinReverseLinks(entity, stubEntry = false) {
+        if (this.reverse[entity["@id"]]) {
+            entity["@reverse"] = {};
+            for (let [property, values] of Object.entries(this.reverse[entity["@id"]])) {
+                entity["@reverse"][property] = values.map((t) => {
+                    let tgtEntity = this.getEntityStub(t);
+                    if (!tgtEntity) return null;
+                    if (stubEntry) {
+                        return { "@id": tgtEntity["@id"] };
+                    } else {
+                        return {
+                            ...tgtEntity,
+                        };
+                    }
+                });
+                entity["@reverse"][property] = compact(entity["@reverse"][property]);
+                if (entity["@reverse"][property].length === 0) delete entity["@reverse"][property];
+                if (stubEntry && entity["@reverse"][property]) {
+                    if (entity["@reverse"][property].length === 1)
+                        entity["@reverse"][property] = entity["@reverse"][property][0];
+                }
+            }
+        }
+        return entity;
+    }
+
+    _normalise(entity, id) {
         if (
             !isString(entity["@type"]) &&
             !isArray(entity["@type"]) &&
@@ -603,160 +811,36 @@ export class Entity {
             throw new Error(`'@type' property must be a string or an array or not defined at all`);
         }
         if (isUndefined(entity["@id"])) {
-            // set it to the generated describoId
-            entity["@id"] = id;
+            // set it to the generated id
+            entity["@id"] = `#${id}`;
         } else if (!isString(entity["@id"])) {
             throw new Error(`'@id' property must be a string`);
-        } else if (entity["@id"] && entity["@type"]) {
-            // there is an @id - is it valid?
-            let { isValid } = validateId({ id: entity["@id"], type: entity["@type"] });
-            if (!isValid) entity["@id"] = `#${encodeURIComponent(entity["@id"])}`;
-        } else if (entity["@id"] && !entity["@type"]) {
-            // there is an @id - is it valid?
-            let { isValid } = validateId({ id: entity["@id"] });
-            if (!isValid) entity["@id"] = `#${encodeURIComponent(entity["@id"])}`;
         }
+
+        //  normalise the entity['@type']
+        entity = normaliseEntityType({ entity });
+
+        // there is an @id - is it valid?
+        let { isValid } = validateId({ id: entity["@id"], type: entity["@type"] });
+        if (!isValid) entity["@id"] = `#${encodeURIComponent(entity["@id"])}`;
 
         // is there a name?
         if (!entity.name) entity.name = entity["@id"].replace(/^#/, "");
 
-        // if no @type then set to URL or Thing
-        if (!entity["@type"]) entity["@type"] = isURL(entity["@id"]) ? ["URL"] : ["Thing"];
+        // if the name is an array join it back into a string
+        if (isArray(entity.name)) entity.name = entity.name.join(" ");
 
-        // set type as array if it's a string
-        if (isString(entity["@type"]))
-            entity["@type"] = entity["@type"].split(", ").map((t) => t.trim());
-
-        if (!entity.describoId) entity.describoId = id.replace("#", "");
         return entity;
     }
-}
 
-export class Property {
-    constructor() {
-        this.properties = [];
-        this.propertiesByEntityId = {};
-        this.lookup = {};
-    }
-
-    set({ srcEntityId, property, value, tgtEntityId }) {
-        this.__addLookupEntry({ srcEntityId, property, value, tgtEntityId });
-
-        // if this property is an association and is already on the stack - return it
-        if (tgtEntityId) {
-            let exists = this.__propertyExists({ srcEntityId, property, value, tgtEntityId });
-            if (exists) return exists;
-        }
-
-        // otherwise create the property and push it onto the stack
-        let data = {
-            propertyId: `#p${this.properties.length}`,
-            srcEntityId,
-            property,
-            value,
-            tgtEntityId,
-        };
-        const idx = this.properties.push(data) - 1;
-
-        // init the entity entry in propertiesByEntityId
-        //  and push a reference to the property
-        if (!this.propertiesByEntityId[srcEntityId]) this.propertiesByEntityId[srcEntityId] = [];
-        this.propertiesByEntityId[srcEntityId].push(idx);
-
-        if (value) {
-            this.lookup[srcEntityId][property][value] = idx;
-        } else if (tgtEntityId) {
-            // this is a linking property
-            // init the entity entry in propertiesByEntityId
-            //  and push a reference to the property
-            if (!this.propertiesByEntityId[tgtEntityId])
-                this.propertiesByEntityId[tgtEntityId] = [];
-            this.propertiesByEntityId[tgtEntityId].push(idx);
-            this.lookup[srcEntityId][property][tgtEntityId] = idx;
-        }
-
-        return data;
-    }
-
-    get({ srcEntityId }) {
-        return (
-            cloneDeep(this.propertiesByEntityId[srcEntityId]?.map((idx) => this.properties[idx])) ??
-            []
-        );
-    }
-
-    update({ srcEntityId, propertyId, value }) {
-        let properties = this.propertiesByEntityId[srcEntityId];
-
-        // find the index of the property in the properties array
-        let propertyIndex;
-        properties.forEach((idx) => {
-            if (this.properties[idx].propertyId === propertyId) {
-                propertyIndex = idx;
-            }
-        });
-
-        // update the property value
-        this.properties[propertyIndex].value = value;
-    }
-
-    delete({ srcEntityId, propertyId }) {
-        let propertiesToKeep = [];
-        for (let idx of this.propertiesByEntityId[srcEntityId]) {
-            const property = this.properties[idx];
-            if (property) {
-                if (property.propertyId !== propertyId) {
-                    propertiesToKeep.push(idx);
-                    continue;
+    _walkProperties(entity, fn) {
+        for (let property of Object.keys(entity)) {
+            if (this.coreProperties.includes(property)) continue;
+            for (let instance of entity[property]) {
+                if (isPlainObject(instance) && instance["@id"]) {
+                    fn(instance, property);
                 }
-                if (property.tgtEntityId) {
-                    const tgtEntityId = property.tgtEntityId;
-                    this.propertiesByEntityId[tgtEntityId] = this.propertiesByEntityId[
-                        tgtEntityId
-                    ].filter((idx) => {
-                        const property = this.properties[idx];
-                        if (property.propertyId !== propertyId) return idx;
-                    });
-                    if (isEmpty(this.propertiesByEntityId[tgtEntityId])) {
-                        delete this.propertiesByEntityId[tgtEntityId];
-                    }
-                    delete this.lookup[srcEntityId]?.[property?.property]?.[tgtEntityId];
-                }
-                delete this.properties[idx];
             }
-        }
-        this.propertiesByEntityId[srcEntityId] = propertiesToKeep;
-        if (isEmpty(this.propertiesByEntityId[srcEntityId])) {
-            delete this.propertiesByEntityId[srcEntityId];
-        }
-    }
-
-    __addLookupEntry({ srcEntityId, property, value, tgtEntityId }) {
-        if (!this.lookup[srcEntityId]) {
-            this.lookup[srcEntityId] = {
-                [property]: {
-                    [value]: undefined,
-                    [tgtEntityId]: undefined,
-                },
-            };
-        }
-        if (!this.lookup[srcEntityId][property]) {
-            this.lookup[srcEntityId][property] = {
-                [value]: undefined,
-                [tgtEntityId]: undefined,
-            };
-        }
-    }
-
-    __propertyExists({ srcEntityId, property, value, tgtEntityId }) {
-        if (this.lookup[srcEntityId][property][value] !== undefined) {
-            const idx = this.lookup[srcEntityId][property][value];
-            return this.properties[idx];
-        } else if (this.lookup[srcEntityId][property][tgtEntityId] !== undefined) {
-            const idx = this.lookup[srcEntityId][property][tgtEntityId];
-            return this.properties[idx];
-        } else {
-            return false;
         }
     }
 }

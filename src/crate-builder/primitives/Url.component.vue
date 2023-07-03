@@ -51,12 +51,13 @@ watch(
 );
 function save() {
     if (isValidUrl.value) {
+        console.log("url component create:entity", props.property, data.internalValue);
         $emit("create:entity", {
             property: props.property,
             json: {
-                "@id": data.internalValue,
+                "@id": data.internalValue.trim(),
                 "@type": "URL",
-                name: data.internalValue,
+                name: data.internalValue.trim(),
             },
         });
     }

@@ -41,7 +41,6 @@
             </el-select>
         </div>
         <describo-crate-builder
-            @ready="data.loading = false"
             :crate="data.selectedCrate"
             :profile="data.selectedProfile"
             :lookup="lookup"
@@ -60,7 +59,7 @@
 </template>
 
 <script setup>
-import { reactive } from "vue";
+import { reactive, nextTick } from "vue";
 import { Lookup } from "./lookup.js";
 import crateFile1 from "../examples/item/empty/ro-crate-metadata.json";
 import crateFile2 from "../examples/item/complex-collection/ro-crate-metadata.json";
@@ -110,9 +109,10 @@ const data = reactive({
 });
 
 function setCrate(name) {
-    data.loading = true;
-    data.selectedCrate = name ? data.crates.filter((c) => c.name === name)[0].value : undefined;
-    if (!data.selectedCrate) data.loading = false;
+    let crate = name ? data.crates.filter((c) => c.name === name)[0].value : undefined;
+    setTimeout(() => {
+        data.selectedCrate = crate;
+    }, 10);
 }
 function setProfile(name) {
     data.selectedProfile = name ? data.profiles.filter((p) => p.name === name)[0].value : undefined;

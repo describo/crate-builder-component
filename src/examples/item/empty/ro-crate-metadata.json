@@ -14,12 +14,7 @@
         },
         {
             "@id": "./",
-            "@type": ["Dataset"],
-            "licence": { "@id": "LICENCE" }
-        },
-        {
-            "@id": "LICENCE",
-            "@type": ["File", "DataReuseLicence"]
+            "@type": ["Dataset"]
         }
     ]
 }

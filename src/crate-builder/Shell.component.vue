@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col">
         <render-entity-component
-            v-if="!data.error && props.crate"
+            v-if="data.ready && !data.error"
             :crate-manager="data.crateManager"
             :profile="data.profile"
             :entity="data.entity"
@@ -141,7 +141,6 @@ const data = reactive({
     progress: {
         percent: 0,
     },
-    loading: false,
 });
 let watchers = [];
 
@@ -158,7 +157,7 @@ onMounted(async () => {
                 () => $route?.query?.id,
                 (n, o) => {
                     if (n && n !== o) {
-                        setCurrentEntity({ describoId: $route?.query?.id });
+                        setCurrentEntity({ id: atob($route?.query?.id) });
                     }
                 }
             )
@@ -177,13 +176,11 @@ onMounted(async () => {
         watch(
             () => props.profile,
             () => {
-                data.ready = false;
                 data.profile = isEmpty(props.profile) ? {} : cloneDeep(props.profile);
                 data.crateManager.profile = data.profile;
             }
         )
     );
-
     watchers.push(
         watch(
             () => props.entityId,
@@ -192,7 +189,6 @@ onMounted(async () => {
             }
         )
     );
-
     watchers.push(
         watch(
             [
@@ -238,18 +234,13 @@ async function init() {
     data.crateManager = new CrateManager();
     data.crateManager.lookup = props.lookup;
     try {
-        if (crate["@graph"].length > 500) {
-            data.loading = true;
-            await new Promise((resolve) => setTimeout(resolve, 100));
-        }
-        await data.crateManager.load({ crate, profile, progress: data.progress });
+        await data.crateManager.load({ crate, profile });
     } catch (error) {
         console.log(error);
         $emit("error", {
             errors: data.crateManager.errors,
         });
         data.error = true;
-        data.errors = data.crateManager.errors;
         ready();
         return;
     }
@@ -258,7 +249,7 @@ async function init() {
         setCurrentEntity({ id: props.entityId });
     } else {
         data.entity = {};
-        setCurrentEntity({ describoId: "RootDataset" });
+        setCurrentEntity({ name: "RootDataset" });
     }
 
     ready();
@@ -292,64 +283,51 @@ function configure() {
 
     return configuration;
 }
-async function setCurrentEntity({ describoId = undefined, name = undefined, id = undefined }) {
+async function setCurrentEntity({ id = undefined, name = undefined }) {
     // return if nothing requested
-    if (!describoId && !name && !id) return;
+    if (!id && !name) return;
 
     // return if we're already on that entity
-    if (describoId === data.entity.describoId) return;
+    if ((id || data.entity["@id"]) && id === data.entity["@id"]) return;
 
     let entity = {};
     if (name === "RootDataset") {
-        entity = data.crateManager.getEntity({
-            describoId: "RootDataset",
-            loadEntityProperties: false,
-            resolveLinkedEntities: false,
-            groupProperties: false,
-        });
-    } else if (describoId) {
-        entity = data.crateManager.getEntity({
-            describoId,
-            loadEntityProperties: false,
-            resolveLinkedEntities: false,
-            groupProperties: false,
-        });
+        entity = data.crateManager.getRootDataset();
     } else if (id) {
         entity = data.crateManager.getEntity({
             id,
-            loadEntityProperties: false,
-            resolveLinkedEntities: false,
-            groupProperties: false,
         });
     }
 
-    if (!isEmpty(entity) && entity.describoId !== data.entity.describoId) {
+    if (!isEmpty(entity) && entity["@id"] !== data.entity["@id"]) {
         updateRoute({ entity });
-        console.debug(`Render Entity Parent, load entity:`, { ...entity });
+        // console.debug(`Render Entity Parent, load entity:`, { ...entity });
         data.entity = { ...entity };
     }
 }
 function updateRoute({ entity }) {
-    $emit("navigation", { id: entity.describoId, "@id": entity["@id"] });
+    $emit("navigation", { "@id": entity["@id"] });
     if (!$router || !$route || !props.enableInternalRouting) return;
+    const encodedId = btoa(entity["@id"]);
+
     if (isEmpty($route?.query)) {
-        $router?.replace({ query: { id: entity.describoId } });
+        $router?.replace({ query: { id: encodedId } });
     } else {
-        $router?.push({ query: { id: entity.describoId } });
+        $router?.push({ query: { id: encodedId } });
     }
 }
 function ready() {
-    data.loading = false;
-    data.progress = { percent: 0 };
     data.ready = true;
     $emit("ready");
 }
 async function saveCrate() {
-    await new Promise((resolve) => setTimeout(resolve, 10));
+    await new Promise((resolve) => setTimeout(resolve, 100));
     if (props.purgeUnlinkedEntities) {
-        data.crateManager.__purgeUnlinkedEntities();
+        data.crateManager.purgeUnlinkedEntities();
     }
     let crate = data.crateManager.exportCrate();
+    console.debug("export crate", crate);
+    // console.log(crate["@graph"].length, crate["@graph"]);
     $emit("save:crate", { crate });
 }
 async function saveCrateAsTemplate(template) {

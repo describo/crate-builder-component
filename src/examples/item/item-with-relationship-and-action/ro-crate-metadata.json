@@ -21,11 +21,16 @@
         {
             "@id": "#relationship",
             "@type": "Relationship, RelatedEntity",
-            "source": { "@id": "#person1" },
+            "source": [{ "@id": "#person1" }, { "@id": "#person2" }],
             "target": { "@id": "#thing1" }
         },
         {
             "@id": "#person1",
+            "@type": ["Person"],
+            "sourceOf": { "@id": "#relationship" }
+        },
+        {
+            "@id": "#person2",
             "@type": ["Person"],
             "sourceOf": { "@id": "#relationship" }
         },

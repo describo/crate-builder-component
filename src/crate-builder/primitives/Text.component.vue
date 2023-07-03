@@ -5,8 +5,8 @@
                 class="w-full"
                 :type="type"
                 v-model="data.internalValue"
-                @blur="data.throttledSave"
-                @change="data.throttledSave"
+                @blur="data.debouncedSave"
+                @change="data.debouncedSave"
                 resize="vertical"
                 :rows="5"
                 :placeholder="props.placeholder"
@@ -24,7 +24,7 @@
 <script setup>
 import { ElInput, ElButton } from "element-plus";
 import { reactive, watch } from "vue";
-import throttle from "lodash-es/throttle.js";
+import debounce from "lodash-es/debounce.js";
 import isBoolean from "lodash-es/isBoolean.js";
 import { $t } from "../i18n";
 
@@ -47,7 +47,7 @@ const data = reactive({
     internalValue: isBoolean(props.value) ? String(props.value) : props.value,
     currentValue: isBoolean(props.value) ? String(props.value) : props.value,
     isValidType: ["text", "textarea"].includes(props.type),
-    throttledSave: throttle(save, 1000),
+    debouncedSave: debounce(save, 200),
 });
 watch(
     () => props.value,

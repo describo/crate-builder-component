@@ -99,7 +99,7 @@ watch(
 );
 
 async function querySearch(queryString) {
-    console.debug(`Query Search: '${queryString}'`);
+    // console.debug(`Query Search: '${queryString}'`);
     data.loading = true;
 
     const lookup = new Lookup({
@@ -121,10 +121,8 @@ async function querySearch(queryString) {
     let lookups = [];
 
     // wire up handler to find matching entities in the crate
-    if (props.crateManager?.findMatchingEntities) {
-        lookups.push(
-            wrapPromise(lookup.findMatchingEntities(props.type, queryString), data.promiseTimeout)
-        );
+    if (props.crateManager?.getEntities) {
+        lookups.push(wrapPromise(lookup.getEntities(props.type, queryString), data.promiseTimeout));
     }
 
     // wire up handler to lookup datapacks externally

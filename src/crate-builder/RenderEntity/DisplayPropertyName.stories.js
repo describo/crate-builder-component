@@ -26,5 +26,6 @@ const Template = (args, { argTypes }) => ({
 
 export const DisplayPropertyNameComponentStory = Template.bind({});
 DisplayPropertyNameComponentStory.args = {
+    property: "something",
     label: "name",
 };
