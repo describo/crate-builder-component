@@ -731,8 +731,11 @@ export class Entity {
     _cleanup(entity) {
         for (let property of Object.keys(entity)) {
             if (["@id", "@type", "name"].includes(property)) continue;
-            if (entity[property].length === 1) entity[property] = entity[property][0];
-            if (entity[property].length === 0) delete entity[property];
+            if (entity[property].length === 1) {
+                entity[property] = entity[property][0];
+            } else if (entity[property].length === 0) {
+                delete entity[property];
+            }
         }
         return entity;
     }
