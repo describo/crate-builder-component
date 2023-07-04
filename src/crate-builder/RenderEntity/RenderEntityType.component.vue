@@ -26,6 +26,7 @@
 </template>
 
 <script setup>
+import { ElSelect, ElOption, ElTag } from "element-plus";
 import { ref, computed, inject } from "vue";
 import { configurationKey } from "./keys.js";
 const configuration = inject(configurationKey);
