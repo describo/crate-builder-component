@@ -236,8 +236,7 @@ const data = reactive({
     },
 });
 let isRootDataset = computed(() => {
-    let rootDataset = props.crateManager.getRootDataset({ stub: true });
-    return props.entity["@id"] === rootDataset["@id"];
+    return props.entity["@id"] === "./";
 });
 let definition = computed(() => {
     if (!props.entity?.["@type"] || !props.crateManager.profileManager?.getTypeDefinition)
