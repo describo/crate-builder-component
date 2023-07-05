@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col">
-        <div class="flex flex-row" v-if="data.total > data.pageSize">
+        <div class="flex flex-row">
             <div class="flex-grow">
                 <el-input
                     :key="configuration.language"
