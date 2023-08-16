@@ -45,8 +45,8 @@ When you want to see the component in action as a whole, there is a small VueJS 
 codebase. To start up the dev environment:
 
 ```
-docker compose up (starts up an elastic search container for datapack lookups)
-npm run develop
+> docker compose up (starts up an elastic search container for datapack lookups)
+> npm run develop
 
 --> browse to localhost:9000
 ```
