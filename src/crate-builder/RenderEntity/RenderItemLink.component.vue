@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col cursor-pointer py-2 px-4" @click="loadEntity">
+    <div class="flex flex-col cursor-pointer m-1" @click="loadEntity">
         <div class="flex flex-col space-y-2">
             <div class="border-b border-gray-500 text-sm flex-grow">
                 {{ decodeURIComponent(entity["@id"]) }}

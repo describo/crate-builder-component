@@ -1,12 +1,12 @@
 <template>
     <div
-        class="describo-render-item-link p-2 rounded bg-blue-200 hover:text-black hover:bg-blue-300 hover:rounded-r-none"
+        class="describo-render-item-link py-2 rounded bg-blue-200 hover:text-black hover:bg-blue-300 hover:rounded-r-none"
     >
         <!-- if the entity does NOT have geography -->
         <div
             v-if="!showMap"
-            class="flex flex-row space-x-2 m-1"
-            :class="{ 'my-2 mx-3': entity?.tgtEntity?.associations.length }"
+            class="flex flex-row space-x-2 m-2"
+            :class="{ 'm-2': entity?.tgtEntity?.associations.length }"
         >
             <!--render the linking element  -->
             <div class="flex flex-row">
@@ -18,15 +18,18 @@
                 />
             </div>
             <!-- if this target has associations, render them -->
-            <div v-if="entity?.tgtEntity?.associations.length" class="flex-col space-y-2">
+            <div
+                v-if="entity?.tgtEntity?.associations.length"
+                class="flex-col space-y-2 border-l-2 pl-1 border-solid border-slate-700"
+            >
                 <div
                     v-for="instance of entity.tgtEntity.associations"
                     @click="loadEntity({ id: instance.entity['@id'] })"
                     :key="instance.entity['@id']"
                     class="cursor-pointer"
                 >
-                    <div class="flex flex-row -mx-2 text-base">
-                        <div class="bg-slate-700 w-3 h-3 rounded-lg mt-4"></div>
+                    <div class="flex flex-row text-base border-solid border-black">
+                        <div class="bg-slate-700 w-3 h-3 rounded-lg -4 mt-4"></div>
                         <div class="bg-slate-700 w-6 h-1 mt-5 -mx-1"></div>
                         <div
                             class="bg-purple-200 hover:bg-cyan-200 flex flex-row p-2 rounded space-x-2"
@@ -36,7 +39,6 @@
                             </div>
                             <div><i class="fa-solid fa-arrow-right"></i></div>
                             <div class="flex flex-row space-x-1">
-                                <!-- <div>{{ instance.entity["@type"].join(", ") }}:</div> -->
                                 <div>
                                     <span v-if="instance.entity.name">{{
                                         instance.entity.name
