@@ -1,0 +1,1733 @@
+{
+  "metadata": {
+    "name": "Metaadatok",
+    "version": 1.0,
+    "description": "",
+    "warnMissingProperty": true
+  },
+  "classes": {
+    "Dataset": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "http://purl.org/dc/terms/title",
+          "name": "title",
+          "label": "Cím",
+          "help": "A  adatcsomagteljes címe",
+          "type": [
+            "Text"
+          ],
+          "required": true,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/subtitle",
+          "name": "subtitle",
+          "label": "Alcím",
+          "help": "Másodlagos cím, a főcím megerősítésére vagy kiegészítésére.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "http://purl.org/dc/terms/title",
+          "name": "title_hu",
+          "label": "Hungarian title (magyarul)",
+          "help": "Hungarian version of the title (magyarul)",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "http://purl.org/dc/terms/alternative",
+          "name": "alternativeTitle",
+          "label": "Alternatív cím",
+          "help": "Cím, amellyel általában hivatkoznak a projektre, vagy a cím rövidítése",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://schema.org/distribution",
+          "name": "alternativeURL",
+          "label": "Alternatív URL",
+          "help": "URL, amelyen a  adatcsomagmegtekinthető. Például személyes weboldal, vagy a projekt weboldala.",
+          "type": [
+            "URL"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/otherId",
+          "name": "otherId",
+          "label": "Külső azonosító",
+          "help": "Külső egyedi azonosító, amely azonosítja a datasetet (Például a készítő, vagy más repozitórium által hozzárendelt szám).",
+          "type": [
+            "otherId"
+          ],
+          "required": false,
+          "multiple": true
+        },
+        {
+          "id": "http://purl.org/dc/terms/creator",
+          "name": "author",
+          "label": "Szerző",
+          "help": "A projekt készítéséért felelős személyek, szervezetek.",
+          "type": [
+            "author"
+          ],
+          "required": true,
+          "multiple": true
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/datasetContact",
+          "name": "datasetContact",
+          "label": "Kapcsolat",
+          "help": "Kapcsolat.",
+          "type": [
+            "datasetContact"
+          ],
+          "required": true,
+          "multiple": true
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/dsDescription",
+          "name": "dsDescription",
+          "label": "Leírás",
+          "help": "A  adatcsomagcéljának, természetének és területének összegzése.",
+          "type": [
+            "dsDescription"
+          ],
+          "required": true,
+          "multiple": true
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/dsDescription_hu",
+          "name": "dsDescription_hu",
+          "label": "Hungarian description (magyarul)",
+          "help": "The Hungarian version of the Description field. (magyarul)",
+          "type": [
+            "dsDescription_hu"
+          ],
+          "required": false,
+          "multiple": true
+        },
+        {
+          "id": "http://purl.org/dc/terms/subject",
+          "name": "subject",
+          "label": "Tárgy",
+          "help": "Tartományt leíró tárgy. Kategóriák, amelyek kapcsolódnak a datasethez.",
+          "type": [
+            "Select"
+          ],
+          "values": [
+            "Law",
+            "Medicine, Health and Life Sciences",
+            "Physics",
+            "Social Sciences",
+            "Other",
+            "Agricultural Sciences",
+            "Arts and Humanities",
+            "Astronomy and Astrophysics",
+            "Business and Management",
+            "Chemistry",
+            "Computer and Information Science",
+            "Earth and Environmental Sciences",
+            "Engineering",
+            "Mathematical Sciences"
+          ],
+          "required": true,
+          "multiple": true
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/keyword",
+          "name": "keyword",
+          "label": "Kulcsszó",
+          "help": "Kulcskifejezések, amelyek a  adatcsomaglegfontosabb jellemzőire utalnak.",
+          "type": [
+            "keyword"
+          ],
+          "required": false,
+          "multiple": true
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/topicClassification",
+          "name": "topicClassification",
+          "label": "Téma besorolás",
+          "help": "Az osztályzás mező jelöli azokat a széleskörű, fontos témákat vagy tématerületeket, melyeket a  adatcsomaglefed. A Kongresszusi Könyvtár tárgyi kifejezései itt használhatók.",
+          "type": [
+            "topicClassification"
+          ],
+          "required": false,
+          "multiple": true
+        },
+        {
+          "id": "http://purl.org/dc/terms/isReferencedBy",
+          "name": "publication",
+          "label": "Kapcsolódó közlemények",
+          "help": "Közlemények, amelyek e  adatcsomagadatait használják.",
+          "type": [
+            "publication"
+          ],
+          "required": false,
+          "multiple": true
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/notesText",
+          "name": "notesText",
+          "label": "Megjegyzés",
+          "help": "További fontos információk a datasettel kapcsolatban.",
+          "type": [
+            "TextArea"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "http://purl.org/dc/terms/language",
+          "name": "language",
+          "label": "Nyelv",
+          "help": "A  adatcsomagnyelve",
+          "type": [
+            "Select"
+          ],
+          "values": [
+            "Abkhaz",
+            "Afar",
+            "Afrikaans",
+            "Akan",
+            "Albanian",
+            "Amharic",
+            "Arabic",
+            "Aragonese",
+            "Armenian",
+            "Assamese",
+            "Avaric",
+            "Avestan",
+            "Aymara",
+            "Azerbaijani",
+            "Bambara",
+            "Bashkir",
+            "Basque",
+            "Belarusian",
+            "Bengali, Bangla",
+            "Bihari",
+            "Bislama",
+            "Bosnian",
+            "Breton",
+            "Bulgarian",
+            "Burmese",
+            "Catalan,Valencian",
+            "Chamorro",
+            "Chechen",
+            "Chichewa, Chewa, Nyanja",
+            "Chinese",
+            "Chuvash",
+            "Cornish",
+            "Corsican",
+            "Cree",
+            "Croatian",
+            "Czech",
+            "Danish",
+            "Divehi, Dhivehi, Maldivian",
+            "Dutch",
+            "Dzongkha",
+            "English",
+            "Esperanto",
+            "Estonian",
+            "Ewe",
+            "Faroese",
+            "Fijian",
+            "Finnish",
+            "French",
+            "Fula, Fulah, Pulaar, Pular",
+            "Galician",
+            "Georgian",
+            "German",
+            "Greek (modern)",
+            "Guaran??",
+            "Gujarati",
+            "Haitian, Haitian Creole",
+            "Hausa",
+            "Hebrew (modern)",
+            "Herero",
+            "Hindi",
+            "Hiri Motu",
+            "Hungarian",
+            "Interlingua",
+            "Indonesian",
+            "Interlingue",
+            "Irish",
+            "Igbo",
+            "Inupiaq",
+            "Ido",
+            "Icelandic",
+            "Italian",
+            "Inuktitut",
+            "Japanese",
+            "Javanese",
+            "Kalaallisut, Greenlandic",
+            "Kannada",
+            "Kanuri",
+            "Kashmiri",
+            "Kazakh",
+            "Khmer",
+            "Kikuyu, Gikuyu",
+            "Kinyarwanda",
+            "Kyrgyz",
+            "Komi",
+            "Kongo",
+            "Korean",
+            "Kurdish",
+            "Kwanyama, Kuanyama",
+            "Latin",
+            "Luxembourgish, Letzeburgesch",
+            "Ganda",
+            "Limburgish, Limburgan, Limburger",
+            "Lingala",
+            "Lao",
+            "Lithuanian",
+            "Luba-Katanga",
+            "Latvian",
+            "Manx",
+            "Macedonian",
+            "Malagasy",
+            "Malay",
+            "Malayalam",
+            "Maltese",
+            "M?�ori",
+            "Marathi (Mar?�???h?�)",
+            "Marshallese",
+            "Mixtepec Mixtec",
+            "Mongolian",
+            "Nauru",
+            "Navajo, Navaho",
+            "Northern Ndebele",
+            "Nepali",
+            "Ndonga",
+            "Norwegian Bokm??l",
+            "Norwegian Nynorsk",
+            "Norwegian",
+            "Nuosu",
+            "Southern Ndebele",
+            "Occitan",
+            "Ojibwe, Ojibwa",
+            "Old Church Slavonic,Church Slavonic,Old Bulgarian",
+            "Oromo",
+            "Oriya",
+            "Ossetian, Ossetic",
+            "Panjabi, Punjabi",
+            "P?�li",
+            "Persian (Farsi)",
+            "Polish",
+            "Pashto, Pushto",
+            "Portuguese",
+            "Quechua",
+            "Romansh",
+            "Kirundi",
+            "Romanian",
+            "Russian",
+            "Sanskrit (Sa??�sk??�ta)",
+            "Sardinian",
+            "Sindhi",
+            "Northern Sami",
+            "Samoan",
+            "Sango",
+            "Serbian",
+            "Scottish Gaelic, Gaelic",
+            "Shona",
+            "Sinhala, Sinhalese",
+            "Slovak",
+            "Slovene",
+            "Somali",
+            "Southern Sotho",
+            "Spanish, Castilian",
+            "Sundanese",
+            "Swahili",
+            "Swati",
+            "Swedish",
+            "Tamil",
+            "Telugu",
+            "Tajik",
+            "Thai",
+            "Tigrinya",
+            "Tibetan Standard, Tibetan, Central",
+            "Turkmen",
+            "Tagalog",
+            "Tswana",
+            "Tonga (Tonga Islands)",
+            "Turkish",
+            "Tsonga",
+            "Tatar",
+            "Twi",
+            "Tahitian",
+            "Uyghur, Uighur",
+            "Ukrainian",
+            "Urdu",
+            "Uzbek",
+            "Venda",
+            "Vietnamese",
+            "Volap??k",
+            "Walloon",
+            "Welsh",
+            "Wolof",
+            "Western Frisian",
+            "Xhosa",
+            "Yiddish",
+            "Yoruba",
+            "Zhuang, Chuang",
+            "Zulu",
+            "Not applicable",
+            "Guaraní",
+            "Māori",
+            "Marathi (Marāṭhī)",
+            "Norwegian Bokmål",
+            "Pāli",
+            "Sanskrit (Saṁskṛta)",
+            "Volapük"
+          ],
+          "required": false,
+          "multiple": true
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/producer",
+          "name": "producer",
+          "label": "Készítő",
+          "help": "A datasetért pénzügyi vagy adminisztratív felelősséggel tartozó személy vagy szervezet.",
+          "type": [
+            "producer"
+          ],
+          "required": false,
+          "multiple": true
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/productionDate",
+          "name": "productionDate",
+          "label": "Elkészítés dátuma",
+          "help": "A datasethez tartozó anyagok készítésének dátuma. (Nem a terjesztés, kiadás vagy archiválás dátuma.)",
+          "type": [
+            "Date"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/productionPlace",
+          "name": "productionPlace",
+          "label": "Elkészítés helye",
+          "help": "A datasethez tartozó anyagok készítésének helye.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "http://purl.org/dc/terms/contributor",
+          "name": "contributor",
+          "label": "Közreműködő",
+          "help": "Személy vagy szervezet, aki gyűjtötti, menedzseli, vagy egyéb módon közreműködik a datasethez tartozó anyagok fejlesztésében.",
+          "type": [
+            "contributor"
+          ],
+          "required": false,
+          "multiple": true
+        },
+        {
+          "id": "https://schema.org/sponsor",
+          "name": "grantNumber",
+          "label": "Támogatói információk",
+          "help": "Támogatási információk",
+          "type": [
+            "grantNumber"
+          ],
+          "required": false,
+          "multiple": true
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/distributor",
+          "name": "distributor",
+          "label": "Terjesztő",
+          "help": "Az a szervezet, amelyet a szerző az általa készített anyagok sokszorosításával bízott meg, beleértve a szükséges módosításokat, javításokat.",
+          "type": [
+            "distributor"
+          ],
+          "required": false,
+          "multiple": true
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/distributionDate",
+          "name": "distributionDate",
+          "label": "Kiadás dátuma",
+          "help": "Dátum, amikor a tartalom terjesztését, bemutatását engedélyezték.",
+          "type": [
+            "Date"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/depositor",
+          "name": "depositor",
+          "label": "Létrehozó",
+          "help": "A személy (családnév, utónév) vagy szervezet neve, amely felvette a datasetet a repozitóriumba.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "http://purl.org/dc/terms/dateSubmitted",
+          "name": "dateOfDeposit",
+          "label": "Létrehozás dátuma",
+          "help": "A  adatcsomagrepozitóriumba történő felvételének dátuma.",
+          "type": [
+            "Date"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://schema.org/temporalCoverage",
+          "name": "timePeriodCovered",
+          "label": "Időtartam",
+          "help": "Időtartam, amelyre az adatok utalnak. A mező az adatok által lefedett idő intervallumot tükrözi, nem a kódolás, tervezés vagy gyűjtés időtartamát.",
+          "type": [
+            "timePeriodCovered"
+          ],
+          "required": false,
+          "multiple": true
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/dateOfCollection",
+          "name": "dateOfCollection",
+          "label": "Gyűjtés dátuma",
+          "help": "Az adatok gyűjtésének dátumát jelöli.",
+          "type": [
+            "dateOfCollection"
+          ],
+          "required": false,
+          "multiple": true
+        },
+        {
+          "id": "http://rdf-vocabulary.ddialliance.org/discovery#kindOfData",
+          "name": "kindOfData",
+          "label": "Adatok típusa",
+          "help": "A datasethez tartozó adatok típusai: felmérési adat, számbavételi adat, összesített adat, klinikai adat, esemény/tranzakció adata, forráskód, számítógépes feldolgozásra szánt szöveg, adminisztratív rekordok adata, kísérleti adat, pszichológiai teszt, szöveges adat, kódolt szöveg, kódolt dokumentum, idő költségvetési naplók, megfigyelési adat/rangsorolás, folyamat által létrejött adat, vagy egyéb.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/series",
+          "name": "series",
+          "label": "Sorozat",
+          "help": "A  adatcsomagsorozatra vonatkozó információk.",
+          "type": [
+            "series"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://www.w3.org/TR/prov-o/#wasGeneratedBy",
+          "name": "software",
+          "label": "Szoftver",
+          "help": "A  adatcsomagelőállítása során használt szoftverre vonatkozó információk.",
+          "type": [
+            "software"
+          ],
+          "required": false,
+          "multiple": true
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/relatedMaterial",
+          "name": "relatedMaterial",
+          "label": "Kapcsolódó anyagok",
+          "help": "Bármely, a datasethez kapcsolódó anyag.",
+          "type": [
+            "TextArea"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "http://purl.org/dc/terms/relation",
+          "name": "relatedDatasets",
+          "label": "Kapcsolódó datasetek",
+          "help": "Dataset, amely ehhez a datasethez kapcsolódik. Például korábbi kutatás ebben a témában.",
+          "type": [
+            "TextArea"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "http://purl.org/dc/terms/references",
+          "name": "otherReferences",
+          "label": "Egyéb referenciák",
+          "help": "Háttéranyagok, vagy a  adatcsomageredményeit alátámasztó anyagok.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://www.w3.org/TR/prov-o/#wasDerivedFrom",
+          "name": "dataSources",
+          "label": "Források",
+          "help": "Az adatgyűjtés forrásául szolgáló könyvek, cikkek, sorozatok vagy egyéb fájlok listája.",
+          "type": [
+            "TextArea"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/originOfSources",
+          "name": "originOfSources",
+          "label": "Források eredete",
+          "help": "Történelmi anyagokhoz a források eredetét, illetve a források kiválasztásának szabályait meg kell adni.",
+          "type": [
+            "TextArea"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/characteristicOfSources",
+          "name": "characteristicOfSources",
+          "label": "A megjelölt források jellemzői",
+          "help": "A jellemzők és a forrásanyag értékelése.",
+          "type": [
+            "TextArea"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/accessToSources",
+          "name": "accessToSources",
+          "label": "Dokumentáció és források hozzáférhetősége",
+          "help": "Az eredeti források dokumentációs szintje.",
+          "type": [
+            "TextArea"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/unitOfAnalysis",
+          "name": "unitOfAnalysis",
+          "label": "Megfigyelési egység",
+          "help": "Az adatcsomag által vizsgált legkisebb egység, mint magánemberek, családok/háztartások, csoportok, intézmények/szervezetek, adminisztratív egységek és egyebek.!!!!!!",
+          "type": [
+            "TextArea"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/universe",
+          "name": "universe",
+          "label": "Univerzum",
+          "help": "A fájl adatai által lefedett populáció leírása; Emberek, vagy egyéb objektumok csoportja, amelyen a kutatást végzik, és amelyre az eredmény vonatkozik. Az életkor, az állampolgárság és a tartózkodási hely általában segíti az adott univerzum körülhatárolását, de tetszőleges számú egyéb tényezőt is fel lehet használni, mint például korhatárok, nem, családi állapot, faj, etnikai csoport, nemzetiség, jövedelem, veterán státus, büntetőítélet és egyebek. Az univerzum nem csak személyekből állhat. Felépülhet lakóegységekből, bírósági ügyekből, halálesetekből, országokból és így tovább. Általánosságban a leírás alapján egy egyedről meg kell tudni mondani, hogy a vizsgált populáció tagja-e. Más néven értékelt univerzum, az értékelt populáció vagy célpopuláció.",
+          "type": [
+            "TextArea"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/timeMethod",
+          "name": "timeMethod",
+          "label": "Időbeli módszer",
+          "help": "Az adatgyűjtés időbeli módszere vagy időbeli dimenziója, mint panel, keresztmetszeti, trend, idősor vagy egyéb.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/dataCollector",
+          "name": "dataCollector",
+          "label": "Gyűjtötte",
+          "help": "",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/collectorTraining",
+          "name": "collectorTraining",
+          "label": "Gyűjtő képzése",
+          "help": "Az adatgyűjtő számára megtartott képzés.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/frequencyOfDataCollection",
+          "name": "frequencyOfDataCollection",
+          "label": "Mintavételi gyakoriság",
+          "help": "Ha az adatgyűjtés több időpontban történt, jelölje meg a mintavétel gyakoriságát; lehet havi, negyedéves vagy egyéb.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/samplingProcedure",
+          "name": "samplingProcedure",
+          "label": "Mintavétel folyamata",
+          "help": "A mintavétel típusa és mintatervezés, amely segítségével kiválasztják a populációt képviselő egyedeket. Tartalmazhat hivatkozást a célzott minta méretére és a mintavételi arányra.",
+          "type": [
+            "TextArea"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/targetSampleSize",
+          "name": "targetSampleSize",
+          "label": "Minta mérete",
+          "help": "Konkrét információk a cél mintaméretre, a valódi mintaméretre és az ezeket meghatározó függvényre vonatkozóan.",
+          "type": [
+            "targetSampleSize"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/deviationsFromSampleDesign",
+          "name": "deviationsFromSampleDesign",
+          "label": "Jelentős eltérések a mintatervezésben",
+          "help": "Mutassa be a mintavételezett egységek (kapott) és a teljes populációra vonatkozó statisztikák (kor, nemek aránya, családi állapot, stb.) közötti összefüggéseket, eltéréseket!",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/collectionMode",
+          "name": "collectionMode",
+          "label": "Gyűjtés módja",
+          "help": "Az adatgyűjtés módszere; az eszközök jellemzői (pl. telefon interview, levélben küldött kérdőív vagy egyéb).",
+          "type": [
+            "TextArea"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/researchInstrument",
+          "name": "researchInstrument",
+          "label": "A kutatási eszköz típusa",
+          "help": "Az adatgyűjtéshez használt eszköz típusa. A Strukturált jelöli azt az eszközt, amelyben az összes válaszadónak ugyanazokat a kérdéseket tették fel, esetleg előre kódolt válaszokkal. Ha egy ilyen kérdőív nyitott kérdéseket tartalmaz, kérjük, írja ide a megfelelő megjegyzéseket. Félig strukturált jelzi, hogy a kutatási eszköz elsősorban nyitott kérdéseket tartalmaz. A nem strukturált jelzi, hogy mélyinterjúkat folytattak.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/dataCollectionSituation",
+          "name": "dataCollectionSituation",
+          "label": "Az adatgyűjtés helyzetének tulajdonságai",
+          "help": "Az adatgyűjtési helyzet fontosabb aspektusainak leírása. Tartalmaz olyan információkat, mint a válaszadók együttműködési hajlandósága, az interjúk időtartama, a visszahívások száma vagy hasonlók.",
+          "type": [
+            "TextArea"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/actionsToMinimizeLoss",
+          "name": "actionsToMinimizeLoss",
+          "label": "A veszteség minimalizálására szolgáló tevékanységek",
+          "help": "Az adavesztés minimalizálása érdekében megtett műveletek összefoglalása. Ida tertoznak a nyomon követési látogatások, felügyeleti ellenőrzések, történeti egyeztetések, becslések, stb.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/controlOperations",
+          "name": "controlOperations",
+          "label": "Irányítási műveletek",
+          "help": "Az elsődleges ellenőr vagy adat archívum által végzett adatkezelés elősegítésére irányuló módszerek.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/weighting",
+          "name": "weighting",
+          "label": "Súlyozás",
+          "help": "A mintavételezési módszerek használata megkívánhatja a minta súlyozűsát a pontosabb statisztikai eredmények érdekében. Leírja a gyűjtemény vizsgálata során alkalmazott súlyozás kritériumát. Ha keletkezett súlyozó függvény vagy együttható, azt meg kell adni, elemeit meg kell határozni és meg kell jelölni, hogy a képletet hogyan alkalmazták az adatokhoz.",
+          "type": [
+            "TextArea"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/cleaningOperations",
+          "name": "cleaningOperations",
+          "label": "Tisztítási műveletek",
+          "help": "Adattisztítás során használt módszerek, mint konzisztencia vizsgálat, helyettesítő kód ellenőrzés vagy egyéb.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/datasetLevelErrorNotes",
+          "name": "datasetLevelErrorNotes",
+          "label": "Tanulmány szintű hibák feljegyzései",
+          "help": "Jegyzet a vizsgálat módszertanának és feldolgozásának kommentálásához, pontosításához.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/responseRate",
+          "name": "responseRate",
+          "label": "Válaszok mértéke",
+          "help": "Az információt nyújtó egyedek aránya.",
+          "type": [
+            "TextArea"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/samplingErrorEstimates",
+          "name": "samplingErrorEstimates",
+          "label": "Mintavételi hiba becslése",
+          "help": "Annak a mértéke, hogy mennyire pontosan lehet a mintából a populációra következtetni.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/otherDataAppraisal",
+          "name": "otherDataAppraisal",
+          "label": "Az adatbecslés egyéb formái",
+          "help": "Az adatértékeléssel kapcsolatos egyéb kérdések. Írja ide az olyan problémákat, mint a válasz variancia, a válasz megtagadás aránya és az torzítás tesztelése, az interjúkészítő és a válasz torzítása, a konfidencia szintje, a kérdés torzulása vagy hasonlók.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/socialScienceNotes",
+          "name": "socialScienceNotes",
+          "label": "Jegyzetek",
+          "help": "Általános jegyzetek az adatcsomaggal kapcsolatban.",
+          "type": [
+            "socialScienceNotes"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "http://schema.org/hasPart",
+          "name": "hasPart",
+          "label": "Tartalma",
+          "help": "Adatcsomag fájljai és al-adatcsomagjai",
+          "multiple": "true",
+          "type": [
+            "Dataset",
+            "File"
+          ]
+        }
+      ],
+      "label": "Adatcsomag",
+      "help": "Fájlok és metaadataik adatcsomagja"
+    },
+    "otherId": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "https://dataverse.org/schema/citation/otherIdAgency",
+          "name": "otherIdAgency",
+          "label": "Szervezet",
+          "help": "Az azonosítót létrehozó szervezet neve.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/otherIdValue",
+          "name": "otherIdValue",
+          "label": "Azonosító",
+          "help": "A külső azonosító értéke.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        }
+      ],
+      "label": "Külső azonosító",
+      "help": "Külső egyedi azonosító, amely azonosítja a datasetet (Például a készítő, vagy más repozitórium által hozzárendelt szám)."
+    },
+    "author": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "https://dataverse.org/schema/citation/authorName",
+          "name": "authorName",
+          "label": "Név",
+          "help": "A szerző család- és utóneve, vagy a szervezet neve.",
+          "type": [
+            "Text"
+          ],
+          "required": true,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/authorAffiliation",
+          "name": "authorAffiliation",
+          "label": "Intézmény",
+          "help": "A szervezet neve, amelyhez a szerző kapcsolódik",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "http://purl.org/spar/datacite/AgentIdentifierScheme",
+          "name": "authorIdentifierScheme",
+          "label": "Azonosító típusa",
+          "help": "A szerzőazonosító neve (ORCID, ISNI).",
+          "type": [
+            "Select"
+          ],
+          "values": [
+            "ORCID",
+            "ISNI",
+            "LCNA",
+            "VIAF",
+            "GND",
+            "DAI",
+            "ResearcherID",
+            "ScopusID"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "http://purl.org/spar/datacite/AgentIdentifier",
+          "name": "authorIdentifier",
+          "label": "Azonosító",
+          "help": "A szerzőazonosító értéke.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        }
+      ],
+      "label": "Szerző",
+      "help": "A projekt készítéséért felelős személyek, szervezetek."
+    },
+    "datasetContact": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "https://dataverse.org/schema/citation/datasetContactName",
+          "name": "datasetContactName",
+          "label": "Név",
+          "help": "A kapcsolattartó családi- és utóneve, vagy a kapcsolattartó szervezet neve.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/datasetContactAffiliation",
+          "name": "datasetContactAffiliation",
+          "label": "Intézmény",
+          "help": "A szervezet neve, amelyhez a kapcsolattartó közhető.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/datasetContactEmail",
+          "name": "datasetContactEmail",
+          "label": "E-mail",
+          "help": "A kapcsolattartó email címe. Nem jelenik meg az adatlapon.",
+          "type": [
+            "Text"
+          ],
+          "required": true,
+          "multiple": false
+        }
+      ],
+      "label": "Kapcsolat",
+      "help": "Kapcsolat."
+    },
+    "dsDescription": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "https://dataverse.org/schema/citation/dsDescriptionValue",
+          "name": "dsDescriptionValue",
+          "label": "Szöveg",
+          "help": "A  adatcsomagcéljának, természetének és területének összegzése.",
+          "type": [
+            "TextArea"
+          ],
+          "required": true,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/dsDescriptionDate",
+          "name": "dsDescriptionDate",
+          "label": "Dátum",
+          "help": "Abban az esetben, ha a datasethez több leírás tartozik (pl. a készítő és a repozitórium is hozzáadott egyet-egyet), A dátum segít megkülönböztetni a leírásokat. A mező formátuma követi az ISO szabványt: ÉÉÉÉ-HH-NN.",
+          "type": [
+            "Date"
+          ],
+          "required": false,
+          "multiple": false
+        }
+      ],
+      "label": "Leírás",
+      "help": "A  adatcsomagcéljának, természetének és területének összegzése."
+    },
+    "dsDescription_hu": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "https://dataverse.org/schema/citation/dsDescriptionValue_hu",
+          "name": "dsDescriptionValue_hu",
+          "label": "Text (magyarul)",
+          "help": "The Hungarian version of the Description field. (magyarul)",
+          "type": [
+            "TextArea"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/dsDescriptionDate_hu",
+          "name": "dsDescriptionDate_hu",
+          "label": "Date (magyarul)",
+          "help": "In cases where a Dataset contains more than one description (for example, one might be supplied by the data producer and another prepared by the data repository where the data are deposited), the date attribute is used to distinguish between the two descriptions. The date attribute follows the ISO convention of YYYY-MM-DD. (magyarul)",
+          "type": [
+            "Date"
+          ],
+          "required": false,
+          "multiple": false
+        }
+      ],
+      "label": "Hungarian description (magyarul)",
+      "help": "The Hungarian version of the Description field. (magyarul)"
+    },
+    "keyword": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "https://dataverse.org/schema/citation/keywordValue",
+          "name": "keywordValue",
+          "label": "Érték",
+          "help": "Kulcskifejezések, amelyek az adatcsomag fontosabb aspektusait írják le. Kulcsszóindexek építésére, osztályzási és visszakeresési célra használhatók. Szókészlet felhasználható. A szókészlet paraméter használható a szókészlet megadására, mint LCSH, MeSH, vagy egyebek. A szókészlet URL paraméterben megadható a szókészlet elérési útja.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/keywordVocabulary",
+          "name": "keywordVocabulary",
+          "label": "Szókészlet",
+          "help": "A használt kulcsszó készlet megadására, mint LCSH, MeSH, vagy egyebek.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/keywordVocabularyURI",
+          "name": "keywordVocabularyURI",
+          "label": "Szókészlet URL-je",
+          "help": "A szókészlet elérési útját adja meg.",
+          "type": [
+            "URL"
+          ],
+          "required": false,
+          "multiple": false
+        }
+      ],
+      "label": "Kulcsszó",
+      "help": "Kulcskifejezések, amelyek a  adatcsomaglegfontosabb jellemzőire utalnak."
+    },
+    "topicClassification": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "https://dataverse.org/schema/citation/topicClassValue",
+          "name": "topicClassValue",
+          "label": "Érték",
+          "help": "Téma vagy tématerület megnevezése.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/topicClassVocab",
+          "name": "topicClassVocab",
+          "label": "Szókészlet",
+          "help": "A használt kulcsszó készlet megadására, mint LCSH, MeSH, vagy egyebek.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/topicClassVocabURI",
+          "name": "topicClassVocabURI",
+          "label": "Szókészlet URL-je",
+          "help": "A szókészlet elérési útját adja meg.",
+          "type": [
+            "URL"
+          ],
+          "required": false,
+          "multiple": false
+        }
+      ],
+      "label": "Téma besorolás",
+      "help": "Az osztályzás mező jelöli azokat a széleskörű, fontos témákat vagy tématerületeket, melyeket a  adatcsomaglefed. A Kongresszusi Könyvtár tárgyi kifejezései itt használhatók."
+    },
+    "publication": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "http://purl.org/dc/terms/bibliographicCitation",
+          "name": "publicationCitation",
+          "label": "Idézés kapcsolat",
+          "help": "A teljes bibliográfiai idézet ehhez a közleményhez.",
+          "type": [
+            "TextArea"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "http://purl.org/spar/datacite/ResourceIdentifierScheme",
+          "name": "publicationIDType",
+          "label": "Azonosító típusa",
+          "help": "A közleményhez tartozó digitális azonosító típusa. (pl. DOI)",
+          "type": [
+            "Select"
+          ],
+          "values": [
+            "ark",
+            "arXiv",
+            "bibcode",
+            "cstr",
+            "DASH-NRS",
+            "doi",
+            "ean13",
+            "eissn",
+            "handle",
+            "isbn",
+            "issn",
+            "istc",
+            "lissn",
+            "lsid",
+            "pmid",
+            "purl",
+            "upc",
+            "url",
+            "urn"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "http://purl.org/spar/datacite/ResourceIdentifier",
+          "name": "publicationIDNumber",
+          "label": "Azonosító értéke",
+          "help": "A közleményhez tartozó digitális azonosító értéke.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://schema.org/distribution",
+          "name": "publicationURL",
+          "label": "URL",
+          "help": "Hivatkozás a közlemény weboldalára (pl. folyóiratcikk oldala, archive rekord vagy egyéb).",
+          "type": [
+            "URL"
+          ],
+          "required": false,
+          "multiple": false
+        }
+      ],
+      "label": "Kapcsolódó közlemények",
+      "help": "Közlemények, amelyek e  adatcsomagadatait használják."
+    },
+    "producer": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "https://dataverse.org/schema/citation/producerName",
+          "name": "producerName",
+          "label": "Név",
+          "help": "A készítő neve",
+          "type": [
+            "Text"
+          ],
+          "required": true,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/producerAffiliation",
+          "name": "producerAffiliation",
+          "label": "Intézmény",
+          "help": "Szervezet, amelyhez a készítő tartozik.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/producerAbbreviation",
+          "name": "producerAbbreviation",
+          "label": "Rövidítés",
+          "help": "A készítőre vonatkozó közismert rövidítés. (pl. IQSS, ICPSR).",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/producerURL",
+          "name": "producerURL",
+          "label": "URL",
+          "help": "A készítő URL-je a személy vagy szervezet internetes profiljára mutat, ha van ilyen. A készítő oldalának abszolút URL-jét kell beírni, például http://www.my.org.",
+          "type": [
+            "URL"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/producerLogoURL",
+          "name": "producerLogoURL",
+          "label": "Logó URL",
+          "help": "A készítő weben elérhető logójának URL-je. Abszolút URL-t kell ide írni, például http://www.my.org/images/logo.gif.",
+          "type": [
+            "URL"
+          ],
+          "required": false,
+          "multiple": false
+        }
+      ],
+      "label": "Készítő",
+      "help": "A datasetért pénzügyi vagy adminisztratív felelősséggel tartozó személy vagy szervezet."
+    },
+    "contributor": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "https://dataverse.org/schema/citation/contributorType",
+          "name": "contributorType",
+          "label": "Típus",
+          "help": "A közreműködés típusa.",
+          "type": [
+            "Select"
+          ],
+          "values": [
+            "Data Collector",
+            "Data Curator",
+            "Data Manager",
+            "Editor",
+            "Funder",
+            "Hosting Institution",
+            "Project Leader",
+            "Project Manager",
+            "Project Member",
+            "Related Person",
+            "Researcher",
+            "Research Group",
+            "Rights Holder",
+            "Sponsor",
+            "Supervisor",
+            "Work Package Leader",
+            "Other"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/contributorName",
+          "name": "contributorName",
+          "label": "Név",
+          "help": "A közreműködő személy családi- és utóneve, vagy a szervezet megnevezése.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        }
+      ],
+      "label": "Közreműködő",
+      "help": "Személy vagy szervezet, aki gyűjtötti, menedzseli, vagy egyéb módon közreműködik a datasethez tartozó anyagok fejlesztésében."
+    },
+    "grantNumber": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "https://dataverse.org/schema/citation/grantNumberAgency",
+          "name": "grantNumberAgency",
+          "label": "Támogató szervezet",
+          "help": "Támogató szervezet",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/grantNumberValue",
+          "name": "grantNumberValue",
+          "label": "Támogatási szám",
+          "help": "A munkát támogató projekt támogatói vagy szerződésszáma.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        }
+      ],
+      "label": "Támogatói információk",
+      "help": "Támogatási információk"
+    },
+    "distributor": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "https://dataverse.org/schema/citation/distributorName",
+          "name": "distributorName",
+          "label": "Terjesztő",
+          "help": "A terjesztő neve.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/distributorAffiliation",
+          "name": "distributorAffiliation",
+          "label": "Intézmény",
+          "help": "A szervezet, amelyhez a terjesztő tartozik.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/distributorAbbreviation",
+          "name": "distributorAbbreviation",
+          "label": "Rövidítés",
+          "help": "A terjesztőre vonatkozó közismert rövidítés. (pl. IQSS, ICPSR).",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/distributorURL",
+          "name": "distributorURL",
+          "label": "URL",
+          "help": "A terjesztő URL-je a személy vagy szervezet internetes profiljára mutat, ha van ilyen. A készítő oldalának abszolút URL-jét kell beírni, például http://www.my.org.",
+          "type": [
+            "URL"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/distributorLogoURL",
+          "name": "distributorLogoURL",
+          "label": "Logó URL",
+          "help": "A terjesztő weben elérhető logójának URL-je. Abszolút URL-t kell ide írni, például http://www.my.org/images/logo.gif.",
+          "type": [
+            "URL"
+          ],
+          "required": false,
+          "multiple": false
+        }
+      ],
+      "label": "Terjesztő",
+      "help": "Az a szervezet, amelyet a szerző az általa készített anyagok sokszorosításával bízott meg, beleértve a szükséges módosításokat, javításokat."
+    },
+    "timePeriodCovered": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "https://dataverse.org/schema/citation/timePeriodCoveredStart",
+          "name": "timePeriodCoveredStart",
+          "label": "Kezdő dátum",
+          "help": "Kezdő dátum, amely az adatok által lefedett idő intervallum elejét jelöli, nem a kódolás, tervezés vagy gyűjtés elejét.",
+          "type": [
+            "Date"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/timePeriodCoveredEnd",
+          "name": "timePeriodCoveredEnd",
+          "label": "Végdátum",
+          "help": "Végdátum, amely az adatok által lefedett idő intervallum végét jelöli, nem a kódolás, tervezés vagy gyűjtés végét.",
+          "type": [
+            "Date"
+          ],
+          "required": false,
+          "multiple": false
+        }
+      ],
+      "label": "Időtartam",
+      "help": "Időtartam, amelyre az adatok utalnak. A mező az adatok által lefedett idő intervallumot tükrözi, nem a kódolás, tervezés vagy gyűjtés időtartamát."
+    },
+    "dateOfCollection": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "https://dataverse.org/schema/citation/dateOfCollectionStart",
+          "name": "dateOfCollectionStart",
+          "label": "Kezdő dátum",
+          "help": "Az adatok gyűjtésének kezdő dátuma.",
+          "type": [
+            "Date"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/dateOfCollectionEnd",
+          "name": "dateOfCollectionEnd",
+          "label": "Végdátum",
+          "help": "Az adatok gyűjtésének végdátuma.",
+          "type": [
+            "Date"
+          ],
+          "required": false,
+          "multiple": false
+        }
+      ],
+      "label": "Gyűjtés dátuma",
+      "help": "Az adatok gyűjtésének dátumát jelöli."
+    },
+    "series": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "https://dataverse.org/schema/citation/seriesName",
+          "name": "seriesName",
+          "label": "Cím",
+          "help": "A befoglaló dataaset sorozat neve.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/seriesInformation",
+          "name": "seriesInformation",
+          "label": "Információk",
+          "help": "A sorozat története, illetve a teljes sorozatra vonatkozó tulajdonságok összefoglalása.",
+          "type": [
+            "TextArea"
+          ],
+          "required": false,
+          "multiple": false
+        }
+      ],
+      "label": "Sorozat",
+      "help": "A  adatcsomagsorozatra vonatkozó információk."
+    },
+    "software": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "https://dataverse.org/schema/citation/softwareName",
+          "name": "softwareName",
+          "label": "Név",
+          "help": "A  adatcsomagelőállítása során használt szoftver neve.",
+          "type": [
+            "Select"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/citation/softwareVersion",
+          "name": "softwareVersion",
+          "label": "Verzió",
+          "help": "A  adatcsomagelőállítása során használt szoftver verziója.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        }
+      ],
+      "label": "Szoftver",
+      "help": "A  adatcsomagelőállítása során használt szoftverre vonatkozó információk."
+    },
+    "targetSampleSize": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "https://dataverse.org/schema/socialscience/targetSampleActualSize",
+          "name": "targetSampleActualSize",
+          "label": "Valódi méret",
+          "help": "Valódi mintaméret",
+          "type": [
+            "Number"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/targetSampleSizeFormula",
+          "name": "targetSampleSizeFormula",
+          "label": "Függvény",
+          "help": "A cél mintaméret meghatározására használt függvény.",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        }
+      ],
+      "label": "Minta mérete",
+      "help": "Konkrét információk a cél mintaméretre, a valódi mintaméretre és az ezeket meghatározó függvényre vonatkozóan."
+    },
+    "socialScienceNotes": {
+      "definition": "override",
+      "subClassOf": [],
+      "inputs": [
+        {
+          "id": "https://dataverse.org/schema/socialscience/socialScienceNotesType",
+          "name": "socialScienceNotesType",
+          "label": "Típus",
+          "help": "A jegyzet típusa",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/socialScienceNotesSubject",
+          "name": "socialScienceNotesSubject",
+          "label": "Tárgy",
+          "help": "A jegyzet tárgya",
+          "type": [
+            "Text"
+          ],
+          "required": false,
+          "multiple": false
+        },
+        {
+          "id": "https://dataverse.org/schema/socialscience/socialScienceNotesText",
+          "name": "socialScienceNotesText",
+          "label": "Szöveg",
+          "help": "A jegyzet szövege",
+          "type": [
+            "TextArea"
+          ],
+          "required": false,
+          "multiple": false
+        }
+      ],
+      "label": "Jegyzetek",
+      "help": "Általános jegyzetek az adatcsomaggal kapcsolatban."
+    }
+  },
+  "enabledClasses": [
+    "dsDescription_hu",
+    "otherId",
+    "dateOfCollection",
+    "software",
+    "Dataset",
+    "author",
+    "datasetContact",
+    "distributor",
+    "topicClassification",
+    "contributor",
+    "series",
+    "dsDescription",
+    "publication",
+    "producer",
+    "keyword",
+    "timePeriodCovered",
+    "grantNumber",
+    "otherId",
+    "author",
+    "datasetContact",
+    "dsDescription",
+    "dsDescription_hu",
+    "keyword",
+    "topicClassification",
+    "publication",
+    "producer",
+    "contributor",
+    "grantNumber",
+    "distributor",
+    "timePeriodCovered",
+    "dateOfCollection",
+    "series",
+    "software",
+    "targetSampleSize",
+    "socialScienceNotes"
+  ],
+  "layouts": {
+    "Dataset": [
+      {
+        "name": "Metaadatok",
+        "description": "",
+        "inputs": [
+          "title",
+          "subtitle",
+          "title_hu",
+          "alternativeTitle",
+          "alternativeURL",
+          "otherId",
+          "author",
+          "datasetContact",
+          "dsDescription",
+          "dsDescription_hu",
+          "subject",
+          "keyword",
+          "topicClassification",
+          "publication",
+          "notesText",
+          "language",
+          "producer",
+          "productionDate",
+          "productionPlace",
+          "contributor",
+          "grantNumber",
+          "distributor",
+          "distributionDate",
+          "depositor",
+          "dateOfDeposit",
+          "timePeriodCovered",
+          "dateOfCollection",
+          "kindOfData",
+          "series",
+          "software",
+          "relatedMaterial",
+          "relatedDatasets",
+          "otherReferences",
+          "dataSources",
+          "originOfSources",
+          "characteristicOfSources",
+          "accessToSources"
+        ]
+      },
+      {
+        "name": "Társadalom- és humán tudomány metaadatai",
+        "description": "",
+        "inputs": [
+          "unitOfAnalysis",
+          "universe",
+          "timeMethod",
+          "dataCollector",
+          "collectorTraining",
+          "frequencyOfDataCollection",
+          "samplingProcedure",
+          "targetSampleSize",
+          "deviationsFromSampleDesign",
+          "collectionMode",
+          "researchInstrument",
+          "dataCollectionSituation",
+          "actionsToMinimizeLoss",
+          "controlOperations",
+          "weighting",
+          "cleaningOperations",
+          "datasetLevelErrorNotes",
+          "responseRate",
+          "samplingErrorEstimates",
+          "otherDataAppraisal",
+          "socialScienceNotes"
+        ]
+      }
+    ]
+  }
+}

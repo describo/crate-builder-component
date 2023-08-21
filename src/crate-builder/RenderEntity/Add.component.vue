@@ -160,8 +160,21 @@ const data = reactive({
     addType: undefined,
 });
 let types = computed(() => {
-    if (!props.definition.type || props.definition.type === "Value") return "";
-    return props.definition.type;
+    // TODO: Not sure about this ...
+    if (!props.definition.type || props.definition.type === "Value") return [{}];
+
+    // If there's just a single type, we can use it as is
+    if (!Array.isArray(props.definition.type)) {
+        return [props.definition];
+    }
+
+    // Otherwise we create as many instances of the props.definition as many types we have. Each will have its onw
+    //typeName value.
+    const deepClone = JSON.parse(JSON.stringify(props.definition));
+    return props.definition.type.map(t => {
+        const specificType = { ...deepClone, typeName: t };
+        return specificType;
+    })
 });
 let addSimpleType = computed(() => {
     return data.simpleTypes.includes(data.addType);

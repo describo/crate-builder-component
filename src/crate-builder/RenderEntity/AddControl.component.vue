@@ -3,17 +3,17 @@
     <div class="flex flex-row flex-wrap">
         <div v-for="(type, idx) of types" :key="idx">
             <el-button
-                @click="toggle(type)"
+                @click="toggle(type.typeName)"
                 type="primary"
                 class="focus:outline-none focus:border-2 focus:border-green-600 m-1"
             >
-                <div v-show="!selectedType || selectedType !== type">
+                <div v-show="!selectedType || selectedType !== type.typeName">
                     <i class="fas fa-plus"></i>
                 </div>
-                <div v-show="selectedType === type">
+                <div v-show="selectedType === type.typeName">
                     <i class="fas fa-times"></i>
                 </div>
-                &nbsp;{{ type }}
+                &nbsp;{{ type.label || type.typeName }}
             </el-button>
         </div>
     </div>
@@ -40,7 +40,7 @@ import { computed } from "vue";
 
 const props = defineProps({
     types: {
-        type: [String, Array],
+        type: [Object, Array],
         required: true,
     },
     selectedType: {

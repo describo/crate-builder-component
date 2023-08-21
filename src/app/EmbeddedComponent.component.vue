@@ -77,6 +77,7 @@ import profile5 from "../examples/profile/profile-with-all-primitives.json";
 import profile6 from "../examples/profile/test-profile-with-resolve.json";
 import profile7 from "../examples/profile/profile-with-all-primitives-groups-no-about.json";
 import profile8 from "../examples/profile/profile-to-test-multiple-types.json";
+import profileHun from "../examples/profile/hungarian-profile.json";
 const lookup = new Lookup();
 
 const data = reactive({
@@ -104,6 +105,8 @@ const data = reactive({
         { name: "Test profile with resolve", value: profile6 },
         { name: "Primitives and bad group definition", value: profile7 },
         { name: "Profile Nyingarn Item", value: profile4 },
+        { name: "Hungarian profile with localization", value: profileHun },
+
     ],
     languages: [
         { name: "English", value: "en" },
