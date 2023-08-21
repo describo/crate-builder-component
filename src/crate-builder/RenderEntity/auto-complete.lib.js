@@ -10,10 +10,10 @@ export class Lookup {
         this.crateManager = crateManager;
     }
 
-    async findMatchingEntities(type, queryString) {
+    async getEntities(type, queryString) {
         if (!queryString) return { endpoint: "internal", documents: [] };
 
-        let results = await this.crateManager?.findMatchingEntities({
+        let results = await this.crateManager?.getEntities({
             limit: resultsLimit,
             type,
             query: queryString,

@@ -5,7 +5,7 @@
         <div class="w-2/3 xl:w-4/5 flex flex-row" v-if="!configuration.readonly">
             <div
                 v-if="
-                    props.entity.describoLabel === 'RootDataset' ||
+                    props.entity['@id'] === './' ||
                     ['Dataset', 'File'].includes(props.entity['@type'])
                 "
                 class=""
@@ -35,7 +35,7 @@
 
 <script setup>
 import TextComponent from "../primitives/Text.component.vue";
-import { reactive, watch, inject } from "vue";
+import { reactive, inject } from "vue";
 import { isURL } from "../crate-manager.js";
 import { configurationKey } from "./keys.js";
 const configuration = inject(configurationKey);
@@ -50,16 +50,7 @@ const emit = defineEmits(["update:entity"]);
 
 let data = reactive({
     property: "@id",
-    value: props.entity.value,
 });
-
-watch(
-    () => props.entity["@id"],
-    () => {
-        data.value = props.entity["@id"];
-    }
-);
-
 async function save(data) {
     emit("update:entity", data);
 }

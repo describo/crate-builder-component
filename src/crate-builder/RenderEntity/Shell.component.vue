@@ -27,7 +27,12 @@
                 />
 
                 <!-- render entity type -->
-                <render-entity-type-component :entity="data.entity" class="my-2 p-2" />
+                <render-entity-type-component
+                    class="my-2 p-2"
+                    :crate-manager="props.crateManager"
+                    :entity="data.entity"
+                    @update:entity="updateEntity"
+                />
 
                 <!-- render entity name -->
                 <render-entity-name-component
@@ -40,26 +45,26 @@
                 />
 
                 <!-- render entity properties -->
-                <div v-for="(values, property) of data.entity.properties" :key="property">
-                    <div
-                        v-if="showProperty(property)"
-                        :class="{
-                            'bg-green-200 rounded p-1 my-1': data.savedProperty === property,
-                        }"
-                    >
+                <div v-for="(values, property) of data.entity['@properties']" :key="property">
+                    <div>
                         <render-entity-property-component
+                            :class="{
+                                'hover:bg-sky-100':
+                                    !configuration.readonly && data.savedProperty !== property,
+                                'bg-green-200 hover:bg-green-200': data.savedProperty === property,
+                            }"
                             class="my-2"
                             :crate-manager="props.crateManager"
                             :entity="data.entity"
                             :property="property"
                             :values="values"
                             @load:entity="loadEntity"
+                            @create:entity="createEntity"
+                            @link:entity="linkEntity"
+                            @unlink:entity="unlinkEntity"
                             @create:property="createProperty"
                             @save:property="saveProperty"
                             @delete:property="deleteProperty"
-                            @create:entity="createEntity"
-                            @link:entity="linkEntity"
-                            @add:template="addTemplate"
                         />
                     </div>
                 </div>
@@ -110,7 +115,6 @@
 
                             <span>
                                 <div v-if="tab.name === 'About'">
-                                    <!-- render entity id -->
                                     <render-entity-id-component
                                         class="my-2 p-2"
                                         :class="{
@@ -120,13 +124,12 @@
                                         :entity="data.tabs[0].entity"
                                         @update:entity="updateEntity"
                                     />
-                                    <!-- render entity type -->
                                     <render-entity-type-component
                                         class="my-2 p-2"
+                                        :crate-manager="props.crateManager"
                                         :entity="data.tabs[0].entity"
+                                        @update:entity="updateEntity"
                                     />
-
-                                    <!-- render entity name -->
                                     <render-entity-name-component
                                         class="my-2 p-2"
                                         :class="{
@@ -134,20 +137,21 @@
                                                 data.savedProperty === 'name',
                                         }"
                                         :entity="data.tabs[0].entity"
-                                        @save:property="saveProperty"
                                         @update:entity="updateEntity"
                                     />
                                 </div>
 
                                 <!-- render entity properties -->
                                 <div
-                                    v-for="(values, property) of tab.entity.properties"
+                                    v-for="(values, property) of tab.entity['@properties']"
                                     :key="property"
                                 >
                                     <div
-                                        v-if="showProperty(property)"
                                         :class="{
-                                            'bg-green-200 rounded p-1 my-1':
+                                            'hover:bg-sky-100':
+                                                !configuration.readonly &&
+                                                data.savedProperty !== property,
+                                            'bg-green-200 hover:bg-green-200':
                                                 data.savedProperty === property,
                                         }"
                                     >
@@ -158,12 +162,12 @@
                                             :property="property"
                                             :values="values"
                                             @load:entity="loadEntity"
+                                            @create:entity="createEntity"
+                                            @link:entity="linkEntity"
+                                            @unlink:entity="unlinkEntity"
                                             @create:property="createProperty"
                                             @save:property="saveProperty"
                                             @delete:property="deleteProperty"
-                                            @create:entity="createEntity"
-                                            @link:entity="linkEntity"
-                                            @add:template="addTemplate"
                                         />
                                     </div>
                                 </div>
@@ -197,8 +201,9 @@
         >
             <template #default>
                 <RenderReverseConnectionsComponent
+                    :key="data.entity['@id']"
                     :crate-manager="props.crateManager"
-                    :connections="data.entity.reverseConnections"
+                    :connections="data.entity['@reverse']"
                     @load:entity="loadEntity"
                 />
             </template>
@@ -216,8 +221,9 @@ import RenderReverseConnectionsComponent from "./RenderReverseConnections.compon
 import RenderControlsComponent from "./RenderControls.component.vue";
 import { configurationKey } from "./keys.js";
 import { reactive, computed, onMounted, onBeforeMount, onBeforeUnmount, watch, provide } from "vue";
-import debounce from "lodash-es/debounce";
-import cloneDeep from "lodash-es/cloneDeep";
+import cloneDeep from "lodash-es/cloneDeep.js";
+import compact from "lodash-es/compact.js";
+import { isURL } from "../crate-manager.js";
 import { ProfileManager } from "../profile-manager.js";
 
 const props = defineProps({
@@ -241,15 +247,13 @@ const props = defineProps({
 
 const data = reactive({
     reverseSidebarVisible: false,
-    hideProperty: ["describoId"],
     classDefinition: undefined,
     entity: {},
     activeTab: "About",
     tabs: [],
-    debouncedInit: debounce(init, 400),
     extraProperties: [],
     savedProperty: undefined,
-    savedPropertyTimeout: 1000,
+    savedPropertyTimeout: 1500,
     watchers: [],
 });
 
@@ -260,7 +264,7 @@ const $emit = defineEmits([
     "save:crate:template",
     "save:entity:template",
     "add:property",
-    "save:property",
+    "update:property",
     "delete:property",
     "ingest:entity",
     "link:entity",
@@ -275,21 +279,23 @@ onBeforeMount(() => {
     );
 });
 onMounted(() => {
-    init();
+    init({ entity: props.entity });
     data.watchers[0] = watch(
         () => props.entity,
         (n, o) => {
-            if (n.describoId !== o.describoId) {
+            if (n["@id"] !== o["@id"]) {
                 data.extraProperties = [];
             }
-            init();
+            init({ entity: props.entity });
         }
     );
     data.watchers[1] = watch(
         () => props.profile,
         () => {
+            data.extraProperties = [];
             data.activeTab = "About";
-            init();
+            const entity = props.crateManager.getEntity({ id: props.entity["@id"] });
+            init({ entity });
         }
     );
 });
@@ -297,57 +303,45 @@ onBeforeUnmount(() => {
     data.watchers.forEach((watcher) => watcher());
 });
 
-function init() {
-    if (props.entity.describoId !== data.entity.describoId) {
+function init({ entity }) {
+    if (!entity["@id"]) return;
+    if (entity["@id"] !== data.entity["@id"]) {
         window.scrollTo(0, 0);
     }
-    if (!props.entity.describoId) return;
     const profileManager = new ProfileManager({ profile: props.crateManager.profile });
     props.crateManager.profileManager = profileManager;
 
-    let entity;
-    if (props.configuration.mode === "embedded") {
-        entity = {
-            ...props.crateManager.getEntity({
-                describoId: props.entity.describoId,
-                groupProperties: true,
-            }),
-        };
-    } else if (props.configuration.mode === "online") {
-        entity = props.entity;
-    }
-
+    // const entity = props.crateManager.getEntity({ id: props.entity["@id"] });
     const inputs = profileManager.getInputsFromProfile({ entity });
     inputs.forEach((input) => {
         if (input.name === "name") return;
-        if (entity.properties[input.name]) {
-            entity.properties[input.name] = entity.properties[input.name];
+        if (entity["@properties"][input.name]) {
+            entity["@properties"][input.name] = entity["@properties"][input.name];
         } else {
-            if (!props.configuration.readonly) entity.properties[input.name] = [];
+            if (!props.configuration.readonly) entity["@properties"][input.name] = [];
         }
     });
     if (data.extraProperties.length) {
         data.extraProperties.forEach((property) => {
-            if (!entity.properties[property]) entity.properties[property] = [];
+            if (!entity["@properties"][property]) entity["@properties"][property] = [];
         });
     }
     let properties = {};
     let propertyNames = [];
-    Object.keys(entity.properties).forEach((k) => (propertyNames[k.toLowerCase()] = k));
-    Object.keys(entity.properties)
+    Object.keys(entity["@properties"]).forEach((k) => (propertyNames[k.toLowerCase()] = k));
+    Object.keys(entity["@properties"])
         .map((k) => k.toLowerCase())
         .sort()
-        .forEach((k) => (properties[propertyNames[k]] = entity.properties[propertyNames[k]]));
-    entity.properties = properties;
+        .forEach((k) => (properties[propertyNames[k]] = entity["@properties"][propertyNames[k]]));
+    entity["@properties"] = properties;
 
     const { layouts, hide } = profileManager.getLayout({ type: entity["@type"] });
     let layout = applyLayout({ layouts, hide, entity });
     if (layout.entity) {
         data.tabs = [];
-        data.entity = { ...entity, ...layout.entity };
+        data.entity = layout.entity;
     } else if (layout.tabs) {
         data.entity = {};
-        // data.tabs = layout.tabs.filter((t) => t?.inputs?.length);
         data.tabs = layout.tabs;
     }
     $emit("ready");
@@ -356,18 +350,19 @@ function applyLayout({ layouts, hide = [], entity }) {
     if (!layouts?.length) return { entity };
 
     let tabs = [];
-
     let mappedInputs = [];
+    let sectionEntity = cloneDeep(entity);
     layouts.forEach((section) => {
-        let sectionEntity = cloneDeep(entity);
-        sectionEntity.properties = {};
+        sectionEntity = {
+            "@id": entity["@id"],
+            "@type": entity["@type"],
+            name: entity["nameid"],
+            "@properties": {},
+        };
 
-        section.inputs.forEach((input) => {
-            let property = Object.keys(entity.properties).filter((property) => property === input);
-            if (property.length && !hide.includes(input)) {
-                mappedInputs.push(input);
-                sectionEntity.properties[input] = entity.properties[input];
-            }
+        section.inputs.forEach((property) => {
+            sectionEntity["@properties"][property] = entity["@properties"][property] ?? [];
+            mappedInputs.push(property);
         });
         tabs.push({
             ...section,
@@ -375,166 +370,221 @@ function applyLayout({ layouts, hide = [], entity }) {
         });
     });
 
-    let unmappedInputs = Object.keys(entity.properties).filter((p) => !mappedInputs.includes(p));
+    let unmappedInputs =
+        Object.keys(entity["@properties"]).filter((p) => !mappedInputs.includes(p)) ?? [];
+
     if (unmappedInputs.length) {
-        let sectionEntity = cloneDeep(entity);
-        sectionEntity.properties = {};
-        unmappedInputs.forEach((p) => {
-            if (!hide.includes(p)) {
-                sectionEntity.properties[p] = entity.properties[p];
+        sectionEntity = {
+            "@id": entity["@id"],
+            "@type": entity["@type"],
+            name: entity["nameid"],
+            "@properties": {},
+        };
+        unmappedInputs.forEach((property) => {
+            sectionEntity["@properties"][property] = entity["@properties"][property] ?? [];
+        });
+
+        const ungroupedTab = {
+            name: "...",
+            description: "",
+            entity: sectionEntity,
+        };
+        let ungroupedTabDefinition = tabs.map((tab) => {
+            if (tab.name.match(/\.\.\./)) {
+                return tab;
             }
         });
-        // is there an ungrouped properties tab?
-        let ungroupedTab = tabs.filter((tab) => tab.name.match(/\.\.\./));
-        if (ungroupedTab.length) {
-            tabs = tabs.map((tab) => {
-                if (tab.name === "...") {
-                    return {
-                        ...tab,
-                        entity: sectionEntity,
-                        inputs: Object.keys(sectionEntity.properties),
-                    };
-                }
-                return tab;
-            });
+        ungroupedTabDefinition = compact(ungroupedTabDefinition);
+        if (ungroupedTabDefinition.length) {
+            tabs.push({ ...ungroupedTab, ...ungroupedTabDefinition[0] });
         } else {
-            tabs.push({
-                name: "...",
-                description: "",
-                entity: sectionEntity,
-                inputs: Object.keys(sectionEntity.properties),
-            });
+            tabs.push(ungroupedTab);
         }
     }
 
-    // is there an about tab?
-    const aboutTab = tabs.filter((tab) => tab.name.match(/about/i));
+    // insert an about tab if there isn't one
+    const aboutTab = tabs.filter((tab) => {
+        return tab.name.match(/about/i);
+    });
     if (!aboutTab.length) {
-        let sectionEntity = cloneDeep(entity);
-        delete sectionEntity.properties;
+        let sectionEntity = {
+            "@id": entity["@id"],
+            "@type": entity["@type"],
+            name: entity["nameid"],
+            "@properties": {},
+        };
         tabs = [{ name: "About", inputs: [], entity: sectionEntity }, ...tabs];
     }
 
     return { tabs };
 }
+function refresh() {
+    const entity = props.crateManager.getEntity({ id: props.entity["@id"] });
+    init({ entity });
+}
 function addPropertyPlaceholder({ property }) {
     data.extraProperties.push(property);
-    init();
-}
-function showProperty(property) {
-    return !data.hideProperty.includes(property);
+    const entity = props.crateManager.getEntity({ id: props.entity["@id"] });
+    init({ entity });
 }
 function loadEntity(entity) {
-    if (props.configuration.mode === "embedded") {
-        if (props.crateManager.getEntity({ describoId: props.crateManager.currentEntity })) {
-            $emit("load:entity", { describoId: props.crateManager.currentEntity });
-        }
-    }
-    $emit("load:entity", entity);
+    $emit("load:entity", { id: entity["@id"], ...entity });
 }
-function saveCrate() {
-    $emit("save:crate");
-}
-function createProperty(patch) {
-    console.debug("Render Entity component: emit(create:property)", patch);
+function createEntity(patch) {
+    const property = patch.property;
+    delete patch.json.type;
+    console.debug("Render Entity component: emit(create:entity)", {
+        id: props.entity["@id"],
+        property,
+        json: patch.json,
+    });
     if (props.configuration.mode === "embedded") {
-        props.crateManager.addProperty({ describoId: props.entity.describoId, ...patch });
+        props.crateManager.ingestAndLink({
+            id: props.entity["@id"],
+            property,
+            json: patch.json,
+        });
     } else {
-        $emit("add:property", { ...patch, entityId: props.entity.describoId });
+        $emit("ingest:entity", { property, entityId: props.entity["@id"], json: data });
+    }
+    refresh();
+    saveCrate();
+}
+function updateEntity(patch) {
+    console.debug("Render Entity component: emit(update:entity)", {
+        id: data.entity["@id"] ?? data.tabs[0].entity["@id"],
+        ...patch,
+    });
+    if (props.configuration.mode === "embedded") {
+        props.crateManager.updateEntity({
+            id: data.entity["@id"] ?? data.tabs[0].entity["@id"],
+            ...patch,
+        });
+    } else {
+        $emit("update:entity", { ...patch, id: data.entity["@id"] });
     }
     data.savedProperty = patch.property;
     setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
+    refresh();
     saveCrate();
-    init();
+}
+function linkEntity(patch) {
+    console.debug("Render Entity component: emit(link:entity)", {
+        id: data.entity["@id"],
+        property: patch.property,
+        tgtEntityId: patch.json["@id"],
+    });
+    if (props.configuration.mode === "embedded") {
+        props.crateManager.linkEntity({
+            id: data.entity["@id"],
+            property: patch.property,
+            tgtEntityId: patch.json["@id"],
+        });
+    } else {
+        $emit("link:entity", { property: patch.property, tgtEntityId: patch.json["@id"] });
+    }
+    refresh();
+    saveCrate();
+}
+function unlinkEntity(patch) {
+    console.debug("Render Entity component: emit(unlink:entity)", {
+        id: data.entity["@id"],
+        property: patch.property,
+        tgtEntityId: patch.tgtEntityId,
+    });
+    if (props.configuration.mode === "embedded") {
+        props.crateManager.unlinkEntity({
+            id: data.entity["@id"],
+            property: patch.property,
+            tgtEntityId: patch.tgtEntityId,
+        });
+    } else {
+        // $emit("unlink:entity", { property: data.property, tgtEntityId: data['@id']});
+    }
+    refresh();
+    saveCrate();
+}
+function deleteEntity(patch) {
+    console.debug("Render Entity component: emit(delete:entity)", patch);
+    if (props.configuration.mode === "embedded") {
+        props.crateManager.deleteEntity(patch);
+        $emit("load:entity", { name: "RootDataset" });
+    } else {
+        $emit("delete:entity", data);
+    }
+    saveCrate();
+}
+function createProperty(patch) {
+    console.debug("Render Entity component: emit(create:property)", {
+        id: data.entity["@id"],
+        ...patch,
+    });
+    if (props.configuration.mode === "embedded") {
+        if (isURL(patch.value)) {
+            createEntity({
+                property: patch.property,
+                json: {
+                    "@id": patch.value,
+                    "@type": "URL",
+                    name: patch.value,
+                },
+            });
+        } else {
+            props.crateManager.setProperty({ id: data.entity["@id"], ...patch });
+            data.savedProperty = patch.property;
+            setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
+        }
+    }
+    refresh();
+    saveCrate();
 }
 function saveProperty(patch) {
-    console.debug("Render Entity component: emit(save:property)", patch);
+    console.debug("Render Entity component: emit(save:property)", {
+        id: data.entity["@id"],
+        ...patch,
+    });
     if (props.configuration.mode === "embedded") {
-        props.crateManager.updateProperty({ describoId: props.entity.describoId, ...patch });
+        if (isURL(patch.value)) {
+            createEntity({
+                property: patch.property,
+                json: {
+                    "@id": patch.value,
+                    "@type": "URL",
+                    name: patch.value,
+                },
+            });
+            deleteProperty({ id: data.entity["@id"], property: patch.property, idx: patch.idx });
+        } else {
+            props.crateManager.updateProperty({ id: data.entity["@id"], ...patch });
+        }
     } else {
         $emit("save:property", patch);
     }
     data.savedProperty = patch.property;
     setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
+    refresh();
     saveCrate();
-    init();
 }
 function deleteProperty(data) {
-    console.debug("Render Entity component: emit(delete:property)", data);
+    console.debug("Render Entity component: emit(delete:property)", {
+        id: props.entity["@id"],
+        property: data.property,
+        propertyIdx: data.idx,
+    });
     if (props.configuration.mode === "embedded") {
         props.crateManager.deleteProperty({
-            describoId: props.entity.describoId,
-            propertyId: data.propertyId,
+            id: props.entity["@id"],
+            property: data.property,
+            propertyIdx: data.idx,
         });
     } else {
         $emit("delete:property", { propertyId: data.propertyId });
     }
-    saveCrate();
-    init();
-}
-function createEntity(data) {
-    const property = data.property;
-    delete data.property;
-    const dataType = data.json.type;
-    delete data.json.type;
-    console.debug("Render Entity component: emit(create:entity)", data);
-    if (props.configuration.mode === "embedded") {
-        if (dataType === "datapack") {
-            props.crateManager.ingestAndLink({
-                srcEntityId: props.entity.describoId,
-                property,
-                json: data,
-            });
-        } else {
-            let entity = props.crateManager.addEntity({ entity: data.json });
-            props.crateManager.linkEntity({
-                srcEntityId: props.entity.describoId,
-                property,
-                tgtEntityId: entity.describoId,
-            });
-        }
-    } else {
-        $emit("ingest:entity", { property, entityId: props.entity.describoId, json: data });
-    }
-    init();
+    refresh();
     saveCrate();
 }
-function updateEntity(patch) {
-    console.debug("Render Entity component: emit(update:entity)", patch);
-    if (props.configuration.mode === "embedded") {
-        props.crateManager.updateEntity({ ...patch, describoId: props.entity.describoId });
-    } else {
-        $emit("update:entity", { ...patch, describoId: props.entity.describoId });
-    }
-    data.savedProperty = patch.property;
-    setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
-    init();
-    saveCrate();
-}
-function linkEntity(data) {
-    console.debug("Render Entity component: emit(link:entity)", data);
-    if (props.configuration.mode === "embedded") {
-        props.crateManager.linkEntity({
-            srcEntityId: props.entity.describoId,
-            property: data.property,
-            tgtEntityId: data.json.describoId,
-        });
-    } else {
-        $emit("link:entity", { property: data.property, tgtEntityId: data.describoId });
-    }
-    init();
-    saveCrate();
-}
-function deleteEntity(data) {
-    if (data.describoId === "RootDataset") return;
-    console.debug("Render Entity component: emit(delete:entity)", data);
-    if (props.configuration.mode === "embedded") {
-        props.crateManager.deleteEntity(data);
-        $emit("load:entity", { describoId: "RootDataset" });
-    } else {
-        $emit("delete:entity", data);
-    }
-    saveCrate();
+function saveCrate() {
+    $emit("save:crate");
 }
 function saveCrateAsTemplate(data) {
     console.debug("Render Entity component: emit(save:crate:template)", data);

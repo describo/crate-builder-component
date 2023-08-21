@@ -5,26 +5,26 @@
                 class="w-full"
                 type="text"
                 v-model="data.internalValue"
-                @blur="data.throttledSave"
-                @change="data.throttledSave"
+                @blur="save"
+                @change="save"
                 resize="vertical"
             ></el-input>
-            <el-button @click="save" type="success" :disabled="!data.isValidUrl">
+            <el-button @click="save" type="success" :disabled="!isValidUrl">
                 <i class="fas fa-check fa-fw"></i>
             </el-button>
         </div>
-        <div class="text-xs" v-if="!data.isValidUrl">
-            {{ $t('invalid_url_value') }}
+        <div class="text-xs" v-if="!isValidUrl">
+            {{ $t("invalid_url_value") }}
         </div>
     </div>
 </template>
 
 <script setup>
 import { ElButton, ElInput } from "element-plus";
-import { reactive, watch } from "vue";
+import { reactive, watch, computed } from "vue";
 import { isURL } from "../crate-manager.js";
 import throttle from "lodash-es/throttle.js";
-import {$t} from '../i18n'
+import { $t } from "../i18n";
 
 const props = defineProps({
     property: {
@@ -38,9 +38,9 @@ const props = defineProps({
 const $emit = defineEmits(["create:entity"]);
 const data = reactive({
     internalValue: props.value,
-    isValidUrl: props.value ? isURL(props.value) : true,
     throttledSave: throttle(save, 1000),
 });
+let isValidUrl = computed(() => isURL(data.internalValue));
 
 watch(
     () => props.value,
@@ -50,14 +50,14 @@ watch(
     }
 );
 function save() {
-    data.isValidUrl = isURL(data.internalValue);
-    if (data.isValidUrl) {
+    if (isValidUrl.value) {
+        console.log("url component create:entity", props.property, data.internalValue);
         $emit("create:entity", {
             property: props.property,
             json: {
-                "@id": data.internalValue,
+                "@id": data.internalValue.trim(),
                 "@type": "URL",
-                name: data.internalValue,
+                name: data.internalValue.trim(),
             },
         });
     }

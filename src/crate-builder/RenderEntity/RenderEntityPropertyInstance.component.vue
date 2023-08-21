@@ -91,13 +91,13 @@ const props = defineProps({
         required: true,
     },
 });
-const $emit = defineEmits(["save:property", "create:entity"]);
+const $emit = defineEmits(["save:property", "update:property", "create:entity"]);
 let type = computed(() => {
     return props?.definition?.type?.[0].toLowerCase();
 });
 async function savePropertyValue(data) {
-    if (!data.propertyId) {
-        data = { ...data, property: props.data.property, propertyId: props.data.propertyId };
+    if (!data.idx) {
+        data = { ...data, property: props.data.property, idx: props.data.idx };
     }
     $emit("save:property", data);
 }
@@ -151,7 +151,6 @@ function isUrl(string) {
     let result = isURL(string);
     return result;
 }
-
 function definitionIncludes(type) {
     return props.definition?.type?.includes(type);
 }

@@ -20,7 +20,7 @@
             </el-option>
         </el-select>
         <div v-if="!data.hasValidValues" class="text-xs text-gray-700">
-            {{ $t('invalid_selectobject_values') }}
+            {{ $t("invalid_selectobject_values") }}
         </div>
     </div>
 </template>
@@ -30,7 +30,7 @@ import { ElSelect, ElOption } from "element-plus";
 import { reactive, watch } from "vue";
 import isPlainObject from "lodash-es/isPlainObject";
 import { validateId } from "../crate-manager.js";
-import {$t} from '../i18n'
+import { $t } from "../i18n";
 
 const props = defineProps({
     property: {

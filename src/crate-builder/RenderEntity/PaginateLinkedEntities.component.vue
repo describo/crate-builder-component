@@ -19,18 +19,15 @@
             />
         </div>
         <div class="flex flex-row flex-wrap mt-2">
-            <div
-                v-for="(instance, idx) of data.entities"
-                :key="instance.propertyId"
-                class="flex flex-row"
-            >
+            <div v-for="instance of data.entities" :key="instance.idx">
                 <RenderLinkedItemComponent
-                    :index="idx"
+                    class="m-1"
+                    :key="instance.tgtEntity['@id']"
                     :crate-manager="props.crateManager"
                     :entity="instance"
+                    :property="props.property"
                     @load:entity="loadEntity"
-                    @save:property="saveProperty"
-                    @delete:property="deleteProperty"
+                    @unlink:entity="unlinkEntity"
                 />
             </div>
         </div>
@@ -54,8 +51,12 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    property: {
+        type: String,
+        required: true,
+    },
 });
-const $emit = defineEmits(["load:entity", "save:property", "delete:property"]);
+const $emit = defineEmits(["load:entity", "unlink:entity"]);
 
 const data = reactive({
     filter: undefined,
@@ -89,15 +90,11 @@ function filterAndChunkEntitiesForDisplay() {
 }
 
 function loadEntity(data) {
-    console.debug("Paginate Linked Entities component: emit(load:entity)", data);
+    // console.debug("Paginate Linked Entities component: emit(load:entity)", data);
     $emit("load:entity", data);
 }
-function saveProperty(data) {
-    console.debug("Paginate Linked Entities component: emit(save:property)", data);
-    $emit("save:property", data);
-}
-function deleteProperty(data) {
-    console.debug("Paginate Linked Entities component: emit(delete:property)", data);
-    $emit("delete:property", data);
+function unlinkEntity(data) {
+    // console.debug("Paginate Linked Entities component: emit(delete:property)", data);
+    $emit("unlink:entity", data);
 }
 </script>

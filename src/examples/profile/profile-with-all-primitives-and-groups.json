@@ -1,13 +1,33 @@
 {
     "metadata": {
-        "name": "A profile with all primitives and no groups",
-        "description": "",
+        "name": "A profile with all primitives and groups",
+        "description": "A profile with entries for each of the supported datatypes",
         "version": 0.1,
         "warnMissingProperty": true
     },
+    "context": "https://w3id.org/ro/crate/1.1/context",
+    "hide": {
+        "Dataset": ["date"]
+    },
+    "layouts": {
+        "Dataset": [
+            { "name": "About", "description": "", "inputs": ["text", "textarea", "url"] },
+            {
+                "name": "Time/Space",
+                "description": "",
+                "inputs": ["date", "datetime", "time", "geo"]
+            },
+            { "name": "Numbers", "description": "", "inputs": ["number", "float", "integer"] },
+            {
+                "name": "Select",
+                "description": "",
+                "inputs": ["select", "selectUrl", "selectObject"]
+            }
+        ]
+    },
     "classes": {
         "Dataset": {
-            "definition": "inherit",
+            "definition": "override",
             "subClassOf": [],
             "inputs": [
                 {
@@ -24,7 +44,7 @@
                     "label": "text",
                     "help": "help message",
                     "required": true,
-                    "multiple": true,
+                    "multiple": false,
                     "type": ["Text"]
                 },
                 {
@@ -149,34 +169,35 @@
                 }
             ]
         },
-        "RepositoryCollection": {
+        "Person": {
+            "definition": "inherit",
+            "subClassOf": [],
+            "inputs": [
+                {
+                    "id": "https://schema.org/name",
+                    "name": "name",
+                    "label": "name",
+                    "help": "The name the person",
+                    "required": true,
+                    "multiple": false,
+                    "type": ["Text"]
+                }
+            ]
+        },
+        "Organisation": {
             "definition": "override",
             "subClassOf": [],
             "inputs": [
                 {
-                    "id": "https://schema.org/text",
-                    "name": "text",
-                    "label": "text",
-                    "help": "help message",
+                    "id": "https://schema.org/name",
+                    "name": "name",
+                    "label": "name",
+                    "help": "The name of the organisation",
                     "required": true,
-                    "multiple": true,
+                    "multiple": false,
                     "type": ["Text"]
                 }
             ]
-        }
-    },
-    "lookup": {
-        "Language": {
-            "fields": [
-                "@id",
-                "name",
-                "alternateName",
-                "iso639-3",
-                "austlangCode",
-                "glottologCode",
-                "languageCode"
-            ],
-            "datapacks": []
         }
     }
 }

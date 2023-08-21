@@ -1,7 +1,7 @@
 {
     "metadata": {
         "name": "NYINGARN Profile",
-        "description": "Am item profile for the NYINGARN project",
+        "description": "An item profile for the NYINGARN project",
         "version": 0.1,
         "warnMissingProperty": true
     },
@@ -20,12 +20,20 @@
             "subClassOf": [],
             "inputs": [
                 {
+                    "id": "https://schema.org/author",
+                    "name": "author",
+                    "label": "Author",
+                    "required": true,
+                    "multiple": true,
+                    "type": ["Person", "Organisation"]
+                },
+                {
                     "id": "https://schema.org/text",
                     "name": "text",
                     "label": "text",
                     "help": "help message",
                     "required": true,
-                    "multiple": true,
+                    "multiple": false,
                     "type": ["Text"]
                 },
                 {

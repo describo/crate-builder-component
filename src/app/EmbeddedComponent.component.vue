@@ -41,7 +41,6 @@
             </el-select>
         </div>
         <describo-crate-builder
-            @ready="data.loading = false"
             :crate="data.selectedCrate"
             :profile="data.selectedProfile"
             :lookup="lookup"
@@ -60,7 +59,7 @@
 </template>
 
 <script setup>
-import { reactive } from "vue";
+import { reactive, nextTick } from "vue";
 import { Lookup } from "./lookup.js";
 import crateFile1 from "../examples/item/empty/ro-crate-metadata.json";
 import crateFile2 from "../examples/item/complex-collection/ro-crate-metadata.json";
@@ -69,15 +68,11 @@ import crateFile4 from "../examples/item/large-crate/ro-crate-metadata.json";
 import crateFile5 from "../examples/item/ridiculously-big-collection/ro-crate-metadata.json";
 import crateFile6 from "../examples/item/item-with-relationship-and-action/ro-crate-metadata.json";
 import crateFile7 from "../examples/item/multiple-types/ro-crate-metadata.json";
-import profile1 from "../examples/profile/test-profile-without-groups.json";
-import profile2 from "../examples/profile/test-profile-with-groups.json";
-import profile3 from "../examples/profile/test-profile-with-datapacks-and-without-groups.json";
+import profile2 from "../examples/profile/profile-with-all-primitives-and-groups.json";
 import profile4 from "../examples/profile/nyingarn-item-profile.json";
 import profile5 from "../examples/profile/profile-with-all-primitives.json";
-import profile6 from "../examples/profile/test-profile-with-resolve.json";
-import profile7 from "../examples/profile/profile-with-all-primitives-groups-no-about.json";
+import profile6 from "../examples/profile/profile-with-resolve.json";
 import profile8 from "../examples/profile/profile-to-test-multiple-types.json";
-import profileHun from "../examples/profile/hungarian-profile.json";
 const lookup = new Lookup();
 
 const data = reactive({
@@ -97,16 +92,11 @@ const data = reactive({
         { name: "Item with Relationship and Action", value: crateFile6 },
     ],
     profiles: [
-        { name: "All primitives", value: profile5 },
-        { name: "Profile with multiple types", value: profile8 },
-        { name: "Profile without groups", value: profile1 },
-        { name: "Profile with groups", value: profile2 },
-        { name: "Profile with datapacks and without groups", value: profile3 },
-        { name: "Test profile with resolve", value: profile6 },
-        { name: "Primitives and bad group definition", value: profile7 },
-        { name: "Profile Nyingarn Item", value: profile4 },
-        { name: "Hungarian profile with localization", value: profileHun },
-
+        { value: profile5, name: profile5.metadata.name },
+        { value: profile2, name: profile2.metadata.name },
+        { value: profile8, name: profile8.metadata.name },
+        { value: profile4, name: profile4.metadata.name },
+        { value: profile6, name: profile6.metadata.name },
     ],
     languages: [
         { name: "English", value: "en" },
@@ -119,9 +109,10 @@ const data = reactive({
 });
 
 function setCrate(name) {
-    data.loading = true;
-    data.selectedCrate = name ? data.crates.filter((c) => c.name === name)[0].value : undefined;
-    if (!data.selectedCrate) data.loading = false;
+    let crate = name ? data.crates.filter((c) => c.name === name)[0].value : undefined;
+    setTimeout(() => {
+        data.selectedCrate = crate;
+    }, 10);
 }
 function setProfile(name) {
     data.selectedProfile = name ? data.profiles.filter((p) => p.name === name)[0].value : undefined;

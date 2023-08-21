@@ -31,6 +31,21 @@ export class ProfileManager {
 
     /**
      *
+     * Get the available classes
+     *   if a profile is defined, get those
+     *   otherwise, get schema.org classes
+     *
+     */
+    getClasses() {
+        if (this.profile?.classes) {
+            return Object.keys(this.profile?.classes).sort();
+        } else {
+            return Object.keys(schemaOrgTypeDefinitions).sort();
+        }
+    }
+
+    /**
+     *
      * Return the type hierarchy for the given entity
      *
      */
