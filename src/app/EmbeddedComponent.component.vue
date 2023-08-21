@@ -73,6 +73,7 @@ import profile4 from "../examples/profile/nyingarn-item-profile.json";
 import profile5 from "../examples/profile/profile-with-all-primitives.json";
 import profile6 from "../examples/profile/profile-with-resolve.json";
 import profile8 from "../examples/profile/profile-to-test-multiple-types.json";
+import profile9 from "../examples/profile/hungarian-profile.json";
 const lookup = new Lookup();
 
 const data = reactive({
@@ -97,6 +98,7 @@ const data = reactive({
         { value: profile8, name: profile8.metadata.name },
         { value: profile4, name: profile4.metadata.name },
         { value: profile6, name: profile6.metadata.name },
+        { value: profile9, name: profile9.metadata.name },
     ],
     languages: [
         { name: "English", value: "en" },
