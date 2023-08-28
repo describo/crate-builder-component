@@ -35,6 +35,12 @@
                     :value="item.value"
                 />
             </el-select>
+            <el-select v-model="data.tabLocation" placeholder="Select a language">
+                <el-option label="left" value="left" />
+                <el-option label="top" value="top" />
+                <el-option label="right" value="right" />
+                <el-option label="bottom" value="bottom" />
+            </el-select>
             <el-select v-model="data.readonly" placeholder="Select a language">
                 <el-option :key="true" label="Readonly: True" :value="true" />
                 <el-option :key="false" label="Readonly: False" :value="false" />
@@ -54,6 +60,7 @@
             :purge-unlinked-entities="true"
             :web-component="false"
             :language="data.selectedLanguage"
+            :tab-location="data.tabLocation"
         />
     </div>
 </template>
@@ -106,6 +113,7 @@ const data = reactive({
     selectedCrate: undefined,
     selectedProfile: undefined,
     selectedLanguage: "en",
+    tabLocation: "left",
 });
 
 function setCrate(name) {

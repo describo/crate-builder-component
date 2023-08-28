@@ -106,6 +106,11 @@ const props = defineProps({
         default: false,
         validator: (val) => [true, false].includes(val),
     },
+    tabLocation: {
+        type: String,
+        default: "left",
+        validator: (val) => ["top", "bottom", "left", "right"].includes(val),
+    },
     language: {
         type: String,
         default: "en",
@@ -200,6 +205,7 @@ onMounted(async () => {
                 () => props.purgeUnlinkedEntities,
                 () => props.readonly,
                 () => props.language,
+                () => props.tabLocation,
             ],
             () => {
                 data.configuration = configure();
@@ -268,6 +274,7 @@ function configure() {
         enableTemplateLookups: false,
         enableDataPackLookups: false,
         language: props.language,
+        tabLocation: props.tabLocation,
     };
 
     i18next.changeLanguage(configuration.language);

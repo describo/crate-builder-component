@@ -84,7 +84,7 @@
                         @save:entity:template="saveEntityAsTemplate"
                         @update:context="updateContext"
                     />
-                    <el-tabs tab-position="left" v-model="data.activeTab">
+                    <el-tabs :tab-position="configuration.tabLocation" v-model="data.activeTab">
                         <el-tab-pane
                             :label="tab.name"
                             :name="tab.name"
@@ -92,9 +92,7 @@
                             :key="idx"
                         >
                             <template #label>
-                                <div
-                                    class="flex flex-col tab-label-width whitespace-normal text-gray-600"
-                                >
+                                <div class="flex flex-col whitespace-normal text-gray-600">
                                     <div
                                         class="cursor-pointer text-lg hover:text-yellow-600"
                                         v-if="tab.label"
@@ -600,9 +598,3 @@ function updateContext(data) {
 }
 function addTemplate() {}
 </script>
-
-<style>
-.tab-label-width {
-    width: 200px;
-}
-</style>
