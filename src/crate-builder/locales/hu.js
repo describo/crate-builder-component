@@ -43,7 +43,7 @@ const hu = {
         // Add.component.vue
         associate_existing_prompt:
             "Egy létező '{{addType}}' társítása (név vagy azonosító alapú kereséssel) vagy egy új '{{addType}}' létrehozása a név megadásával",
-        associate_any_prompt: "",
+        associate_any_prompt: "Bármely entitás hozzárendelése (azonosító vagy név alapján)",
         add_text: "Szöveg hozzáadása",
 
         // Text.component.vue
