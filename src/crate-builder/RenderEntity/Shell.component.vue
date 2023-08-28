@@ -5,7 +5,7 @@
             <div v-if="!data.tabs.length">
                 <!-- render controls -->
                 <render-controls-component
-                    v-if="!configuration.readonly"
+                    v-if="!configuration.readonly && configuration.showControls"
                     :crate-manager="props.crateManager"
                     :entity="data.entity"
                     @load:entity="loadEntity"
@@ -74,7 +74,7 @@
                 <div class="flex flex-col flex-grow">
                     <!-- render controls -->
                     <render-controls-component
-                        v-if="!configuration.readonly"
+                        v-if="!configuration.readonly && configuration.showControls"
                         :crate-manager="props.crateManager"
                         :entity="data.tabs[0].entity"
                         @load:entity="loadEntity"

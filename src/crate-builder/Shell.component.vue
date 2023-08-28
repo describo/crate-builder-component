@@ -111,6 +111,11 @@ const props = defineProps({
         default: "left",
         validator: (val) => ["top", "bottom", "left", "right"].includes(val),
     },
+    showControls: {
+        type: Boolean,
+        default: true,
+        validator: (val) => [true, false].includes(val),
+    },
     language: {
         type: String,
         default: "en",
@@ -206,6 +211,7 @@ onMounted(async () => {
                 () => props.readonly,
                 () => props.language,
                 () => props.tabLocation,
+                () => props.showControls,
             ],
             () => {
                 data.configuration = configure();
@@ -275,6 +281,7 @@ function configure() {
         enableDataPackLookups: false,
         language: props.language,
         tabLocation: props.tabLocation,
+        showControls: props.showControls,
     };
 
     i18next.changeLanguage(configuration.language);

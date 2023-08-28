@@ -36,15 +36,20 @@
                 />
             </el-select>
             <el-select v-model="data.tabLocation" placeholder="Select a language">
-                <el-option label="left" value="left" />
-                <el-option label="top" value="top" />
-                <el-option label="right" value="right" />
-                <el-option label="bottom" value="bottom" />
+                <el-option label="Tabs: left" value="left" />
+                <el-option label="Tabs: top" value="top" />
+                <el-option label="Tabs: right" value="right" />
+                <el-option label="Tabs: bottom" value="bottom" />
             </el-select>
             <el-select v-model="data.readonly" placeholder="Select a language">
                 <el-option :key="true" label="Readonly: True" :value="true" />
                 <el-option :key="false" label="Readonly: False" :value="false" />
             </el-select>
+            <el-switch
+                v-model="data.showControls"
+                active-text="show controls"
+                inactive-text="hide controls"
+            />
         </div>
         <describo-crate-builder
             :crate="data.selectedCrate"
@@ -61,6 +66,7 @@
             :web-component="false"
             :language="data.selectedLanguage"
             :tab-location="data.tabLocation"
+            :show-controls="data.showControls"
         />
     </div>
 </template>
@@ -114,6 +120,7 @@ const data = reactive({
     selectedProfile: undefined,
     selectedLanguage: "en",
     tabLocation: "left",
+    showControls: true,
 });
 
 function setCrate(name) {
