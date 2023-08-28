@@ -16,7 +16,7 @@
                     "label": "Author",
                     "required": true,
                     "multiple": true,
-                    "type": ["Person", "Organisation"]
+                    "type": ["ANY", "Person", "Organization"]
                 },
                 {
                     "id": "https://schema.org/text",

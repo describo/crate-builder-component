@@ -18,14 +18,22 @@ export default {
     },
 };
 
-const Template = (args, { argTypes }) => ({
-    components: { DisplayPropertyNameComponent },
-    props: Object.keys(argTypes),
-    template: '<DisplayPropertyNameComponent v-bind="$props" />',
-});
+const Template = {
+    render: (args, { argTypes }) => {
+        return {
+            components: { DisplayPropertyNameComponent },
+            setup() {
+                return { args };
+            },
+            template: '<DisplayPropertyNameComponent v-bind="args" />',
+        };
+    },
+};
 
-export const DisplayPropertyNameComponentStory = Template.bind({});
-DisplayPropertyNameComponentStory.args = {
-    property: "something",
-    label: "name",
+export const DisplayPropertyNameComponentStory = {
+    ...Template,
+    args: {
+        property: "something",
+        label: "name",
+    },
 };

@@ -13,14 +13,20 @@ export default {
     },
 };
 
-const Template = (args, { argTypes }) => ({
-    components: { ValueComponent },
-    props: Object.keys(argTypes),
-    template: '<ValueComponent v-bind="$props" />',
-});
+const Template = {
+    render: (args, { argTypes }) => ({
+        components: { ValueComponent },
+        setup() {
+            return { args };
+        },
+        template: '<ValueComponent v-bind="args" />',
+    }),
+};
 
-export const ValueComponentStory = Template.bind({});
-ValueComponentStory.args = {
-    property: "value",
-    value: "1",
+export const ValueComponentStory = {
+    ...Template,
+    args: {
+        property: "value",
+        value: "1",
+    },
 };

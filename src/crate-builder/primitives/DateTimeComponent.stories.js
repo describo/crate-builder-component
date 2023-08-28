@@ -3,25 +3,28 @@ import DateTimeComponent from "./DateTime.component.vue";
 export default {
     component: DateTimeComponent,
     argTypes: {
-        property: {
-            control: { type: "text" },
-        },
         value: {
             options: ["2022-03-02", "2022-09-28T02:20:56.521", "date now"],
             control: { type: "radio" },
         },
-        saveProperty: { action: "saveProperty" },
+        "save:property": { action: "saveProperty" },
     },
 };
 
-const Template = (args, { argTypes }) => ({
-    components: { DateTimeComponent },
-    props: Object.keys(argTypes),
-    template: '<DateTimeComponent v-bind="$props" @save:property="saveProperty" />',
-});
+const Template = {
+    render: (args, { argTypes }) => ({
+        components: { DateTimeComponent },
+        setup() {
+            return { args };
+        },
+        template: '<DateTimeComponent v-bind="args" v-on="args" />',
+    }),
+};
 
-export const DateTimeComponentStory = Template.bind({});
-DateTimeComponentStory.args = {
-    property: "date",
-    value: "2022-03-02",
+export const DateTimeComponentStory = {
+    ...Template,
+    args: {
+        property: "date",
+        value: "2022-03-02",
+    },
 };

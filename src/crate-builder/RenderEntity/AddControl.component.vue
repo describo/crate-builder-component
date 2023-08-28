@@ -17,26 +17,11 @@
             </el-button>
         </div>
     </div>
-    <!-- <div v-else> -->
-    <!-- <el-select
-        v-model="data.selectedType"
-        :placeholder="$t('select_a_type_to_add')"
-        @change="toggle"
-        clearable
-        class="w-full"
-    >
-        <el-option v-for="(type, idx) in data.allowedTypes" :key="idx" :label="type" :value="type">
-        </el-option>
-    </el-select> -->
-    <!-- </div> -->
-    <!-- </div> -->
 </template>
 
 <script setup>
-// import { ElButton, ElSelect, ElOption } from "element-plus";
 import { ElButton } from "element-plus";
 import { computed } from "vue";
-// import { $t } from "../i18n";
 
 const props = defineProps({
     types: {

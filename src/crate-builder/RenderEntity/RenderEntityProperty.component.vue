@@ -21,7 +21,6 @@
         </div>
         <div class="w-2/3 xl:w-4/5 flex flex-col flex-grow">
             <add-component
-                class="mx-1"
                 v-if="showAddControl && !configuration.readonly"
                 :property="props.property"
                 :definition="data.propertyDefinition"
@@ -148,7 +147,7 @@ function getProfileDefinitionForProperty() {
         entity: props.entity,
     });
     data.propertyDefinition = cloneDeep(propertyDefinition);
-    data.help = propertyDefinition.help;
+    data.help = propertyDefinition?.help;
 }
 const $emit = defineEmits([
     "load:entity",

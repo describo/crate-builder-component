@@ -16,18 +16,24 @@ export default {
             ],
             control: { type: "radio" },
         },
-        createEntity: { action: "createEntity" },
+        "create:entity": { action: "createEntity" },
     },
 };
 
-const Template = (args, { argTypes }) => ({
-    components: { UrlComponent },
-    props: Object.keys(argTypes),
-    template: '<UrlComponent v-bind="$props" @create:entity="createEntity"/>',
-});
+const Template = {
+    render: (args, { argTypes }) => ({
+        components: { UrlComponent },
+        setup() {
+            return { args };
+        },
+        template: '<UrlComponent v-bind="args" v-on="args" />',
+    }),
+};
 
-export const UrlComponentStory = Template.bind({});
-UrlComponentStory.args = {
-    property: "url",
-    value: "http://schema.org/name",
+export const UrlComponentStory = {
+    ...Template,
+    args: {
+        property: "url",
+        value: "http://schema.org/name",
+    },
 };

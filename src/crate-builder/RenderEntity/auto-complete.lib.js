@@ -149,19 +149,21 @@ function assembleQuery(type, fields, queryString) {
         size: resultsLimit,
         query: {
             bool: {
-                must: [
-                    {
-                        match: {
-                            "@type.keyword": {
-                                query: type,
-                                operator: "and",
-                            },
-                        },
-                    },
-                ],
+                must: [],
             },
         },
     };
+    // If type is not ANY, then we add it to the filter query
+    if (type !== "ANY") {
+        query.query.bool.must.push({
+            match: {
+                "@type.keyword": {
+                    query: type,
+                    operator: "and",
+                },
+            },
+        });
+    }
 
     let shouldMatches = [];
     fields.forEach((field) => {
@@ -177,7 +179,7 @@ function assembleQuery(type, fields, queryString) {
             should: shouldMatches,
         },
     });
-    // console.log(JSON.stringify(shouldMatches, null, 2));
+    // console.log(JSON.stringify(query, null, 2));
     return query;
 }
 

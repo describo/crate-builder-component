@@ -17,7 +17,7 @@
             <el-option-group v-for="group in data.matches" :key="group.label" :label="group.label">
                 <el-option
                     v-for="item in group.entities"
-                    :key="item['@type']"
+                    :key="item['@id']"
                     :label="item.name"
                     :value="item"
                     :value-key="item['@id']"
@@ -153,7 +153,7 @@ async function querySearch(queryString) {
     }
 
     // wire up handler to lookup organisations in ROR
-    if (["Organisation", "Organization"].includes(props.type)) {
+    if (["Organisation", "Organization"].includes(props.type) || props.type === "ANY") {
         lookups.push(
             wrapPromise(lookup.ror(queryString), data.promiseTimeout, {
                 reason: "ROR Lookup Timeout",
@@ -194,10 +194,12 @@ async function querySearch(queryString) {
         }
     }
 
-    matches.push({
-        label: "Create new entity",
-        entities: queryString ? newEntity : [],
-    });
+    if (props.type !== "ANY") {
+        matches.push({
+            label: "Create new entity",
+            entities: queryString ? newEntity : [],
+        });
+    }
 
     data.matches = matches;
     data.loading = false;

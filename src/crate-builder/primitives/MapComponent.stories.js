@@ -5,15 +5,19 @@ export default {
     argTypes: {},
 };
 
-const Template = (args, { argTypes }) => ({
-    components: { MapComponent },
-    props: Object.keys(argTypes),
-    template: '<MapComponent v-bind="$props" />',
-});
+const Template = {
+    render: (args, { argTypes }) => ({
+        components: { MapComponent },
+        setup() {
+            return { args };
+        },
+        template: '<MapComponent v-bind="args" />',
+    }),
+};
 
 const entities = [
     {
-        "@id": "#geo",
+        "@id": "#geo_1",
         "@type": ["GeoCoordinates"],
         name: "geocoordinates",
         "@properties": {
@@ -27,7 +31,7 @@ const entities = [
         },
     },
     {
-        "@id": "#geo",
+        "@id": "#geo_2",
         "@type": ["GeoShape"],
         name: "geoshape",
         "@properties": {
@@ -42,22 +46,26 @@ const entities = [
     },
 ];
 
-export const GeoJSONPoint = Template.bind({});
-GeoJSONPoint.args = {
-    entity: entities[0],
-    crateManager: {
-        getEntity({ id }) {
-            return entities[0];
+export const GeoJSONPoint = {
+    ...Template,
+    args: {
+        entity: entities[0],
+        crateManager: {
+            getEntity({ id }) {
+                return entities[0];
+            },
         },
     },
 };
 
-export const GeoJSONArea = Template.bind({});
-GeoJSONArea.args = {
-    entity: entities[1],
-    crateManager: {
-        getEntity({ id }) {
-            return entities[1];
+export const GeoJSONArea = {
+    ...Template,
+    args: {
+        entity: entities[1],
+        crateManager: {
+            getEntity({ id }) {
+                return entities[1];
+            },
         },
     },
 };

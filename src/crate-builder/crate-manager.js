@@ -372,6 +372,7 @@ export class Entity {
         if (query) {
             query = query.toLowerCase();
         }
+        if (type === "ANY") type = undefined;
         let entities;
         if (query || type) {
             entities = this.entities.filter((e) => {
@@ -385,7 +386,7 @@ export class Entity {
                     type = type.toLowerCase();
                     return etype.match(type);
                 } else if (query && !type) {
-                    return eid.match(query) || e.name.match(query);
+                    return eid.match(query) || name.match(query);
                 } else if (query && type) {
                     type = type.toLowerCase();
                     return etype.match(type) && (eid.match(query) || name.match(query));

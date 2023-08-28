@@ -10,18 +10,24 @@ export default {
             options: ["09:30", "11:00:03", "15:58", "18:34:21", "time now"],
             control: { type: "radio" },
         },
-        saveProperty: { action: "saveProperty" },
+        "save:property": { action: "saveProperty" },
     },
 };
 
-const Template = (args, { argTypes }) => ({
-    components: { TimeComponent },
-    props: Object.keys(argTypes),
-    template: '<TimeComponent v-bind="$props" @save:property="saveProperty" />',
-});
+const Template = {
+    render: (args, { argTypes }) => ({
+        components: { TimeComponent },
+        setup() {
+            return { args };
+        },
+        template: '<TimeComponent v-bind="args" v-on="args" />',
+    }),
+};
 
-export const TimeComponentStory = Template.bind({});
-TimeComponentStory.args = {
-    property: "currentTime",
-    value: "09:30",
+export const TimeComponentStory = {
+    ...Template,
+    args: {
+        property: "currentTime",
+        value: "09:30",
+    },
 };

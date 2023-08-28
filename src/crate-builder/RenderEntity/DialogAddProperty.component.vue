@@ -66,7 +66,7 @@ let inputs = computed(() => {
     if (!data.filter) return inputs;
     return inputs.filter((i) => {
         let re = new RegExp(data.filter, "i");
-        return i.name.match(re) || i.help.match(re);
+        return i?.name?.match(re) || i?.help?.match(re);
     });
 });
 

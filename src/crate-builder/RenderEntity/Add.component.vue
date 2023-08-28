@@ -85,7 +85,10 @@
                     v-if="data.addType"
                 >
                     <div class="w-full">
-                        <div class="">
+                        <div class="" v-if="data.addType === 'ANY'">
+                            {{ $t("associate_any_prompt") }}
+                        </div>
+                        <div class="" v-if="data.addType !== 'ANY'">
                             {{ $t("associate_existing_prompt", { addType: data.addType }) }}
                         </div>
                         <autocomplete-component

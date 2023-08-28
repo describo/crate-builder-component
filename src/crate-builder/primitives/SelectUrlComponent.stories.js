@@ -6,21 +6,27 @@ export default {
         property: {
             control: { type: "text" },
         },
-        createEntity: { action: "createEntity" },
+        "create:entity": { action: "createEntity" },
     },
 };
 
-const Template = (args, { argTypes }) => ({
-    components: { SelectUrlComponent },
-    props: Object.keys(argTypes),
-    template: '<SelectUrlComponent v-bind="$props" @create:entity="createEntity" />',
-});
+const Template = {
+    render: (args, { argTypes }) => ({
+        components: { SelectUrlComponent },
+        setup() {
+            return { args };
+        },
+        template: '<SelectUrlComponent v-bind="args" v-on="args" />',
+    }),
+};
 
-export const SelectUrlComponentStory = Template.bind({});
-SelectUrlComponentStory.args = {
-    property: "select",
-    value: "http://schema.org/name",
-    definition: {
-        values: ["http://schema.org/name", "https://schema.org/Country"],
+export const SelectUrlComponentStory = {
+    ...Template,
+    args: {
+        property: "select",
+        value: "http://schema.org/name",
+        definition: {
+            values: ["http://schema.org/name", "https://schema.org/Country"],
+        },
     },
 };

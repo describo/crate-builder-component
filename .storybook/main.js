@@ -1,4 +1,4 @@
-const {mergeConfig} = require("vite");
+const { mergeConfig } = require("vite");
 
 module.exports = {
     stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
@@ -29,7 +29,7 @@ module.exports = {
     // https://github.com/storybookjs/storybook/issues/18920#issuecomment-1310602214
     async viteFinal(config) {
         return mergeConfig(config, {
-            define: { 'process.env': { ...process.env } },
+            define: { "process.env": { ...process.env } },
         });
-    }
+    },
 };

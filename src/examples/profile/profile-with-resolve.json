@@ -37,6 +37,21 @@
                     "type": ["Text"]
                 }
             ]
+        },
+        "Relationship": {
+            "definition": "override",
+            "subClassOf": [],
+            "inputs": [
+                {
+                    "id": "https://schema.org/name",
+                    "name": "source",
+                    "label": "Source",
+                    "help": "",
+                    "required": true,
+                    "multiple": true,
+                    "type": ["ANY"]
+                }
+            ]
         }
     }
 }

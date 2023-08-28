@@ -27,6 +27,8 @@
                 <a class="text-blue-800" :href="props.entity['@id']" target="_blank">{{
                     props.entity["@id"]
                 }}</a>
+                &nbsp;
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
             </div>
             <div v-else>{{ props.entity["@id"] }}</div>
         </div>

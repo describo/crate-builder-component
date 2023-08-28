@@ -6,25 +6,31 @@ export default {
         property: {
             control: { type: "text" },
         },
-        createEntity: { action: "createEntity" },
+        "create:entity": { action: "createEntity" },
     },
 };
 
-const Template = (args, { argTypes }) => ({
-    components: { SelectObjectComponent },
-    props: Object.keys(argTypes),
-    template: '<SelectObjectComponent v-bind="$props" @create:entity="createEntity" />',
-});
+const Template = {
+    render: (args, { argTypes }) => ({
+        components: { SelectObjectComponent },
+        setup() {
+            return { args };
+        },
+        template: '<SelectObjectComponent v-bind="args" v-on="args" />',
+    }),
+};
 
-export const SelectObjectComponentStory = Template.bind({});
-SelectObjectComponentStory.args = {
-    property: "select",
-    definition: {
-        values: [
-            { "@id": "#a", "@type": "Thing", name: "a" },
-            { "@id": "#b", "@type": "Thing", name: "b" },
-            { "@id": "#c", "@type": "Thing", name: "c" },
-            { "@id": "#d", "@type": "Thing", name: "d" },
-        ],
+export const SelectObjectComponentStory = {
+    ...Template,
+    args: {
+        property: "select",
+        definition: {
+            values: [
+                { "@id": "#a", "@type": "Thing", name: "a" },
+                { "@id": "#b", "@type": "Thing", name: "b" },
+                { "@id": "#c", "@type": "Thing", name: "c" },
+                { "@id": "#d", "@type": "Thing", name: "d" },
+            ],
+        },
     },
 };

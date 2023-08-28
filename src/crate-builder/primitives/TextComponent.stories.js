@@ -10,14 +10,21 @@ export default {
             control: { type: "radio" },
         },
         placeholder: { options: [undefined, "some helpful text"], control: { type: "radio" } },
+        "save:property": { action: "saveProperty" },
     },
 };
 
-const Template = (args, { argTypes }) => ({
-    components: { TextComponent },
-    props: Object.keys(argTypes),
-    template: '<TextComponent v-bind="$props" @save:property="saveProperty" />',
-});
+const Template = {
+    render: (args, { argTypes }) => ({
+        components: { TextComponent },
+        setup() {
+            return { args };
+        },
+        template: '<TextComponent v-bind="args" v-on="args" />',
+    }),
+};
 
-export const TextComponentStory = Template.bind({});
-TextComponentStory.args = { type: "text", property: "text", value: "http://schema.org/name" };
+export const TextComponentStory = {
+    ...Template,
+    args: { type: "text", property: "text", value: "http://schema.org/name" },
+};
