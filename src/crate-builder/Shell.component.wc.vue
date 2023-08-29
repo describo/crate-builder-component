@@ -5,14 +5,17 @@
             :profile="data.profile"
             :lookup="data.lookup"
             :entityId="data.entityId"
-            :readonly="data.readonly"
-            :web-component="data.webComponent"
             :enable-context-editor="data.enableContextEditor"
             :enable-crate-preview="data.enableCratePreview"
             :enable-browse-entities="data.enableBrowseEntities"
             :enable-template-save="data.enableTemplateSave"
+            :enable-internal-routing="data.enableInternalRouting"
             :enable-reverse-link-browser="data.enableReverseLinkBrowser"
             :purge-unlinked-entities="data.purgeUnlinkedEntities"
+            :readonly="data.readonly"
+            :web-component="data.webComponent"
+            :tab-location="data.tabLocation"
+            :show-controls="data.showControls"
             :language="data.language"
             @ready="ready"
             @error="error"
@@ -68,11 +71,13 @@ function init() {
         enableCratePreview: $this?.config?.enableCratePreview ?? true,
         enableBrowseEntities: $this?.config?.enableBrowseEntities ?? true,
         enableTemplateSave: $this?.config?.enableTemplateSave ?? false,
+        enableInternalRouting: $this?.config?.enableInternalRouting ?? false,
         enableReverseLinkBrowser: $this?.config?.enableReverseLinkBrowser ?? true,
         purgeUnlinkedEntities: $this?.config?.purgeUnlinkedEntities ?? true,
         readonly: $this?.config?.readonly ?? false,
         webComponent: $this?.config?.webComponent ?? true,
-        enableInternalRouting: $this?.config?.enableInternalRouting ?? false,
+        tabLocation: $this?.config?.tabLocation ?? "left",
+        showControls: $this?.config?.showControls ?? true,
         language: $this?.config?.language ?? "en",
     };
 }
