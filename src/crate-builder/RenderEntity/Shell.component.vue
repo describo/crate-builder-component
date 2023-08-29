@@ -261,11 +261,12 @@ const $emit = defineEmits([
     "save:crate",
     "save:crate:template",
     "save:entity:template",
-    "add:property",
+    "create:property",
     "update:property",
     "delete:property",
     "ingest:entity",
     "link:entity",
+    "unlink:entity",
     "update:entity",
     "delete:entity",
 ]);
@@ -442,11 +443,11 @@ function createEntity(patch) {
             property,
             json: patch.json,
         });
+        refresh();
+        saveCrate();
     } else {
-        $emit("ingest:entity", { property, entityId: props.entity["@id"], json: data });
+        $emit("ingest:entity", { property, id: props.entity["@id"], json: patch.json });
     }
-    refresh();
-    saveCrate();
 }
 function updateEntity(patch) {
     console.debug("Render Entity component: emit(update:entity)", {
@@ -458,13 +459,13 @@ function updateEntity(patch) {
             id: data.entity["@id"] ?? data.tabs[0].entity["@id"],
             ...patch,
         });
+        refresh();
+        saveCrate();
     } else {
         $emit("update:entity", { ...patch, id: data.entity["@id"] });
     }
     data.savedProperty = patch.property;
     setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
-    refresh();
-    saveCrate();
 }
 function linkEntity(patch) {
     console.debug("Render Entity component: emit(link:entity)", {
@@ -478,11 +479,11 @@ function linkEntity(patch) {
             property: patch.property,
             tgtEntityId: patch.json["@id"],
         });
+        refresh();
+        saveCrate();
     } else {
         $emit("link:entity", { property: patch.property, tgtEntityId: patch.json["@id"] });
     }
-    refresh();
-    saveCrate();
 }
 function unlinkEntity(patch) {
     console.debug("Render Entity component: emit(unlink:entity)", {
@@ -496,21 +497,25 @@ function unlinkEntity(patch) {
             property: patch.property,
             tgtEntityId: patch.tgtEntityId,
         });
+        refresh();
+        saveCrate();
     } else {
-        // $emit("unlink:entity", { property: data.property, tgtEntityId: data['@id']});
+        $emit("unlink:entity", {
+            id: data.entity["@id"],
+            property: patch.property,
+            tgtEntityId: patch.tgtEntityId,
+        });
     }
-    refresh();
-    saveCrate();
 }
 function deleteEntity(patch) {
     console.debug("Render Entity component: emit(delete:entity)", patch);
     if (props.configuration.mode === "embedded") {
         props.crateManager.deleteEntity(patch);
         $emit("load:entity", { name: "RootDataset" });
+        saveCrate();
     } else {
-        $emit("delete:entity", data);
+        $emit("delete:entity", patch);
     }
-    saveCrate();
 }
 function createProperty(patch) {
     console.debug("Render Entity component: emit(create:property)", {
@@ -532,9 +537,11 @@ function createProperty(patch) {
             data.savedProperty = patch.property;
             setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
         }
+        refresh();
+        saveCrate();
+    } else {
+        $emit("create:property", { id: data.entity["@id"], ...patch });
     }
-    refresh();
-    saveCrate();
 }
 function saveProperty(patch) {
     console.debug("Render Entity component: emit(save:property)", {
@@ -555,31 +562,31 @@ function saveProperty(patch) {
         } else {
             props.crateManager.updateProperty({ id: data.entity["@id"], ...patch });
         }
+        refresh();
+        saveCrate();
     } else {
-        $emit("save:property", patch);
+        $emit("save:property", { id: data.entity["@id"], ...patch });
     }
     data.savedProperty = patch.property;
     setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
-    refresh();
-    saveCrate();
 }
-function deleteProperty(data) {
+function deleteProperty(patch) {
     console.debug("Render Entity component: emit(delete:property)", {
         id: props.entity["@id"],
-        property: data.property,
-        propertyIdx: data.idx,
+        property: patch.property,
+        propertyIdx: patch.idx,
     });
     if (props.configuration.mode === "embedded") {
         props.crateManager.deleteProperty({
             id: props.entity["@id"],
-            property: data.property,
-            propertyIdx: data.idx,
+            property: patch.property,
+            propertyIdx: patch.idx,
         });
+        refresh();
+        saveCrate();
     } else {
-        $emit("delete:property", { propertyId: data.propertyId });
+        $emit("delete:property", { id: patch.idx });
     }
-    refresh();
-    saveCrate();
 }
 function saveCrate() {
     $emit("save:crate");
