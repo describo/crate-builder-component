@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-row flex-grow p-4 describo-property-background">
+    <div class="flex flex-row flex-grow p-2 describo-property-background">
         <div class="w-1/3 xl:w-1/5 flex flex-col">
             <div>
                 <display-property-name-component
