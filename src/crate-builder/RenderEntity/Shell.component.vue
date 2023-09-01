@@ -2,7 +2,7 @@
     <div class="flex flex-row">
         <div class="flex flex-col pr-4 w-full">
             <!-- <pre>{{ data.entity }}</pre> -->
-            <div v-if="!data.tabs.length">
+            <div v-if="!data.renderTabs">
                 <!-- render controls -->
                 <render-controls-component
                     v-if="!configuration.readonly && configuration.showControls"
@@ -69,7 +69,7 @@
                     </div>
                 </div>
             </div>
-            <div v-if="data.tabs.length">
+            <div v-if="data.renderTabs">
                 <!-- grouped profile -->
                 <div class="flex flex-col flex-grow">
                     <!-- render controls -->
@@ -246,8 +246,9 @@ const props = defineProps({
 const data = reactive({
     reverseSidebarVisible: false,
     classDefinition: undefined,
-    entity: {},
     activeTab: "About",
+    renderTabs: false,
+    entity: {},
     tabs: [],
     extraProperties: [],
     savedProperty: undefined,
@@ -335,13 +336,15 @@ function init({ entity }) {
     entity["@properties"] = properties;
 
     const { layouts, hide } = profileManager.getLayout({ type: entity["@type"] });
+    data.entity = entity;
     let layout = applyLayout({ layouts, hide, entity });
     if (layout.entity) {
         data.tabs = [];
-        data.entity = layout.entity;
+        // data.entity = layout.entity;
+        data.renderTabs = false;
     } else if (layout.tabs) {
-        data.entity = {};
         data.tabs = layout.tabs;
+        data.renderTabs = true;
     }
     $emit("ready");
 }
@@ -355,7 +358,7 @@ function applyLayout({ layouts, hide = [], entity }) {
         sectionEntity = {
             "@id": entity["@id"],
             "@type": entity["@type"],
-            name: entity["nameid"],
+            name: entity["name"],
             "@properties": {},
         };
 
@@ -376,7 +379,7 @@ function applyLayout({ layouts, hide = [], entity }) {
         sectionEntity = {
             "@id": entity["@id"],
             "@type": entity["@type"],
-            name: entity["nameid"],
+            name: entity["name"],
             "@properties": {},
         };
         unmappedInputs.forEach((property) => {
@@ -409,7 +412,7 @@ function applyLayout({ layouts, hide = [], entity }) {
         let sectionEntity = {
             "@id": entity["@id"],
             "@type": entity["@type"],
-            name: entity["nameid"],
+            name: entity["name"],
             "@properties": {},
         };
         tabs = [{ name: "About", inputs: [], entity: sectionEntity }, ...tabs];
