@@ -1,6 +1,6 @@
 <template>
     <div class="">
-        <div class="flex flex-row space-x-2" v-if="data.isValidType">
+        <div class="flex flex-row space-x-2" v-if="isValidType">
             <el-input
                 class="w-full"
                 :type="type"
@@ -23,7 +23,7 @@
 
 <script setup>
 import { ElInput, ElButton } from "element-plus";
-import { reactive, watch } from "vue";
+import { reactive, watch, computed } from "vue";
 import debounce from "lodash-es/debounce.js";
 import isBoolean from "lodash-es/isBoolean.js";
 import { $t } from "../i18n";
@@ -49,6 +49,7 @@ const data = reactive({
     isValidType: ["text", "textarea"].includes(props.type),
     debouncedSave: debounce(save, 200),
 });
+let isValidType = computed(() => ["text", "textarea"].includes(props.type));
 watch(
     () => props.value,
     () => {
