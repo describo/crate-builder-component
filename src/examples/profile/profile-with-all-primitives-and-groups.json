@@ -6,24 +6,20 @@
         "warnMissingProperty": true
     },
     "context": "https://w3id.org/ro/crate/1.1/context",
-    "hide": {
-        "Dataset": ["date"]
-    },
-    "layouts": {
-        "Dataset": [
-            { "name": "About", "description": "", "inputs": ["text", "textarea", "url"] },
-            {
-                "name": "Time/Space",
-                "description": "",
-                "inputs": ["date", "datetime", "time", "geo"]
-            },
-            { "name": "Numbers", "description": "", "inputs": ["number", "float", "integer"] },
-            {
-                "name": "Select",
-                "description": "",
-                "inputs": ["select", "selectUrl", "selectObject"]
-            }
-        ]
+    "layout": {
+        "about": { "label": "About", "description": "" },
+        "temporal": {
+            "label": "Time/Space",
+            "description": ""
+        },
+        "numeric": { "label": "Numbers", "description": "" },
+        "select": {
+            "label": "select",
+            "description": ""
+        },
+        "overflow": {
+            "label": "Other"
+        }
     },
     "classes": {
         "Dataset": {
@@ -36,7 +32,8 @@
                     "label": "Author",
                     "required": true,
                     "multiple": true,
-                    "type": ["Person", "Organisation"]
+                    "type": ["Person", "Organisation"],
+                    "group": "about"
                 },
                 {
                     "id": "https://schema.org/text",
@@ -45,7 +42,8 @@
                     "help": "help message",
                     "required": true,
                     "multiple": false,
-                    "type": ["Text"]
+                    "type": ["Text"],
+                    "group": "about"
                 },
                 {
                     "id": "https://schema.org/textarea",
@@ -54,7 +52,9 @@
                     "help": "help message",
                     "required": true,
                     "multiple": true,
-                    "type": ["TextArea"]
+                    "type": ["TextArea"],
+                    "group": "about",
+                    "readonly": true
                 },
                 {
                     "id": "https://schema.org/url",
