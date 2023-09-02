@@ -149,7 +149,10 @@
                                             'bg-green-200 hover:bg-green-200':
                                                 data.savedProperty === input.name,
                                         }"
-                                        v-if="!['@id', '@type', 'name'].includes(input.name)"
+                                        v-if="
+                                            tab.name === data.activeTab &&
+                                            !['@id', '@type', 'name'].includes(input.name)
+                                        "
                                     >
                                         <render-entity-property-component
                                             class="my-2"
