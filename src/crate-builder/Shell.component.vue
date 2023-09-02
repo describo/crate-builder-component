@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col">
         <render-entity-component
-            v-if="!data.error"
+            v-if="data.ready && !data.error"
             :crate-manager="data.crateManager"
             :profile="data.profile"
             :entity="data.entity"
@@ -176,7 +176,6 @@ onMounted(async () => {
         watch(
             () => props.crate,
             () => {
-                data.ready = false;
                 init();
             }
         )
@@ -226,6 +225,7 @@ onBeforeUnmount(() => {
 
 async function init() {
     if (!props.crate || isEmpty(props.crate)) {
+        data.ready = false;
         data.crate = {};
         data.entity = {};
         return;
