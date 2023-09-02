@@ -21,12 +21,8 @@ export class ProfileManager {
      * Get the layout properties from the profile if defined
      *
      */
-    getLayout({ type }) {
-        if (isArray(type)) type = type.join(", ");
-        return {
-            layouts: this.profile?.layouts?.[type],
-            hide: this.profile?.hide?.[type],
-        };
+    getLayout() {
+        return this.profile?.layout ?? {};
     }
 
     /**
