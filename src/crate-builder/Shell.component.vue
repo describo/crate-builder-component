@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col">
         <render-entity-component
-            v-if="data.ready && !data.error"
+            v-if="!data.error"
             :crate-manager="data.crateManager"
             :profile="data.profile"
             :entity="data.entity"
@@ -31,7 +31,6 @@ import {
     reactive,
     watch,
     getCurrentInstance,
-    inject,
 } from "vue";
 import cloneDeep from "lodash-es/cloneDeep";
 import isEmpty from "lodash-es/isEmpty";
