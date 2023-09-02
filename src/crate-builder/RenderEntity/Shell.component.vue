@@ -218,6 +218,7 @@ import RenderControlsComponent from "./RenderControls.component.vue";
 import { configurationKey } from "./keys.js";
 import { reactive, computed, onMounted, onBeforeMount, onBeforeUnmount, watch, provide } from "vue";
 import isEmpty from "lodash-es/isEmpty.js";
+import difference from "lodash-es/difference.js";
 import { isURL } from "../crate-manager.js";
 import { ProfileManager } from "../profile-manager.js";
 
@@ -345,11 +346,11 @@ function init({ entity }) {
         data.renderTabs = false;
     } else {
         data.renderTabs = true;
-        data.tabs = applyLayout({ layout, inputs });
+        data.tabs = applyLayout({ layout, inputs, entity });
     }
     $emit("ready");
 }
-function applyLayout({ layout, inputs }) {
+function applyLayout({ layout, inputs, entity }) {
     for (let name of Object.keys(layout)) {
         layout[name].name = name;
         layout[name].inputs = [];
@@ -361,6 +362,7 @@ function applyLayout({ layout, inputs }) {
             inputs: [],
         };
     }
+    // sort the inputs into their groups
     for (let input of inputs) {
         if (input.hide) {
             continue;
@@ -369,6 +371,20 @@ function applyLayout({ layout, inputs }) {
         } else {
             layout.overflow.inputs.push(input);
         }
+    }
+
+    // get a list of the properties defined on the input
+    //   but which have no input definition and pop them
+    //   into the overflow group with a default Text configuration
+    let profileInputs = inputs.map((i) => i.name);
+    let entityProperties = Object.keys(entity["@properties"]);
+    let missingInputs = difference(entityProperties, profileInputs);
+    for (let input of missingInputs) {
+        layout.overflow.inputs.push({
+            name: input,
+            multiple: true,
+            values: ["Text"],
+        });
     }
 
     return Object.keys(layout).map((k) => layout[k]);
