@@ -12,7 +12,7 @@
             <div class="flex flex-row">
                 <RenderItemLinkComponent :entity="entity.tgtEntity" @load:entity="loadEntity" />
                 <UnlinkEntityComponent
-                    v-if="!configuration.readonly"
+                    v-if="!configuration.readonly && !props.readonly"
                     :entity="entity.tgtEntity"
                     @unlink:entity="unlinkEntity"
                 />
@@ -65,7 +65,7 @@
                     />
                 </div>
                 <UnlinkEntityComponent
-                    v-if="!configuration.readonly"
+                    v-if="!configuration.readonly && !props.readonly"
                     :entity="props.entity.tgtEntity"
                     @unlink:entity="unlinkEntity"
                 />
@@ -94,6 +94,9 @@ const props = defineProps({
     },
     property: {
         type: String,
+        required: true,
+    },
+    readonly: {
         required: true,
     },
 });
