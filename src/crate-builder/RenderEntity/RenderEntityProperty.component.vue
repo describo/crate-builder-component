@@ -4,16 +4,16 @@
             <div>
                 <display-property-name-component
                     :property="props.property"
-                    :label="data.propertyDefinition.label"
+                    :label="propertyDefinition.label"
                     class="inline-block"
                     :class="{ 'text-red-600': isRequired && !isValid }"
                 />
                 <el-badge is-dot class="animate-pulse -ml-1 -mt-2" v-if="isRequired && !isValid">
                 </el-badge>
             </div>
-            <render-property-help-component :help="data.help" />
+            <render-property-help-component :help="propertyDefinition.help" />
             <div
-                v-if="!data.propertyDefinition && profileWarnMissingProperty"
+                v-if="!propertyDefinition && profileWarnMissingProperty"
                 class="text-red-600 text-xs"
             >
                 ({{ $t("not_defined_in_profile") }})
@@ -42,7 +42,7 @@
                             class="flex-grow"
                             :crate-manager="props.crateManager"
                             :data="instance"
-                            :definition="data.propertyDefinition"
+                            :definition="propertyDefinition"
                             @save:property="saveProperty"
                             @create:entity="createEntity"
                         />
@@ -146,16 +146,16 @@ const isValid = computed(() => {
     return props.values.length ? true : false;
 });
 const isRequired = computed(() => {
-    return data.propertyDefinition?.required;
+    return propertyDefinition.value?.required;
 });
 const isNotValue = computed(() => {
-    return data.propertyDefinition?.type !== "Value";
+    return propertyDefinition.value?.type !== "Value";
 });
 const profileWarnMissingProperty = computed(() => {
     return props.crateManager.profile.warnMissingProperty;
 });
 const showAddControl = computed(() => {
-    return data?.propertyDefinition?.multiple || !props?.values?.length;
+    return propertyDefinition.value?.multiple || !props?.values?.length;
 });
 const propertyDefinition = computed(() => {
     if (!props.crateManager?.profile) return {};
