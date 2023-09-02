@@ -72,7 +72,6 @@ export class ProfileManager {
                 //     JSON.stringify(propertyDefinition, null, 2)
                 // );
                 propertyDefinition = cloneDeep(propertyDefinition[0]);
-                if (!has(propertyDefinition, "multiple")) propertyDefinition.multiple = true;
             }
         }
         // unable to locate a property definition in the profile - look in schema.org
@@ -89,7 +88,6 @@ export class ProfileManager {
                 //     JSON.stringify(propertyDefinition, null, 2)
                 // );
                 propertyDefinition = cloneDeep(propertyDefinition[0]);
-                if (!has(propertyDefinition, "multiple")) propertyDefinition.mutliple = true;
             }
         }
 
@@ -109,6 +107,7 @@ export class ProfileManager {
         if (!isArray(propertyDefinition.type)) {
             propertyDefinition.type = [propertyDefinition.type];
         }
+        if (!has(propertyDefinition, "multiple")) propertyDefinition.mutliple = true;
 
         return { propertyDefinition };
     }
