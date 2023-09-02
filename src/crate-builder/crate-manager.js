@@ -58,6 +58,7 @@ export class CrateManager {
         }
 
         if (errors.length) {
+            console.error(errors);
             this.errors = errors;
             throw new Error(`The crate is invalid.`);
         }
