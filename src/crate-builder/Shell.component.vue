@@ -248,7 +248,6 @@ async function init() {
     try {
         await data.crateManager.load({ crate, profile });
     } catch (error) {
-        console.log(error);
         $emit("error", {
             errors: data.crateManager.errors,
         });
