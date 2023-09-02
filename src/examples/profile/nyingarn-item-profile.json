@@ -6,9 +6,6 @@
         "warnMissingProperty": true,
         "keywords": ["languages", "Australian Languages", "Item Metadata"]
     },
-    "hide": {
-        "Dataset": ["identifier", "hasPart", "licence"]
-    },
     "layout": {
         "about": { "label": "About", "description": "" },
         "source": { "label": "Original Source Information", "description": "" },
