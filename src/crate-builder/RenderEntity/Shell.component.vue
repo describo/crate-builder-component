@@ -76,7 +76,7 @@
                     <render-controls-component
                         v-if="!configuration.readonly && configuration.showControls"
                         :crate-manager="props.crateManager"
-                        :entity="data.tabs[0].entity"
+                        :entity="data.entity"
                         @load:entity="loadEntity"
                         @add:property:placeholder="addPropertyPlaceholder"
                         @delete:entity="deleteEntity"
@@ -112,20 +112,20 @@
                             </template>
 
                             <span>
-                                <div v-if="tab.name === 'About'">
+                                <div v-if="tab.name === 'about'">
                                     <render-entity-id-component
                                         class="my-2 p-2"
                                         :class="{
                                             'bg-green-200 rounded p-1 my-1':
                                                 data.savedProperty === '@id',
                                         }"
-                                        :entity="data.tabs[0].entity"
+                                        :entity="data.entity"
                                         @update:entity="updateEntity"
                                     />
                                     <render-entity-type-component
                                         class="my-2 p-2"
                                         :crate-manager="props.crateManager"
-                                        :entity="data.tabs[0].entity"
+                                        :entity="data.entity"
                                         @update:entity="updateEntity"
                                     />
                                     <render-entity-name-component
@@ -134,31 +134,29 @@
                                             'bg-green-200 rounded p-1 my-1':
                                                 data.savedProperty === 'name',
                                         }"
-                                        :entity="data.tabs[0].entity"
+                                        :entity="data.entity"
                                         @update:entity="updateEntity"
                                     />
                                 </div>
 
-                                <!-- render entity properties -->
-                                <div
-                                    v-for="(values, property) of tab.entity['@properties']"
-                                    :key="property"
-                                >
+                                <!-- render the entity properties in this tab definition -->
+                                <div v-for="input of tab.inputs">
                                     <div
                                         :class="{
                                             'hover:bg-sky-100':
                                                 !configuration.readonly &&
-                                                data.savedProperty !== property,
+                                                data.savedProperty !== input.name,
                                             'bg-green-200 hover:bg-green-200':
-                                                data.savedProperty === property,
+                                                data.savedProperty === input.name,
                                         }"
+                                        v-if="!['@id', '@type', 'name'].includes(input.name)"
                                     >
                                         <render-entity-property-component
                                             class="my-2"
                                             :crate-manager="props.crateManager"
-                                            :entity="tab.entity"
-                                            :property="property"
-                                            :values="values"
+                                            :entity="data.entity"
+                                            :property="input.name"
+                                            :values="data.entity['@properties'][input.name]"
                                             @load:entity="loadEntity"
                                             @create:entity="createEntity"
                                             @link:entity="linkEntity"
@@ -219,8 +217,7 @@ import RenderReverseConnectionsComponent from "./RenderReverseConnections.compon
 import RenderControlsComponent from "./RenderControls.component.vue";
 import { configurationKey } from "./keys.js";
 import { reactive, computed, onMounted, onBeforeMount, onBeforeUnmount, watch, provide } from "vue";
-import cloneDeep from "lodash-es/cloneDeep.js";
-import compact from "lodash-es/compact.js";
+import isEmpty from "lodash-es/isEmpty.js";
 import { isURL } from "../crate-manager.js";
 import { ProfileManager } from "../profile-manager.js";
 
@@ -244,9 +241,10 @@ const props = defineProps({
 });
 
 const data = reactive({
+    profileManager: {},
     reverseSidebarVisible: false,
     classDefinition: undefined,
-    activeTab: "About",
+    activeTab: "about",
     renderTabs: false,
     entity: {},
     tabs: [],
@@ -277,6 +275,7 @@ onBeforeMount(() => {
         configurationKey,
         computed(() => props.configuration)
     );
+    initProfile();
 });
 onMounted(() => {
     init({ entity: props.entity });
@@ -292,8 +291,9 @@ onMounted(() => {
     data.watchers[1] = watch(
         () => props.profile,
         () => {
+            initProfile();
             data.extraProperties = [];
-            data.activeTab = "About";
+            data.activeTab = "about";
             const entity = props.crateManager.getEntity({ id: props.entity["@id"] });
             init({ entity });
         }
@@ -303,24 +303,28 @@ onBeforeUnmount(() => {
     data.watchers.forEach((watcher) => watcher());
 });
 
+function initProfile() {
+    data.profileManager = new ProfileManager({ profile: props.profile });
+    props.crateManager.profileManager = data.profileManager;
+}
 function init({ entity }) {
     if (!entity["@id"]) return;
     if (entity["@id"] !== data.entity["@id"]) {
         window.scrollTo(0, 0);
     }
-    const profileManager = new ProfileManager({ profile: props.crateManager.profile });
-    props.crateManager.profileManager = profileManager;
 
-    // const entity = props.crateManager.getEntity({ id: props.entity["@id"] });
-    const inputs = profileManager.getInputsFromProfile({ entity });
-    inputs.forEach((input) => {
-        if (input.name === "name") return;
-        if (entity["@properties"][input.name]) {
-            entity["@properties"][input.name] = entity["@properties"][input.name];
-        } else {
-            if (!props.configuration.readonly) entity["@properties"][input.name] = [];
+    const inputs = data.profileManager.getInputsFromProfile({ entity });
+
+    for (let input of inputs) {
+        if (input.name === "name") continue;
+        if (!input.id) {
+            console.error(`Excluding invalid input - missing id: ${input}`);
+            continue;
         }
-    });
+        if (!entity["@properties"][input.name] && !props.configuration.readonly) {
+            entity["@properties"][input.name] = [];
+        }
+    }
     if (data.extraProperties.length) {
         data.extraProperties.forEach((property) => {
             if (!entity["@properties"][property]) entity["@properties"][property] = [];
@@ -335,90 +339,39 @@ function init({ entity }) {
         .forEach((k) => (properties[propertyNames[k]] = entity["@properties"][propertyNames[k]]));
     entity["@properties"] = properties;
 
-    const { layouts, hide } = profileManager.getLayout({ type: entity["@type"] });
     data.entity = entity;
-    let layout = applyLayout({ layouts, hide, entity });
-    if (layout.entity) {
-        data.tabs = [];
-        // data.entity = layout.entity;
+    let layout = data.profileManager.getLayout();
+    if (isEmpty(layout)) {
         data.renderTabs = false;
-    } else if (layout.tabs) {
-        data.tabs = layout.tabs;
+    } else {
         data.renderTabs = true;
+        data.tabs = applyLayout({ layout, inputs });
     }
     $emit("ready");
 }
-function applyLayout({ layouts, hide = [], entity }) {
-    if (!layouts?.length) return { entity };
-
-    let tabs = [];
-    let mappedInputs = [];
-    let sectionEntity = cloneDeep(entity);
-    layouts.forEach((section) => {
-        sectionEntity = {
-            "@id": entity["@id"],
-            "@type": entity["@type"],
-            name: entity["name"],
-            "@properties": {},
+function applyLayout({ layout, inputs }) {
+    for (let name of Object.keys(layout)) {
+        layout[name].name = name;
+        layout[name].inputs = [];
+    }
+    if (!layout.overflow) {
+        layout.overflow = {
+            name: "overflow",
+            label: "...",
+            inputs: [],
         };
-
-        section.inputs.forEach((property) => {
-            sectionEntity["@properties"][property] = entity["@properties"][property] ?? [];
-            mappedInputs.push(property);
-        });
-        tabs.push({
-            ...section,
-            entity: sectionEntity,
-        });
-    });
-
-    let unmappedInputs =
-        Object.keys(entity["@properties"]).filter((p) => !mappedInputs.includes(p)) ?? [];
-
-    if (unmappedInputs.length) {
-        sectionEntity = {
-            "@id": entity["@id"],
-            "@type": entity["@type"],
-            name: entity["name"],
-            "@properties": {},
-        };
-        unmappedInputs.forEach((property) => {
-            sectionEntity["@properties"][property] = entity["@properties"][property] ?? [];
-        });
-
-        const ungroupedTab = {
-            name: "...",
-            description: "",
-            entity: sectionEntity,
-        };
-        let ungroupedTabDefinition = tabs.map((tab) => {
-            if (tab.name.match(/\.\.\./)) {
-                return tab;
-            }
-        });
-        ungroupedTabDefinition = compact(ungroupedTabDefinition);
-        if (ungroupedTabDefinition.length) {
-            tabs.push({ ...ungroupedTab, ...ungroupedTabDefinition[0] });
+    }
+    for (let input of inputs) {
+        if (input.hide) {
+            continue;
+        } else if (input.group && layout[input.group]) {
+            layout[input.group].inputs.push(input);
         } else {
-            tabs.push(ungroupedTab);
+            layout.overflow.inputs.push(input);
         }
     }
 
-    // insert an about tab if there isn't one
-    const aboutTab = tabs.filter((tab) => {
-        return tab.name.match(/about/i);
-    });
-    if (!aboutTab.length) {
-        let sectionEntity = {
-            "@id": entity["@id"],
-            "@type": entity["@type"],
-            name: entity["name"],
-            "@properties": {},
-        };
-        tabs = [{ name: "About", inputs: [], entity: sectionEntity }, ...tabs];
-    }
-
-    return { tabs };
+    return Object.keys(layout).map((k) => layout[k]);
 }
 function refresh() {
     const entity = props.crateManager.getEntity({ id: props.entity["@id"] });
