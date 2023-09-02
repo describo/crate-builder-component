@@ -127,7 +127,8 @@
                     "name": "participant",
                     "help": "The participant was present during the creation of the resource, but did not contribute substantially to its content.",
                     "multiple": true,
-                    "type": ["Person", "Organization"]
+                    "type": ["Person", "Organization"],
+                    "group": "who"
                 },
                 {
                     "id": "https://w3id.org/ro/terms/text-commons#performer",
@@ -311,7 +312,8 @@
                     "name": "languageAuthorityPermissions",
                     "help": "Permissions required from the relevant language authority",
                     "type": ["Select"],
-                    "values": ["Yes", "No"]
+                    "values": ["Yes", "No"],
+                    "group": "permissions"
                 },
                 {
                     "id": "http://schema.org/extent",
