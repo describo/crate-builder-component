@@ -6,18 +6,21 @@
         "warnMissingProperty": true
     },
     "context": "https://w3id.org/ro/crate/1.1/context",
-    "layout": {
-        "about": { "label": "About", "description": "" },
-        "spatio-temporal": { "label": "Spatio-Temporal", "description": "" },
-        "numbers": { "label": "Numbers", "description": "" },
-        "select": {
-            "label": "select",
-            "description": ""
-        },
-        "overflow": {
-            "label": "Other"
+    "layouts": [
+        {
+            "appliesTo": ["Dataset"],
+            "about": { "label": "About", "description": "" },
+            "spatio-temporal": { "label": "Spatio-Temporal", "description": "" },
+            "numbers": { "label": "Numbers", "description": "" },
+            "select": {
+                "label": "select",
+                "description": ""
+            },
+            "overflow": {
+                "label": "Other"
+            }
         }
-    },
+    ],
     "classes": {
         "Dataset": {
             "definition": "override",

@@ -6,18 +6,29 @@
         "warnMissingProperty": true,
         "keywords": ["languages", "Australian Languages", "Item Metadata"]
     },
-    "layout": {
-        "about": { "label": "About", "description": "" },
-        "source": { "label": "Original Source Information", "description": "" },
-        "who": { "label": "Who", "description": "" },
-        "permissions": {
-            "label": "Permissions",
-            "description": ""
+    "layouts": [
+        {
+            "appliesTo": ["Dataset"],
+            "about": { "label": "About", "description": "" },
+            "source": { "label": "Original Source Information", "description": "" },
+            "who": { "label": "Who", "description": "" },
+            "permissions": {
+                "label": "Permissions",
+                "description": ""
+            },
+            "overflow": {
+                "label": "Other"
+            }
         },
-        "overflow": {
-            "label": "Other"
+        {
+            "appliesTo": ["Language"],
+            "about": { "label": "About", "description": "" },
+            "source": { "label": "More information", "description": "" },
+            "overflow": {
+                "label": "Other"
+            }
         }
-    },
+    ],
     "classes": {
         "Dataset": {
             "definition": "override",
@@ -393,7 +404,15 @@
         "Language": {
             "definition": "override",
             "subClassOf": [],
-            "inputs": []
+            "inputs": [
+                {
+                    "id": "https://schema.org/geoJson",
+                    "name": "geojson",
+                    "required": true,
+                    "multiple": true,
+                    "type": ["GeoCoordinates", "GeoShape"]
+                }
+            ]
         }
     },
     "lookup": {
