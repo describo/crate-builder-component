@@ -127,7 +127,7 @@ function setCrate(name) {
     let crate = name ? data.crates.filter((c) => c.name === name)[0].value : undefined;
     setTimeout(() => {
         data.selectedCrate = crate;
-    }, 10);
+    }, 5);
 }
 function setProfile(name) {
     data.selectedProfile = name ? data.profiles.filter((p) => p.name === name)[0].value : undefined;
