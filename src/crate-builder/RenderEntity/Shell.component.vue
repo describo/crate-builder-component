@@ -220,7 +220,6 @@ import RenderReverseConnectionsComponent from "./RenderReverseConnections.compon
 import RenderControlsComponent from "./RenderControls.component.vue";
 import { configurationKey } from "./keys.js";
 import { reactive, computed, onMounted, onBeforeMount, onBeforeUnmount, watch, provide } from "vue";
-import isEmpty from "lodash-es/isEmpty.js";
 import difference from "lodash-es/difference.js";
 import { isURL } from "../crate-manager.js";
 import { ProfileManager } from "../profile-manager.js";
@@ -344,8 +343,8 @@ function init({ entity }) {
     entity["@properties"] = properties;
 
     data.entity = entity;
-    let layout = data.profileManager.getLayout();
-    if (isEmpty(layout)) {
+    let layout = data.profileManager.getLayouts({ entity });
+    if (!layout) {
         data.renderTabs = false;
     } else {
         data.renderTabs = true;
@@ -390,7 +389,10 @@ function applyLayout({ layout, inputs, entity }) {
         });
     }
 
-    return Object.keys(layout).map((k) => layout[k]);
+    let tabs = Object.keys(layout)
+        .map((k) => layout[k])
+        .filter((t) => t.name !== "appliesTo");
+    return tabs;
 }
 function refresh() {
     const entity = props.crateManager.getEntity({ id: props.entity["@id"] });
