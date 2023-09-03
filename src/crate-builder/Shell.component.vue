@@ -110,6 +110,11 @@ const props = defineProps({
         default: "left",
         validator: (val) => ["top", "bottom", "left", "right"].includes(val),
     },
+    resetTabOnEntityChange: {
+        type: Boolean,
+        default: false,
+        validator: (val) => [true, false].includes(val),
+    },
     showControls: {
         type: Boolean,
         default: true,
@@ -209,6 +214,7 @@ onMounted(async () => {
                 () => props.readonly,
                 () => props.language,
                 () => props.tabLocation,
+                () => props.resetTabOnEntityChange,
                 () => props.showControls,
             ],
             () => {
@@ -279,6 +285,7 @@ function configure() {
         enableDataPackLookups: false,
         language: props.language,
         tabLocation: props.tabLocation,
+        resetTabOnEntityChange: props.resetTabOnEntityChange,
         showControls: props.showControls,
     };
 

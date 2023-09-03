@@ -287,6 +287,8 @@ onMounted(() => {
         (n, o) => {
             if (n["@id"] !== o["@id"]) {
                 data.extraProperties = [];
+                console.log(props.configuration.resetTabOnEntityChange);
+                if (props.configuration.resetTabOnEntityChange) data.activeTab = "about";
             }
             init({ entity: props.entity });
         }

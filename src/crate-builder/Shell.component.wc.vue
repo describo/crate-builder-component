@@ -15,6 +15,7 @@
             :readonly="data.readonly"
             :web-component="data.webComponent"
             :tab-location="data.tabLocation"
+            :reset-tab-on-entity-change="data.resetTabOnEntityChange"
             :show-controls="data.showControls"
             :language="data.language"
             @ready="ready"
@@ -77,6 +78,7 @@ function init() {
         readonly: $this?.config?.readonly ?? false,
         webComponent: $this?.config?.webComponent ?? true,
         tabLocation: $this?.config?.tabLocation ?? "left",
+        resetTabOnEntityChange: $this?.config?.resetTabOnEntityChange ?? true,
         showControls: $this?.config?.showControls ?? true,
         language: $this?.config?.language ?? "en",
     };
