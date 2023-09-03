@@ -112,7 +112,7 @@ const props = defineProps({
     },
     resetTabOnEntityChange: {
         type: Boolean,
-        default: false,
+        default: true,
         validator: (val) => [true, false].includes(val),
     },
     showControls: {
