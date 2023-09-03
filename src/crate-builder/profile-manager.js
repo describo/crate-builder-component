@@ -9,7 +9,7 @@ import has from "lodash-es/has";
 import compact from "lodash-es/compact";
 import uniq from "lodash-es/uniq";
 import uniqBy from "lodash-es/uniqBy";
-import difference from "lodash-es/difference";
+import intersection from "lodash-es/intersection";
 
 // TODO: write some tests against this
 export class ProfileManager {
@@ -21,8 +21,19 @@ export class ProfileManager {
      * Get the layout properties from the profile if defined
      *
      */
-    getLayout() {
-        return this.profile?.layout ?? {};
+    getLayouts({ entity }) {
+        // no layout defined in profile
+        if (!this.profile.layouts || !this.profile.layouts.length) return null;
+        let layouts = this.profile.layouts;
+        let layout = layouts.filter((layout) => {
+            return intersection(layout.appliesTo, entity["@type"]).length;
+        });
+
+        // no matching layout found
+        if (!layout.length) return null;
+
+        // match found - return it
+        return layout[0];
     }
 
     /**
