@@ -79,7 +79,11 @@ function addFeatureGroup({ geoJSON, type }) {
         data.layers.push(fg);
 
         setTimeout(() => {
-            data.map.flyToBounds(fg.getBounds(), { maxZoom: 3, duration: 2 });
+            try {
+                data.map.flyToBounds(fg.getBounds(), { maxZoom: 3, duration: 2 });
+            } catch (error) {
+                // swallow zoom errors as it's most likely to be because the map is no longer showing
+            }
         }, 1500);
         return fg;
     } catch (error) {

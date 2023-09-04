@@ -297,9 +297,11 @@ from there.**
 -   `readonly`: true | false: `(default: false)` : if set to true all of the controls to edit that
     the data are turned off. The crate is set into a mode where it is readonly.
 -   `webComponent`: true | false: `(default: false)` : Setting this to true alters the behaviour of
-    some components when the crate builder is used as a web component. `tabLocation`: left | top |
-    right | bottom: `(default: left)` : Specify where the tabs are shown when profiles define
-    grouping.
+    some components when the crate builder is used as a web component.
+-   `tabLocation`: left | top | right | bottom: `(default: left)` : Specify where the tabs are shown
+    when profiles define grouping.
+-   `resetTabOnEntityChange`: true | false: `(default: true)` : When true, if a layout is applied
+    and the entity changes, the UI will navigate to the about tab. If false, that doesn't happen.
 -   `showControls`: true | false: `(default: true)` : Show or hide the controls bar. Useful if you
     want to provision those controls in your own application.
 -   `language`: en | hu `(default: en)` : Sets the component's localization to the given language.

@@ -6,25 +6,21 @@
         "warnMissingProperty": true
     },
     "context": "https://w3id.org/ro/crate/1.1/context",
-    "hide": {
-        "Dataset": ["date"]
-    },
-    "layouts": {
-        "Dataset": [
-            { "name": "About", "description": "", "inputs": ["text", "textarea", "url"] },
-            {
-                "name": "Time/Space",
-                "description": "",
-                "inputs": ["date", "datetime", "time", "geo"]
+    "layouts": [
+        {
+            "appliesTo": ["Dataset"],
+            "about": { "label": "About", "description": "" },
+            "spatio-temporal": { "label": "Spatio-Temporal", "description": "" },
+            "numbers": { "label": "Numbers", "description": "" },
+            "select": {
+                "label": "select",
+                "description": ""
             },
-            { "name": "Numbers", "description": "", "inputs": ["number", "float", "integer"] },
-            {
-                "name": "Select",
-                "description": "",
-                "inputs": ["select", "selectUrl", "selectObject"]
+            "overflow": {
+                "label": "Other"
             }
-        ]
-    },
+        }
+    ],
     "classes": {
         "Dataset": {
             "definition": "override",
@@ -36,7 +32,8 @@
                     "label": "Author",
                     "required": true,
                     "multiple": true,
-                    "type": ["Person", "Organisation"]
+                    "type": ["Person", "Organisation"],
+                    "group": "about"
                 },
                 {
                     "id": "https://schema.org/text",
@@ -45,7 +42,8 @@
                     "help": "help message",
                     "required": true,
                     "multiple": false,
-                    "type": ["Text"]
+                    "type": ["Text"],
+                    "group": "about"
                 },
                 {
                     "id": "https://schema.org/textarea",
@@ -54,7 +52,9 @@
                     "help": "help message",
                     "required": true,
                     "multiple": true,
-                    "type": ["TextArea"]
+                    "type": ["TextArea"],
+                    "readonly": true,
+                    "group": "about"
                 },
                 {
                     "id": "https://schema.org/url",
@@ -63,7 +63,8 @@
                     "help": "help message",
                     "required": true,
                     "multiple": true,
-                    "type": ["URL"]
+                    "type": ["URL"],
+                    "group": "about"
                 },
                 {
                     "id": "https://schema.org/date",
@@ -72,7 +73,8 @@
                     "help": "help message",
                     "required": true,
                     "multiple": true,
-                    "type": ["Date"]
+                    "type": ["Date"],
+                    "group": "spatio-temporal"
                 },
                 {
                     "id": "https://schema.org/datetime",
@@ -81,7 +83,8 @@
                     "help": "help message",
                     "required": true,
                     "multiple": true,
-                    "type": ["DateTime"]
+                    "type": ["DateTime"],
+                    "group": "spatio-temporal"
                 },
                 {
                     "id": "https://schema.org/time",
@@ -90,7 +93,8 @@
                     "help": "help message",
                     "required": true,
                     "multiple": true,
-                    "type": ["Time"]
+                    "type": ["Time"],
+                    "group": "spatio-temporal"
                 },
                 {
                     "id": "https://schema.org/number",
@@ -99,7 +103,8 @@
                     "help": "help message",
                     "required": true,
                     "multiple": true,
-                    "type": ["Number"]
+                    "type": ["Number"],
+                    "group": "numbers"
                 },
                 {
                     "id": "https://schema.org/float",
@@ -108,7 +113,8 @@
                     "help": "help message",
                     "required": true,
                     "multiple": true,
-                    "type": ["Float"]
+                    "type": ["Float"],
+                    "group": "numbers"
                 },
                 {
                     "id": "https://schema.org/integer",
@@ -117,7 +123,8 @@
                     "help": "help message",
                     "required": true,
                     "multiple": true,
-                    "type": ["Integer"]
+                    "type": ["Integer"],
+                    "group": "numbers"
                 },
                 {
                     "id": "http://schema.org/select",
@@ -132,7 +139,8 @@
                         "Public Domain",
                         "Copyright conditions may apply",
                         "Copyright holder(s) authority"
-                    ]
+                    ],
+                    "group": "select"
                 },
                 {
                     "id": "http://schema.org/selecturl",
@@ -142,7 +150,8 @@
                     "required": true,
                     "multiple": true,
                     "type": ["SelectURL"],
-                    "values": ["http://schema.org/name", "arcp://name,...."]
+                    "values": ["http://schema.org/name", "arcp://name,...."],
+                    "group": "select"
                 },
                 {
                     "id": "http://schema.org/selectobject",
@@ -156,7 +165,8 @@
                         { "@id": "#one", "@type": "Dataset", "name": "one" },
                         { "@id": "#two", "@type": "Dataset", "name": "two" },
                         { "@id": "#three", "@type": "Dataset", "name": "three" }
-                    ]
+                    ],
+                    "group": "select"
                 },
                 {
                     "id": "http://schema.org/geo",
@@ -165,7 +175,8 @@
                     "help": "help message",
                     "required": true,
                     "multiple": true,
-                    "type": ["Geo"]
+                    "type": ["Geo"],
+                    "group": "spatio-temporal"
                 }
             ]
         },

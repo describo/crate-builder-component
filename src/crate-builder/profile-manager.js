@@ -9,7 +9,7 @@ import has from "lodash-es/has";
 import compact from "lodash-es/compact";
 import uniq from "lodash-es/uniq";
 import uniqBy from "lodash-es/uniqBy";
-import difference from "lodash-es/difference";
+import intersection from "lodash-es/intersection";
 
 // TODO: write some tests against this
 export class ProfileManager {
@@ -21,12 +21,19 @@ export class ProfileManager {
      * Get the layout properties from the profile if defined
      *
      */
-    getLayout({ type }) {
-        if (isArray(type)) type = type.join(", ");
-        return {
-            layouts: this.profile?.layouts?.[type],
-            hide: this.profile?.hide?.[type],
-        };
+    getLayouts({ entity }) {
+        // no layout defined in profile
+        if (!this.profile.layouts || !this.profile.layouts.length) return null;
+        let layouts = this.profile.layouts;
+        let layout = layouts.filter((layout) => {
+            return intersection(layout.appliesTo, entity["@type"]).length;
+        });
+
+        // no matching layout found
+        if (!layout.length) return null;
+
+        // match found - return it
+        return layout[0];
     }
 
     /**
@@ -76,7 +83,6 @@ export class ProfileManager {
                 //     JSON.stringify(propertyDefinition, null, 2)
                 // );
                 propertyDefinition = cloneDeep(propertyDefinition[0]);
-                if (!has(propertyDefinition, "multiple")) propertyDefinition.multiple = true;
             }
         }
         // unable to locate a property definition in the profile - look in schema.org
@@ -93,7 +99,6 @@ export class ProfileManager {
                 //     JSON.stringify(propertyDefinition, null, 2)
                 // );
                 propertyDefinition = cloneDeep(propertyDefinition[0]);
-                if (!has(propertyDefinition, "multiple")) propertyDefinition.mutliple = true;
             }
         }
 
@@ -113,6 +118,7 @@ export class ProfileManager {
         if (!isArray(propertyDefinition.type)) {
             propertyDefinition.type = [propertyDefinition.type];
         }
+        if (!has(propertyDefinition, "multiple")) propertyDefinition.mutliple = true;
 
         return { propertyDefinition };
     }

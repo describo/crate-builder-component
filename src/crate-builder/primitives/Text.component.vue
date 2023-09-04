@@ -1,6 +1,6 @@
 <template>
     <div class="">
-        <div class="flex flex-row space-x-2" v-if="data.isValidType">
+        <div class="flex flex-row space-x-2">
             <el-input
                 class="w-full"
                 :type="type"
@@ -15,18 +15,18 @@
                 <i class="fas fa-check fa-fw"></i>
             </el-button>
         </div>
-        <div v-else class="text-xs text-gray-700">
+        <!-- <div v-else class="text-xs text-gray-700">
             {{ $t("invalid_type_for_text", { type: props.type }) }}
-        </div>
+        </div> -->
     </div>
 </template>
 
 <script setup>
 import { ElInput, ElButton } from "element-plus";
-import { reactive, watch } from "vue";
+import { reactive, watch, computed } from "vue";
 import debounce from "lodash-es/debounce.js";
 import isBoolean from "lodash-es/isBoolean.js";
-import { $t } from "../i18n";
+// import { $t } from "../i18n";
 
 const props = defineProps({
     type: {
@@ -46,14 +46,13 @@ const $emit = defineEmits(["save:property"]);
 const data = reactive({
     internalValue: isBoolean(props.value) ? String(props.value) : props.value,
     currentValue: isBoolean(props.value) ? String(props.value) : props.value,
-    isValidType: ["text", "textarea"].includes(props.type),
     debouncedSave: debounce(save, 200),
 });
+// let isValidType = computed(() => ["text", "textarea"].includes(props.type));
 watch(
     () => props.value,
     () => {
         data.internalValue = props.value;
-        data.isValidType = ["text", "textarea"].includes(props.type);
     }
 );
 function save() {

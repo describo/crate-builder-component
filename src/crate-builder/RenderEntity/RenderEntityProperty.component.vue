@@ -4,16 +4,16 @@
             <div>
                 <display-property-name-component
                     :property="props.property"
-                    :label="data.propertyDefinition.label"
+                    :label="propertyDefinition.label"
                     class="inline-block"
                     :class="{ 'text-red-600': isRequired && !isValid }"
                 />
                 <el-badge is-dot class="animate-pulse -ml-1 -mt-2" v-if="isRequired && !isValid">
                 </el-badge>
             </div>
-            <render-property-help-component :help="data.help" />
+            <render-property-help-component :help="propertyDefinition.help" />
             <div
-                v-if="!data.propertyDefinition && profileWarnMissingProperty"
+                v-if="!propertyDefinition && profileWarnMissingProperty"
                 class="text-red-600 text-xs"
             >
                 ({{ $t("not_defined_in_profile") }})
@@ -23,7 +23,7 @@
             <add-component
                 v-if="showAddControl && !configuration.readonly"
                 :property="props.property"
-                :definition="data.propertyDefinition"
+                :definition="propertyDefinition"
                 :embedded="false"
                 :crate-manager="props.crateManager"
                 @create:property="createProperty"
@@ -33,31 +33,32 @@
 
             <!-- render all of the simple things (text, textarea, date etc) in a column -->
             <div class="flex flex-col space-y-1" v-if="data.simpleInstances.length">
-                <div
-                    v-for="instance of data.simpleInstances"
-                    :key="instance.idx"
-                    class="flex flex-row"
-                >
-                    <render-entity-property-instance-component
-                        class="flex-grow"
-                        :crate-manager="props.crateManager"
-                        :data="instance"
-                        :definition="data.propertyDefinition"
-                        @save:property="saveProperty"
-                        @create:entity="createEntity"
-                    />
-                    <delete-property-component
-                        v-if="
-                            isNotValue &&
-                            instance.value &&
-                            !instance.tgtEntityId &&
-                            !configuration.readonly
-                        "
-                        class="pl-2"
-                        type="delete"
-                        :property="instance"
-                        @delete:property="deleteProperty(instance)"
-                    />
+                <div v-for="instance of data.simpleInstances" :key="instance.idx">
+                    <div v-if="propertyDefinition.readonly">
+                        {{ instance.value }}
+                    </div>
+                    <div v-else class="flex flex-row">
+                        <render-entity-property-instance-component
+                            class="flex-grow"
+                            :crate-manager="props.crateManager"
+                            :data="instance"
+                            :definition="propertyDefinition"
+                            @save:property="saveProperty"
+                            @create:entity="createEntity"
+                        />
+                        <delete-property-component
+                            v-if="
+                                isNotValue &&
+                                instance.value &&
+                                !instance.tgtEntityId &&
+                                !configuration.readonly
+                            "
+                            class="pl-2"
+                            type="delete"
+                            :property="instance"
+                            @delete:property="deleteProperty(instance)"
+                        />
+                    </div>
                 </div>
             </div>
             <!-- render all the links in a wrapping row -->
@@ -66,6 +67,7 @@
                     :crate-manager="props.crateManager"
                     :entities="data.linkInstances"
                     :property="props.property"
+                    :readonly="propertyDefinition.readonly"
                     @load:entity="loadEntity"
                     @unlink:entity="unlinkEntity"
                 />
@@ -86,7 +88,6 @@ import { configurationKey } from "./keys.js";
 import { reactive, computed, onMounted, onBeforeMount, onBeforeUnmount, watch, inject } from "vue";
 import cloneDeep from "lodash-es/cloneDeep";
 import orderBy from "lodash-es/orderBy";
-import debounce from "lodash-es/debounce";
 import { ProfileManager } from "../profile-manager.js";
 import { $t } from "../i18n";
 const configuration = inject(configurationKey);
@@ -114,7 +115,6 @@ const data = reactive({
     propertyDefinition: {},
     simpleInstances: [],
     linkInstances: [],
-    debouncedGetProfileDefinitionForProperty: debounce(getProfileDefinitionForProperty, 200),
     watchers: [],
 });
 
@@ -122,13 +122,6 @@ onBeforeMount(() => {
     sortInstances();
 });
 onMounted(() => {
-    data.debouncedGetProfileDefinitionForProperty();
-    data.watchers[0] = watch(
-        () => props.property,
-        () => {
-            data.debouncedGetProfileDefinitionForProperty();
-        }
-    );
     data.watchers[1] = watch(
         () => props.values,
         () => {
@@ -140,15 +133,6 @@ onBeforeUnmount(() => {
     data.watchers.forEach((watcher) => watcher());
 });
 
-function getProfileDefinitionForProperty() {
-    const profileManager = new ProfileManager({ profile: props.crateManager.profile });
-    let { propertyDefinition } = profileManager.getPropertyDefinition({
-        property: props.property,
-        entity: props.entity,
-    });
-    data.propertyDefinition = cloneDeep(propertyDefinition);
-    data.help = propertyDefinition?.help;
-}
 const $emit = defineEmits([
     "load:entity",
     "create:property",
@@ -162,16 +146,25 @@ const isValid = computed(() => {
     return props.values.length ? true : false;
 });
 const isRequired = computed(() => {
-    return data.propertyDefinition?.required;
+    return propertyDefinition.value?.required;
 });
 const isNotValue = computed(() => {
-    return data.propertyDefinition?.type !== "Value";
+    return propertyDefinition.value?.type !== "Value";
 });
 const profileWarnMissingProperty = computed(() => {
     return props.crateManager.profile.warnMissingProperty;
 });
 const showAddControl = computed(() => {
-    return data?.propertyDefinition?.multiple || !props?.values?.length;
+    return propertyDefinition.value?.multiple || !props?.values?.length;
+});
+const propertyDefinition = computed(() => {
+    if (!props.crateManager?.profile) return {};
+    const profileManager = new ProfileManager({ profile: props.crateManager.profile });
+    let { propertyDefinition } = profileManager.getPropertyDefinition({
+        property: props.property,
+        entity: props.entity,
+    });
+    return cloneDeep(propertyDefinition);
 });
 function sortInstances() {
     data.simpleInstances = props.values.filter((v) => v.value);

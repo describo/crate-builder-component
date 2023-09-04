@@ -81,11 +81,11 @@ import crateFile4 from "../examples/item/large-crate/ro-crate-metadata.json";
 import crateFile5 from "../examples/item/ridiculously-big-collection/ro-crate-metadata.json";
 import crateFile6 from "../examples/item/item-with-relationship-and-action/ro-crate-metadata.json";
 import crateFile7 from "../examples/item/multiple-types/ro-crate-metadata.json";
+import profile1 from "../examples/profile/profile-with-all-primitives.json";
 import profile2 from "../examples/profile/profile-with-all-primitives-and-groups.json";
-import profile4 from "../examples/profile/nyingarn-item-profile.json";
-import profile5 from "../examples/profile/profile-with-all-primitives.json";
-import profile6 from "../examples/profile/profile-with-resolve.json";
-import profile8 from "../examples/profile/profile-to-test-multiple-types.json";
+import profile3 from "../examples/profile/profile-to-test-multiple-types.json";
+import profile4 from "../examples/profile/profile-with-resolve.json";
+import profile5 from "../examples/profile/nyingarn-item-profile.json";
 const lookup = new Lookup();
 
 const data = reactive({
@@ -105,11 +105,11 @@ const data = reactive({
         { name: "Item with Relationship and Action", value: crateFile6 },
     ],
     profiles: [
-        { value: profile5, name: profile5.metadata.name },
+        { value: profile1, name: profile1.metadata.name },
         { value: profile2, name: profile2.metadata.name },
-        { value: profile8, name: profile8.metadata.name },
+        { value: profile3, name: profile3.metadata.name },
         { value: profile4, name: profile4.metadata.name },
-        { value: profile6, name: profile6.metadata.name },
+        { value: profile5, name: profile5.metadata.name },
     ],
     languages: [
         { name: "English", value: "en" },
@@ -127,7 +127,7 @@ function setCrate(name) {
     let crate = name ? data.crates.filter((c) => c.name === name)[0].value : undefined;
     setTimeout(() => {
         data.selectedCrate = crate;
-    }, 10);
+    }, 5);
 }
 function setProfile(name) {
     data.selectedProfile = name ? data.profiles.filter((p) => p.name === name)[0].value : undefined;

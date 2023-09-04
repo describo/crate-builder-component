@@ -31,7 +31,6 @@ import {
     reactive,
     watch,
     getCurrentInstance,
-    inject,
 } from "vue";
 import cloneDeep from "lodash-es/cloneDeep";
 import isEmpty from "lodash-es/isEmpty";
@@ -111,6 +110,11 @@ const props = defineProps({
         default: "left",
         validator: (val) => ["top", "bottom", "left", "right"].includes(val),
     },
+    resetTabOnEntityChange: {
+        type: Boolean,
+        default: true,
+        validator: (val) => [true, false].includes(val),
+    },
     showControls: {
         type: Boolean,
         default: true,
@@ -177,7 +181,6 @@ onMounted(async () => {
         watch(
             () => props.crate,
             () => {
-                data.ready = false;
                 init();
             }
         )
@@ -211,6 +214,7 @@ onMounted(async () => {
                 () => props.readonly,
                 () => props.language,
                 () => props.tabLocation,
+                () => props.resetTabOnEntityChange,
                 () => props.showControls,
             ],
             () => {
@@ -227,6 +231,7 @@ onBeforeUnmount(() => {
 
 async function init() {
     if (!props.crate || isEmpty(props.crate)) {
+        data.ready = false;
         data.crate = {};
         data.entity = {};
         return;
@@ -248,7 +253,6 @@ async function init() {
     try {
         await data.crateManager.load({ crate, profile });
     } catch (error) {
-        console.log(error);
         $emit("error", {
             errors: data.crateManager.errors,
         });
@@ -281,6 +285,7 @@ function configure() {
         enableDataPackLookups: false,
         language: props.language,
         tabLocation: props.tabLocation,
+        resetTabOnEntityChange: props.resetTabOnEntityChange,
         showControls: props.showControls,
     };
 

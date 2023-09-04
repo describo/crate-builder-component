@@ -26,6 +26,7 @@
                     :crate-manager="props.crateManager"
                     :entity="instance"
                     :property="props.property"
+                    :readonly="props.readonly"
                     @load:entity="loadEntity"
                     @unlink:entity="unlinkEntity"
                 />
@@ -54,6 +55,10 @@ const props = defineProps({
     property: {
         type: String,
         required: true,
+    },
+    readonly: {
+        required: true,
+        default: false,
     },
 });
 const $emit = defineEmits(["load:entity", "unlink:entity"]);
