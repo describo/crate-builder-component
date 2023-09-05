@@ -221,6 +221,7 @@ import RenderControlsComponent from "./RenderControls.component.vue";
 import { configurationKey } from "./keys.js";
 import { reactive, computed, onMounted, onBeforeMount, onBeforeUnmount, watch, provide } from "vue";
 import difference from "lodash-es/difference.js";
+import orderBy from "lodash-es/orderBy.js";
 import { isURL } from "../crate-manager.js";
 import { ProfileManager } from "../profile-manager.js";
 
@@ -355,15 +356,18 @@ function init({ entity }) {
     $emit("ready");
 }
 function applyLayout({ layout, inputs, entity }) {
+    const sort = false;
     for (let name of Object.keys(layout)) {
         layout[name].name = name;
         layout[name].inputs = [];
+        if (layout[name.order]) sort = true;
     }
     if (!layout.about) {
-        layout.overflow = {
+        layout.about = {
             name: "about",
             label: "About",
             inputs: [],
+            order: 0,
         };
     }
     if (!layout.overflow) {
@@ -371,6 +375,7 @@ function applyLayout({ layout, inputs, entity }) {
             name: "overflow",
             label: "...",
             inputs: [],
+            order: Object.keys(layout).length,
         };
     }
     // sort the inputs into their groups
@@ -401,6 +406,7 @@ function applyLayout({ layout, inputs, entity }) {
     let tabs = Object.keys(layout)
         .map((k) => layout[k])
         .filter((t) => t.name !== "appliesTo");
+    if (sort) tabs = orderBy(tabs, "order");
     return tabs;
 }
 function refresh() {
