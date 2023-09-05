@@ -356,7 +356,7 @@ function init({ entity }) {
     $emit("ready");
 }
 function applyLayout({ layout, inputs, entity }) {
-    const sort = false;
+    let sort = false;
     for (let name of Object.keys(layout)) {
         layout[name].name = name;
         layout[name].inputs = [];
