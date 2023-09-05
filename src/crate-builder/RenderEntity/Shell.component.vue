@@ -360,7 +360,7 @@ function applyLayout({ layout, inputs, entity }) {
     for (let name of Object.keys(layout)) {
         layout[name].name = name;
         layout[name].inputs = [];
-        if (layout[name.order]) sort = true;
+        if (layout[name].order) sort = true;
     }
     if (!layout.about) {
         layout.about = {
