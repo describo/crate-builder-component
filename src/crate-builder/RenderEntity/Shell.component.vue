@@ -359,6 +359,13 @@ function applyLayout({ layout, inputs, entity }) {
         layout[name].name = name;
         layout[name].inputs = [];
     }
+    if (!layout.about) {
+        layout.overflow = {
+            name: "about",
+            label: "About",
+            inputs: [],
+        };
+    }
     if (!layout.overflow) {
         layout.overflow = {
             name: "overflow",
