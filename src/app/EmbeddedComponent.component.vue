@@ -1,73 +1,109 @@
 <template>
-    <div class="flex flex-col space-y-2">
-        <div class="flex flex-row space-x-4">
-            <el-select
-                v-model="data.select.crate"
-                @change="setCrate"
-                placeholder="Select a crate"
-                clearable
-            >
-                <el-option
-                    v-for="item in data.crates"
-                    :key="item.name"
-                    :label="item.name"
-                    :value="item.name"
-                />
-            </el-select>
-            <el-select
-                v-model="data.select.profile"
-                @change="setProfile"
-                placeholder="Select a profile"
-                clearable
-            >
-                <el-option
-                    v-for="item in data.profiles"
-                    :key="item.name"
-                    :label="item.name"
-                    :value="item.name"
-                />
-            </el-select>
-            <el-select v-model="data.selectedLanguage" placeholder="Select a language">
-                <el-option
-                    v-for="item in data.languages"
-                    :key="item.name"
-                    :label="item.name"
-                    :value="item.value"
-                />
-            </el-select>
-            <el-select v-model="data.tabLocation" placeholder="Select a language">
-                <el-option label="Tabs: left" value="left" />
-                <el-option label="Tabs: top" value="top" />
-                <el-option label="Tabs: right" value="right" />
-                <el-option label="Tabs: bottom" value="bottom" />
-            </el-select>
-            <el-select v-model="data.readonly" placeholder="Select a language">
-                <el-option :key="true" label="Readonly: True" :value="true" />
-                <el-option :key="false" label="Readonly: False" :value="false" />
-            </el-select>
-            <el-switch
-                v-model="data.showControls"
-                active-text="show controls"
-                inactive-text="hide controls"
+    <div class="flex flex-row space-x-2">
+        <div class="flex flex-col space-y-2 w-4/6">
+            <div class="flex flex-row space-x-4">
+                <el-select
+                    v-model="data.select.crate"
+                    @change="setCrate"
+                    placeholder="Select a crate"
+                    clearable
+                >
+                    <el-option
+                        v-for="item in data.crates"
+                        :key="item.name"
+                        :label="item.name"
+                        :value="item.name"
+                    />
+                </el-select>
+                <el-select
+                    v-model="data.select.profile"
+                    @change="setProfile"
+                    placeholder="Select a profile"
+                    clearable
+                >
+                    <el-option
+                        v-for="item in data.profiles"
+                        :key="item.name"
+                        :label="item.name"
+                        :value="item.name"
+                    />
+                </el-select>
+            </div>
+            <describo-crate-builder
+                :crate="data.selectedCrate"
+                :profile="data.selectedProfile"
+                :lookup="lookup"
+                :readonly="data.configuration.readonly"
+                :enable-context-editor="data.configuration.enableContextEditor"
+                :enable-crate-preview="data.configuration.enableCratePreview"
+                :enable-browse-entities="data.configuration.enableBrowseEntities"
+                :enable-template-save="data.configuration.enableTemplateSave"
+                :enable-internal-routing="true"
+                :enable-reverse-link-browser="data.configuration.enableReverseLinkBrowser"
+                :purge-unlinked-entities="data.configuration.purgeUnlinkedEntities"
+                :web-component="false"
+                :language="data.configuration.language"
+                :tab-location="data.configuration.tabLocation"
+                :show-controls="data.configuration.showControls"
             />
         </div>
-        <describo-crate-builder
-            :crate="data.selectedCrate"
-            :profile="data.selectedProfile"
-            :lookup="lookup"
-            :readonly="data.readonly"
-            :enable-context-editor="true"
-            :enable-crate-preview="true"
-            :enable-browse-entities="true"
-            :enable-template-save="true"
-            :enable-internal-routing="true"
-            :enable-reverse-link-browser="true"
-            :purge-unlinked-entities="true"
-            :web-component="false"
-            :language="data.selectedLanguage"
-            :tab-location="data.tabLocation"
-            :show-controls="data.showControls"
-        />
+
+        <div class="flex flex-col space-y-2 w-2/6 p-4 border-slate-200 border-2">
+            <div>Component Controls</div>
+            <el-form label-width="250px">
+                <el-form-item label="Language">
+                    <el-select
+                        v-model="data.configuration.language"
+                        placeholder="Select a language"
+                    >
+                        <el-option
+                            v-for="item in data.languages"
+                            :key="item.name"
+                            :label="item.name"
+                            :value="item.value"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Tab Location">
+                    <el-select v-model="data.configuration.tabLocation">
+                        <el-option label="Tabs: left" value="left" />
+                        <el-option label="Tabs: top" value="top" />
+                        <el-option label="Tabs: right" value="right" />
+                        <el-option label="Tabs: bottom" value="bottom" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Set to readonly">
+                    <el-switch v-model="data.configuration.readonly" />
+                </el-form-item>
+                <el-form-item label="Enable component controls">
+                    <el-switch v-model="data.configuration.showControls" />
+                </el-form-item>
+                <el-form-item label="Enable Context Editor">
+                    <el-switch v-model="data.configuration.enableContextEditor" />
+                </el-form-item>
+                <el-form-item label="Enable Crate Preview">
+                    <el-switch v-model="data.configuration.enableCratePreview" />
+                </el-form-item>
+                <el-form-item label="Enable Browse Entities">
+                    <el-switch v-model="data.configuration.enableBrowseEntities" />
+                </el-form-item>
+                <el-form-item label="Enable Reverse Link Browser">
+                    <el-switch v-model="data.configuration.enableReverseLinkBrowser" />
+                </el-form-item>
+                <el-form-item label="Enable Template Save">
+                    <el-switch v-model="data.configuration.enableTemplateSave" />
+                </el-form-item>
+                <el-form-item label="Purge Unlinked Entities">
+                    <el-switch v-model="data.configuration.purgeUnlinkedEntities" />
+                </el-form-item>
+                <el-form-item label="Reset Tab on Entity Change">
+                    <el-switch v-model="data.configuration.resetTabOnEntityChange" />
+                </el-form-item>
+                <el-form-item label="Reset Tab on Profile Change">
+                    <el-switch v-model="data.configuration.resetTabOnProfileChange" />
+                </el-form-item>
+            </el-form>
+        </div>
     </div>
 </template>
 
@@ -118,9 +154,21 @@ const data = reactive({
 
     selectedCrate: undefined,
     selectedProfile: undefined,
-    selectedLanguage: "en",
-    tabLocation: "left",
-    showControls: true,
+    configuration: {
+        language: "en",
+        enableContextEditor: true,
+        enableCratePreview: true,
+        enableBrowseEntities: true,
+        enableTemplateSave: true,
+        enableReverseLinkBrowser: true,
+        purgeUnlinkedEntities: true,
+        readonly: false,
+        language: "en",
+        tabLocation: "left",
+        resetTabOnEntityChange: true,
+        resetTabOnProfileChange: true,
+        showControls: true,
+    },
 });
 
 function setCrate(name) {
