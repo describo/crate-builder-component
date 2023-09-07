@@ -299,7 +299,18 @@ onMounted(() => {
         () => {
             initProfile();
             data.extraProperties = [];
-            data.activeTab = "about";
+            // If we always reset to "about" ...
+            if (props.configuration.resetTabOnEntityChange) {
+                data.activeTab = "about";
+            }
+            // ... otherwise only change to "about" if the newly set profile doesn't have a layout with the same name as
+            // the currently selected one. If there is such layout, keep that (no change to data.activeTab).
+            else {
+                const layouts = data.profileManager.getLayouts({entity: props.entity});
+                if (layouts == null || !layouts[data.activeTab]) {
+                    data.activeTab = "about"
+                }
+            }
             const entity = props.crateManager.getEntity({ id: props.entity["@id"] });
             init({ entity });
         }
