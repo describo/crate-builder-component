@@ -288,8 +288,17 @@ onMounted(() => {
         (n, o) => {
             if (n["@id"] !== o["@id"]) {
                 data.extraProperties = [];
-                console.log(props.configuration.resetTabOnEntityChange);
-                if (props.configuration.resetTabOnEntityChange) data.activeTab = "about";
+                if (props.configuration.resetTabOnEntityChange) {
+                    // if true - always reset tab on entity change
+                    data.activeTab = "about";
+                } else {
+                    // ... otherwise only change to "about" if the newly set entity doesn't have a layout with the same name as
+                    // the currently selected one. If there is such layout, keep that (no change to data.activeTab).
+                    const layouts = data.profileManager.getLayouts({ entity: props.entity });
+                    if (layouts == null || !layouts[data.activeTab]) {
+                        data.activeTab = "about";
+                    }
+                }
             }
             init({ entity: props.entity });
         }
@@ -299,16 +308,15 @@ onMounted(() => {
         () => {
             initProfile();
             data.extraProperties = [];
-            // If we always reset to "about" ...
-            if (props.configuration.resetTabOnEntityChange) {
+            if (props.configuration.resetTabOnProfileChange) {
+                // if true - always reset tab on profile change
                 data.activeTab = "about";
-            }
-            // ... otherwise only change to "about" if the newly set profile doesn't have a layout with the same name as
-            // the currently selected one. If there is such layout, keep that (no change to data.activeTab).
-            else {
-                const layouts = data.profileManager.getLayouts({entity: props.entity});
+            } else {
+                // ... otherwise only change to "about" if the newly set profile doesn't have a layout with the same name as
+                // the currently selected one. If there is such layout, keep that (no change to data.activeTab).
+                const layouts = data.profileManager.getLayouts({ entity: props.entity });
                 if (layouts == null || !layouts[data.activeTab]) {
-                    data.activeTab = "about"
+                    data.activeTab = "about";
                 }
             }
             const entity = props.crateManager.getEntity({ id: props.entity["@id"] });

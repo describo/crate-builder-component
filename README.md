@@ -1,25 +1,25 @@
 # Crate Builder Component
 
--   [Crate Builder Component](#crate-builder-component)
--   [Developing the plugin](#developing-the-plugin)
-    -   [Storybook](#storybook)
-    -   [Development application](#development-application)
--   [Building and publishing a release](#building-and-publishing-a-release)
--   [Repo structure](#repo-structure)
--   [Using the component in your app](#using-the-component-in-your-app)
-    -   [Install the package](#install-the-package)
-    -   [Vite users](#vite-users)
-    -   [Profiles](#profiles)
-    -   [Tailwind CSS dependency](#tailwind-css-dependency)
-    -   [Vue Router Dependency](#vue-router-dependency)
-    -   [Wire it up](#wire-it-up)
--   [Identifiers and Types](#identifiers-and-types)
--   [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
--   [Full Usage - configuration and events](#full-usage---configuration-and-events)
-    -   [Properties](#properties)
-    -   [Events](#events)
--   [Themes](#themes)
--   [Internationalisation](#internationalisation)
+- [Crate Builder Component](#crate-builder-component)
+- [Developing the plugin](#developing-the-plugin)
+  - [Storybook](#storybook)
+  - [Development application](#development-application)
+- [Building and publishing a release](#building-and-publishing-a-release)
+- [Repo structure](#repo-structure)
+- [Using the component in your app](#using-the-component-in-your-app)
+  - [Install the package](#install-the-package)
+  - [Vite users](#vite-users)
+  - [Profiles](#profiles)
+  - [Tailwind CSS dependency](#tailwind-css-dependency)
+  - [Vue Router Dependency](#vue-router-dependency)
+  - [Wire it up](#wire-it-up)
+- [Identifiers and Types](#identifiers-and-types)
+- [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
+- [Full Usage - configuration and events](#full-usage---configuration-and-events)
+  - [Properties](#properties)
+  - [Events](#events)
+- [Themes](#themes)
+- [Internationalisation](#internationalisation)
 
 This is the core UI component for assembling an RO-Crate inside Describo. It is a self contained
 VueJS component that can be used inside your app. If you use this component, your app is responsible
@@ -224,6 +224,8 @@ Pass in the crate file and optionally a profile.
         :readonly="false"
         :webcomponent="false"
         :tabLocation="'left'"
+        :resetTabOnEntityChange="true"
+        :resetTabOnProfileChange="true"
         :showControls="true"
         @save:crate="saveCrate"
         @save:crate:template="saveTemplate"
@@ -302,6 +304,9 @@ from there.**
     when profiles define grouping.
 -   `resetTabOnEntityChange`: true | false: `(default: true)` : When true, if a layout is applied
     and the entity changes, the UI will navigate to the about tab. If false, that doesn't happen.
+-   `resetTabOnProfileChange`: true | false: `(default: true)` : When true, if a layout is applied
+    and the profile changes, the UI will navigate to the about tab. If false, that doesn't happen if
+    there is a matching tab. Otherwise it will go back to the about tab.
 -   `showControls`: true | false: `(default: true)` : Show or hide the controls bar. Useful if you
     want to provision those controls in your own application.
 -   `language`: en | hu `(default: en)` : Sets the component's localization to the given language.

@@ -115,6 +115,11 @@ const props = defineProps({
         default: true,
         validator: (val) => [true, false].includes(val),
     },
+    resetTabOnProfileChange: {
+        type: Boolean,
+        default: true,
+        validator: (val) => [true, false].includes(val),
+    },
     showControls: {
         type: Boolean,
         default: true,
@@ -215,6 +220,7 @@ onMounted(async () => {
                 () => props.language,
                 () => props.tabLocation,
                 () => props.resetTabOnEntityChange,
+                () => props.resetTabOnProfileChange,
                 () => props.showControls,
             ],
             () => {
@@ -286,6 +292,7 @@ function configure() {
         language: props.language,
         tabLocation: props.tabLocation,
         resetTabOnEntityChange: props.resetTabOnEntityChange,
+        resetTabOnProfileChange: props.resetTabOnProfileChange,
         showControls: props.showControls,
     };
 
