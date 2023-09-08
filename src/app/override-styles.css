@@ -3,8 +3,17 @@
     @apply bg-yellow-200 hover:bg-yellow-400
 }
 
-/* set styles here to override the colour of the property rows*/
+/* set styles here to override the colour of the property rows */
 .describo-property-background {
     @apply hover:bg-orange-100 bg-purple-200
 
 }
+
+/* set styles here to override tab label styles */
+.describo-tab-label {
+    @apply text-orange-600
+}
+.describo-tab-description {
+    @apply text-purple-600 text-xl text-left pb-4
+}
+

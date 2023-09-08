@@ -84,20 +84,35 @@
                     :key="idx"
                 >
                     <template #label>
-                        <div class="flex flex-col whitespace-normal text-gray-600">
-                            <div
-                                class="cursor-pointer text-lg hover:text-yellow-600"
-                                v-if="tab.label"
-                            >
-                                {{ tab.label }}
+                        <div class="flex flex-col">
+                            <div class="flex flex-row space-x-2">
+                                <div
+                                    class="flex flex-col whitespace-normal text-2xl text-gray-600 pt-1"
+                                >
+                                    <div
+                                        class="cursor-pointer hover:text-yellow-600 describo-tab-label"
+                                        v-if="tab.label"
+                                    >
+                                        {{ tab.label }}
+                                    </div>
+                                    <div
+                                        class="cursor-pointer hover:text-yellow-600 describo-tab-label"
+                                        v-else-if="tab.name"
+                                    >
+                                        {{ tab.name }}
+                                    </div>
+                                </div>
+                                <div v-if="tab.missingRequiredData" class="text-red-600">
+                                    <i class="fa-regular fa-circle-xmark fa-lg"></i>
+                                </div>
+                                <div
+                                    v-if="tab.hasData && !tab.missingRequiredData"
+                                    class="text-green-600"
+                                >
+                                    <i class="fa-regular fa-circle-check fa-lg"></i>
+                                </div>
                             </div>
-                            <div
-                                class="cursor-pointer text-lg hover:text-yellow-600"
-                                v-else-if="tab.name"
-                            >
-                                {{ tab.name }}
-                            </div>
-                            <div class="text-gray-600 font-light text-xs pr-1 pb-4">
+                            <div class="text-gray-600 text-left font-light text-xs pr-1 pb-4">
                                 {{ tab.description }}
                             </div>
                         </div>
@@ -357,7 +372,9 @@ function init({ entity }) {
         data.renderTabs = false;
     } else {
         data.renderTabs = true;
-        data.tabs = applyLayout({ layout, inputs, entity });
+        let tabs = applyLayout({ layout, inputs, entity });
+        data.tabs = applyTabDataIndicators({ tabs, entity });
+        // console.log(JSON.stringify(data.tabs, null, 2));
     }
     $emit("ready");
 }
@@ -413,6 +430,21 @@ function applyLayout({ layout, inputs, entity }) {
         .map((k) => layout[k])
         .filter((t) => t.name !== "appliesTo");
     if (sort) tabs = orderBy(tabs, "order");
+    return tabs;
+}
+function applyTabDataIndicators({ tabs, entity }) {
+    for (let tab of tabs) {
+        tab.missingRequiredData = false;
+        tab.hasData = false;
+        for (let input of tab.inputs) {
+            if (input.required && !entity["@properties"][input.name].length) {
+                tab.missingRequiredData = true;
+            }
+            if (entity["@properties"][input.name].length) {
+                tab.hasData = true;
+            }
+        }
+    }
     return tabs;
 }
 function refresh() {
