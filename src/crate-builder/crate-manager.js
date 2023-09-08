@@ -99,7 +99,21 @@ export class CrateManager {
     }
 
     exportEntityTemplate({ id }) {
-        let entity = this.em.getEntity({ id, exportForm: true });
+        let entity = this.getEntity({ id });
+
+        for (let property of Object.keys(entity["@properties"])) {
+            entity[property] = entity["@properties"][property]
+                .filter((p) => p.value)
+                .map((p) => p.value);
+            if (entity[property].length === 0) {
+                delete entity[property];
+            } else if (entity[property].length === 1) {
+                entity[property] = entity[property][0];
+            }
+        }
+        delete entity["@properties"];
+        delete entity["@reverse"];
+
         return entity;
     }
 

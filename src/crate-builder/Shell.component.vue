@@ -356,7 +356,7 @@ async function saveCrate() {
     $emit("save:crate", { crate });
 }
 function saveEntityAsTemplate(template) {
-    let entity = data.crateManager.exportEntityTemplate({ describoId: data.entity.describoId });
+    let entity = data.crateManager.exportEntityTemplate({ id: data.entity["@id"] });
     $emit("save:entity:template", { entity });
 }
 </script>
