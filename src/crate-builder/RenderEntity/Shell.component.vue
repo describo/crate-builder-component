@@ -357,7 +357,9 @@ function init({ entity }) {
         data.renderTabs = false;
     } else {
         data.renderTabs = true;
-        data.tabs = applyLayout({ layout, inputs, entity });
+        let tabs = applyLayout({ layout, inputs, entity });
+        data.tabs = applyTabDataIndicators({ tabs, entity });
+        // console.log(JSON.stringify(data.tabs, null, 2));
     }
     $emit("ready");
 }
@@ -413,6 +415,21 @@ function applyLayout({ layout, inputs, entity }) {
         .map((k) => layout[k])
         .filter((t) => t.name !== "appliesTo");
     if (sort) tabs = orderBy(tabs, "order");
+    return tabs;
+}
+function applyTabDataIndicators({ tabs, entity }) {
+    for (let tab of tabs) {
+        tab.missingRequiredData = false;
+        tab.hasData = false;
+        for (let input of tab.inputs) {
+            if (input.required && !entity["@properties"][input.name].length) {
+                tab.missingRequiredData = true;
+            }
+            if (entity["@properties"][input.name].length) {
+                tab.hasData = true;
+            }
+        }
+    }
     return tabs;
 }
 function refresh() {
