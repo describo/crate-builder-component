@@ -324,7 +324,8 @@ async function setCurrentEntity({ id = undefined, name = undefined }) {
         });
     }
 
-    if (!isEmpty(entity) && entity["@id"] !== data.entity["@id"]) {
+    // if (!isEmpty(entity) && entity["@id"] !== data.entity["@id"]) {
+    if (!isEmpty(entity)) {
         updateRoute({ entity });
         // console.debug(`Render Entity Parent, load entity:`, { ...entity });
         data.entity = { ...entity };
