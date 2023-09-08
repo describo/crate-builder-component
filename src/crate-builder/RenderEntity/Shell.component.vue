@@ -85,10 +85,8 @@
                 >
                     <template #label>
                         <div class="flex flex-col">
-                            <div class="flex flex-row space-x-2">
-                                <div
-                                    class="flex flex-col whitespace-normal text-2xl text-gray-600 pt-1"
-                                >
+                            <div class="flex flex-row items-center space-x-2">
+                                <div class="flex flex-col whitespace-normal text-lg text-gray-600">
                                     <div
                                         class="cursor-pointer hover:text-yellow-600 describo-tab-label"
                                         v-if="tab.label"
