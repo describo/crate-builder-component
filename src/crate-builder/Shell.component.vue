@@ -9,7 +9,6 @@
             @load:entity="setCurrentEntity"
             @ready="ready"
             @save:crate="saveCrate"
-            @save:crate:template="saveCrateAsTemplate"
             @save:entity:template="saveEntityAsTemplate"
         />
 
@@ -137,7 +136,7 @@ const $emit = defineEmits([
     "error",
     "navigation",
     "save:crate",
-    "save:crate:template",
+    "save:entity:template",
 ]);
 
 if (props.enableInternalRouting) {
@@ -355,15 +354,6 @@ async function saveCrate() {
     console.debug("export crate", crate);
     // console.log(crate["@graph"].length, crate["@graph"]);
     $emit("save:crate", { crate });
-}
-async function saveCrateAsTemplate(template) {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    $emit("save:crate:template", {
-        template: {
-            name: template.name,
-            crate: data.crateManager.exportCrate(),
-        },
-    });
 }
 function saveEntityAsTemplate(template) {
     let entity = data.crateManager.exportEntityTemplate({ describoId: data.entity.describoId });

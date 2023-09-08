@@ -50,24 +50,6 @@
                 </el-button>
             </div>
             <div class="flex flex-row space-x-1">
-                <div v-if="configuration.enableTemplateSave && isRootDataset">
-                    <!-- save crate as template -->
-                    <el-button
-                        @click="toggle('saveCrateAsTemplate')"
-                        type="primary"
-                        :disabled="!isRootDataset"
-                    >
-                        <div class="inline-block">
-                            <i class="fas fa-save"></i>
-                        </div>
-                        <div
-                            class="inline-block ml-1 xl:inline-block xl:ml-1"
-                            :class="{ hidden: entity.etype === 'File' }"
-                        >
-                            {{ $t("save_crate_as_template_label") }}
-                        </div>
-                    </el-button>
-                </div>
                 <div v-if="configuration.enableTemplateSave && !isRootDataset">
                     <!-- save entity as template -->
                     <el-button
@@ -113,6 +95,8 @@
             </div>
             <!-- /navbar: controls -->
         </div>
+
+        <!-- add property drawer -->
         <el-drawer
             v-model="data.dialog.addProperty"
             direction="ltr"
@@ -132,6 +116,7 @@
             </template>
         </el-drawer>
 
+        <!-- edit context drawer -->
         <el-drawer
             v-model="data.dialog.editContext"
             direction="ltr"
@@ -149,6 +134,7 @@
             </template>
         </el-drawer>
 
+        <!-- preview crate drawer -->
         <el-drawer
             v-model="data.dialog.previewCrate"
             direction="ltr"
@@ -164,14 +150,7 @@
             </template>
         </el-drawer>
 
-        <save-crate-as-template-dialog
-            class="bg-indigo-200 p-6 rounded"
-            v-if="data.dialog.saveCrateAsTemplate"
-            :entity="entity"
-            @close="data.dialog.saveCrateAsTemplate = false"
-            @save:crate:template="saveCrateAsTemplate"
-        />
-
+        <!-- browse entities drawer -->
         <el-drawer
             v-model="data.dialog.browseEntities"
             direction="rtl"
@@ -195,7 +174,6 @@
 <script setup>
 import { ElDrawer, ElPopconfirm, ElButton } from "element-plus";
 import AddPropertyDialog from "./DialogAddProperty.component.vue";
-import SaveCrateAsTemplateDialog from "./DialogSaveCrateAsTemplate.component.vue";
 import EditContextDialog from "./DialogEditContext.component.vue";
 import PreviewCrateDialog from "./DialogPreviewCrate.component.vue";
 import BrowseEntitiesDialog from "./DialogBrowseEntities.component.vue";
@@ -218,7 +196,6 @@ const $emit = defineEmits([
     "load:entity",
     "add:property:placeholder",
     "delete:entity",
-    "save:crate:template",
     "save:entity:template",
     "update:context",
 ]);
@@ -265,9 +242,6 @@ function deleteEntity() {
     $emit("delete:entity", {
         id: props.entity["@id"],
     });
-}
-function saveCrateAsTemplate(data) {
-    $emit("save:crate:template", data);
 }
 function saveEntityAsTemplate(data) {
     $emit("save:entity:template");

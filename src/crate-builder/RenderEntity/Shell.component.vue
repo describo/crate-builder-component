@@ -1,21 +1,22 @@
 <template>
     <div class="flex flex-row">
         <div class="flex flex-col pr-4 w-full">
-            <!-- <pre>{{ data.entity }}</pre> -->
-            <div v-if="!data.renderTabs">
-                <!-- render controls -->
-                <render-controls-component
-                    v-if="!configuration.readonly && configuration.showControls"
-                    :crate-manager="props.crateManager"
-                    :entity="data.entity"
-                    @load:entity="loadEntity"
-                    @add:property:placeholder="addPropertyPlaceholder"
-                    @delete:entity="deleteEntity"
-                    @save:crate:template="saveCrateAsTemplate"
-                    @save:entity:template="saveEntityAsTemplate"
-                    @update:context="updateContext"
-                />
+            <!-- render controls -->
+            <render-controls-component
+                v-if="!configuration.readonly && configuration.showControls"
+                :crate-manager="props.crateManager"
+                :entity="data.entity"
+                @load:entity="loadEntity"
+                @add:property:placeholder="addPropertyPlaceholder"
+                @delete:entity="deleteEntity"
+                @save:entity:template="saveEntityAsTemplate"
+                @update:context="updateContext"
+            />
 
+            <!-- <pre>{{ data.entity }}</pre> -->
+
+            <!-- Untabbed layout  -->
+            <div v-if="!data.renderTabs">
                 <!-- render entity id -->
                 <render-entity-id-component
                     class="my-2 p-2"
@@ -69,112 +70,99 @@
                     </div>
                 </div>
             </div>
-            <div v-if="data.renderTabs">
-                <!-- grouped profile -->
-                <div class="flex flex-col flex-grow">
-                    <!-- render controls -->
-                    <render-controls-component
-                        v-if="!configuration.readonly && configuration.showControls"
-                        :crate-manager="props.crateManager"
-                        :entity="data.entity"
-                        @load:entity="loadEntity"
-                        @add:property:placeholder="addPropertyPlaceholder"
-                        @delete:entity="deleteEntity"
-                        @save:crate:template="saveCrateAsTemplate"
-                        @save:entity:template="saveEntityAsTemplate"
-                        @update:context="updateContext"
-                    />
-                    <el-tabs :tab-position="configuration.tabLocation" v-model="data.activeTab">
-                        <el-tab-pane
-                            :label="tab.name"
-                            :name="tab.name"
-                            v-for="(tab, idx) of data.tabs"
-                            :key="idx"
-                        >
-                            <template #label>
-                                <div class="flex flex-col whitespace-normal text-gray-600">
-                                    <div
-                                        class="cursor-pointer text-lg hover:text-yellow-600"
-                                        v-if="tab.label"
-                                    >
-                                        {{ tab.label }}
-                                    </div>
-                                    <div
-                                        class="cursor-pointer text-lg hover:text-yellow-600"
-                                        v-else-if="tab.name"
-                                    >
-                                        {{ tab.name }}
-                                    </div>
-                                    <div class="text-gray-600 font-light text-xs pr-1 pb-4">
-                                        {{ tab.description }}
-                                    </div>
-                                </div>
-                            </template>
 
-                            <span>
-                                <div v-if="tab.name === 'about'">
-                                    <render-entity-id-component
-                                        class="my-2 p-2"
-                                        :class="{
-                                            'bg-green-200 rounded p-1 my-1':
-                                                data.savedProperty === '@id',
-                                        }"
-                                        :entity="data.entity"
-                                        @update:entity="updateEntity"
-                                    />
-                                    <render-entity-type-component
-                                        class="my-2 p-2"
-                                        :crate-manager="props.crateManager"
-                                        :entity="data.entity"
-                                        @update:entity="updateEntity"
-                                    />
-                                    <render-entity-name-component
-                                        class="my-2 p-2"
-                                        :class="{
-                                            'bg-green-200 rounded p-1 my-1':
-                                                data.savedProperty === 'name',
-                                        }"
-                                        :entity="data.entity"
-                                        @update:entity="updateEntity"
-                                    />
-                                </div>
+            <!-- tabbed layout -->
+            <el-tabs
+                :tab-position="configuration.tabLocation"
+                v-model="data.activeTab"
+                v-if="data.renderTabs"
+            >
+                <el-tab-pane
+                    :label="tab.name"
+                    :name="tab.name"
+                    v-for="(tab, idx) of data.tabs"
+                    :key="idx"
+                >
+                    <template #label>
+                        <div class="flex flex-col whitespace-normal text-gray-600">
+                            <div
+                                class="cursor-pointer text-lg hover:text-yellow-600"
+                                v-if="tab.label"
+                            >
+                                {{ tab.label }}
+                            </div>
+                            <div
+                                class="cursor-pointer text-lg hover:text-yellow-600"
+                                v-else-if="tab.name"
+                            >
+                                {{ tab.name }}
+                            </div>
+                            <div class="text-gray-600 font-light text-xs pr-1 pb-4">
+                                {{ tab.description }}
+                            </div>
+                        </div>
+                    </template>
 
-                                <!-- render the entity properties in this tab definition -->
-                                <div v-for="input of tab.inputs">
-                                    <div
-                                        :class="{
-                                            'hover:bg-sky-100':
-                                                !configuration.readonly &&
-                                                data.savedProperty !== input.name,
-                                            'bg-green-200 hover:bg-green-200':
-                                                data.savedProperty === input.name,
-                                        }"
-                                        v-if="
-                                            tab.name === data.activeTab &&
-                                            !['@id', '@type', 'name'].includes(input.name)
-                                        "
-                                    >
-                                        <render-entity-property-component
-                                            class="my-2"
-                                            :crate-manager="props.crateManager"
-                                            :entity="data.entity"
-                                            :property="input.name"
-                                            :values="data.entity['@properties'][input.name]"
-                                            @load:entity="loadEntity"
-                                            @create:entity="createEntity"
-                                            @link:entity="linkEntity"
-                                            @unlink:entity="unlinkEntity"
-                                            @create:property="createProperty"
-                                            @save:property="saveProperty"
-                                            @delete:property="deleteProperty"
-                                        />
-                                    </div>
-                                </div>
-                            </span>
-                        </el-tab-pane>
-                    </el-tabs>
-                </div>
-            </div>
+                    <span>
+                        <div v-if="tab.name === 'about'">
+                            <render-entity-id-component
+                                class="my-2 p-2"
+                                :class="{
+                                    'bg-green-200 rounded p-1 my-1': data.savedProperty === '@id',
+                                }"
+                                :entity="data.entity"
+                                @update:entity="updateEntity"
+                            />
+                            <render-entity-type-component
+                                class="my-2 p-2"
+                                :crate-manager="props.crateManager"
+                                :entity="data.entity"
+                                @update:entity="updateEntity"
+                            />
+                            <render-entity-name-component
+                                class="my-2 p-2"
+                                :class="{
+                                    'bg-green-200 rounded p-1 my-1': data.savedProperty === 'name',
+                                }"
+                                :entity="data.entity"
+                                @update:entity="updateEntity"
+                            />
+                        </div>
+
+                        <!-- render the entity properties in this tab definition -->
+                        <div v-for="input of tab.inputs">
+                            <div
+                                :class="{
+                                    'hover:bg-sky-100':
+                                        !configuration.readonly &&
+                                        data.savedProperty !== input.name,
+                                    'bg-green-200 hover:bg-green-200':
+                                        data.savedProperty === input.name,
+                                }"
+                                v-if="
+                                    tab.name === data.activeTab &&
+                                    !['@id', '@type', 'name'].includes(input.name)
+                                "
+                            >
+                                <render-entity-property-component
+                                    class="my-2"
+                                    :crate-manager="props.crateManager"
+                                    :entity="data.entity"
+                                    :property="input.name"
+                                    :values="data.entity['@properties'][input.name]"
+                                    @load:entity="loadEntity"
+                                    @create:entity="createEntity"
+                                    @link:entity="linkEntity"
+                                    @unlink:entity="unlinkEntity"
+                                    @create:property="createProperty"
+                                    @save:property="saveProperty"
+                                    @delete:property="deleteProperty"
+                                />
+                            </div>
+                        </div>
+                    </span>
+                </el-tab-pane>
+            </el-tabs>
         </div>
         <!--show reverse links panel  -->
         <div
@@ -262,7 +250,6 @@ const $emit = defineEmits([
     "ready",
     "load:entity",
     "save:crate",
-    "save:crate:template",
     "save:entity:template",
     "create:property",
     "update:property",
@@ -602,10 +589,6 @@ function deleteProperty(patch) {
 function saveCrate() {
     $emit("save:crate");
 }
-function saveCrateAsTemplate(data) {
-    console.debug("Render Entity component: emit(save:crate:template)", data);
-    $emit("save:crate:template", data);
-}
 function saveEntityAsTemplate() {
     console.debug("Render Entity component: emit(save:entity:template)");
     $emit("save:entity:template");
@@ -614,5 +597,4 @@ function updateContext(data) {
     props.crateManager.context = data;
     saveCrate();
 }
-function addTemplate() {}
 </script>
