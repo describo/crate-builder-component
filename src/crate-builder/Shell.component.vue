@@ -313,7 +313,7 @@ async function setCurrentEntity({ id = undefined, name = undefined }) {
     if (!id && !name) return;
 
     // return if we're already on that entity
-    if ((id || data.entity["@id"]) && id === data.entity["@id"]) return;
+    // if ((id || data.entity["@id"]) && id === data.entity["@id"]) return;
 
     let entity = {};
     if (name === "RootDataset") {
