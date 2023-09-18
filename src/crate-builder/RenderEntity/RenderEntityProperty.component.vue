@@ -1,5 +1,8 @@
 <template>
-    <div class="flex flex-row flex-grow p-2 describo-property-background">
+    <div
+        class="flex flex-row flex-grow p-2 describo-property-background"
+        :class="{ 'bg-red-200': props.highlightRequired && isRequired && !isValid }"
+    >
         <div class="w-1/3 xl:w-1/5 flex flex-col">
             <div>
                 <display-property-name-component
@@ -108,6 +111,10 @@ const props = defineProps({
     values: {
         type: Array,
         required: true,
+    },
+    highlightRequired: {
+        type: Boolean,
+        default: false,
     },
 });
 

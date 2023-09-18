@@ -17,6 +17,17 @@
 
             <!-- Untabbed layout  -->
             <div v-if="!data.renderTabs">
+                <!-- highlight required properties -->
+                <div class="text-red-600 float-right" v-if="!configuration.readonly">
+                    <el-button
+                        size="large"
+                        @click="
+                            data.highlightRequiredProperties = !data.highlightRequiredProperties
+                        "
+                    >
+                        <i class="fa-solid fa-triangle-exclamation text-3xl text-red-600"></i>
+                    </el-button>
+                </div>
                 <!-- render entity id -->
                 <render-entity-id-component
                     class="my-2 p-2"
@@ -59,6 +70,7 @@
                             :entity="data.entity"
                             :property="property"
                             :values="values"
+                            :highlight-required="data.highlightRequiredProperties"
                             @load:entity="loadEntity"
                             @create:entity="createEntity"
                             @link:entity="linkEntity"
@@ -117,6 +129,22 @@
                     </template>
 
                     <span>
+                        <div
+                            class="text-red-600 float-right"
+                            v-if="!configuration.readonly && tab.missingRequiredData"
+                        >
+                            <el-button
+                                size="large"
+                                @click="
+                                    data.highlightRequiredProperties =
+                                        !data.highlightRequiredProperties
+                                "
+                            >
+                                <i
+                                    class="fa-solid fa-triangle-exclamation text-3xl text-red-600"
+                                ></i>
+                            </el-button>
+                        </div>
                         <div v-if="tab.name === 'about'">
                             <render-entity-id-component
                                 class="my-2 p-2"
@@ -163,6 +191,7 @@
                                     :entity="data.entity"
                                     :property="input.name"
                                     :values="data.entity['@properties'][input.name]"
+                                    :highlight-required="data.highlightRequiredProperties"
                                     @load:entity="loadEntity"
                                     @create:entity="createEntity"
                                     @link:entity="linkEntity"
@@ -248,6 +277,7 @@ const props = defineProps({
 const data = reactive({
     profileManager: {},
     reverseSidebarVisible: false,
+    highlightRequiredProperties: false,
     activeTab: "about",
     renderTabs: false,
     entity: {},
