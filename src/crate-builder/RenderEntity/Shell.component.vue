@@ -20,6 +20,7 @@
                 <!-- highlight required properties -->
                 <div class="text-red-600 float-right" v-if="!configuration.readonly">
                     <el-button
+                        size="large"
                         @click="
                             data.highlightRequiredProperties = !data.highlightRequiredProperties
                         "
@@ -128,19 +129,23 @@
                     </template>
 
                     <span>
+                        <div
+                            class="text-red-600 float-right"
+                            v-if="!configuration.readonly && tab.missingRequiredData"
+                        >
+                            <el-button
+                                size="large"
+                                @click="
+                                    data.highlightRequiredProperties =
+                                        !data.highlightRequiredProperties
+                                "
+                            >
+                                <i
+                                    class="fa-solid fa-triangle-exclamation text-3xl text-red-600"
+                                ></i>
+                            </el-button>
+                        </div>
                         <div v-if="tab.name === 'about'">
-                            <div class="text-red-600 float-right" v-if="!configuration.readonly">
-                                <el-button
-                                    @click="
-                                        data.highlightRequiredProperties =
-                                            !data.highlightRequiredProperties
-                                    "
-                                >
-                                    <i
-                                        class="fa-solid fa-triangle-exclamation text-3xl text-red-600"
-                                    ></i>
-                                </el-button>
-                            </div>
                             <render-entity-id-component
                                 class="my-2 p-2"
                                 :class="{
