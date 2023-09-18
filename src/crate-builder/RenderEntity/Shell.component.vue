@@ -17,6 +17,16 @@
 
             <!-- Untabbed layout  -->
             <div v-if="!data.renderTabs">
+                <!-- highlight required properties -->
+                <div class="text-red-600 float-right" v-if="!configuration.readonly">
+                    <el-button
+                        @click="
+                            data.highlightRequiredProperties = !data.highlightRequiredProperties
+                        "
+                    >
+                        <i class="fa-solid fa-triangle-exclamation text-3xl text-red-600"></i>
+                    </el-button>
+                </div>
                 <!-- render entity id -->
                 <render-entity-id-component
                     class="my-2 p-2"
@@ -59,6 +69,7 @@
                             :entity="data.entity"
                             :property="property"
                             :values="values"
+                            :highlight-required="data.highlightRequiredProperties"
                             @load:entity="loadEntity"
                             @create:entity="createEntity"
                             @link:entity="linkEntity"
@@ -118,6 +129,18 @@
 
                     <span>
                         <div v-if="tab.name === 'about'">
+                            <div class="text-red-600 float-right" v-if="!configuration.readonly">
+                                <el-button
+                                    @click="
+                                        data.highlightRequiredProperties =
+                                            !data.highlightRequiredProperties
+                                    "
+                                >
+                                    <i
+                                        class="fa-solid fa-triangle-exclamation text-3xl text-red-600"
+                                    ></i>
+                                </el-button>
+                            </div>
                             <render-entity-id-component
                                 class="my-2 p-2"
                                 :class="{
@@ -163,6 +186,7 @@
                                     :entity="data.entity"
                                     :property="input.name"
                                     :values="data.entity['@properties'][input.name]"
+                                    :highlight-required="data.highlightRequiredProperties"
                                     @load:entity="loadEntity"
                                     @create:entity="createEntity"
                                     @link:entity="linkEntity"
@@ -248,7 +272,7 @@ const props = defineProps({
 const data = reactive({
     profileManager: {},
     reverseSidebarVisible: false,
-    classDefinition: undefined,
+    highlightRequiredProperties: false,
     activeTab: "about",
     renderTabs: false,
     entity: {},
