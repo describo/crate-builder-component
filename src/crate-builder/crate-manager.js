@@ -312,6 +312,9 @@ export function isURL(value) {
 }
 
 export function validateId({ id, type }) {
+    if (!id) {
+        return { isValid: false };
+    }
     if (type) {
         // if type matches File then whatever is provided is valid
         type = isArray(type) ? type.join(", ") : type;
