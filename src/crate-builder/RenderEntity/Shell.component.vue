@@ -248,7 +248,6 @@ const props = defineProps({
 const data = reactive({
     profileManager: {},
     reverseSidebarVisible: false,
-    classDefinition: undefined,
     activeTab: "about",
     renderTabs: false,
     entity: {},
@@ -401,6 +400,7 @@ function applyLayout({ layout, inputs, entity }) {
     }
     // sort the inputs into their groups
     for (let input of inputs) {
+        if (!entity["@properties"][input.name]) continue;
         if (input.hide) {
             continue;
         } else if (input.group && layout[input.group]) {
@@ -432,14 +432,19 @@ function applyLayout({ layout, inputs, entity }) {
 }
 function applyTabDataIndicators({ tabs, entity }) {
     for (let tab of tabs) {
-        tab.missingRequiredData = false;
-        tab.hasData = false;
-        for (let input of tab.inputs) {
-            if (input.required && !entity["@properties"][input.name].length) {
-                tab.missingRequiredData = true;
-            }
-            if (entity["@properties"][input.name].length) {
-                tab.hasData = true;
+        if (props.configuration.readonly) {
+            tab.hasData = false;
+            tab.missingRequiredData = false;
+        } else {
+            tab.missingRequiredData = false;
+            tab.hasData = false;
+            for (let input of tab.inputs) {
+                if (input.required && !entity["@properties"][input.name].length) {
+                    tab.missingRequiredData = true;
+                }
+                if (entity["@properties"][input.name].length) {
+                    tab.hasData = true;
+                }
             }
         }
     }
