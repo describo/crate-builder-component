@@ -217,4 +217,11 @@ export class ProfileManager {
         let directive = types.map((type) => this.profile.classes?.[type]?.definition);
         return directive.includes("override") ? "override" : "inherit";
     }
+
+    /**
+     * Get an entity label if defined
+     */
+    getTypeLabel(type) {
+        return this.profile?.translations?.[type] ?? type;
+    }
 }
