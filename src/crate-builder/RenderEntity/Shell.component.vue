@@ -128,7 +128,7 @@
                         </div>
                     </template>
 
-                    <span>
+                    <span v-if="data.activeTab === tab.name">
                         <div
                             class="text-red-600 float-right"
                             v-if="!configuration.readonly && tab.missingRequiredData"
