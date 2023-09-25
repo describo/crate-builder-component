@@ -65,6 +65,8 @@
 </template>
 
 <script setup>
+// https://macwright.com/lonlat/
+
 import { ElButton, ElRadio, ElSelect, ElOption, ElForm, ElFormItem, ElInput } from "element-plus";
 import "leaflet/dist/leaflet.css";
 import * as Leaflet from "leaflet/dist/leaflet-src.esm.js";
