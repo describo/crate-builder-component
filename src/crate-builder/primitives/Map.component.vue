@@ -70,7 +70,8 @@ function addFeatureGroup({ geoJSON, type }) {
         let fg = Leaflet.featureGroup([
             Leaflet.geoJSON(geoJSON, {
                 pointToLayer: function (feature, latlng) {
-                    return Leaflet.circleMarker(latlng);
+                    // return Leaflet.circleMarker(latlng);
+                    return Leaflet.marker(latlng);
                 },
             }),
         ]);
