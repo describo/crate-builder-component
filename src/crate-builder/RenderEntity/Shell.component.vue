@@ -17,26 +17,28 @@
 
             <!-- Untabbed layout  -->
             <div v-if="!data.renderTabs">
-                <!-- highlight required properties -->
-                <div class="text-red-600 float-right" v-if="!configuration.readonly">
-                    <el-button
-                        size="large"
-                        @click="
-                            data.highlightRequiredProperties = !data.highlightRequiredProperties
-                        "
-                    >
-                        <i class="fa-solid fa-triangle-exclamation text-3xl text-red-600"></i>
-                    </el-button>
-                </div>
                 <!-- render entity id -->
-                <render-entity-id-component
-                    class="my-2 p-2"
-                    :class="{
-                        'bg-green-200 rounded p-1 my-1': data.savedProperty === '@id',
-                    }"
-                    :entity="data.entity"
-                    @update:entity="updateEntity"
-                />
+                <div class="flex flex-row space-x-2 my-2 p-2">
+                    <render-entity-id-component
+                        class="flex-grow"
+                        :class="{
+                            'bg-green-200 rounded p-1 my-1': data.savedProperty === '@id',
+                        }"
+                        :entity="data.entity"
+                        @update:entity="updateEntity"
+                    />
+                    <!-- highlight required properties -->
+                    <div v-if="!configuration.readonly && data.missingRequiredData">
+                        <el-button
+                            type="danger"
+                            @click="
+                                data.highlightRequiredProperties = !data.highlightRequiredProperties
+                            "
+                        >
+                            <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                        </el-button>
+                    </div>
+                </div>
 
                 <!-- render entity type -->
                 <render-entity-type-component
@@ -134,15 +136,13 @@
                             v-if="!configuration.readonly && tab.missingRequiredData"
                         >
                             <el-button
-                                size="large"
+                                type="danger"
                                 @click="
                                     data.highlightRequiredProperties =
                                         !data.highlightRequiredProperties
                                 "
                             >
-                                <i
-                                    class="fa-solid fa-triangle-exclamation text-3xl text-red-600"
-                                ></i>
+                                <i class="fa-solid fa-triangle-exclamation text-xl"></i>
                             </el-button>
                         </div>
                         <div v-if="tab.name === 'about'">
@@ -241,7 +241,7 @@
 </template>
 
 <script setup>
-import { ElTabs, ElTabPane, ElDrawer } from "element-plus";
+import { ElTabs, ElTabPane, ElDrawer, ElButton } from "element-plus";
 import RenderEntityIdComponent from "./RenderEntityId.component.vue";
 import RenderEntityTypeComponent from "./RenderEntityType.component.vue";
 import RenderEntityNameComponent from "./RenderEntityName.component.vue";
@@ -252,6 +252,7 @@ import { configurationKey } from "./keys.js";
 import { reactive, computed, onMounted, onBeforeMount, onBeforeUnmount, watch, provide } from "vue";
 import difference from "lodash-es/difference.js";
 import orderBy from "lodash-es/orderBy.js";
+import isEmpty from "lodash-es/isEmpty.js";
 import { isURL } from "../crate-manager.js";
 import { ProfileManager } from "../profile-manager.js";
 
@@ -278,6 +279,7 @@ const data = reactive({
     profileManager: {},
     reverseSidebarVisible: false,
     highlightRequiredProperties: false,
+    missingRequiredData: false,
     activeTab: "about",
     renderTabs: false,
     entity: {},
@@ -368,6 +370,7 @@ function init({ entity }) {
     }
 
     const inputs = data.profileManager.getInputsFromProfile({ entity });
+    data.missingRequiredData = false;
 
     for (let input of inputs) {
         if (input.name === "name") continue;
@@ -377,6 +380,10 @@ function init({ entity }) {
         }
         if (!entity["@properties"][input.name] && !props.configuration.readonly) {
             entity["@properties"][input.name] = [];
+        }
+
+        if (input.required && !entity["@properties"][input.name].length) {
+            data.missingRequiredData = true;
         }
     }
     if (data.extraProperties.length) {
