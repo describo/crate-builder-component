@@ -1,5 +1,4 @@
 <template>
-    <!-- <div class="flex flex-row space-x-1"> -->
     <div class="flex flex-row flex-wrap">
         <div v-for="(type, idx) of types" :key="idx">
             <el-button
@@ -13,7 +12,7 @@
                 <div v-show="selectedType === type">
                     <i class="fas fa-times"></i>
                 </div>
-                &nbsp;{{ type }}
+                &nbsp;{{ getTypeLabelFromProfile(type) }}
             </el-button>
         </div>
     </div>
@@ -24,6 +23,10 @@ import { ElButton } from "element-plus";
 import { computed } from "vue";
 
 const props = defineProps({
+    crateManager: {
+        type: Object,
+        required: true,
+    },
     types: {
         type: [String, Array],
         required: true,
@@ -37,6 +40,9 @@ const emit = defineEmits(["add", "close"]);
 let selectedType = computed(() => props.selectedType);
 let types = computed(() => props.types);
 
+function getTypeLabelFromProfile(type) {
+    return props.crateManager.profileManager.getTypeLabel(type);
+}
 function toggle(type) {
     if (props.selectedType === type) {
         emit("close");
