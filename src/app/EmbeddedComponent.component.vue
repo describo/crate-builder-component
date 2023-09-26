@@ -40,11 +40,14 @@
                 :enable-template-save="data.configuration.enableTemplateSave"
                 :enable-internal-routing="true"
                 :enable-reverse-link-browser="data.configuration.enableReverseLinkBrowser"
+                :enable-profile-validation="data.configuration.enableProfileValidation"
                 :purge-unlinked-entities="data.configuration.purgeUnlinkedEntities"
                 :web-component="false"
                 :language="data.configuration.language"
                 :tab-location="data.configuration.tabLocation"
                 :show-controls="data.configuration.showControls"
+                @error="logErrors"
+                @warning="logWarnings"
             />
         </div>
 
@@ -89,6 +92,9 @@
                 </el-form-item>
                 <el-form-item label="Enable Reverse Link Browser">
                     <el-switch v-model="data.configuration.enableReverseLinkBrowser" />
+                </el-form-item>
+                <el-form-item label="Enable Profile Validation">
+                    <el-switch v-model="data.configuration.enableProfileValidation" />
                 </el-form-item>
                 <el-form-item label="Enable Template Save">
                     <el-switch v-model="data.configuration.enableTemplateSave" />
@@ -161,6 +167,7 @@ const data = reactive({
         enableBrowseEntities: true,
         enableTemplateSave: true,
         enableReverseLinkBrowser: true,
+        enableProfileValidation: true,
         purgeUnlinkedEntities: true,
         readonly: false,
         language: "en",
@@ -184,5 +191,11 @@ function setLanguage(value) {
     data.selectedLanguage = value
         ? data.languages.filter((p) => p.name === value)[0].value
         : undefined;
+}
+function logErrors({ errors }) {
+    console.log(`errors:`, [...errors]);
+}
+function logWarnings({ warnings }) {
+    console.log(`warnings:`, [...warnings]);
 }
 </script>

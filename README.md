@@ -297,6 +297,8 @@ from there.**
     the component can't.
 -   `enableReverseLinkBrowser`: true : false: `(default: true)`: enable / disable the reverse link
     browser. If enabled, it can be shown as a right sidebar as required.
+-   `enableProfileValidation`: true : false: `(default: true)`: enable / disable validating the
+    profile
 -   `purgeUnlinkedEntities`: true : false: `(default: true)`: purge unlinked entities from the crate
     before emitting the crate for saving
 -   `readonly`: true | false: `(default: false)` : if set to true all of the controls to edit that
@@ -310,6 +312,8 @@ from there.**
 -   `resetTabOnProfileChange`: true | false: `(default: true)` : When true, if a layout is applied
     and the profile changes, the UI will navigate to the about tab. If false, that doesn't happen if
     there is a matching tab. Otherwise it will go back to the about tab.
+-   `showControls`: true | false: `(default: true)` : Show or hide the controls bar. Useful if you
+    want to provision those controls in your own application.
 -   `showControls`: true | false: `(default: true)` : Show or hide the controls bar. Useful if you
     want to provision those controls in your own application.
 -   `language`: en | hu `(default: en)` : Sets the component's localization to the given language.
