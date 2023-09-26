@@ -222,6 +222,6 @@ export class ProfileManager {
      * Get an entity label if defined
      */
     getTypeLabel(type) {
-        return this.profile?.translations?.[type] ?? type;
+        return this.profile?.localisation?.[type] ?? type;
     }
 }

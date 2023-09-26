@@ -5,7 +5,7 @@
         "version": 0.1,
         "warnMissingProperty": true
     },
-    "translations": {
+    "localisation": {
         "Person": "Hombre",
         "Date": "When it happened"
     },
