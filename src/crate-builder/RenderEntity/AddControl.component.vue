@@ -41,7 +41,7 @@ let selectedType = computed(() => props.selectedType);
 let types = computed(() => props.types);
 
 function getTypeLabelFromProfile(type) {
-    return props.crateManager.profileManager.getTypeLabel(type);
+    return props.crateManager?.profileManager?.getTypeLabel(type);
 }
 function toggle(type) {
     if (props.selectedType === type) {
