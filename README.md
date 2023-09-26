@@ -1,25 +1,25 @@
 # Crate Builder Component
 
-- [Crate Builder Component](#crate-builder-component)
-- [Developing the plugin](#developing-the-plugin)
-  - [Storybook](#storybook)
-  - [Development application](#development-application)
-- [Building and publishing a release](#building-and-publishing-a-release)
-- [Repo structure](#repo-structure)
-- [Using the component in your app](#using-the-component-in-your-app)
-  - [Install the package](#install-the-package)
-  - [Vite users](#vite-users)
-  - [Profiles](#profiles)
-  - [Tailwind CSS dependency](#tailwind-css-dependency)
-  - [Vue Router Dependency](#vue-router-dependency)
-  - [Wire it up](#wire-it-up)
-- [Identifiers and Types](#identifiers-and-types)
-- [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
-- [Full Usage - configuration and events](#full-usage---configuration-and-events)
-  - [Properties](#properties)
-  - [Events](#events)
-- [Themes](#themes)
-- [Internationalisation](#internationalisation)
+-   [Crate Builder Component](#crate-builder-component)
+-   [Developing the plugin](#developing-the-plugin)
+    -   [Storybook](#storybook)
+    -   [Development application](#development-application)
+-   [Building and publishing a release](#building-and-publishing-a-release)
+-   [Repo structure](#repo-structure)
+-   [Using the component in your app](#using-the-component-in-your-app)
+    -   [Install the package](#install-the-package)
+    -   [Vite users](#vite-users)
+    -   [Profiles](#profiles)
+    -   [Tailwind CSS dependency](#tailwind-css-dependency)
+    -   [Vue Router Dependency](#vue-router-dependency)
+    -   [Wire it up](#wire-it-up)
+-   [Identifiers and Types](#identifiers-and-types)
+-   [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
+-   [Full Usage - configuration and events](#full-usage---configuration-and-events)
+    -   [Properties](#properties)
+    -   [Events](#events)
+-   [Themes](#themes)
+-   [Internationalisation](#internationalisation)
 
 This is the core UI component for assembling an RO-Crate inside Describo. It is a self contained
 VueJS component that can be used inside your app. If you use this component, your app is responsible
@@ -227,8 +227,11 @@ Pass in the crate file and optionally a profile.
         :resetTabOnEntityChange="true"
         :resetTabOnProfileChange="true"
         :showControls="true"
+        @ready="ready"
+        @error="handleErrors"
+        @warning="handleWarnings"
+        @navigation="handleNavigation"
         @save:crate="saveCrate"
-        @save:crate:template="saveTemplate"
         @save:entity:template="saveTemplate">
     </describo-crate-builder>
 ```
@@ -322,14 +325,14 @@ from there.**
 -   `error`: If the component fails to load the crate it will emit an error message with more
     information. You should listen for this event and handle it accordingly in your application. It
     emits an object with one property, `errors` which is an array of errors found in the crate.
+-   `warning`: If the component needs to warn you about issues with the data it will emit this
+    event. It emits an object with one property, `warnings` which is an array of warnings found in
+    the crate.
 -   `navigation`: The component emits a navigation event whenever an entity is selected. The output
     is an object with a single property `id` which you can set on the location if you want to enable
     navigation (back, forward) and want to manage it yourself.
 -   `@save:crate`: whenever the crate changes internally, this event will be emitted with the full
     crate for your app to save or handle in some way
--   `@save:crate:template`: this event emits the current crate as a template with a name. This is so
-    users can craft one crate and then re-use it for other datasets. It's up to your app to save it
-    and provide it as an option to the users when loading up a dataset.
 -   `@save:entity:template`: this event emits an entity template for re-use within this crate or
     others. It's up to your app to save it and make it available to the crate-builder via the
     `lookup` interface defined above.
