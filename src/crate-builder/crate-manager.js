@@ -781,7 +781,7 @@ export class Entity {
 
     _confirmNoClash(entity) {
         let idx = this.entitiesById.get(entity["@id"]);
-        if (idx === undefined || entity["@id"] !== "./") return entity;
+        if (idx === undefined || entity["@id"] === "./") return entity;
 
         let entityLookup = this.entities[idx];
         if (entityLookup["@type"] !== entity["@type"]) {
