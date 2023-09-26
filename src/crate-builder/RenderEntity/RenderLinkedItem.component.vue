@@ -38,7 +38,7 @@
                                 {{ instance.property }}
                             </div>
                             <div><i class="fa-solid fa-arrow-right"></i></div>
-                            <div class="flex flex-row space-x-1">
+                            <div class="flex flex-row space-x-1 w-20">
                                 <div>
                                     <span v-if="instance.entity.name">{{
                                         instance.entity.name
