@@ -23,6 +23,7 @@ export class CrateManager {
         this.context = crate["@context"];
 
         let errors = [];
+        let warnings = [];
         this.rootDescriptor;
         let entities = [];
 
@@ -37,7 +38,6 @@ export class CrateManager {
             } else {
                 // ensure every entity has a defined type
                 if (!entity?.["@type"]) {
-                    console.warn(`The entity does not have '@type' defined.`, entity);
                     errors.push({
                         message: `The entity does not have '@type' defined.`,
                         entity,
@@ -46,22 +46,22 @@ export class CrateManager {
                 }
 
                 // then see if @id is a valid identifier
+                if (entity?.["@id"].match(/\s+/)) {
+                    warnings.push(
+                        `Entity @id: '${entity["@id"]}' has spaces in it. These should be encoded. Describo will do this to pass the validate test but the data will not be changed.`
+                    );
+                }
                 let { isValid, message } = validateId({ id: entity["@id"], type: entity["@type"] });
                 if (!isValid) {
                     errors.push({
                         message,
                         entity,
                     });
+                    continue;
                 }
 
                 entities.push(entity);
             }
-        }
-
-        if (errors.length) {
-            console.error(errors);
-            this.errors = errors;
-            throw new Error(`The crate is invalid.`);
         }
 
         // ingest the entities
@@ -75,6 +75,7 @@ export class CrateManager {
         this.em.createMissingEntities();
         this.rootDescriptor.about = { "@id": "./" };
 
+        return { warnings, errors };
         // console.timeEnd();
     }
 
@@ -323,9 +324,6 @@ export function validateId({ id, type }) {
 
     // if there are spaces in the id - encode them
     if (id.match(/\s+/)) {
-        console.warn(
-            `Entity @id: '${id}' has spaces in it. These should be encoded. Describo will do this to pass the validate test but the data will not be changed.`
-        );
         id = id.replace(/\s+/g, "%20");
     }
 

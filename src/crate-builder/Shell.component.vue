@@ -134,6 +134,7 @@ const $emit = defineEmits([
     "load",
     "ready",
     "error",
+    "warning",
     "navigation",
     "save:crate",
     "save:entity:template",
@@ -235,6 +236,7 @@ onBeforeUnmount(() => {
 });
 
 async function init() {
+    const t0 = performance.now();
     if (!props.crate || isEmpty(props.crate)) {
         data.ready = false;
         data.crate = {};
@@ -255,12 +257,12 @@ async function init() {
 
     data.crateManager = new CrateManager();
     data.crateManager.lookup = props.lookup;
-    try {
-        await data.crateManager.load({ crate, profile });
-    } catch (error) {
-        $emit("error", {
-            errors: data.crateManager.errors,
-        });
+    let { errors, warnings } = await data.crateManager.load({ crate, profile });
+    if (warnings.length) {
+        $emit("warning", { warnings });
+    }
+    if (errors.length) {
+        $emit("error", { errors });
         data.error = true;
         ready();
         return;
@@ -274,6 +276,8 @@ async function init() {
     }
 
     ready();
+    const t1 = performance.now();
+    console.log(`Crate load time: ${t1 - t0}ms`);
 }
 function configure() {
     const configuration = {
