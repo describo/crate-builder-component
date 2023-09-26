@@ -39,6 +39,7 @@
         "@element-plus/theme-chalk": "^2.2.16",
         "@fortawesome/fontawesome-free": "^6.4.2",
         "@fortawesome/fontawesome-svg-core": "^6.4.2",
+        "ajv": "^8.12.0",
         "codemirror": "^6.0.1",
         "date-fns": "^2.30.0",
         "element-plus": "^2.3.12",
