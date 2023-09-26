@@ -503,13 +503,14 @@ function createEntity(patch) {
     const property = patch.property;
     delete patch.json.type;
     console.debug("Render Entity component: emit(create:entity)", {
-        id: props.entity["@id"],
+        id: data.entity["@id"],
         property,
         json: patch.json,
     });
+
     if (props.configuration.mode === "embedded") {
         props.crateManager.ingestAndLink({
-            id: props.entity["@id"],
+            id: data.entity["@id"],
             property,
             json: patch.json,
         });
