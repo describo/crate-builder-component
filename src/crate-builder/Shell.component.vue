@@ -38,8 +38,10 @@ import debounce from "lodash-es/debounce";
 import { CrateManager } from "./crate-manager.js";
 import { useRouter, useRoute } from "vue-router";
 import { $t, i18next } from "./i18n";
+import Ajv from "ajv";
 
 let $route, $router;
+import profileSchema from "./profile-schema.json";
 
 const props = defineProps({
     crate: {
@@ -89,6 +91,11 @@ const props = defineProps({
         default: true,
         validator: (val) => [true, false].includes(val),
     },
+    enableProfileValidation: {
+        type: Boolean,
+        default: true,
+        validator: (val) => [true, false].includes(val),
+    },
     purgeUnlinkedEntities: {
         type: Boolean,
         default: true,
@@ -124,6 +131,7 @@ const props = defineProps({
         default: true,
         validator: (val) => [true, false].includes(val),
     },
+
     language: {
         type: String,
         default: "en",
@@ -194,8 +202,10 @@ onMounted(async () => {
         watch(
             () => props.profile,
             () => {
-                data.profile = isEmpty(props.profile) ? {} : cloneDeep(props.profile);
-                data.crateManager.profile = data.profile;
+                validateProfile().then(() => {
+                    data.profile = isEmpty(props.profile) ? {} : cloneDeep(props.profile);
+                    data.crateManager.profile = data.profile;
+                });
             }
         )
     );
@@ -222,6 +232,7 @@ onMounted(async () => {
                 () => props.resetTabOnEntityChange,
                 () => props.resetTabOnProfileChange,
                 () => props.showControls,
+                () => props.validateProfile,
             ],
             () => {
                 data.configuration = configure();
@@ -236,6 +247,7 @@ onBeforeUnmount(() => {
 });
 
 async function init() {
+    console.debug("init crate");
     const t0 = performance.now();
     if (!props.crate || isEmpty(props.crate)) {
         data.ready = false;
@@ -245,6 +257,7 @@ async function init() {
     }
     data.error = false;
 
+    await validateProfile();
     let profile = isEmpty(props.profile) ? {} : cloneDeep(props.profile);
     let crate = cloneDeep(props.crate);
 
@@ -349,6 +362,17 @@ function updateRoute({ entity }) {
 function ready() {
     data.ready = true;
     $emit("ready");
+}
+async function validateProfile() {
+    if (props.enableProfileValidation && !isEmpty(props.profile)) {
+        console.debug("validate profile");
+        const ajv = new Ajv();
+        const validate = ajv.compile(profileSchema);
+        let valid = validate(props.profile);
+        if (!valid) {
+            $emit("error", { errors: validate.errors });
+        }
+    }
 }
 async function saveCrate() {
     await new Promise((resolve) => setTimeout(resolve, 100));
