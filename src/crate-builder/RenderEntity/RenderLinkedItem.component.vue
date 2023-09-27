@@ -5,7 +5,7 @@
         <!-- if the entity does NOT have geography -->
         <div
             v-if="!showMap"
-            class="flex flex-row space-x-2 m-2"
+            class="flex flex-col m-2"
             :class="{ 'm-2': entity?.tgtEntity?.associations.length }"
         >
             <!--render the linking element  -->
@@ -20,7 +20,7 @@
             <!-- if this target has associations, render them -->
             <div
                 v-if="entity?.tgtEntity?.associations.length"
-                class="flex-col space-y-2 border-l-2 pl-1 border-solid border-slate-700"
+                class="mt-2 flex-col space-y-2 border-l-2 pl-1 border-solid border-slate-700"
             >
                 <div
                     v-for="instance of entity.tgtEntity.associations"
@@ -38,7 +38,7 @@
                                 {{ instance.property }}
                             </div>
                             <div><i class="fa-solid fa-arrow-right"></i></div>
-                            <div class="flex flex-row space-x-1 w-20">
+                            <div class="flex flex-row space-x-1 w-52">
                                 <div>
                                     <span v-if="instance.entity.name">{{
                                         instance.entity.name

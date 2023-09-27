@@ -4,11 +4,11 @@
             <div class="border-b border-gray-500 text-sm flex-grow">
                 {{ decodeURIComponent(entity["@id"]) }}
             </div>
-            <div class="flex flex-col lg:flex-row lg:space-x-2">
+            <div class="flex flex-col xl:flex-row xl:space-x-2">
                 <div class="text-base flex flex-row space-x-1">
                     <RenderTypesComponent :types="entity['@type']" />
                 </div>
-                <div class="pt-1 w-20 lg:w-32 xl:w-96">
+                <div class="">
                     {{ props.entity.name }}
                 </div>
             </div>
