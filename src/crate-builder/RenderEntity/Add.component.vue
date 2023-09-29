@@ -90,7 +90,9 @@
                             {{ $t("associate_any_prompt") }}
                         </div>
                         <div class="" v-if="data.addType !== 'ANY'">
-                            {{ $t("associate_existing_prompt", { addType: data.addType }) }}
+                            {{
+                                $t("associate_existing_prompt", { addType: data.localisedAddType })
+                            }}
                         </div>
                         <autocomplete-component
                             :crate-manager="props.crateManager"
@@ -161,7 +163,9 @@ const data = reactive({
         "GeoShape",
     ],
     addType: undefined,
+    localisedAddType: undefined,
 });
+
 let types = computed(() => {
     if (!props.definition.type || props.definition.type === "Value") return "";
     return props.definition.type;
@@ -171,9 +175,11 @@ let addSimpleType = computed(() => {
 });
 function close() {
     data.addType = undefined;
+    data.localisedAddType = undefined;
 }
 function add({ type }) {
     data.addType = type;
+    data.localisedAddType = props.crateManager?.profileManager?.getTypeLabel(type);
 }
 function createProperty(data) {
     // console.debug("Add Component : emit(create:property)", data);
