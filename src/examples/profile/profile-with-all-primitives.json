@@ -5,6 +5,10 @@
         "version": 0.1,
         "warnMissingProperty": true
     },
+    "localisation": {
+        "Person": "Hombre",
+        "Date": "When it happened"
+    },
     "classes": {
         "Dataset": {
             "definition": "inherit",

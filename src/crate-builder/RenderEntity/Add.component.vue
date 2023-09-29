@@ -1,6 +1,7 @@
 <template>
     <div class="flex flex-col">
         <add-control-component
+            :crate-manager="props.crateManager"
             :types="types"
             :selected-type="data.addType"
             @add="add"

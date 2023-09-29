@@ -310,7 +310,6 @@ onBeforeMount(() => {
         configurationKey,
         computed(() => props.configuration)
     );
-    initProfile();
 });
 onMounted(() => {
     init({ entity: props.entity });
@@ -364,6 +363,7 @@ function initProfile() {
     props.crateManager.profileManager = data.profileManager;
 }
 function init({ entity }) {
+    initProfile();
     if (!entity["@id"]) return;
     if (entity["@id"] !== data.entity["@id"]) {
         window.scrollTo(0, 0);
