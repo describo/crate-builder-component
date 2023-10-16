@@ -125,7 +125,6 @@ const props = defineProps({
         default: true,
         validator: (val) => [true, false].includes(val),
     },
-
     language: {
         type: String,
         default: "en",
@@ -152,7 +151,8 @@ if (props.enableInternalRouting) {
 const data = reactive({
     ready: false,
     error: false,
-    errors: [],
+    errors: {},
+    warnings: {},
     crate: {},
     profile: {},
     entity: {},
@@ -265,6 +265,8 @@ async function init() {
     data.crateManager = new CrateManager();
     data.crateManager.lookup = props.lookup;
     let { errors, warnings } = await data.crateManager.load({ crate, profile });
+    data.errors = errors;
+    data.warnings = warnings;
     $emit("warning", { warnings });
     $emit("error", { errors });
 
@@ -358,12 +360,16 @@ function ready() {
 }
 async function validateProfile() {
     if (props.enableProfileValidation && !isEmpty(props.profile)) {
-        console.debug("validate profile");
         const ajv = new Ajv();
         const validate = ajv.compile(profileSchema);
         let valid = validate(props.profile);
         if (!valid) {
-            $emit("error", { errors: validate.errors });
+            data.errors.profileStructuralErrors = {
+                description: `Structural errors have been found in the profile.`,
+                data: validate.errors,
+            };
+
+            $emit("error", { errors: data.errors });
         }
     }
 }
