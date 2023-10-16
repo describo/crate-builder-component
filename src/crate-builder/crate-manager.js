@@ -720,7 +720,10 @@ export class Entity {
 
             this.entities = this.entities.map((entity) => {
                 if (!entity) return null;
-                if (!linkedEntities[entity["@id"]]) return null;
+                if (!linkedEntities[entity["@id"]]) {
+                    this.entitiesById.delete(entity["@id"]);
+                    return null;
+                }
                 return entity;
             });
         }
@@ -739,30 +742,6 @@ export class Entity {
                 });
             }
         }
-        // this.entities = this.entities.map((entity) => {
-        //     if (!entity) return null;
-        //     if (entity["@id"] === "./") return entity;
-        //     if (!this.reverse[entity["@id"]]) return null;
-
-        //     let connections = Object.keys(this.reverse[entity["@id"]]).map(
-        //         (property) => this.reverse[entity["@id"]][property]
-        //     );
-        //     connections = flattenDeep(connections);
-        //     connections = compact(connections);
-
-        //     let intermediatesKnown = connections.map((id) => {
-        //         let e = this.getEntityStub(id);
-        //         if (!e || !this.reverse[e["@id"]]) return id;
-        //         let c = Object.keys(this.reverse[e["@id"]]).map(
-        //             (property) => this.reverse[e["@id"]][property]
-        //         );
-        //         c = flattenDeep(c);
-        //         c = compact(c);
-        //         return c;
-        //     });
-        //     intermediatesKnown = flattenDeep(intermediatesKnown);
-        //     return connections.length && intermediatesKnown.length ? entity : null;
-        // });
     }
 
     _getEntity({ id }) {
@@ -790,7 +769,7 @@ export class Entity {
         if (idx === undefined || entity["@id"] === "./") return entity;
 
         let entityLookup = this.entities[idx];
-        if (entityLookup["@type"] !== entity["@type"]) {
+        if (entityLookup?.["@type"] !== entity["@type"]) {
             const id = `e${this.entities.length}`;
             entity["@id"] = `#${id}`;
         }
