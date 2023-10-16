@@ -11,13 +11,6 @@
             @save:crate="saveCrate"
             @save:entity:template="saveEntityAsTemplate"
         />
-
-        <div v-if="data.error && data.errors.length">
-            There are errors in the data.
-            <pre
-                >{{ data.errors }}
-            </pre>
-        </div>
     </div>
 </template>
 
@@ -31,6 +24,7 @@ import {
     watch,
     getCurrentInstance,
 } from "vue";
+import flattenDeep from "lodash-es/flattenDeep";
 import cloneDeep from "lodash-es/cloneDeep";
 import isEmpty from "lodash-es/isEmpty";
 import isFunction from "lodash-es/isFunction";
@@ -271,13 +265,12 @@ async function init() {
     data.crateManager = new CrateManager();
     data.crateManager.lookup = props.lookup;
     let { errors, warnings } = await data.crateManager.load({ crate, profile });
-    if (warnings.length) {
-        $emit("warning", { warnings });
-    }
-    if (errors.length) {
-        $emit("error", { errors });
-        data.error = true;
-        ready();
+    $emit("warning", { warnings });
+    $emit("error", { errors });
+
+    data.error =
+        flattenDeep(Object.keys(errors).map((errorType) => errors[errorType].data)).length > 0;
+    if (data.error) {
         return;
     }
 

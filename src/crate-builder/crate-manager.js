@@ -22,8 +22,22 @@ export class CrateManager {
         this.profile = profile;
         this.context = crate["@context"];
 
-        let errors = [];
-        let warnings = [];
+        let errors = {
+            invalidIdentifier: {
+                description: `The entity identifier (@id) is not valid. See https://github.com/describo/crate-builder-component/blob/master/README.identifiers.md for more information`,
+                data: [],
+            },
+            missingTypeDefinition: {
+                description: `The entity does not have a defined type (@type).`,
+                data: [],
+            },
+        };
+        let warnings = {
+            invalidIdentifier: {
+                description: `The entity identifier (@id) has spaces in it that should be encoded. Describo will do this to pass the validate test but the data must be corrected manually.`,
+                data: [],
+            },
+        };
         this.rootDescriptor;
         let entities = [];
 
@@ -38,25 +52,17 @@ export class CrateManager {
             } else {
                 // ensure every entity has a defined type
                 if (!entity?.["@type"]) {
-                    errors.push({
-                        message: `The entity does not have '@type' defined.`,
-                        entity,
-                    });
+                    errors.missingTypeDefinition.data.push(entity["@id"]);
                     continue;
                 }
 
                 // then see if @id is a valid identifier
                 if (entity?.["@id"].match(/\s+/)) {
-                    warnings.push(
-                        `Entity @id: '${entity["@id"]}' has spaces in it. These should be encoded. Describo will do this to pass the validate test but the data will not be changed.`
-                    );
+                    warnings.invalidIdentifier.data.push(entity["@id"]);
                 }
                 let { isValid, message } = validateId({ id: entity["@id"], type: entity["@type"] });
                 if (!isValid) {
-                    errors.push({
-                        message,
-                        entity,
-                    });
+                    errors.invalidIdentifier.data.push(entity["@id"]);
                     continue;
                 }
 

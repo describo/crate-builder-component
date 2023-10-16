@@ -187,15 +187,10 @@ function setCrate(name) {
 function setProfile(name) {
     data.selectedProfile = name ? data.profiles.filter((p) => p.name === name)[0].value : undefined;
 }
-function setLanguage(value) {
-    data.selectedLanguage = value
-        ? data.languages.filter((p) => p.name === value)[0].value
-        : undefined;
-}
 function logErrors({ errors }) {
-    console.log(`errors:`, [...errors]);
+    console.log(`errors:`, { ...errors });
 }
 function logWarnings({ warnings }) {
-    console.log(`warnings:`, [...warnings]);
+    console.log(`warnings:`, { ...warnings });
 }
 </script>
