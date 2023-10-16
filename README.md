@@ -1,25 +1,26 @@
 # Crate Builder Component
 
--   [Crate Builder Component](#crate-builder-component)
--   [Developing the plugin](#developing-the-plugin)
-    -   [Storybook](#storybook)
-    -   [Development application](#development-application)
--   [Building and publishing a release](#building-and-publishing-a-release)
--   [Repo structure](#repo-structure)
--   [Using the component in your app](#using-the-component-in-your-app)
-    -   [Install the package](#install-the-package)
-    -   [Vite users](#vite-users)
-    -   [Profiles](#profiles)
-    -   [Tailwind CSS dependency](#tailwind-css-dependency)
-    -   [Vue Router Dependency](#vue-router-dependency)
-    -   [Wire it up](#wire-it-up)
--   [Identifiers and Types](#identifiers-and-types)
--   [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
--   [Full Usage - configuration and events](#full-usage---configuration-and-events)
-    -   [Properties](#properties)
-    -   [Events](#events)
--   [Themes](#themes)
--   [Internationalisation](#internationalisation)
+- [Crate Builder Component](#crate-builder-component)
+- [Developing the plugin](#developing-the-plugin)
+  - [Storybook](#storybook)
+  - [Development application](#development-application)
+- [Building and publishing a release](#building-and-publishing-a-release)
+- [Repo structure](#repo-structure)
+- [Using the component in your app](#using-the-component-in-your-app)
+  - [Install the package](#install-the-package)
+  - [Vite users](#vite-users)
+  - [Profiles](#profiles)
+  - [Tailwind CSS dependency](#tailwind-css-dependency)
+  - [Vue Router Dependency](#vue-router-dependency)
+  - [Wire it up](#wire-it-up)
+- [Identifiers and Types](#identifiers-and-types)
+- [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
+- [Full Usage - configuration and events](#full-usage---configuration-and-events)
+  - [Properties](#properties)
+  - [Events](#events)
+    - [Warnings and errors](#warnings-and-errors)
+- [Themes](#themes)
+- [Internationalisation](#internationalisation)
 
 This is the core UI component for assembling an RO-Crate inside Describo. It is a self contained
 VueJS component that can be used inside your app. If you use this component, your app is responsible
@@ -111,7 +112,7 @@ export default defineConfig({
         }),
     ],
     optimizeDeps: {
-        include: ["element-plus", "lodash", "@describo/crate-builder-component"],
+        include: ["element-plus", "lodash", "@describo/crate-builder-component", "ajv"],
     },
 });
 ```
@@ -328,10 +329,9 @@ from there.**
     used, listen for this event to cancel the indicator.
 -   `error`: If the component fails to load the crate it will emit an error message with more
     information. You should listen for this event and handle it accordingly in your application. It
-    emits an object with one property, `errors` which is an array of errors found in the crate.
+    emits an object with one property, `errors`.
 -   `warning`: If the component needs to warn you about issues with the data it will emit this
-    event. It emits an object with one property, `warnings` which is an array of warnings found in
-    the crate.
+    event. It emits an object with one property, `warnings`.
 -   `navigation`: The component emits a navigation event whenever an entity is selected. The output
     is an object with a single property `id` which you can set on the location if you want to enable
     navigation (back, forward) and want to manage it yourself.
@@ -340,6 +340,44 @@ from there.**
 -   `@save:entity:template`: this event emits an entity template for re-use within this crate or
     others. It's up to your app to save it and make it available to the crate-builder via the
     `lookup` interface defined above.
+
+### Warnings and errors
+
+You should listen for these events and handle them accordingly. Warnings do not stop the data
+component from rendering the crate but errors do. The structure is as follows:
+
+In both cases, the object keys are the type of error and the value is an object with two properties:
+a `description` of the error and the entity id's that caused it in the `data` property.
+
+-   Warnings
+
+```JSON
+{
+    "invalidIdentifier": {
+        "description": "The entity identifier (@id) has spaces in it that should be encoded. Describo will do this to pass the validate test but the data must be corrected manually.",
+        "data": [
+          "#Erakor, Lelepa",
+          "#South Efate",
+          "#geo_Erakor, Lelepa"
+        ]
+    }
+}
+```
+
+-   Errors
+
+```JSON
+{
+  "invalidIdentifier": {
+    "description": "The entity identifier (@id) is not valid. See https://github.com/describo/crate-builder-component/blob/master/README.identifiers.md for more information",
+    "data": []
+  },
+  "missingTypeDefinition": {
+    "description": "The entity does not have a defined type (@type).",
+    "data": []
+  }
+}
+```
 
 # Themes
 
