@@ -54,20 +54,22 @@
 
         <!-- if the entity has geography then show the map -->
         <div v-if="showMap">
-            <div class="flex flex-row space-x-2">
-                <div class="flex flex-col">
-                    <div class="p-2">
+            <div class="flex flex-col space-y-2">
+                <div class="flex flex-row p-2">
+                    <div>
                         {{ props.entity.tgtEntity.name }}
                     </div>
-                    <map-component
-                        :crate-manager="props.crateManager"
+                    <div class="flex-grow"></div>
+
+                    <UnlinkEntityComponent
+                        v-if="!configuration.readonly && !props.readonly"
                         :entity="props.entity.tgtEntity"
+                        @unlink:entity="unlinkEntity"
                     />
                 </div>
-                <UnlinkEntityComponent
-                    v-if="!configuration.readonly && !props.readonly"
+                <map-component
+                    :crate-manager="props.crateManager"
                     :entity="props.entity.tgtEntity"
-                    @unlink:entity="unlinkEntity"
                 />
             </div>
         </div>

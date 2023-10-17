@@ -91,19 +91,15 @@ const props = defineProps({
 });
 const $emit = defineEmits(["create:entity", "link:entity"]);
 
+const map = new Leaflet.map("map");
 const data = reactive({
     mode: "box",
     form: undefined,
     locationName: undefined,
-    map: undefined,
-    showLocationSearchBox: false,
     selection: undefined,
-    locations: [],
-    layers: [],
     feature: undefined,
     existingEntities: [],
     selectValue: undefined,
-    geojsonProperty: undefined,
     error: undefined,
 });
 
@@ -111,28 +107,24 @@ onMounted(() => {
     init();
 });
 onBeforeUnmount(() => {
-    data.map.off();
-    data.map.remove();
+    map.off();
+    map.remove();
 });
 
 async function init() {
     await loadGeoDataInCrate();
-    // await loadPropertyData();
-    data.map = new Leaflet.map("map");
 
-    // we need to give leaflet and vue and the dom a couple seconds before barreling on
+    // we need to give leaflet and vue and the dom a moment before barrelling on
     await new Promise((resolve) => setTimeout(resolve, 200));
     centerMap();
-    Leaflet.tileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.{ext}", {
+
+    Leaflet.tileLayer("//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
-            'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        subdomains: "abcd",
+            'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
         minZoom: 1,
         maxZoom: 16,
-        ext: "jpg",
         noWrap: true,
-    }).addTo(data.map);
-
+    }).addTo(map);
     updateHandlers();
 }
 
@@ -149,36 +141,18 @@ async function loadGeoDataInCrate() {
 }
 
 function centerMap() {
-    data.map.setView([0, 0], 0);
+    map.setView([0, 0], 0);
 }
-
-// function querySearch(queryString, cb) {
-//     if (queryString.length < 4) return [];
-//     const re = new RegExp(queryString, "i");
-//     const matches = data.locations.filter((l) => l.properties.name.match(re));
-//     return cb(matches);
-// }
-
-function removeExistingLayers() {
-    data.layers.forEach((layer) => data.map.removeLayer(layer));
-}
-
-// function addFeatureGroup(geoJSON) {
-//     const fg = Leaflet.featureGroup([Leaflet.geoJSON(geoJSON)]);
-//     fg.addTo(data.map);
-//     data.layers.push(fg);
-//     return fg;
-// }
 
 function updateHandlers() {
     if (data.mode === "box") {
-        data.map.off("click");
-        data.map.selectArea.enable();
-        data.map.selectArea.setShiftKey(true);
-        data.map.on("areaselected", handleAreaSelect);
+        map.off("click");
+        map.selectArea.enable();
+        map.selectArea.setShiftKey(true);
+        map.on("areaselected", handleAreaSelect);
     } else {
-        data.map.off("areaselected");
-        data.map.on("click", handlePointSelect);
+        map.off("areaselected");
+        map.on("click", handlePointSelect);
     }
 }
 
@@ -198,7 +172,6 @@ function handleAreaSelect(e) {
             ],
         },
     };
-    removeExistingLayers();
     const entity = {
         "@type": "GeoShape",
         geojson: geoJSON,
@@ -208,7 +181,7 @@ function handleAreaSelect(e) {
 }
 
 function handlePointSelect(e) {
-    const latlng = data.map.mouseEventToLatLng(e.originalEvent);
+    const latlng = map.mouseEventToLatLng(e.originalEvent);
     const geoJSON = {
         type: "Feature",
         geometry: {
@@ -216,7 +189,6 @@ function handlePointSelect(e) {
             coordinates: [latlng.lng, latlng.lat],
         },
     };
-    removeExistingLayers();
 
     const entity = {
         "@type": "GeoCoordinates",

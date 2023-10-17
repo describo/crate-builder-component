@@ -15,37 +15,34 @@ const props = defineProps({
     entity: { type: Object },
 });
 
+const mapId = btoa(props.entity["@id"]);
+let map;
+let layers = [];
 const data = reactive({
-    map: undefined,
     properties: {},
-    layers: [],
 });
 
 onMounted(() => {
+    map = new Leaflet.map(mapId, { scrollWheelZoom: false, touchZoom: false });
     init();
 });
 onBeforeUnmount(() => {
-    data.map.off();
-    data.map.remove();
+    map.off();
+    map.remove();
 });
-const mapId = btoa(props.entity["@id"]);
 
 async function init() {
     const entity = props.crateManager.getEntity({ id: props.entity["@id"] });
-    data.map = new Leaflet.map(mapId, { scrollWheelZoom: false, touchZoom: false });
 
     // we need to give leaflet and vue and the dom a couple seconds before barreling on
     await new Promise((resolve) => setTimeout(resolve, 200));
     centerMap();
-    Leaflet.tileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.{ext}", {
+    Leaflet.tileLayer("//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
-            'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        subdomains: "abcd",
+            'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
         minZoom: 1,
         maxZoom: 16,
-        ext: "jpg",
-        noWrap: true,
-    }).addTo(data.map);
+    }).addTo(map);
 
     if (entity["@properties"].geojson) {
         let geojson = JSON.parse(entity["@properties"].geojson[0].value);
@@ -58,11 +55,11 @@ async function init() {
 }
 
 function centerMap() {
-    data.map.setView([0, 0], 0);
+    map.setView([0, 0], 0);
 }
 
 function removeExistingLayers() {
-    data.layers.forEach((layer) => data.map.removeLayer(layer));
+    layers.forEach((layer) => map.removeLayer(layer));
 }
 
 function addFeatureGroup({ geoJSON, type }) {
@@ -76,12 +73,12 @@ function addFeatureGroup({ geoJSON, type }) {
             }),
         ]);
         fg.setStyle({ color: "#000000" });
-        fg.addTo(data.map);
-        data.layers.push(fg);
+        fg.addTo(map);
+        layers.push(fg);
 
         setTimeout(() => {
             try {
-                data.map.flyToBounds(fg.getBounds(), { maxZoom: 3, duration: 2 });
+                map.flyToBounds(fg.getBounds(), { maxZoom: 3, duration: 2 });
             } catch (error) {
                 // swallow zoom errors as it's most likely to be because the map is no longer showing
             }
