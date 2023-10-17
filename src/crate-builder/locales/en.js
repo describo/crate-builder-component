@@ -91,7 +91,7 @@ const en = {
             "The definition provided to this component has values of the wrong from. It can only be an array of JSON-LD objects and each object, at a minimum, must have '@id', '@type' and 'name' defined.",
 
         // Geo.component.vue
-        define_location: "Define a location by selection on the map",
+        define_location: "Define a location by selecting on the map",
         center_map: "center map",
         select_region: "select region",
         select_point: "select point",
