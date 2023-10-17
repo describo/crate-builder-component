@@ -23,7 +23,12 @@ const data = reactive({
 });
 
 onMounted(() => {
-    map = new Leaflet.map(mapId, { scrollWheelZoom: false, touchZoom: false });
+    map = new Leaflet.map(mapId, {
+        center: [0, 0],
+        zoom: 1,
+        scrollWheelZoom: false,
+        touchZoom: false,
+    });
     init();
 });
 onBeforeUnmount(() => {
@@ -36,13 +41,22 @@ async function init() {
 
     // we need to give leaflet and vue and the dom a couple seconds before barreling on
     await new Promise((resolve) => setTimeout(resolve, 200));
-    centerMap();
-    Leaflet.tileLayer("//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution:
-            'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
-        minZoom: 1,
-        maxZoom: 16,
-    }).addTo(map);
+    // centerMap();
+    Leaflet.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+        {
+            attribution:
+                "Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012",
+            minZoom: 1,
+            maxZoom: 16,
+        }
+    ).addTo(map);
+    // Leaflet.tileLayer("//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    //     attribution:
+    //         'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+    //     minZoom: 1,
+    //     maxZoom: 16,
+    // }).addTo(map);
 
     if (entity["@properties"].geojson) {
         let geojson = JSON.parse(entity["@properties"].geojson[0].value);

@@ -91,7 +91,7 @@ const props = defineProps({
 });
 const $emit = defineEmits(["create:entity", "link:entity"]);
 
-const map = new Leaflet.map("map");
+let map;
 const data = reactive({
     mode: "box",
     form: undefined,
@@ -104,6 +104,14 @@ const data = reactive({
 });
 
 onMounted(() => {
+    map = new Leaflet.map("map", {
+        center: [0, 0],
+        zoom: 1,
+        // maxBounds: [
+        //     [-90, -180],
+        //     [90, 180],
+        // ],
+    });
     init();
 });
 onBeforeUnmount(() => {
@@ -116,15 +124,24 @@ async function init() {
 
     // we need to give leaflet and vue and the dom a moment before barrelling on
     await new Promise((resolve) => setTimeout(resolve, 200));
-    centerMap();
+    // centerMap();
 
-    Leaflet.tileLayer("//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution:
-            'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
-        minZoom: 1,
-        maxZoom: 16,
-        noWrap: true,
-    }).addTo(map);
+    Leaflet.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+        {
+            attribution:
+                "Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012",
+            minZoom: 1,
+            maxZoom: 16,
+        }
+    ).addTo(map);
+    // Leaflet.tileLayer("//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    //     attribution:
+    //         'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+    //     minZoom: 1,
+    //     maxZoom: 16,
+    //     noWrap: true,
+    // }).addTo(map);
     updateHandlers();
 }
 
