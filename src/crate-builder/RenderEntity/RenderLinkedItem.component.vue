@@ -56,7 +56,7 @@
         <div v-if="showMap">
             <div class="flex flex-row space-x-2">
                 <div class="flex flex-col">
-                    <div>
+                    <div class="p-2">
                         {{ props.entity.tgtEntity.name }}
                     </div>
                     <map-component
