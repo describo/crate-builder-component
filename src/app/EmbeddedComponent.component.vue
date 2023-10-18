@@ -190,9 +190,9 @@ function setProfile(name) {
     data.selectedProfile = name ? data.profiles.filter((p) => p.name === name)[0].value : undefined;
 }
 function logErrors({ errors }) {
-    console.log(`errors:`, { ...errors });
+    console.error(`errors:`, { ...errors });
 }
 function logWarnings({ warnings }) {
-    console.log(`warnings:`, { ...warnings });
+    console.warn(`warnings:`, { ...warnings });
 }
 </script>
