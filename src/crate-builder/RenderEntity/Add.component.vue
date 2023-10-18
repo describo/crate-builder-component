@@ -1,7 +1,11 @@
 <template>
     <div
-        class="flex flex-row my-2 space-x-2 items-center rounded"
-        :class="{ 'bg-indigo-200 p-1': data.addType }"
+        class="flex my-2 p-1 rounded"
+        :class="{
+            'bg-indigo-200': data.addType,
+            'flex-row space-x-2 space-y-0': types.length === 1,
+            'flex-col space-y-2 space-x-0': types.length > 1,
+        }"
     >
         <add-control-component
             :crate-manager="props.crateManager"
@@ -11,7 +15,7 @@
             @close="close"
         />
 
-        <div v-if="addSimpleType" class="w-full">
+        <div v-if="addSimpleType" class="p-1 w-full">
             <text-component
                 v-if="data.addType === 'Text'"
                 :property="props.property"
@@ -77,7 +81,7 @@
                 @link:entity="linkEntity"
             />
         </div>
-        <div v-else class="w-full">
+        <div v-else class="p-1 w-full">
             <div
                 class="flex flex-row space-x-2 divide-y divide-gray-300 text-gray-600"
                 v-if="data.addType"

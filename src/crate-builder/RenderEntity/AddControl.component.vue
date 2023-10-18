@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-row flex-wrap">
+    <div class="flex flex-row">
         <div v-for="(type, idx) of types" :key="idx">
             <el-button
                 @click="toggle(type)"
