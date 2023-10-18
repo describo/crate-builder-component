@@ -287,7 +287,7 @@ const props = defineProps({
 const contextEntity = shallowRef({});
 const profileManager = shallowRef({});
 const tabs = shallowRef({});
-const watchers = [];
+let watchers = [];
 
 const data = reactive({
     reverseSidebarVisible: false,
@@ -366,6 +366,7 @@ onMounted(() => {
 });
 onBeforeUnmount(() => {
     watchers.forEach((watcher) => watcher());
+    watchers = [];
 });
 
 function initProfile() {

@@ -156,7 +156,7 @@ const crate = shallowRef({});
 const profile = shallowRef({});
 const configuration = shallowRef({});
 const contextEntity = shallowRef({});
-const watchers = [];
+let watchers = [];
 
 const data = reactive({
     ready: false,
