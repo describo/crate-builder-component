@@ -1,23 +1,18 @@
 <template>
-    <div class="">
-        <div class="flex flex-row space-x-2">
-            <el-input
-                class="w-full"
-                :type="type"
-                v-model="data.internalValue"
-                @blur="data.debouncedSave"
-                @change="data.debouncedSave"
-                resize="vertical"
-                :rows="5"
-                :placeholder="props.placeholder"
-            ></el-input>
-            <el-button @click="save" type="success" size="default">
-                <i class="fas fa-check fa-fw"></i>
-            </el-button>
-        </div>
-        <!-- <div v-else class="text-xs text-gray-700">
-            {{ $t("invalid_type_for_text", { type: props.type }) }}
-        </div> -->
+    <div class="flex flex-row space-x-2">
+        <el-input
+            class="w-full"
+            :type="type"
+            v-model="data.internalValue"
+            @blur="data.debouncedSave"
+            @change="data.debouncedSave"
+            resize="vertical"
+            :rows="5"
+            :placeholder="props.placeholder"
+        ></el-input>
+        <el-button @click="save" type="success" size="default">
+            <i class="fas fa-check fa-fw"></i>
+        </el-button>
     </div>
 </template>
 
