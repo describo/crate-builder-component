@@ -5,7 +5,7 @@
             <render-controls-component
                 v-if="!configuration.readonly && configuration.showControls"
                 :crate-manager="props.crateManager"
-                :entity="data.entity"
+                :entity="contextEntity"
                 @load:entity="loadEntity"
                 @add:property:placeholder="addPropertyPlaceholder"
                 @delete:entity="deleteEntity"
@@ -24,7 +24,7 @@
                         :class="{
                             'bg-green-200 rounded p-1 my-1': data.savedProperty === '@id',
                         }"
-                        :entity="data.entity"
+                        :entity="contextEntity"
                         @update:entity="updateEntity"
                     />
                     <!-- highlight required properties -->
@@ -44,7 +44,7 @@
                 <render-entity-type-component
                     class="my-2 p-2"
                     :crate-manager="props.crateManager"
-                    :entity="data.entity"
+                    :entity="contextEntity"
                     @update:entity="updateEntity"
                 />
 
@@ -54,12 +54,12 @@
                     :class="{
                         'bg-green-200 rounded p-1 my-1': data.savedProperty === 'name',
                     }"
-                    :entity="data.entity"
+                    :entity="contextEntity"
                     @update:entity="updateEntity"
                 />
 
                 <!-- render entity properties -->
-                <div v-for="(values, property) of data.entity['@properties']" :key="property">
+                <div v-for="(values, property) of contextEntity['@properties']" :key="property">
                     <div>
                         <render-entity-property-component
                             :class="{
@@ -69,7 +69,7 @@
                             }"
                             class="my-2"
                             :crate-manager="props.crateManager"
-                            :entity="data.entity"
+                            :entity="contextEntity"
                             :property="property"
                             :values="values"
                             :highlight-required="data.highlightRequiredProperties"
@@ -94,7 +94,7 @@
                 <el-tab-pane
                     :label="tab.name"
                     :name="tab.name"
-                    v-for="(tab, idx) of data.tabs"
+                    v-for="(tab, idx) of tabs"
                     :key="idx"
                 >
                     <template #label>
@@ -151,13 +151,13 @@
                                 :class="{
                                     'bg-green-200 rounded p-1 my-1': data.savedProperty === '@id',
                                 }"
-                                :entity="data.entity"
+                                :entity="contextEntity"
                                 @update:entity="updateEntity"
                             />
                             <render-entity-type-component
                                 class="my-2 p-2"
                                 :crate-manager="props.crateManager"
-                                :entity="data.entity"
+                                :entity="contextEntity"
                                 @update:entity="updateEntity"
                             />
                             <render-entity-name-component
@@ -165,7 +165,7 @@
                                 :class="{
                                     'bg-green-200 rounded p-1 my-1': data.savedProperty === 'name',
                                 }"
-                                :entity="data.entity"
+                                :entity="contextEntity"
                                 @update:entity="updateEntity"
                             />
                         </div>
@@ -188,9 +188,9 @@
                                 <render-entity-property-component
                                     class="my-2"
                                     :crate-manager="props.crateManager"
-                                    :entity="data.entity"
+                                    :entity="contextEntity"
                                     :property="input.name"
-                                    :values="data.entity['@properties'][input.name]"
+                                    :values="contextEntity['@properties'][input.name]"
                                     :highlight-required="data.highlightRequiredProperties"
                                     @load:entity="loadEntity"
                                     @create:entity="createEntity"
@@ -230,9 +230,9 @@
         >
             <template #default>
                 <RenderReverseConnectionsComponent
-                    :key="data.entity['@id']"
+                    :key="contextEntity['@id']"
                     :crate-manager="props.crateManager"
-                    :connections="data.entity['@reverse']"
+                    :connections="contextEntity['@reverse']"
                     @load:entity="loadEntity"
                 />
             </template>
@@ -241,6 +241,18 @@
 </template>
 
 <script setup>
+import { configurationKey } from "./keys.js";
+import {
+    reactive,
+    shallowRef,
+    triggerRef,
+    computed,
+    onMounted,
+    onBeforeMount,
+    onBeforeUnmount,
+    watch,
+    provide,
+} from "vue";
 import { ElTabs, ElTabPane, ElDrawer, ElButton } from "element-plus";
 import RenderEntityIdComponent from "./RenderEntityId.component.vue";
 import RenderEntityTypeComponent from "./RenderEntityType.component.vue";
@@ -248,11 +260,8 @@ import RenderEntityNameComponent from "./RenderEntityName.component.vue";
 import RenderEntityPropertyComponent from "./RenderEntityProperty.component.vue";
 import RenderReverseConnectionsComponent from "./RenderReverseConnections.component.vue";
 import RenderControlsComponent from "./RenderControls.component.vue";
-import { configurationKey } from "./keys.js";
-import { reactive, computed, onMounted, onBeforeMount, onBeforeUnmount, watch, provide } from "vue";
 import difference from "lodash-es/difference.js";
 import orderBy from "lodash-es/orderBy.js";
-import isEmpty from "lodash-es/isEmpty.js";
 import { isURL } from "../crate-manager.js";
 import { ProfileManager } from "../profile-manager.js";
 
@@ -275,19 +284,20 @@ const props = defineProps({
     },
 });
 
+const contextEntity = shallowRef({});
+const profileManager = shallowRef({});
+const tabs = shallowRef({});
+const watchers = [];
+
 const data = reactive({
-    profileManager: {},
     reverseSidebarVisible: false,
     highlightRequiredProperties: false,
     missingRequiredData: false,
     activeTab: "about",
     renderTabs: false,
-    entity: {},
-    tabs: [],
     extraProperties: [],
     savedProperty: undefined,
     savedPropertyTimeout: 1500,
-    watchers: [],
 });
 
 const $emit = defineEmits([
@@ -313,7 +323,7 @@ onBeforeMount(() => {
 });
 onMounted(() => {
     init({ entity: props.entity });
-    data.watchers[0] = watch(
+    watchers[0] = watch(
         () => props.entity,
         (n, o) => {
             if (n["@id"] !== o["@id"]) {
@@ -324,7 +334,7 @@ onMounted(() => {
                 } else {
                     // ... otherwise only change to "about" if the newly set entity doesn't have a layout with the same name as
                     // the currently selected one. If there is such layout, keep that (no change to data.activeTab).
-                    const layouts = data.profileManager.getLayouts({ entity: props.entity });
+                    const layouts = profileManager.value.getLayouts({ entity: props.entity });
                     if (layouts == null || !layouts[data.activeTab]) {
                         data.activeTab = "about";
                     }
@@ -333,7 +343,7 @@ onMounted(() => {
             init({ entity: props.entity });
         }
     );
-    data.watchers[1] = watch(
+    watchers[1] = watch(
         () => props.profile,
         () => {
             initProfile();
@@ -344,7 +354,7 @@ onMounted(() => {
             } else {
                 // ... otherwise only change to "about" if the newly set profile doesn't have a layout with the same name as
                 // the currently selected one. If there is such layout, keep that (no change to data.activeTab).
-                const layouts = data.profileManager.getLayouts({ entity: props.entity });
+                const layouts = profileManager.value.getLayouts({ entity: props.entity });
                 if (layouts == null || !layouts[data.activeTab]) {
                     data.activeTab = "about";
                 }
@@ -355,21 +365,21 @@ onMounted(() => {
     );
 });
 onBeforeUnmount(() => {
-    data.watchers.forEach((watcher) => watcher());
+    watchers.forEach((watcher) => watcher());
 });
 
 function initProfile() {
-    data.profileManager = new ProfileManager({ profile: props.profile });
-    props.crateManager.profileManager = data.profileManager;
+    profileManager.value = new ProfileManager({ profile: props.profile });
+    props.crateManager.profileManager = profileManager.value;
 }
 function init({ entity }) {
     initProfile();
     if (!entity["@id"]) return;
-    if (entity["@id"] !== data.entity["@id"]) {
+    if (entity["@id"] !== contextEntity.value["@id"]) {
         window.scrollTo(0, 0);
     }
 
-    const inputs = data.profileManager.getInputsFromProfile({ entity });
+    const inputs = profileManager.value.getInputsFromProfile({ entity });
     data.missingRequiredData = false;
 
     for (let input of inputs) {
@@ -400,15 +410,17 @@ function init({ entity }) {
         .forEach((k) => (properties[propertyNames[k]] = entity["@properties"][propertyNames[k]]));
     entity["@properties"] = properties;
 
-    data.entity = entity;
-    let layout = data.profileManager.getLayouts({ entity });
+    contextEntity.value = entity;
+    let layout = profileManager.value.getLayouts({ entity });
     if (!layout) {
         data.renderTabs = false;
     } else {
         data.renderTabs = true;
-        let tabs = applyLayout({ layout, inputs, entity });
-        data.tabs = applyTabDataIndicators({ tabs, entity });
-        // console.log(JSON.stringify(data.tabs, null, 2));
+        tabs.value = applyTabDataIndicators({
+            tabs: applyLayout({ layout, inputs, entity }),
+            entity,
+        });
+        triggerRef(tabs);
     }
     $emit("ready");
 }
@@ -503,14 +515,14 @@ function createEntity(patch) {
     const property = patch.property;
     delete patch.json.type;
     console.debug("Render Entity component: emit(create:entity)", {
-        id: data.entity["@id"],
+        id: contextEntity.value["@id"],
         property,
         json: patch.json,
     });
 
     if (props.configuration.mode === "embedded") {
         props.crateManager.ingestAndLink({
-            id: data.entity["@id"],
+            id: contextEntity.value["@id"],
             property,
             json: patch.json,
         });
@@ -522,31 +534,31 @@ function createEntity(patch) {
 }
 function updateEntity(patch) {
     console.debug("Render Entity component: emit(update:entity)", {
-        id: data.entity["@id"] ?? data.tabs[0].entity["@id"],
+        id: contextEntity.value["@id"],
         ...patch,
     });
     if (props.configuration.mode === "embedded") {
         props.crateManager.updateEntity({
-            id: data.entity["@id"] ?? data.tabs[0].entity["@id"],
+            id: contextEntity.value["@id"],
             ...patch,
         });
         refresh();
         saveCrate();
     } else {
-        $emit("update:entity", { ...patch, id: data.entity["@id"] });
+        $emit("update:entity", { ...patch, id: contextEntity.value["@id"] });
     }
     data.savedProperty = patch.property;
     setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
 }
 function linkEntity(patch) {
     console.debug("Render Entity component: emit(link:entity)", {
-        id: data.entity["@id"],
+        id: contextEntity.value["@id"],
         property: patch.property,
         tgtEntityId: patch.json["@id"],
     });
     if (props.configuration.mode === "embedded") {
         props.crateManager.linkEntity({
-            id: data.entity["@id"],
+            id: contextEntity.value["@id"],
             property: patch.property,
             tgtEntityId: patch.json["@id"],
         });
@@ -558,13 +570,13 @@ function linkEntity(patch) {
 }
 function unlinkEntity(patch) {
     console.debug("Render Entity component: emit(unlink:entity)", {
-        id: data.entity["@id"],
+        id: contextEntity.value["@id"],
         property: patch.property,
         tgtEntityId: patch.tgtEntityId,
     });
     if (props.configuration.mode === "embedded") {
         props.crateManager.unlinkEntity({
-            id: data.entity["@id"],
+            id: contextEntity.value["@id"],
             property: patch.property,
             tgtEntityId: patch.tgtEntityId,
         });
@@ -572,7 +584,7 @@ function unlinkEntity(patch) {
         saveCrate();
     } else {
         $emit("unlink:entity", {
-            id: data.entity["@id"],
+            id: contextEntity.value["@id"],
             property: patch.property,
             tgtEntityId: patch.tgtEntityId,
         });
@@ -590,7 +602,7 @@ function deleteEntity(patch) {
 }
 function createProperty(patch) {
     console.debug("Render Entity component: emit(create:property)", {
-        id: data.entity["@id"],
+        id: contextEntity.value["@id"],
         ...patch,
     });
     if (props.configuration.mode === "embedded") {
@@ -604,19 +616,19 @@ function createProperty(patch) {
                 },
             });
         } else {
-            props.crateManager.setProperty({ id: data.entity["@id"], ...patch });
+            props.crateManager.setProperty({ id: contextEntity.value["@id"], ...patch });
             data.savedProperty = patch.property;
             setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
         }
         refresh();
         saveCrate();
     } else {
-        $emit("create:property", { id: data.entity["@id"], ...patch });
+        $emit("create:property", { id: contextEntity.value["@id"], ...patch });
     }
 }
 function saveProperty(patch) {
     console.debug("Render Entity component: emit(save:property)", {
-        id: data.entity["@id"],
+        id: contextEntity.value["@id"],
         ...patch,
     });
     if (props.configuration.mode === "embedded") {
@@ -629,14 +641,18 @@ function saveProperty(patch) {
                     name: patch.value,
                 },
             });
-            deleteProperty({ id: data.entity["@id"], property: patch.property, idx: patch.idx });
+            deleteProperty({
+                id: contextEntity.value["@id"],
+                property: patch.property,
+                idx: patch.idx,
+            });
         } else {
-            props.crateManager.updateProperty({ id: data.entity["@id"], ...patch });
+            props.crateManager.updateProperty({ id: contextEntity.value["@id"], ...patch });
         }
         refresh();
         saveCrate();
     } else {
-        $emit("save:property", { id: data.entity["@id"], ...patch });
+        $emit("save:property", { id: contextEntity.value["@id"], ...patch });
     }
     data.savedProperty = patch.property;
     setTimeout(() => (data.savedProperty = undefined), data.savedPropertyTimeout);
