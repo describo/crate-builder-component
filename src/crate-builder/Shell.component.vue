@@ -24,7 +24,6 @@ import {
     watch,
     getCurrentInstance,
     shallowRef,
-    triggerRef,
 } from "vue";
 import flattenDeep from "lodash-es/flattenDeep";
 import cloneDeep from "lodash-es/cloneDeep";
@@ -187,6 +186,7 @@ onMounted(async () => {
             () => props.crate,
             () => {
                 init();
+                // triggerRef(crateManager);
             }
         )
     );
@@ -260,7 +260,6 @@ async function init() {
     }
     data.error = false;
 
-    // console.log("init fired");
     profile.value = isEmpty(props.profile) ? {} : cloneDeep(props.profile);
     crate.value = cloneDeep(props.crate);
 
@@ -287,7 +286,6 @@ async function init() {
 
     ready();
     const t1 = performance.now();
-    // triggerRef(crateManager);
     console.log(`Crate load time: ${t1 - t0}ms`);
 }
 function configure() {
