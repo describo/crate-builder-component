@@ -23,17 +23,6 @@
             </div>
         </div>
         <div class="w-2/3 xl:w-4/5 flex flex-col flex-grow">
-            <add-component
-                v-if="showAddControl && !configuration.readonly"
-                :property="props.property"
-                :definition="propertyDefinition"
-                :embedded="false"
-                :crate-manager="props.crateManager"
-                @create:property="createProperty"
-                @create:entity="createEntity"
-                @link:entity="linkEntity"
-            />
-
             <!-- render all of the simple things (text, textarea, date etc) in a column -->
             <div class="flex flex-col space-y-1" v-if="data.simpleInstances.length">
                 <div v-for="instance of data.simpleInstances" :key="instance.idx">
@@ -75,6 +64,16 @@
                     @unlink:entity="unlinkEntity"
                 />
             </div>
+            <add-component
+                v-if="showAddControl && !configuration.readonly"
+                :property="props.property"
+                :definition="propertyDefinition"
+                :embedded="false"
+                :crate-manager="props.crateManager"
+                @create:property="createProperty"
+                @create:entity="createEntity"
+                @link:entity="linkEntity"
+            />
         </div>
     </div>
 </template>

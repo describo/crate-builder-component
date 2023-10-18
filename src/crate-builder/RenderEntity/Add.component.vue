@@ -1,5 +1,8 @@
 <template>
-    <div class="flex flex-col">
+    <div
+        class="flex flex-row my-2 space-x-2 items-center rounded"
+        :class="{ 'bg-indigo-200 p-1': data.addType }"
+    >
         <add-control-component
             :crate-manager="props.crateManager"
             :types="types"
@@ -8,99 +11,90 @@
             @close="close"
         />
 
-        <div class="flex flex-row mt-1">
+        <div v-if="addSimpleType" class="w-full">
+            <text-component
+                v-if="data.addType === 'Text'"
+                :property="props.property"
+                type="text"
+                @save:property="createProperty"
+                :placeholder="$t('add_text')"
+            />
+            <text-component
+                v-if="data.addType === 'TextArea'"
+                :property="props.property"
+                type="textarea"
+                @save:property="createProperty"
+            />
+            <date-component
+                v-if="data.addType === 'Date'"
+                :property="props.property"
+                @save:property="createProperty"
+            />
+            <date-time-component
+                v-if="data.addType === 'DateTime'"
+                :property="props.property"
+                @save:property="createProperty"
+            />
+            <number-component
+                v-if="['Number', 'Float', 'Integer'].includes(data.addType)"
+                :property="props.property"
+                @save:property="createProperty"
+            />
+            <time-component
+                v-if="data.addType === 'Time'"
+                :property="props.property"
+                @save:property="createProperty"
+            />
+            <select-component
+                v-if="data.addType === 'Select'"
+                :property="props.property"
+                :definition="props.definition"
+                @save:property="createProperty"
+            />
+            <url-component
+                v-if="data.addType === 'URL'"
+                :property="props.property"
+                :definition="props.definition"
+                @create:entity="createEntity"
+            />
+            <select-url-component
+                v-if="data.addType === 'SelectURL'"
+                :property="props.property"
+                :definition="props.definition"
+                @create:entity="createEntity"
+            />
+            <select-object-component
+                v-if="data.addType === 'SelectObject'"
+                :property="props.property"
+                :definition="props.definition"
+                @create:entity="createEntity"
+            />
+            <geo-component
+                v-if="['Geo', 'GeoCoordinates', 'GeoShape'].includes(data.addType)"
+                :crate-manager="props.crateManager"
+                :property="props.property"
+                @create:entity="createEntity"
+                @link:entity="linkEntity"
+            />
+        </div>
+        <div v-else class="w-full">
             <div
-                v-if="addSimpleType"
-                class="w-full my-2"
-                :class="{ 'bg-indigo-200 p-2': !props.embedded }"
+                class="flex flex-row space-x-2 divide-y divide-gray-300 text-gray-600"
+                v-if="data.addType"
             >
-                <text-component
-                    v-if="data.addType === 'Text'"
-                    :property="props.property"
-                    type="text"
-                    @save:property="createProperty"
-                    :placeholder="$t('add_text')"
-                />
-                <text-component
-                    v-if="data.addType === 'TextArea'"
-                    :property="props.property"
-                    type="textarea"
-                    @save:property="createProperty"
-                />
-                <date-component
-                    v-if="data.addType === 'Date'"
-                    :property="props.property"
-                    @save:property="createProperty"
-                />
-                <date-time-component
-                    v-if="data.addType === 'DateTime'"
-                    :property="props.property"
-                    @save:property="createProperty"
-                />
-                <number-component
-                    v-if="['Number', 'Float', 'Integer'].includes(data.addType)"
-                    :property="props.property"
-                    @save:property="createProperty"
-                />
-                <time-component
-                    v-if="data.addType === 'Time'"
-                    :property="props.property"
-                    @save:property="createProperty"
-                />
-                <select-component
-                    v-if="data.addType === 'Select'"
-                    :property="props.property"
-                    :definition="props.definition"
-                    @save:property="createProperty"
-                />
-                <url-component
-                    v-if="data.addType === 'URL'"
-                    :property="props.property"
-                    :definition="props.definition"
-                    @create:entity="createEntity"
-                />
-                <select-url-component
-                    v-if="data.addType === 'SelectURL'"
-                    :property="props.property"
-                    :definition="props.definition"
-                    @create:entity="createEntity"
-                />
-                <select-object-component
-                    v-if="data.addType === 'SelectObject'"
-                    :property="props.property"
-                    :definition="props.definition"
-                    @create:entity="createEntity"
-                />
-                <geo-component
-                    v-if="['Geo', 'GeoCoordinates', 'GeoShape'].includes(data.addType)"
-                    :crate-manager="props.crateManager"
-                    :property="props.property"
-                    @create:entity="createEntity"
-                    @link:entity="linkEntity"
-                />
-            </div>
-            <div v-else class="w-full">
-                <div
-                    class="flex flex-row space-x-2 divide-y divide-gray-300 text-gray-600"
-                    :class="{ 'bg-indigo-200 p-2': !props.embedded }"
-                    v-if="data.addType"
-                >
-                    <div class="w-full">
-                        <div class="" v-if="data.addType === 'ANY'">
-                            {{ $t("associate_any_prompt") }}
-                        </div>
-                        <div class="" v-if="data.addType !== 'ANY'">
-                            {{
-                                $t("associate_existing_prompt", { addType: data.localisedAddType })
-                            }}
-                        </div>
-                        <autocomplete-component
-                            :crate-manager="props.crateManager"
-                            :type="data.addType"
-                            @link:entity="linkEntity"
-                            @create:entity="createEntity"
-                        />
+                <div class="w-full">
+                    <div class="" v-if="data.addType === 'ANY'">
+                        {{ $t("associate_any_prompt") }}
                     </div>
+                    <div class="" v-if="data.addType !== 'ANY'">
+                        {{ $t("associate_existing_prompt", { addType: data.localisedAddType }) }}
+                    </div>
+                    <autocomplete-component
+                        :crate-manager="props.crateManager"
+                        :type="data.addType"
+                        @link:entity="linkEntity"
+                        @create:entity="createEntity"
+                    />
                 </div>
             </div>
         </div>
