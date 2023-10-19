@@ -95,7 +95,7 @@
                     :label="tab.name"
                     :name="tab.name"
                     v-for="(tab, idx) of tabs"
-                    :key="idx"
+                    :key="tab.name + tab.hasData + tab.missingRequiredData"
                 >
                     <template #label>
                         <div class="flex flex-col">
@@ -245,7 +245,6 @@ import { configurationKey } from "./keys.js";
 import {
     reactive,
     shallowRef,
-    triggerRef,
     computed,
     onMounted,
     onBeforeMount,
@@ -287,7 +286,7 @@ const props = defineProps({
 const contextEntity = shallowRef({});
 const crateManager = shallowRef(props.crateManager);
 const profileManager = shallowRef(new ProfileManager({ profile: props.profile }));
-const tabs = shallowRef({});
+const tabs = shallowRef([]);
 let watchers = [];
 
 const data = reactive({
@@ -412,7 +411,7 @@ function init({ entity }) {
         .forEach((k) => (properties[propertyNames[k]] = entity["@properties"][propertyNames[k]]));
     entity["@properties"] = properties;
 
-    contextEntity.value = entity;
+    contextEntity.value = Object.create(entity);
     let layout = profileManager.value.getLayouts({ entity });
     if (!layout) {
         data.renderTabs = false;
@@ -422,7 +421,6 @@ function init({ entity }) {
             tabs: applyLayout({ layout, inputs, entity }),
             entity,
         });
-        triggerRef(tabs);
     }
     $emit("ready");
 }
