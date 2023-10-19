@@ -70,6 +70,13 @@
 import { ElButton, ElRadio, ElSelect, ElOption, ElForm, ElFormItem, ElInput } from "element-plus";
 import "leaflet/dist/leaflet.css";
 import * as Leaflet from "leaflet/dist/leaflet-src.esm.js";
+import icon from "leaflet/dist/images/marker-icon.png";
+import iconShadow from "leaflet/dist/images/marker-shadow.png";
+let DefaultIcon = Leaflet.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+});
+Leaflet.Marker.prototype.options.icon = DefaultIcon;
 import AreaSelectInit from "./Map.SelectArea.js";
 import { reactive, onMounted, onBeforeUnmount } from "vue";
 import { $t } from "../i18n";
@@ -135,13 +142,6 @@ async function init() {
             maxZoom: 16,
         }
     ).addTo(map);
-    // Leaflet.tileLayer("//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    //     attribution:
-    //         'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
-    //     minZoom: 1,
-    //     maxZoom: 16,
-    //     noWrap: true,
-    // }).addTo(map);
     updateHandlers();
 }
 

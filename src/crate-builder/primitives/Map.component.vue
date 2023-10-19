@@ -5,6 +5,13 @@
 <script setup>
 import "leaflet/dist/leaflet.css";
 import * as Leaflet from "leaflet/dist/leaflet-src.esm.js";
+import icon from "leaflet/dist/images/marker-icon.png";
+import iconShadow from "leaflet/dist/images/marker-shadow.png";
+let DefaultIcon = Leaflet.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+});
+Leaflet.Marker.prototype.options.icon = DefaultIcon;
 import { reactive, onMounted, onBeforeUnmount } from "vue";
 
 const props = defineProps({
@@ -51,12 +58,6 @@ async function init() {
             maxZoom: 16,
         }
     ).addTo(map);
-    // Leaflet.tileLayer("//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    //     attribution:
-    //         'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
-    //     minZoom: 1,
-    //     maxZoom: 16,
-    // }).addTo(map);
 
     if (entity["@properties"].geojson) {
         let geojson = JSON.parse(entity["@properties"].geojson[0].value);
