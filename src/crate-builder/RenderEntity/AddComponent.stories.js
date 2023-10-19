@@ -1,7 +1,10 @@
 import AddComponent from "./Add.component.vue";
+import { ProfileManager } from "../profile-manager.js";
+const profileManager = new ProfileManager({});
 
 const crateManager = {
     getEntities: () => [],
+    profileManager,
 };
 const help = "some help text";
 const multiple = true;
