@@ -29,7 +29,7 @@
                     <div v-if="propertyDefinition.readonly">
                         {{ instance.value }}
                     </div>
-                    <div v-else class="flex flex-row">
+                    <div v-else class="flex flex-row space-x-2">
                         <render-entity-property-instance-component
                             class="flex-grow"
                             :crate-manager="props.crateManager"
@@ -45,7 +45,6 @@
                                 !instance.tgtEntityId &&
                                 !configuration.readonly
                             "
-                            class="pl-2"
                             type="delete"
                             :property="instance"
                             @delete:property="deleteProperty(instance)"
