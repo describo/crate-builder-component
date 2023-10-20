@@ -21,7 +21,7 @@ export class ProfileManager {
      * Get the layout properties from the profile if defined
      *
      */
-    getLayouts({ entity }) {
+    getLayout({ entity }) {
         // no layout defined in profile
         if (!this.profile.layouts || !this.profile.layouts.length) return null;
         let layouts = this.profile.layouts;

@@ -412,7 +412,7 @@ function init({ entity }) {
     entity["@properties"] = properties;
 
     contextEntity.value = Object.create(entity);
-    let layout = profileManager.value.getLayouts({ entity });
+    let layout = profileManager.value.getLayout({ entity });
     if (!layout) {
         data.renderTabs = false;
     } else {
