@@ -24,7 +24,12 @@ const Template = {
     }),
 };
 
-export const TextComponentStory = {
+export const textWithoutSpaces = {
     ...Template,
     args: { type: "text", property: "text", value: "http://schema.org/name" },
+};
+
+export const textWithSpaces = {
+    ...Template,
+    args: { type: "text", property: "@id", value: "http://schema.org/name of person" },
 };

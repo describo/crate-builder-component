@@ -1,32 +1,35 @@
 <template>
-    <div class="flex flex-row space-x-2">
-        <el-input
-            class="w-full"
-            :type="type"
-            v-model="data.internalValue"
-            @blur="data.debouncedSave"
-            @change="data.debouncedSave"
-            resize="vertical"
-            :rows="5"
-            :placeholder="props.placeholder"
-        ></el-input>
-        <el-button @click="save" type="success" size="default">
-            <i class="fas fa-check fa-fw"></i>
-        </el-button>
+    <div class="flex flex-col space-y-2">
+        <div class="flex flex-row space-x-2">
+            <el-input
+                class="w-full"
+                :type="type"
+                v-model="data.displayValue"
+                @blur="debouncedSave"
+                @change="debouncedSave"
+                resize="vertical"
+                :rows="5"
+                :placeholder="props.placeholder"
+            ></el-input>
+            <el-button @click="save" type="success" size="default">
+                <i class="fas fa-check fa-fw"></i>
+            </el-button>
+        </div>
     </div>
 </template>
 
 <script setup>
 import { ElInput, ElButton } from "element-plus";
-import { reactive, watch, computed } from "vue";
+import { reactive, watch } from "vue";
 import debounce from "lodash-es/debounce.js";
 import isBoolean from "lodash-es/isBoolean.js";
-// import { $t } from "../i18n";
+const debouncedSave = debounce(save, 200);
 
 const props = defineProps({
     type: {
         type: String,
         default: "text",
+        validator: (val) => ["text", "textarea"].includes(val),
     },
     property: {
         type: String,
@@ -39,25 +42,26 @@ const props = defineProps({
 });
 const $emit = defineEmits(["save:property"]);
 const data = reactive({
-    internalValue: isBoolean(props.value) ? String(props.value) : props.value,
-    currentValue: isBoolean(props.value) ? String(props.value) : props.value,
-    debouncedSave: debounce(save, 200),
+    displayValue: decodeValue(props.value),
 });
-// let isValidType = computed(() => ["text", "textarea"].includes(props.type));
 watch(
     () => props.value,
     () => {
-        data.internalValue = props.value;
+        data.displayValue = decodeValue(props.value);
     }
 );
 function save() {
-    if (data.internalValue !== data.currentValue) {
-        data.currentValue = data.internalValue;
+    $emit("save:property", {
+        property: props.property,
+        value: data.displayValue.trim(),
+    });
+}
 
-        $emit("save:property", {
-            property: props.property,
-            value: data.internalValue.trim(),
-        });
+function decodeValue(value) {
+    if (isBoolean(value)) {
+        return String(value);
+    } else {
+        return decodeURI(value) === "undefined" ? "" : decodeURI(value);
     }
 }
 </script>
