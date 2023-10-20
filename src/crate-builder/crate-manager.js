@@ -4,6 +4,7 @@ import isArray from "lodash-es/isArray.js";
 import isPlainObject from "lodash-es/isPlainObject.js";
 import isUndefined from "lodash-es/isUndefined.js";
 import isBoolean from "lodash-es/isBoolean.js";
+import isEqual from "lodash-es/isEqual.js";
 import cloneDeep from "lodash-es/cloneDeep.js";
 import flattenDeep from "lodash-es/flattenDeep.js";
 import compact from "lodash-es/compact.js";
@@ -202,7 +203,7 @@ export class CrateManager {
 
         let flattened = this._flatten(json);
         flattened = flattened.map((entity) => {
-            return this.em.setEntity(entity);
+            return this.setEntity({ entity });
         });
 
         this.linkEntity({ id, property, tgtEntityId: flattened[0]["@id"] });
@@ -302,7 +303,7 @@ export function isMatchingEntity(source, target) {
     if (!source || !target) return false;
     let sourceType = [...source["@type"]].sort();
     let targetType = [...target["@type"]].sort();
-    return source["@id"] === target["@id"] && sourceType === targetType;
+    return isEqual(source["@id"], target["@id"]) && isEqual(sourceType, targetType);
 }
 
 export function isURL(value) {
@@ -508,8 +509,8 @@ export class Entity {
         entity = this._confirmNoClash(entity);
 
         // if this entity is already on the stack - return it
-        let exists = this._getEntity({ id: entity["@id"] });
-        if (exists) return exists;
+        // let exists = this._getEntity({ id: entity["@id"] });
+        // if (exists) return exists;
 
         // set all properties, other than core props, to array
         for (let property of Object.keys(entity)) {
@@ -531,7 +532,8 @@ export class Entity {
 
     updateEntityId({ id, value }) {
         let { isValid } = validateId({ id: value });
-        if (!isValid) value = `#${encodeURIComponent(value)}`;
+        if (!isValid) value = `#${value}`;
+        value = encodeURI(value);
 
         const originalId = id;
         const newId = value;
@@ -757,6 +759,7 @@ export class Entity {
             if (["@id", "@type", "name"].includes(property)) continue;
             if (entity[property].length === 1) {
                 entity[property] = entity[property][0];
+                if (!entity[property]) delete entity[property];
             } else if (entity[property].length === 0) {
                 delete entity[property];
             }
@@ -849,7 +852,7 @@ export class Entity {
 
         // there is an @id - is it valid?
         let { isValid } = validateId({ id: entity["@id"], type: entity["@type"] });
-        if (!isValid) entity["@id"] = `#${encodeURIComponent(entity["@id"])}`;
+        if (!isValid) entity["@id"] = `#${encodeURI(entity["@id"])}`;
 
         // is there a name?
         if (!entity.name) entity.name = entity["@id"].replace(/^#/, "");

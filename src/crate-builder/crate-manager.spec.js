@@ -321,7 +321,7 @@ describe("Test interacting with the crate", () => {
             "@id": "./",
         };
         e = crateManager.setEntity({ entity });
-        expect(e["@id"]).toEqual("#e5");
+        expect(e["@id"]).toEqual("./");
         expect(e["@type"]).toEqual(["Thing"]);
     });
     test("add a simple File or Dataset entity to the crate", () => {
@@ -915,6 +915,7 @@ describe("Test interacting with the crate", () => {
             property: "author",
             json,
         });
+        let crate = crateManager.exportCrate({});
 
         // delete the author property from the root dataset
         let rootDataset = crateManager.getRootDataset();
@@ -924,7 +925,7 @@ describe("Test interacting with the crate", () => {
             idx: 0,
         });
 
-        let crate = crateManager.exportCrate({});
+        crate = crateManager.exportCrate({});
         expect(crate["@graph"].length).toEqual(3);
         expect(crate["@graph"]).toMatchObject([
             {

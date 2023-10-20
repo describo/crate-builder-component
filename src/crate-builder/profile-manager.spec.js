@@ -152,17 +152,40 @@ describe("Test working with profiles", () => {
     test("get layout information from profile", () => {
         const profile = {
             metadata: {},
-            hide: {
-                Dataset: ["field2"],
-            },
-            layouts: {
-                Dataset: [{ group1: ["field1"] }],
-            },
+            layouts: [
+                {
+                    appliesTo: ["Dataset"],
+                    about: {
+                        label: "About",
+                        description: "",
+                    },
+                    source: {
+                        label: "Original Source Information",
+                        description: "",
+                    },
+                    permissions: {
+                        label: "Permissions",
+                        description: "",
+                    },
+                    who: {
+                        label: "Who",
+                        description: "",
+                    },
+                    location: {
+                        label: "Location",
+                        description: "",
+                    },
+                    overflow: {
+                        label: "Other",
+                    },
+                },
+            ],
         };
         const profileManager = new ProfileManager({ profile });
-        let { layouts, hide } = profileManager.getLayout({ type: "Dataset" });
-        expect(layouts).toEqual(profile.layouts.Dataset);
-        expect(hide).toEqual(profile.hide.Dataset);
+        let layout = profileManager.getLayout({
+            entity: { "@id": "#1", "@type": ["Dataset"] },
+        });
+        expect(layout).toEqual(profile.layouts[0]);
     });
     test("get layout information from profile - no layout", () => {
         const profile = {
@@ -171,9 +194,8 @@ describe("Test working with profiles", () => {
             layouts: {},
         };
         const profileManager = new ProfileManager({ profile });
-        let { layouts, hide } = profileManager.getLayout({ type: "Dataset" });
-        expect(layouts).toBe(undefined);
-        expect(hide).toBe(undefined);
+        let layout = profileManager.getLayout({ entity: { "@id": "#1", "@type": ["Thing"] } });
+        expect(layout).toBe(null);
     });
     test("get property definition - defined in profile", () => {
         const profile = {
