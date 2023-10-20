@@ -54,16 +54,7 @@ codebase. To start up the dev environment:
 
 # Building and publishing a release
 
-Build the VueJS and web component
-
--   `npm run build`
-
-Version it
-
--   npm version {minor|patch}
-
-Push the tag to github and create a release
-
+-   `npm version {minor|patch}`
 -   `git push origin master --tags`
 -   Go to the repo and create a release from the tag, documenting what is in it.
 -   Publish to npm: `npm publish`

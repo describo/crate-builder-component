@@ -5,7 +5,6 @@
     "main": "./src/crate-builder/index.js",
     "type": "module",
     "files": [
-        "dist",
         "src/crate-builder"
     ],
     "scripts": {
