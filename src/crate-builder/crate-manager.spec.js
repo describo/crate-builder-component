@@ -434,6 +434,63 @@ describe("Test interacting with the crate", () => {
         e = crateManager.getEntity({ id: e["@id"] });
         expect(e["@id"]).toEqual("#something%20else");
     });
+    test("a sequence of complex '@id' updates across the crate", () => {
+        let entity = {
+            "@id": "an id",
+            "@type": "Person",
+            name: "person",
+        };
+        let e1 = crateManager.setEntity({ entity });
+        crateManager.linkEntity({ id: "./", property: "author", tgtEntityId: e1["@id"] });
+
+        let entityChild = {
+            "@id": "child id",
+            "@type": "Person",
+            name: "child",
+        };
+        let e2 = crateManager.setEntity({ entity: entityChild });
+        crateManager.linkEntity({ id: "#an%20id", property: "child", tgtEntityId: e2["@id"] });
+
+        let crate = crateManager.exportCrate();
+        expect(crate["@graph"][1].author["@id"]).toEqual("#an%20id");
+        expect(crate["@graph"][2]["@id"]).toEqual("#an%20id");
+
+        // change the id to #a new id
+        crateManager.updateEntity({ id: e1["@id"], property: "@id", value: "a new id" });
+        crate = crateManager.exportCrate();
+        expect(crate["@graph"][1].author["@id"]).toEqual("#a%20new%20id");
+        expect(crate["@graph"][2]["@id"]).toEqual("#a%20new%20id");
+
+        // change the id to http://schema.org/person
+        crateManager.updateEntity({
+            id: e1["@id"],
+            property: "@id",
+            value: "http://schema.org/person",
+        });
+        crate = crateManager.exportCrate();
+        expect(crate["@graph"][1].author["@id"]).toEqual("http://schema.org/person");
+        expect(crate["@graph"][2]["@id"]).toEqual("http://schema.org/person");
+
+        // change the id to #a new id
+        crateManager.updateEntity({
+            id: e1["@id"],
+            property: "@id",
+            value: "a new id",
+        });
+        crate = crateManager.exportCrate();
+        expect(crate["@graph"][1].author["@id"]).toEqual("#a%20new%20id");
+        expect(crate["@graph"][2]["@id"]).toEqual("#a%20new%20id");
+
+        // change the id to http://schema.org/person
+        crateManager.updateEntity({
+            id: e1["@id"],
+            property: "@id",
+            value: "http://schema.org/person",
+        });
+        crate = crateManager.exportCrate();
+        expect(crate["@graph"][1].author["@id"]).toEqual("http://schema.org/person");
+        expect(crate["@graph"][2]["@id"]).toEqual("http://schema.org/person");
+    });
     test("adding a property to an entity", () => {
         const url = chance.url();
         let entity = {

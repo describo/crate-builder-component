@@ -538,15 +538,32 @@ export class Entity {
         const originalId = id;
         const newId = value;
 
+        // get the entity using the original id and then walk the properties forward
+        //  to find what it links to. For each of those, set the reverse link to the new id
         let entityIdx = this.entitiesById.get(originalId);
-        this.entities[entityIdx]["@id"] = newId;
-        this.entitiesById.set(newId, entityIdx);
-        this.reverse[newId] = cloneDeep(this.reverse[originalId]);
+        let entity = this.entities[entityIdx];
 
-        // walk all the reverse links from this entity
-        //   update all of the forward links back to it
-        if (this.reverse[newId]) {
-            for (let [property, entityIds] of Object.entries(this.reverse[newId])) {
+        for (let [property, instances] of Object.entries(entity)) {
+            if (this.coreProperties.includes(property)) continue;
+
+            for (let instance of instances) {
+                if (instance?.["@id"]) {
+                    this.reverse[instance["@id"]][property].push(newId);
+                    // remove the original id
+                    this.reverse[instance["@id"]][property] = this.reverse[instance["@id"]][
+                        property
+                    ].filter((id) => id !== originalId);
+                    // ensure there are no duplicates
+                    this.reverse[instance["@id"]][property] = uniq(
+                        this.reverse[instance["@id"]][property]
+                    );
+                }
+            }
+        }
+
+        // now walk the reverse links of the entity to update the references to it
+        if (this.reverse[originalId]) {
+            for (let [property, entityIds] of Object.entries(this.reverse[originalId])) {
                 for (let entityId of entityIds) {
                     // get the related entity
                     let relatedEntityIdx = this.entitiesById.get(entityId);
@@ -562,29 +579,12 @@ export class Entity {
             }
         }
 
-        // walk the properties of this entity
-        //   update the reverse links back to it
-        const entity = this.entities[entityIdx];
-        for (let [property, instances] of Object.entries(entity)) {
-            if (this.coreProperties.includes(property)) continue;
-            for (let instance of instances) {
-                if (instance?.["@id"]) {
-                    // push the new id
-                    this.reverse[instance["@id"]][property].push(newId);
+        // finally update the entity @id
+        this.entities[entityIdx]["@id"] = newId;
+        this.entitiesById.set(newId, entityIdx);
+        this.reverse[newId] = cloneDeep(this.reverse[originalId]);
 
-                    // remove the original id
-                    this.reverse[instance["@id"]][property] = this.reverse[instance["@id"]][
-                        property
-                    ].filter((id) => id !== originalId);
-
-                    // ensure there are no duplicates
-                    this.reverse[instance["@id"]][property] = uniq(
-                        this.reverse[instance["@id"]][property]
-                    );
-                }
-            }
-        }
-
+        // cleanup
         delete this.reverse[originalId];
         delete this.entitiesById.delete[id];
     }
