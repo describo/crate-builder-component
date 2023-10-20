@@ -114,7 +114,8 @@
 </template>
 
 <script setup>
-import { reactive, nextTick } from "vue";
+import { ElForm, ElFormItem, ElSwitch, ElSelect, ElOption } from "element-plus";
+import { reactive } from "vue";
 import { Lookup } from "./lookup.js";
 import crateFile1 from "../examples/item/empty/ro-crate-metadata.json";
 import crateFile2 from "../examples/item/complex-collection/ro-crate-metadata.json";

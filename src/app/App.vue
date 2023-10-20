@@ -10,6 +10,7 @@
 </template>
 
 <script setup>
+import { ElTabs, ElTabPane } from "element-plus";
 import EmbeddedComponent from "./EmbeddedComponent.component.vue";
 import RenderEntityComponent from "./RenderEntity.component.vue";
 import { reactive } from "vue";
