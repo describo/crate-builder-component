@@ -1,5 +1,5 @@
 import "./tailwind.css";
-import "@element-plus/theme-chalk/dist/index.css";
+import "element-plus/dist/index.css";
 import "./component.css";
 import "@fortawesome/fontawesome-free/js/all";
 import { config } from "@fortawesome/fontawesome-svg-core";
