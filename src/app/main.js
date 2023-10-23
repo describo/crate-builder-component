@@ -1,4 +1,6 @@
 import "regenerator-runtime";
+import "../crate-builder/tailwind.css";
+import "element-plus/dist/index.css";
 import { createApp } from "vue";
 import App from "./App.vue";
 import DescriboCrateBuilder from "../crate-builder/index.js";

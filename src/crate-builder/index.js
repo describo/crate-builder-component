@@ -1,9 +1,4 @@
-import "./tailwind.css";
-import "element-plus/dist/index.css";
 import "./component.css";
-import "@fortawesome/fontawesome-free/js/all";
-import { config } from "@fortawesome/fontawesome-svg-core";
-config.autoReplaceSvg = "nest";
 import DescriboCrateBuilder from "./Shell.component.vue";
 
 export default {

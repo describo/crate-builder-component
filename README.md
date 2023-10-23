@@ -1,26 +1,27 @@
 # Crate Builder Component
 
-- [Crate Builder Component](#crate-builder-component)
-- [Developing the plugin](#developing-the-plugin)
-  - [Storybook](#storybook)
-  - [Development application](#development-application)
-- [Building and publishing a release](#building-and-publishing-a-release)
-- [Repo structure](#repo-structure)
-- [Using the component in your app](#using-the-component-in-your-app)
-  - [Install the package](#install-the-package)
-  - [Vite users](#vite-users)
-  - [Profiles](#profiles)
-  - [Tailwind CSS dependency](#tailwind-css-dependency)
-  - [Vue Router Dependency](#vue-router-dependency)
-  - [Wire it up](#wire-it-up)
-- [Identifiers and Types](#identifiers-and-types)
-- [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
-- [Full Usage - configuration and events](#full-usage---configuration-and-events)
-  - [Properties](#properties)
-  - [Events](#events)
-    - [Warnings and errors](#warnings-and-errors)
-- [Themes](#themes)
-- [Internationalisation](#internationalisation)
+-   [Crate Builder Component](#crate-builder-component)
+-   [Developing the plugin](#developing-the-plugin)
+    -   [Storybook](#storybook)
+    -   [Development application](#development-application)
+-   [Building and publishing a release](#building-and-publishing-a-release)
+-   [Repo structure](#repo-structure)
+-   [Profiles](#profiles)
+-   [Using the component in your app](#using-the-component-in-your-app)
+    -   [Install the package](#install-the-package)
+    -   [Vite users](#vite-users)
+    -   [Tailwind CSS dependency](#tailwind-css-dependency)
+    -   [Vue Router Dependency](#vue-router-dependency)
+    -   [Fontawesome free icons dependency](#fontawesome-free-icons-dependency)
+    -   [Wire it up](#wire-it-up)
+-   [Identifiers and Types](#identifiers-and-types)
+-   [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
+-   [Full Usage - configuration and events](#full-usage---configuration-and-events)
+    -   [Properties](#properties)
+    -   [Events](#events)
+        -   [Warnings and errors](#warnings-and-errors)
+-   [Themes](#themes)
+-   [Internationalisation](#internationalisation)
 
 This is the core UI component for assembling an RO-Crate inside Describo. It is a self contained
 VueJS component that can be used inside your app. If you use this component, your app is responsible
@@ -68,6 +69,14 @@ codebase. To start up the dev environment:
     the plugin and wire it into Vue as well as an App.vue file where we load the component.
 -   The component is at `./src/crate-builder`.
 
+# Profiles
+
+Profiles used with this component are described in
+[https://github.com/describo/profiles](https://github.com/describo/profiles).
+
+The profiles that this component understands are an evolution of the original Describo Online
+profiles so be sure to follow the documentation linked above.
+
 # Using the component in your app
 
 ## Install the package
@@ -90,23 +99,17 @@ export default defineConfig({
         // ...
     ],
     optimizeDeps: {
-        include: ["ajv", "element-plus" ],
+        include: ["ajv", "element-plus", "@describo/crate-builder-component" ],
     },
 });
 ```
 
-## Profiles
-
-Profiles used with this component are described in
-[https://github.com/describo/profiles](https://github.com/describo/profiles).
-
-The profiles that this component understands are an evolution of the original Describo Online
-profiles so be sure to follow the documentation linked above.
-
 ## Tailwind CSS dependency
 
 The component uses [tailwindcss](https://tailwindcss.com/) and in order for the CSS to be processed
-correctly, you need to `setup your app for tailwind` and add a `tailwind.config.js` that looks like:
+correctly, you need to
+[`setup your app for tailwind`](https://tailwindcss.com/docs/installation/using-postcss) and add a
+`tailwind.config.js` that looks like:
 
 ```JS
 module.exports = {
@@ -136,11 +139,24 @@ completely disabled (ie you want to do it yourself or maybe you're using the web
 sure to read the note about internal routing in the section:
 [Unreactive Properties](#unreactive-properties)
 
+## Fontawesome free icons dependency
+
+```bash
+npm install --save @fortawesome/fontawesome-free @fortawesome/fontawesome-svg-core
+```
+
 ## Wire it up
 
--   Plug it into your Vue app. It will look something like:
+-   Plug it into your Vue app. It will look something like the following - note that `you` configure
+    tailwind, fontawesome and element-plus css your app:
 
 ```JS
+import "./tailwind.css";
+import "element-plus/dist/index.css";
+import "@fortawesome/fontawesome-free/js/all";
+import { config } from "@fortawesome/fontawesome-svg-core";
+config.autoReplaceSvg = "nest";
+
 import { createApp } from "vue";
 import App from "./App.vue";
 import DescriboCrateBuilder from "@describo/crate-builder-component";
