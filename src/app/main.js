@@ -1,6 +1,9 @@
 import "regenerator-runtime";
 import "../crate-builder/tailwind.css";
 import "element-plus/dist/index.css";
+import "@fortawesome/fontawesome-free/js/all";
+import { config } from "@fortawesome/fontawesome-svg-core";
+config.autoReplaceSvg = "nest";
 import { createApp } from "vue";
 import App from "./App.vue";
 import DescriboCrateBuilder from "../crate-builder/index.js";

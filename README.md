@@ -1,27 +1,27 @@
 # Crate Builder Component
 
--   [Crate Builder Component](#crate-builder-component)
--   [Developing the plugin](#developing-the-plugin)
-    -   [Storybook](#storybook)
-    -   [Development application](#development-application)
--   [Building and publishing a release](#building-and-publishing-a-release)
--   [Repo structure](#repo-structure)
--   [Profiles](#profiles)
--   [Using the component in your app](#using-the-component-in-your-app)
-    -   [Install the package](#install-the-package)
-    -   [Vite users](#vite-users)
-    -   [Tailwind CSS dependency](#tailwind-css-dependency)
-    -   [Vue Router Dependency](#vue-router-dependency)
-    -   [Fontawesome free icons dependency](#fontawesome-free-icons-dependency)
-    -   [Wire it up](#wire-it-up)
--   [Identifiers and Types](#identifiers-and-types)
--   [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
--   [Full Usage - configuration and events](#full-usage---configuration-and-events)
-    -   [Properties](#properties)
-    -   [Events](#events)
-        -   [Warnings and errors](#warnings-and-errors)
--   [Themes](#themes)
--   [Internationalisation](#internationalisation)
+- [Crate Builder Component](#crate-builder-component)
+- [Developing the plugin](#developing-the-plugin)
+  - [Storybook](#storybook)
+  - [Development application](#development-application)
+- [Building and publishing a release](#building-and-publishing-a-release)
+- [Repo structure](#repo-structure)
+- [Profiles](#profiles)
+- [Using the component in your app](#using-the-component-in-your-app)
+  - [Install the package](#install-the-package)
+  - [Vite users](#vite-users)
+  - [Tailwind CSS dependency](#tailwind-css-dependency)
+  - [Vue Router Dependency](#vue-router-dependency)
+  - [Fontawesome free icons and element-plus dependencies](#fontawesome-free-icons-and-element-plus-dependencies)
+  - [Wire it up](#wire-it-up)
+- [Identifiers and Types](#identifiers-and-types)
+- [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
+- [Full Usage - configuration and events](#full-usage---configuration-and-events)
+  - [Properties](#properties)
+  - [Events](#events)
+    - [Warnings and errors](#warnings-and-errors)
+- [Themes](#themes)
+- [Internationalisation](#internationalisation)
 
 This is the core UI component for assembling an RO-Crate inside Describo. It is a self contained
 VueJS component that can be used inside your app. If you use this component, your app is responsible
@@ -139,10 +139,10 @@ completely disabled (ie you want to do it yourself or maybe you're using the web
 sure to read the note about internal routing in the section:
 [Unreactive Properties](#unreactive-properties)
 
-## Fontawesome free icons dependency
+## Fontawesome free icons and element-plus dependencies
 
 ```bash
-npm install --save @fortawesome/fontawesome-free @fortawesome/fontawesome-svg-core
+npm install --save element-plus @fortawesome/fontawesome-free @fortawesome/fontawesome-svg-core
 ```
 
 ## Wire it up
