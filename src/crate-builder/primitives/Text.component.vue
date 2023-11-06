@@ -29,7 +29,7 @@ const props = defineProps({
     type: {
         type: String,
         default: "text",
-        validator: (val) => ["text", "textarea"].includes(val),
+        validator: (val) => ["text", "textarea", "url"].includes(val),
     },
     property: {
         type: String,
