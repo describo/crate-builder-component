@@ -5,17 +5,41 @@
             :key="configuration.language"
         >
             <!-- navbar : controls -->
-            <div>
-                <!-- go to root dataset -->
-                <el-button
-                    @click="loadRootDataset"
-                    type="primary"
-                    :disabled="isRootDataset"
-                    v-if="configuration.mode === 'embedded'"
-                >
-                    <i class="fa-solid fa-house"></i>
-                    &nbsp; {{ $t("root_dataset_label") }}
-                </el-button>
+            <div class="flex flex-row space-x-1 mr-4">
+                <div>
+                    <!-- back -->
+                    <el-button
+                        @click="back"
+                        type="primary"
+                        v-if="configuration.mode === 'embedded'"
+                    >
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <!-- &nbsp; {{ $t("root_dataset_label") }} -->
+                    </el-button>
+                </div>
+                <div>
+                    <!-- go to root dataset -->
+                    <el-button
+                        @click="loadRootDataset"
+                        type="primary"
+                        :disabled="isRootDataset"
+                        v-if="configuration.mode === 'embedded'"
+                    >
+                        <i class="fa-solid fa-house"></i>
+                        <!-- &nbsp; {{ $t("root_dataset_label") }} -->
+                    </el-button>
+                </div>
+                <div>
+                    <!-- forward -->
+                    <el-button
+                        @click="forward"
+                        type="primary"
+                        v-if="configuration.mode === 'embedded'"
+                    >
+                        <i class="fa-solid fa-arrow-right"></i>
+                        <!-- &nbsp; {{ $t("root_dataset_label") }} -->
+                    </el-button>
+                </div>
             </div>
             <div>
                 <!-- add property -->
@@ -194,6 +218,8 @@ const props = defineProps({
 });
 const $emit = defineEmits([
     "load:entity",
+    "back",
+    "forward",
     "add:property:placeholder",
     "delete:entity",
     "save:entity:template",
@@ -230,6 +256,12 @@ function toggle(dialog) {
 }
 function loadRootDataset() {
     $emit("load:entity", { name: "RootDataset" });
+}
+function back() {
+    history.back();
+}
+function forward() {
+    history.forward();
 }
 function loadEntity(data) {
     $emit("load:entity", data);
