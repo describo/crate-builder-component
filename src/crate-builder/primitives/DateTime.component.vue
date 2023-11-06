@@ -9,7 +9,7 @@
         >
         </el-date-picker>
         <div class="text-xs text-gray-700" v-if="!data.isValidDate">
-            {{ $t('invalid_datetime_value', {value: props.value}) }}
+            {{ $t("invalid_datetime_value", { value: props.value }) }}
         </div>
     </div>
 </template>
@@ -18,7 +18,7 @@
 import { ElDatePicker } from "element-plus";
 import { reactive, watch } from "vue";
 import { checkDateIsValid } from "./date-libs";
-import {$t} from '../i18n'
+import { $t } from "../i18n";
 
 const props = defineProps({
     property: {
@@ -43,11 +43,16 @@ watch(
     }
 );
 function save() {
-    data.isValidDate = checkDateIsValid(data.internalValue);
-    if (!data.isValidDate) return;
-    $emit("save:property", {
-        property: props.property,
-        value: data.internalValue.toISOString(),
-    });
+    try {
+        data.isValidDate = checkDateIsValid(data.internalValue);
+        if (!data.isValidDate) return;
+        $emit("save:property", {
+            property: props.property,
+            value: data.internalValue.toISOString(),
+        });
+    } catch (error) {
+        // invalid date - do nothing
+        data.isValidDate = false;
+    }
 }
 </script>
