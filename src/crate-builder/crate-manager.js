@@ -634,11 +634,17 @@ export class Entity {
         const propertyIdx = idx;
         idx = this.entitiesById.get(id);
         if (idx !== undefined) {
-            this.entities[idx][property][propertyIdx] = value;
+            if (value) {
+                this.entities[idx][property][propertyIdx] = value;
+            } else {
+                delete this.entities[idx][property].splice(propertyIdx, 1);
+            }
         }
     }
 
     setProperty({ id, property, value = undefined, tgtEntityId = undefined }) {
+        if (!value && !tgtEntityId) return;
+
         const idx = this.entitiesById.get(id);
 
         if (!this.entities[idx][property]) this.entities[idx][property] = [];
