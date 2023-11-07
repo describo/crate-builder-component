@@ -327,6 +327,7 @@ export function validateId({ id, type }) {
         // if type matches File then whatever is provided is valid
         type = isArray(type) ? type.join(", ") : type;
         if (type.match(/file/i)) return { isValid: true };
+        if (type.match(/Dataset/i)) return { isValid: true };
     }
 
     // if there are spaces in the id - encode them
