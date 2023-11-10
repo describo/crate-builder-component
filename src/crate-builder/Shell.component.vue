@@ -28,11 +28,13 @@ import {
 import flattenDeep from "lodash-es/flattenDeep";
 import cloneDeep from "lodash-es/cloneDeep";
 import isEmpty from "lodash-es/isEmpty";
+import debounce from "lodash-es/debounce";
 import isFunction from "lodash-es/isFunction";
 import { CrateManager } from "./crate-manager.js";
 import { useRouter, useRoute } from "vue-router";
 import { $t, i18next } from "./i18n";
 import Ajv from "ajv";
+const debouncedEmitNavigation = debounce(emitNavigation, 1000, { leading: true, trailing: false });
 
 let $route, $router;
 import profileSchema from "./profile-schema.json";
@@ -340,7 +342,6 @@ async function setCurrentEntity({ id = undefined, name = undefined }) {
     }
 }
 function updateRoute({ entity }) {
-    $emit("navigation", { "@id": entity["@id"] });
     if (!$router || !$route || !props.enableInternalRouting) return;
     const encodedId = btoa(entity["@id"]);
 
@@ -349,6 +350,10 @@ function updateRoute({ entity }) {
     } else {
         $router?.push({ query: { id: encodedId } });
     }
+    debouncedEmitNavigation({ entity });
+}
+function emitNavigation({ entity }) {
+    $emit("navigation", { "@id": entity["@id"] });
 }
 function ready() {
     data.ready = true;
