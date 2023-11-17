@@ -1,27 +1,27 @@
 # Crate Builder Component
 
--   [Crate Builder Component](#crate-builder-component)
--   [Developing the plugin](#developing-the-plugin)
-    -   [Storybook](#storybook)
-    -   [Development application](#development-application)
--   [Building and publishing a release](#building-and-publishing-a-release)
--   [Repo structure](#repo-structure)
--   [Profiles](#profiles)
--   [Using the component in your app](#using-the-component-in-your-app)
-    -   [Install the package](#install-the-package)
-    -   [Vite users](#vite-users)
-    -   [Tailwind CSS dependency](#tailwind-css-dependency)
-    -   [Vue Router Dependency](#vue-router-dependency)
-    -   [Fontawesome free icons and element-plus dependencies](#fontawesome-free-icons-and-element-plus-dependencies)
-    -   [Wire it up](#wire-it-up)
--   [Identifiers and Types](#identifiers-and-types)
--   [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
--   [Full Usage - configuration and events](#full-usage---configuration-and-events)
-    -   [Properties](#properties)
-    -   [Events](#events)
-        -   [Warnings and errors](#warnings-and-errors)
--   [Themes](#themes)
--   [Internationalisation](#internationalisation)
+- [Crate Builder Component](#crate-builder-component)
+- [Developing the plugin](#developing-the-plugin)
+  - [Storybook](#storybook)
+  - [Development application](#development-application)
+- [Building and publishing a release](#building-and-publishing-a-release)
+- [Repo structure](#repo-structure)
+- [Profiles](#profiles)
+- [Using the component in your app](#using-the-component-in-your-app)
+  - [Install the package](#install-the-package)
+  - [Vite users](#vite-users)
+  - [Tailwind CSS dependency](#tailwind-css-dependency)
+  - [Vue Router Dependency](#vue-router-dependency)
+  - [Fontawesome free icons and element-plus dependencies](#fontawesome-free-icons-and-element-plus-dependencies)
+  - [Wire it up](#wire-it-up)
+- [Identifiers and Types](#identifiers-and-types)
+- [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
+- [Full Usage - configuration and events](#full-usage---configuration-and-events)
+  - [Properties](#properties)
+  - [Events](#events)
+    - [Warnings and errors](#warnings-and-errors)
+- [Themes](#themes)
+- [Internationalisation](#internationalisation)
 
 This is the core UI component for assembling an RO-Crate inside Describo. It is a self contained
 VueJS component that can be used inside your app. If you use this component, your app is responsible
@@ -328,8 +328,8 @@ from there.**
 -   `warning`: If the component needs to warn you about issues with the data it will emit this
     event. It emits an object with one property, `warnings`.
 -   `navigation`: The component emits a navigation event whenever an entity is selected. The output
-    is an object with a single property `id` which you can set on the location if you want to enable
-    navigation (back, forward) and want to manage it yourself.
+    is an object with `@id`, `@type` and `name` properties which your app can use to enable
+    navigation (back, forward).
 -   `@save:crate`: whenever the crate changes internally, this event will be emitted with the full
     crate for your app to save or handle in some way
 -   `@save:entity:template`: this event emits an entity template for re-use within this crate or

@@ -342,6 +342,8 @@ async function setCurrentEntity({ id = undefined, name = undefined }) {
     }
 }
 function updateRoute({ entity }) {
+    debouncedEmitNavigation({ entity });
+
     if (!$router || !$route || !props.enableInternalRouting) return;
     const encodedId = btoa(entity["@id"]);
 
@@ -350,10 +352,9 @@ function updateRoute({ entity }) {
     } else {
         $router?.push({ query: { id: encodedId } });
     }
-    debouncedEmitNavigation({ entity });
 }
 function emitNavigation({ entity }) {
-    $emit("navigation", { "@id": entity["@id"] });
+    $emit("navigation", { "@id": entity["@id"], "@type": entity["@type"], name: entity.name });
 }
 function ready() {
     data.ready = true;
