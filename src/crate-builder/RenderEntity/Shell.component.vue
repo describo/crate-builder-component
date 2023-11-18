@@ -334,7 +334,7 @@ onMounted(() => {
                 } else {
                     // ... otherwise only change to "about" if the newly set entity doesn't have a layout with the same name as
                     // the currently selected one. If there is such layout, keep that (no change to data.activeTab).
-                    const layouts = profileManager.value.getLayouts({ entity: props.entity });
+                    const layouts = profileManager.value.getLayout({ entity: props.entity });
                     if (layouts == null || !layouts[data.activeTab]) {
                         data.activeTab = "about";
                     }
@@ -353,7 +353,7 @@ onMounted(() => {
             } else {
                 // ... otherwise only change to "about" if the newly set profile doesn't have a layout with the same name as
                 // the currently selected one. If there is such layout, keep that (no change to data.activeTab).
-                const layouts = profileManager.value.getLayouts({ entity: props.entity });
+                const layouts = profileManager.value.getLayout({ entity: props.entity });
                 if (layouts == null || !layouts[data.activeTab]) {
                     data.activeTab = "about";
                 }
