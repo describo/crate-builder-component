@@ -98,9 +98,17 @@
                     :key="tab.name + tab.hasData + tab.missingRequiredData"
                 >
                     <template #label>
-                        <div class="flex flex-col">
-                            <div class="flex flex-row items-center space-x-2">
-                                <div class="flex flex-col whitespace-normal text-lg text-gray-600">
+                        <div
+                            class="flex flex-col"
+                            :class="{
+                                'items-end': configuration.tabLocation === 'left',
+                                'items-start': configuration.tabLocation !== 'left',
+                            }"
+                        >
+                            <div class="flex flex-row text-right items-center space-x-2">
+                                <div
+                                    class="flex flex-col whitespace-normal text-lg text-gray-600 text-right"
+                                >
                                     <div
                                         class="cursor-pointer hover:text-yellow-600 describo-tab-label"
                                         v-if="tab.label"
@@ -124,7 +132,7 @@
                                     <i class="fa-regular fa-circle-check fa-lg"></i>
                                 </div>
                             </div>
-                            <div class="text-gray-600 text-left font-light text-xs pr-1 pb-4">
+                            <div class="text-gray-600 font-light text-xs pr-1 pb-4">
                                 {{ tab.description }}
                             </div>
                         </div>
