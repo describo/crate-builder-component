@@ -188,7 +188,6 @@ onMounted(async () => {
             () => props.crate,
             () => {
                 init();
-                // triggerRef(crateManager);
             }
         )
     );
@@ -206,9 +205,6 @@ onMounted(async () => {
                     } else {
                         configuration.value.enableContextEditor = props.enableContextEditor;
                     }
-
-                    // triggerRef(crateManager);
-                    // triggerRef(profile);
                 });
             }
         )
@@ -361,10 +357,10 @@ function ready() {
     $emit("ready");
 }
 async function validateProfile() {
-    if (props.enableProfileValidation && !isEmpty(profile.value)) {
+    if (props.enableProfileValidation && !isEmpty(props.profile)) {
         const ajv = new Ajv();
         const validate = ajv.compile(profileSchema);
-        let valid = validate(profile.value);
+        let valid = validate(props.profile);
         if (!valid) {
             warnings.profileStructuralErrors = {
                 description: `Structural issues have been found in the profile.`,
