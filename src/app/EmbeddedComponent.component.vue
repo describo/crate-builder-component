@@ -40,7 +40,6 @@
                 :enable-template-save="data.configuration.enableTemplateSave"
                 :enable-internal-routing="true"
                 :enable-reverse-link-browser="data.configuration.enableReverseLinkBrowser"
-                :enable-profile-validation="data.configuration.enableProfileValidation"
                 :purge-unlinked-entities="data.configuration.purgeUnlinkedEntities"
                 :web-component="false"
                 :language="data.configuration.language"
@@ -93,9 +92,6 @@
                 <el-form-item label="Enable Reverse Link Browser">
                     <el-switch v-model="data.configuration.enableReverseLinkBrowser" />
                 </el-form-item>
-                <el-form-item label="Enable Profile Validation">
-                    <el-switch v-model="data.configuration.enableProfileValidation" />
-                </el-form-item>
                 <el-form-item label="Enable Template Save">
                     <el-switch v-model="data.configuration.enableTemplateSave" />
                 </el-form-item>
@@ -131,6 +127,7 @@ import profile4 from "../examples/profile/profile-with-resolve.json";
 import profile5 from "../examples/profile/nyingarn-item-profile.json";
 import profile6 from "../examples/profile/vocabulary-creation-profile.json";
 const lookup = new Lookup();
+import { validateProfile } from "../crate-builder/helpers.js";
 
 const data = reactive({
     loading: false,
@@ -170,7 +167,6 @@ const data = reactive({
         enableBrowseEntities: true,
         enableTemplateSave: true,
         enableReverseLinkBrowser: true,
-        enableProfileValidation: true,
         purgeUnlinkedEntities: true,
         readonly: false,
         language: "en",
@@ -188,7 +184,12 @@ function setCrate(name) {
     }, 5);
 }
 function setProfile(name) {
-    data.selectedProfile = name ? data.profiles.filter((p) => p.name === name)[0].value : undefined;
+    const profile = name ? data.profiles.filter((p) => p.name === name)[0].value : undefined;
+    if (profile) {
+        let result = validateProfile(profile);
+        if (!result.valid) console.log("Profile errors", { ...result });
+    }
+    data.selectedProfile = profile;
 }
 function logErrors({ errors }) {
     console.error(`errors:`, { ...errors });

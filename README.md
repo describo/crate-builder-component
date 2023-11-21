@@ -1,27 +1,29 @@
 # Crate Builder Component
 
-- [Crate Builder Component](#crate-builder-component)
-- [Developing the plugin](#developing-the-plugin)
-  - [Storybook](#storybook)
-  - [Development application](#development-application)
-- [Building and publishing a release](#building-and-publishing-a-release)
-- [Repo structure](#repo-structure)
-- [Profiles](#profiles)
-- [Using the component in your app](#using-the-component-in-your-app)
-  - [Install the package](#install-the-package)
-  - [Vite users](#vite-users)
-  - [Tailwind CSS dependency](#tailwind-css-dependency)
-  - [Vue Router Dependency](#vue-router-dependency)
-  - [Fontawesome free icons and element-plus dependencies](#fontawesome-free-icons-and-element-plus-dependencies)
-  - [Wire it up](#wire-it-up)
-- [Identifiers and Types](#identifiers-and-types)
-- [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
-- [Full Usage - configuration and events](#full-usage---configuration-and-events)
-  - [Properties](#properties)
-  - [Events](#events)
-    - [Warnings and errors](#warnings-and-errors)
-- [Themes](#themes)
-- [Internationalisation](#internationalisation)
+-   [Crate Builder Component](#crate-builder-component)
+-   [Developing the plugin](#developing-the-plugin)
+    -   [Storybook](#storybook)
+    -   [Development application](#development-application)
+-   [Building and publishing a release](#building-and-publishing-a-release)
+-   [Repo structure](#repo-structure)
+-   [Profiles](#profiles)
+-   [Using the component in your app](#using-the-component-in-your-app)
+    -   [Install the package](#install-the-package)
+    -   [Vite users](#vite-users)
+    -   [Tailwind CSS dependency](#tailwind-css-dependency)
+    -   [Vue Router Dependency](#vue-router-dependency)
+    -   [Fontawesome free icons and element-plus dependencies](#fontawesome-free-icons-and-element-plus-dependencies)
+    -   [Wire it up as a plugin](#wire-it-up-as-a-plugin)
+        -   [Wire it up by direct import where you want to use it](#wire-it-up-by-direct-import-where-you-want-to-use-it)
+-   [Identifiers and Types](#identifiers-and-types)
+-   [Basic Usage - pass in crate and profile](#basic-usage---pass-in-crate-and-profile)
+-   [Full Usage - configuration and events](#full-usage---configuration-and-events)
+    -   [Properties](#properties)
+    -   [Events](#events)
+        -   [Warnings and errors](#warnings-and-errors)
+-   [Themes](#themes)
+-   [Internationalisation](#internationalisation)
+-   [Profile validation](#profile-validation)
 
 This is the core UI component for assembling an RO-Crate inside Describo. It is a self contained
 VueJS component that can be used inside your app. If you use this component, your app is responsible
@@ -146,10 +148,10 @@ sure to read the note about internal routing in the section:
 npm install --save element-plus @fortawesome/fontawesome-free @fortawesome/fontawesome-svg-core
 ```
 
-## Wire it up
+## Wire it up as a plugin
 
--   Plug it into your Vue app. It will look something like the following - note that `you` configure
-    tailwind, fontawesome and element-plus css your app:
+Plug it into your Vue app. It will look something like the following - note that `you` configure
+tailwind, fontawesome and element-plus css your app:
 
 ```JS
 import "./tailwind.css";
@@ -178,6 +180,21 @@ const app = createApp(App);
 app.use(router);
 app.use(DescriboCrateBuilder);
 app.mount("#app");
+```
+
+### Wire it up by direct import where you want to use it
+
+You can also just import it at the point you need. Note that you still need to setup tailwind,
+fontawesome and element-plus as shown above.
+
+```JS
+<script setup>
+import DescriboCrateBuilder from "@describo/crate-builder-component/src/crate-builder/Shell.component.vue";
+</script>
+
+<template>
+    <DescriboCrateBuilder... />
+</template>
 ```
 
 # Identifiers and Types
@@ -293,8 +310,6 @@ from there.**
     the component can't.
 -   `enableReverseLinkBrowser`: true : false: `(default: true)`: enable / disable the reverse link
     browser. If enabled, it can be shown as a right sidebar as required.
--   `enableProfileValidation`: true : false: `(default: true)`: enable / disable validating the
-    profile
 -   `purgeUnlinkedEntities`: true : false: `(default: true)`: purge unlinked entities from the crate
     before emitting the crate for saving
 -   `readonly`: true | false: `(default: false)` : if set to true all of the controls to edit that
@@ -404,3 +419,17 @@ To submit an internationalisation file please do the following:
 If you're not sure what all of this means, copy the file above to your computer and translate the
 entries. Then, submit an issue in the
 [issue tracker](https://github.com/describo/crate-builder-component/issues) and attach the file.
+
+# Profile validation
+
+Included in this bundle is a method you can use in your own application to validate the profile.
+
+```JS
+import validateProfile from "@describo/crate-builder-component/src/crate-builder/helpers.js"
+
+const profile = { ... }
+if (profile) {
+    let result = validateProfile(profile);
+    if (!result.valid) console.log("Profile errors", { ...result });
+}
+```

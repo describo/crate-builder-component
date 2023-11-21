@@ -33,11 +33,9 @@ import isFunction from "lodash-es/isFunction";
 import { CrateManager } from "./crate-manager.js";
 import { useRouter, useRoute } from "vue-router";
 import { $t, i18next } from "./i18n";
-import Ajv from "ajv";
 const debouncedEmitNavigation = debounce(emitNavigation, 1000, { leading: true, trailing: false });
 
 let $route, $router;
-import profileSchema from "./profile-schema.json";
 
 const props = defineProps({
     crate: {
@@ -83,11 +81,6 @@ const props = defineProps({
         validator: (val) => [true, false].includes(val),
     },
     enableReverseLinkBrowser: {
-        type: Boolean,
-        default: true,
-        validator: (val) => [true, false].includes(val),
-    },
-    enableProfileValidation: {
         type: Boolean,
         default: true,
         validator: (val) => [true, false].includes(val),
@@ -195,17 +188,15 @@ onMounted(async () => {
         watch(
             () => props.profile,
             () => {
-                validateProfile().then(() => {
-                    profile.value = isEmpty(props.profile) ? {} : cloneDeep(props.profile);
-                    crateManager.value.profile = profile.value;
+                profile.value = isEmpty(props.profile) ? {} : cloneDeep(props.profile);
+                crateManager.value.profile = profile.value;
 
-                    // does the profile have a context defined? yes - disable the context editor
-                    if (profile?.context) {
-                        configuration.value.enableContextEditor = false;
-                    } else {
-                        configuration.value.enableContextEditor = props.enableContextEditor;
-                    }
-                });
+                // does the profile have a context defined? yes - disable the context editor
+                if (profile?.context) {
+                    configuration.value.enableContextEditor = false;
+                } else {
+                    configuration.value.enableContextEditor = props.enableContextEditor;
+                }
             }
         )
     );
@@ -232,7 +223,6 @@ onMounted(async () => {
                 () => props.resetTabOnEntityChange,
                 () => props.resetTabOnProfileChange,
                 () => props.showControls,
-                () => props.validateProfile,
             ],
             () => {
                 configuration.value = configure();
@@ -355,21 +345,6 @@ function emitNavigation({ entity }) {
 function ready() {
     data.ready = true;
     $emit("ready");
-}
-async function validateProfile() {
-    if (props.enableProfileValidation && !isEmpty(props.profile)) {
-        const ajv = new Ajv();
-        const validate = ajv.compile(profileSchema);
-        let valid = validate(props.profile);
-        if (!valid) {
-            warnings.profileStructuralErrors = {
-                description: `Structural issues have been found in the profile.`,
-                data: validate.errors,
-            };
-
-            $emit("warning", { warnings });
-        }
-    }
 }
 async function saveCrate() {
     await new Promise((resolve) => setTimeout(resolve, 100));

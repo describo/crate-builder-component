@@ -51,6 +51,15 @@
                 "additionalProperties": false
             }
         },
+        "localisation": {
+            "description": "Configuration to localise class names",
+            "type": "object",
+            "patternProperties": {
+                "^[A-Z,a-z]*": {
+                    "type": "string"
+                }
+            }
+        },
         "classes": {
             "description": "Class definitions",
             "type": "object",
