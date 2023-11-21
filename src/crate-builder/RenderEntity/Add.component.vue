@@ -81,7 +81,7 @@
                 @link:entity="linkEntity"
             />
         </div>
-        <div v-else class="p-1 w-full">
+        <div v-else class="p-1 w-full describo-property-type-entity">
             <div
                 class="flex flex-row space-x-2 divide-y divide-gray-300 text-gray-600"
                 v-if="data.addType"

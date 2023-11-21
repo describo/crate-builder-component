@@ -1,5 +1,5 @@
 <template>
-    <div :id="mapId" class="map-style"></div>
+    <div :id="mapId" class="map-style describo-property-type-map"></div>
 </template>
 
 <script setup>
