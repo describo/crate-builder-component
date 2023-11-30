@@ -20,7 +20,7 @@
                 <!-- render entity id -->
                 <div class="flex flex-row space-x-2 my-2 p-2">
                     <render-entity-id-component
-                        class="flex-grow"
+                        class="flex-grow describo-property describo-property-name-id"
                         :class="{
                             'bg-green-200 rounded p-1 my-1': data.savedProperty === '@id',
                         }"
@@ -42,7 +42,7 @@
 
                 <!-- render entity type -->
                 <render-entity-type-component
-                    class="my-2 p-2"
+                    class="my-2 p-2 describo-property describo-property-name-type"
                     :crate-manager="crateManager"
                     :entity="contextEntity"
                     @update:entity="updateEntity"
@@ -50,7 +50,7 @@
 
                 <!-- render entity name -->
                 <render-entity-name-component
-                    class="my-2 p-2"
+                    class="my-2 p-2 describo-property describo-property-name-name"
                     :class="{
                         'bg-green-200 rounded p-1 my-1': data.savedProperty === 'name',
                     }"
@@ -155,7 +155,7 @@
                         </div>
                         <div v-if="tab.name === 'about'">
                             <render-entity-id-component
-                                class="my-2 p-2"
+                                class="my-2 p-2 describo-property describo-property-name-id"
                                 :class="{
                                     'bg-green-200 rounded p-1 my-1': data.savedProperty === '@id',
                                 }"
@@ -163,13 +163,13 @@
                                 @update:entity="updateEntity"
                             />
                             <render-entity-type-component
-                                class="my-2 p-2"
+                                class="my-2 p-2 describo-property describo-property-name-type"
                                 :crate-manager="crateManager"
                                 :entity="contextEntity"
                                 @update:entity="updateEntity"
                             />
                             <render-entity-name-component
-                                class="my-2 p-2"
+                                class="my-2 p-2 describo-property describo-property-name-name"
                                 :class="{
                                     'bg-green-200 rounded p-1 my-1': data.savedProperty === 'name',
                                 }"

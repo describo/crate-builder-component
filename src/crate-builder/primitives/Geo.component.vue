@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-row text-gray-600">
+    <div class="flex flex-row text-gray-600 describo-property-type-geo">
         <div
             class="flex flex-col p-4"
             :class="{

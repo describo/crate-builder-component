@@ -1,12 +1,12 @@
 <template>
     <div>
-        <div class="text-gray-600 font-light text-sm pr-1" v-if="!showToggle">
+        <div class="text-gray-600 font-light text-sm pr-1 describo-property-help" v-if="!showToggle">
             {{ help }}
         </div>
 
         <div
             v-if="showToggle"
-            class="text-gray-600 font-light text-sm pr-1 cursor-pointer"
+            class="text-gray-600 font-light text-sm pr-1 cursor-pointer describo-property-help-more"
             @click="data.showMore = !data.showMore"
         >
             {{ help }} <span v-if="!data.showMore">...</span>

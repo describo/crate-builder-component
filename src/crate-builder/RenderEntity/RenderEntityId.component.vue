@@ -1,8 +1,8 @@
 <template>
     <div class="flex flex-row">
-        <div class="w-1/3 xl:w-1/5 flex flex-col">@id</div>
+        <div class="w-1/3 xl:w-1/5 flex flex-col describo-property-name">@id</div>
 
-        <div class="w-2/3 xl:w-4/5 flex flex-row" v-if="!configuration.readonly">
+        <div class="w-2/3 xl:w-4/5 flex flex-row describo-property-value" v-if="!configuration.readonly">
             <div
                 v-if="
                     props.entity['@id'] === './' ||
@@ -22,7 +22,7 @@
                 />
             </div>
         </div>
-        <div class="w-2/3 xl:w-4/5 flex flex-row" v-else>
+        <div class="w-2/3 xl:w-4/5 flex flex-row describo-property-value" v-else>
             <div v-if="isURL(props.entity['@id'])">
                 <a class="text-blue-800" :href="props.entity['@id']" target="_blank">{{
                     props.entity["@id"]

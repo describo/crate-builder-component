@@ -1,5 +1,5 @@
 <template>
-    <div>{{ labelDisplay }}</div>
+    <div class="describo-property-name">{{ labelDisplay }}</div>
 </template>
 
 <script setup>

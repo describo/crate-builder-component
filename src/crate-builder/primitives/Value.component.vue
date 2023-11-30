@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col">
+    <div class="flex flex-col describo-property-type-value">
         <div v-if="isValidString">{{ props.value }}</div>
         <div v-if="!isValidString">
             {{ $t('invalid_value_value', {type: props.value}) }}

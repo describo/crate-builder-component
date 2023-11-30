@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col">
+    <div class="flex flex-col describo-property-type-url">
         <div class="flex flex-row flex-grow space-x-2">
             <el-input
                 class="w-full"

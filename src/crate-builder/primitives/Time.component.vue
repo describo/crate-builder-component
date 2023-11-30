@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col">
+    <div class="flex flex-col describo-property-type-time">
         <el-input
             class="w-full"
             type="text"

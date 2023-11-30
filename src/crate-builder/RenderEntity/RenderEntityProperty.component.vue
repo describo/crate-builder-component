@@ -1,9 +1,9 @@
 <template>
     <div
         class="flex flex-row flex-grow p-2 describo-property-background"
-        :class="{ 'bg-red-200': props.highlightRequired && isRequired && !isValid }"
+        :class="[{ 'bg-red-200': props.highlightRequired && isRequired && !isValid }, `describo-property describo-property-name-${props.property}`]"
     >
-        <div class="w-1/3 xl:w-1/5 flex flex-col">
+        <div class="w-1/3 xl:w-1/5 flex flex-col describo-property-heading">
             <div>
                 <display-property-name-component
                     :property="props.property"
@@ -22,11 +22,11 @@
                 ({{ $t("not_defined_in_profile") }})
             </div>
         </div>
-        <div class="w-2/3 xl:w-4/5 flex flex-col flex-grow">
+        <div class="w-2/3 xl:w-4/5 flex flex-col flex-grow describo-property-value">
             <!-- render all of the simple things (text, textarea, date etc) in a column -->
             <div class="flex flex-col space-y-1" v-if="data.simpleInstances.length">
                 <div v-for="instance of data.simpleInstances" :key="instance.idx">
-                    <div v-if="propertyDefinition.readonly">
+                    <div v-if="propertyDefinition.readonly" class="describo-property-value-readonly">
                         {{ instance.value }}
                     </div>
                     <div v-else class="flex flex-row space-x-2">
