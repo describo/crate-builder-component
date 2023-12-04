@@ -33,7 +33,7 @@ import isFunction from "lodash-es/isFunction";
 import { CrateManager } from "./crate-manager.js";
 import { useRouter, useRoute } from "vue-router";
 import { $t, i18next } from "./i18n";
-const debouncedEmitNavigation = debounce(emitNavigation, 1000, { leading: true, trailing: false });
+const debouncedEmitNavigation = debounce(emitNavigation, 500, { leading: true, trailing: false });
 
 let $route, $router;
 
