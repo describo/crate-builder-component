@@ -47,7 +47,6 @@
             />
             <text-component
                 v-else-if="isText(props.data.value)"
-                :type="type"
                 :property="props.data.property"
                 :value="props.data.value"
                 :definition="props.definition"
@@ -92,9 +91,10 @@ const props = defineProps({
     },
 });
 const $emit = defineEmits(["save:property", "update:property", "create:entity"]);
-let type = computed(() => {
-    return props?.definition?.type?.[0].toLowerCase();
-});
+// let type = computed(() => {
+//     console.log(props.definition);
+//     return props?.definition?.type?.[0].toLowerCase();
+// });
 async function savePropertyValue(data) {
     if (!data.idx) {
         data = { ...data, property: props.data.property, idx: props.data.idx };
