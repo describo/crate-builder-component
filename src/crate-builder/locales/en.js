@@ -49,6 +49,7 @@ const en = {
         // Text.component.vue
         invalid_type_for_text:
             "The type '{{type}}' is not valid for this component. It can only be 'text' or 'textarea'",
+        text_constraints_error_message: "The specified value does not meet the following constraints: {{value}}",
 
         // Date.component.vue
         pick_a_date: "Pick a date",
@@ -68,6 +69,7 @@ const en = {
         // Number.component.vue
         invalid_number_value:
             "The supplied number '{{value}}' is invalid. The value must be a valid number passed in as a String or a Number.",
+        number_constraints_error_message: "The specified number does not meet the following constraints: {{value}}",
 
         // Select.component.vue
         select: "Select",

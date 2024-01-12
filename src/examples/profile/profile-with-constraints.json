@@ -1,0 +1,409 @@
+{
+    "metadata": {
+        "name": "A profile with constraints",
+        "description": "",
+        "version": 0.1,
+        "warnMissingProperty": true
+    },
+    "classes": {
+        "Dataset": {
+            "definition": "inherit",
+            "subClassOf": [],
+            "inputs": [
+                {
+                    "id": "https://schema.org/text",
+                    "name": "text",
+                    "label": "Text",
+                    "help": "Text field with no constraint",
+                    "required": false,
+                    "multiple": true,
+                    "type": ["Text"]
+                },
+                {
+                    "id": "https://schema.org/text1",
+                    "name": "text1",
+                    "label": "Text field with every constraint",
+                    "help": "Text field with every constraint: minLength, maxLength, regex",
+                    "required": false,
+                    "multiple": true,
+                    "minLength": 5,
+                    "maxLength": 10,
+                    "regex": "^a",
+                    "type": ["Text"]
+                },
+                {
+                    "id": "https://schema.org/text2",
+                    "name": "text2",
+                    "label": "Text field with minLength",
+                    "help": "help message",
+                    "required": false,
+                    "multiple": true,
+                    "minLength": 5,
+                    "type": ["Text"]
+                },
+                {
+                    "id": "https://schema.org/text3",
+                    "name": "text3",
+                    "label": "Text field with maxLength",
+                    "help": "help message",
+                    "required": false,
+                    "multiple": true,
+                    "maxLength": 10,
+                    "type": ["Text"]
+                },
+                {
+                    "id": "https://schema.org/text4",
+                    "name": "text4",
+                    "label": "Text field with regex",
+                    "help": "help message",
+                    "required": false,
+                    "multiple": true,
+                    "regex": "^a",
+                    "type": ["Text"]
+                },
+                {
+                    "id": "https://schema.org/text5",
+                    "name": "text5",
+                    "label": "Text field with min/maxLength",
+                    "help": "help message",
+                    "required": false,
+                    "multiple": true,
+                    "minLength": 1,
+                    "maxLength": 10,
+                    "type": ["Text"]
+                },
+                {
+                    "id": "https://schema.org/textarea",
+                    "name": "textarea",
+                    "label": "Textarea",
+                    "help": "Textarea with no constraint",
+                    "required": false,
+                    "multiple": true,
+                    "minLength": 10,
+                    "maxLength": 15,
+                    "regex": "^b",
+                    "type": ["TextArea"]
+                },
+                {
+                    "id": "https://schema.org/textarea1",
+                    "name": "textarea1",
+                    "label": "Textarea with minLength",
+                    "help": "help message",
+                    "required": false,
+                    "multiple": true,
+                    "minLength": 10,
+                    "type": ["TextArea"]
+                },
+                {
+                    "id": "https://schema.org/textarea2",
+                    "name": "textarea2",
+                    "label": "Textarea with maxLength",
+                    "help": "help message",
+                    "required": false,
+                    "multiple": true,
+                    "maxLength": 15,
+                    "type": ["TextArea"]
+                },
+                {
+                    "id": "https://schema.org/textarea3",
+                    "name": "textarea3",
+                    "label": "Textarea with regex",
+                    "help": "help message",
+                    "required": false,
+                    "multiple": true,
+                    "regex": "^b",
+                    "type": ["TextArea"]
+                },
+                {
+                    "id": "https://schema.org/textarea4",
+                    "name": "textarea4",
+                    "label": "Textarea with min/maxLength",
+                    "help": "help message",
+                    "required": false,
+                    "multiple": true,
+                    "minLength": 10,
+                    "maxLength": 15,
+                    "type": ["TextArea"]
+                },
+                {
+                    "id": "https://schema.org/date",
+                    "name": "date",
+                    "label": "Date",
+                    "help": "Date field with no constraints",
+                    "required": false,
+                    "multiple": true,
+                    "type": ["Date"]
+                },
+                {
+                    "id": "https://schema.org/date1",
+                    "name": "date1",
+                    "label": "Date with full granularity",
+                    "help": "Granularity: YYYY-MM-DD",
+                    "required": false,
+                    "multiple": true,
+                    "granularity": "YYYY-MM-DD",
+                    "type": ["Date"]
+                },
+                {
+                    "id": "https://schema.org/date2",
+                    "name": "date2",
+                    "label": "Date with year and month",
+                    "help": "Granularity: YYYY-MM",
+                    "required": false,
+                    "multiple": true,
+                    "granularity": "YYYY-MM",
+                    "type": ["Date"]
+                },
+                {
+                    "id": "https://schema.org/date3",
+                    "name": "date3",
+                    "label": "Date with year only",
+                    "help": "Granularity: YYYY",
+                    "required": false,
+                    "multiple": true,
+                    "granularity": "YYYY",
+                    "type": ["Date"]
+                },
+                {
+                    "id": "https://schema.org/datetime",
+                    "name": "datetime",
+                    "label": "Datetime with no constraints",
+                    "help": "help message",
+                    "required": false,
+                    "multiple": true,
+                    "type": ["DateTime"]
+                },
+                {
+                    "id": "https://schema.org/datetime1",
+                    "name": "datetime1",
+                    "label": "Datetime with every constraints",
+                    "help": "Datetime with every constraints: dateGranularity, timeGranularity",
+                    "required": false,
+                    "multiple": true,
+                    "dateGranularity": "YYYY-MM",
+                    "timeGranularity": "hh.mm",
+                    "type": ["DateTime"]
+                },
+                {
+                    "id": "https://schema.org/datetime2",
+                    "name": "datetime2",
+                    "label": "Datetime with full dateGranularity",
+                    "help": "Datetime with dateGranularity: YYYY-MM-DD",
+                    "required": false,
+                    "multiple": true,
+                    "dateGranularity": "YYYY-MM-DD",
+                    "type": ["DateTime"]
+                },
+                {
+                    "id": "https://schema.org/datetime3",
+                    "name": "datetime3",
+                    "label": "Datetime with dateGranularity, year and month",
+                    "help": "Datetime with dateGranularity: YYYY-MM",
+                    "required": false,
+                    "multiple": true,
+                    "dateGranularity": "YYYY-MM",
+                    "type": ["DateTime"]
+                },
+                {
+                    "id": "https://schema.org/datetime4",
+                    "name": "datetime4",
+                    "label": "Datetime with dateGranularity, year only",
+                    "help": "Datetime with dateGranularity: YYYY",
+                    "required": false,
+                    "multiple": true,
+                    "dateGranularity": "YYYY",
+                    "type": ["DateTime"]
+                },
+                {
+                    "id": "https://schema.org/datetime5",
+                    "name": "datetime5",
+                    "label": "Datetime with full timeGranularity",
+                    "help": "Datetime with dateGranularity: hh.mm.ss",
+                    "required": false,
+                    "multiple": true,
+                    "timeGranularity": "hh.mm.ss",
+                    "type": ["DateTime"]
+                },
+                {
+                    "id": "https://schema.org/datetime6",
+                    "name": "datetime6",
+                    "label": "Datetime with timeGranularity, hour and month",
+                    "help": "Datetime with timeGranularity: hh.mm",
+                    "required": false,
+                    "multiple": true,
+                    "timeGranularity": "hh.mm",
+                    "type": ["DateTime"]
+                },
+                {
+                    "id": "https://schema.org/datetime7",
+                    "name": "datetime7",
+                    "label": "Datetime with timeGranularity, hour only",
+                    "help": "Datetime with timeGranularity: hh",
+                    "required": false,
+                    "multiple": true,
+                    "timeGranularity": "hh",
+                    "type": ["DateTime"]
+                },
+                {
+                    "id": "https://schema.org/datetime8",
+                    "name": "datetime8",
+                    "label": "Datetime with date/timeGranularity, full granularity",
+                    "help": "Datetime with dateGranularity: YYYY-MM-DD, timeGranularity: hh.mm.ss.",
+                    "required": false,
+                    "multiple": true,
+                    "dateGranularity": "YYYY-MM-DD",
+                    "timeGranularity": "hh.mm.ss",
+                    "type": ["DateTime"]
+                },
+                {
+                    "id": "https://schema.org/datetime9",
+                    "name": "datetime9",
+                    "label": "Datetime with date/timeGranularity, full date, partial time granularity",
+                    "help": "Datetime with dateGranularity: YYYY-MM-DD, timeGranularity: hh.mm",
+                    "required": false,
+                    "multiple": true,
+                    "dateGranularity": "YYYY-MM-DD",
+                    "timeGranularity": "hh.mm",
+                    "type": ["DateTime"]
+                },
+                {
+                    "id": "https://schema.org/datetime10",
+                    "name": "datetime10",
+                    "label": "Datetime with date/timeGranularity, full time, partial date granularity",
+                    "help": "Datetime with dateGranularity: YYYY-MM, timeGranularity: hh.mm.ss.",
+                    "required": false,
+                    "multiple": true,
+                    "dateGranularity": "YYYY-MM",
+                    "timeGranularity": "hh.mm.ss",
+                    "type": ["DateTime"]
+                },
+                {
+                    "id": "https://schema.org/number",
+                    "name": "number",
+                    "label": "Number with no constraint",
+                    "help": "Number with no constraint",
+                    "required": false,
+                    "multiple": true,
+                    "type": ["Number"]
+                },
+                {
+                    "id": "https://schema.org/number1",
+                    "name": "number1",
+                    "label": "Number with every constraint",
+                    "help": "Number with every constraint: minValue, maxValue, numberType",
+                    "required": false,
+                    "multiple": true,
+                    "minValue": 10,
+                    "maxValue": 15,
+                    "numberType": ["Int"],
+                    "type": ["Number"]
+                },
+                {
+                    "id": "https://schema.org/number2",
+                    "name": "number2",
+                    "label": "Number with minValue",
+                    "help": "Number with minValue constraint",
+                    "required": false,
+                    "multiple": true,
+                    "minValue": 10,
+                    "type": ["Number"]
+                },
+                {
+                    "id": "https://schema.org/number3",
+                    "name": "number3",
+                    "label": "Number with maxValue",
+                    "help": "Number with maxValue constraint",
+                    "required": false,
+                    "multiple": true,
+                    "maxValue": 10,
+                    "type": ["Number"]
+                },
+                {
+                    "id": "https://schema.org/number4",
+                    "name": "number4",
+                    "label": "Number with min/maxValue",
+                    "help": "Number with minValue and maxValue constraint",
+                    "required": false,
+                    "multiple": true,
+                    "minValue": 10,
+                    "maxValue": 20,
+                    "type": ["Number"]
+                },
+                {
+                    "id": "https://schema.org/number5",
+                    "name": "number5",
+                    "label": "Number with Int numberType",
+                    "help": "Number with numberType: ['Int'] constraint",
+                    "required": false,
+                    "multiple": true,
+                    "numberType": ["Int"],
+                    "type": ["Number"]
+                },
+                {
+                    "id": "https://schema.org/number6",
+                    "name": "number6",
+                    "label": "Number with Float numberType",
+                    "help": "Number with numberType: ['Float'] constraint",
+                    "required": false,
+                    "multiple": true,
+                    "numberType": ["Float"],
+                    "type": ["Number"]
+                },
+                {
+                    "id": "https://schema.org/number7",
+                    "name": "number7",
+                    "label": "Number with Double numberType",
+                    "help": "Number with numberType: ['Double'] constraint",
+                    "required": false,
+                    "multiple": true,
+                    "numberType": ["Double"],
+                    "type": ["Number"]
+                },
+                {
+                    "id": "https://schema.org/number8",
+                    "name": "number8",
+                    "label": "Number with Long numberType",
+                    "help": "Number with numberType: ['Long'] constraint",
+                    "required": false,
+                    "multiple": true,
+                    "numberType": ["Long"],
+                    "type": ["Number"]
+                },
+                {
+                    "id": "https://schema.org/number9",
+                    "name": "number9",
+                    "label": "Number with Any numberType",
+                    "help": "Number with numberType: ['Any'] constraint",
+                    "required": false,
+                    "multiple": true,
+                    "numberType": ["Any"],
+                    "type": ["Number"]
+                },
+                {
+                    "id": "https://schema.org/number10",
+                    "name": "number10",
+                    "label": "Number with multiple numberType",
+                    "help": "Number with numberType: ['Int', 'Float', 'Long'] constraint",
+                    "required": false,
+                    "multiple": true,
+                    "numberType": ["Int", "Float", "Long"],
+                    "type": ["Number"]
+                }
+            ]
+        }
+    },
+    "lookup": {
+        "Language": {
+            "fields": [
+                "@id",
+                "name",
+                "alternateName",
+                "iso639-3",
+                "austlangCode",
+                "glottologCode",
+                "languageCode"
+            ],
+            "datapacks": []
+        }
+    }
+}

@@ -9,15 +9,38 @@
             <!--  not readonly - try to load the relevant display component-->
             <value-component v-if="isValue()" :definition="props.definition.value" />
             <date-time-component
-                v-else-if="isDateTime(props.data.value)"
+                v-else-if="isDateTime(props.data.value) &&
+                    (!props.definition.dateGranularity || 
+                    !props.definition.timeGranularity) || 
+                    props.definition.dateGranularity + ' ' + props.definition.timeGranularity === 'YYYY-MM-DD hh.mm.ss'"
                 :property="props.data.property"
                 :value="props.data.value"
                 @save:property="savePropertyValue"
             />
             <date-component
-                v-else-if="isDate(props.data.value)"
+                v-else-if="isDate(props.data.value)&& 
+                    !props.definition.granularity || props.definition.granularity === 'YYYY-MM-DD'"
                 :property="props.data.property"
                 :value="props.data.value"
+                @save:property="savePropertyValue"
+            />
+            <text-component
+                v-else-if="isDate(props.data.value) && 
+                    (props.definition.granularity && 
+                    props.definition.granularity !== 'YYYY-MM-DD')"
+                :property="props.data.property"
+                :value="props.data.value"
+                :definition="props.definition"
+                @save:property="savePropertyValue"
+            />
+            <text-component
+                v-else-if="isDateTime(props.data.value) && 
+                    ((props.definition.dateGranularity|| 
+                    props.definition.timeGranularity) &&  
+                    props.definition.dateGranularity + ' ' + props.definition.timeGranularity !== 'YYYY-MM-DD hh.mm.ss')" 
+                :property="props.data.property"
+                :value="props.data.value"
+                :definition="props.definition"
                 @save:property="savePropertyValue"
             />
             <time-component
@@ -30,6 +53,7 @@
                 v-else-if="isNumber(props.data.value)"
                 :property="props.data.property"
                 :value="props.data.value"
+                :definition="props.definition"
                 @save:property="savePropertyValue"
             />
             <select-component

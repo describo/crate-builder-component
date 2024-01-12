@@ -20,6 +20,7 @@
                 v-if="data.addType === 'Text'"
                 :property="props.property"
                 type="text"
+                :definition="props.definition"
                 @save:property="createProperty"
                 :placeholder="$t('add_text')"
             />
@@ -27,21 +28,46 @@
                 v-if="data.addType === 'TextArea'"
                 :property="props.property"
                 type="textarea"
+                :definition="props.definition"
+                @save:property="createProperty"
+            />
+            <text-component
+                v-if="data.addType === 'Date' && 
+                    (props.definition.granularity && 
+                    props.definition.granularity !== 'YYYY-MM-DD')"
+                :property="props.property"
+                type="text"
+                :definition="props.definition"
+                @save:property="createProperty"
+            />
+            <text-component
+                v-if="data.addType === 'DateTime' &&
+                    ((props.definition.dateGranularity || 
+                    props.definition.timeGranularity) &&  
+                    props.definition.dateGranularity + ' ' + props.definition.timeGranularity !== 'YYYY-MM-DD hh.mm.ss')"
+                :property="props.property"
+                type="text"
+                :definition="props.definition"
                 @save:property="createProperty"
             />
             <date-component
-                v-if="data.addType === 'Date'"
+                v-if="data.addType === 'Date' && 
+                    !props.definition.granularity || props.definition.granularity === 'YYYY-MM-DD'"
                 :property="props.property"
                 @save:property="createProperty"
             />
             <date-time-component
-                v-if="data.addType === 'DateTime'"
+                v-if="data.addType === 'DateTime' &&
+                    (!props.definition.dateGranularity && 
+                    !props.definition.timeGranularity) ||  
+                    props.definition.dateGranularity + ' ' + props.definition.timeGranularity === 'YYYY-MM-DD hh.mm.ss'"
                 :property="props.property"
                 @save:property="createProperty"
             />
             <number-component
                 v-if="['Number', 'Float', 'Integer'].includes(data.addType)"
                 :property="props.property"
+                :definition="props.definition"
                 @save:property="createProperty"
             />
             <time-component
