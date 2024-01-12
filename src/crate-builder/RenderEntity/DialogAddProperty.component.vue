@@ -34,15 +34,12 @@
 
 <script setup>
 import { ElInput } from "element-plus";
-import { reactive, computed, watch } from "vue";
-import { ProfileManager } from "../profile-manager";
+import { reactive, computed, watch, inject } from "vue";
 import { $t } from "../i18n";
+import { profileManagerKey } from "./keys.js";
+const pm = inject(profileManagerKey);
 
 const props = defineProps({
-    crateManager: {
-        type: Object,
-        required: true,
-    },
     entity: {
         type: [Object, undefined],
         required: true,
@@ -61,8 +58,7 @@ watch(
 
 let inputs = computed(() => {
     if (!props.entity["@type"]) return [];
-    const profileManager = new ProfileManager({ profile: props.crateManager.profile });
-    let { inputs } = profileManager.getAllInputs({ entity: props.entity });
+    let { inputs } = pm.value.getAllInputs({ entity: props.entity });
     if (!data.filter) return inputs;
     return inputs.filter((i) => {
         let re = new RegExp(data.filter, "i");

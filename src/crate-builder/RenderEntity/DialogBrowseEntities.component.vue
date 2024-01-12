@@ -32,13 +32,9 @@ import { reactive, computed, inject } from "vue";
 import compact from "lodash-es/compact";
 import RenderItemLinkComponent from "./RenderItemLink.component.vue";
 import { $t } from "../i18n";
+import { crateManagerKey } from "./keys.js";
+const cm = inject(crateManagerKey);
 
-const props = defineProps({
-    crateManager: {
-        type: Object,
-        required: true,
-    },
-});
 const data = reactive({
     collapse: false,
     filterInputModel: "",
@@ -54,18 +50,9 @@ let entities = computed(() => {
     let offset = (data.currentPage - 1) * data.pageSize;
     let entities;
     if (data.query) {
-        const re = new RegExp(data.query, "i");
-        entities = props.crateManager.em.entities.filter((entity) => {
-            if (
-                entity["@id"].match(re) ||
-                entity["@type"].join(", ").match(re) ||
-                entity.name.match(re)
-            ) {
-                return entity;
-            }
-        });
+        entities = [...cm.value.getEntities({ query: data.query, limit: data.pageSize })];
     } else {
-        entities = props.crateManager.em.entities;
+        entities = [...cm.value.getEntities()];
     }
     entities = compact(entities);
     data.total = entities.length;

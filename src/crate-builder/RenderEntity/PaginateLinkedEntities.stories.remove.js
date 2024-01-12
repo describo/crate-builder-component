@@ -28,7 +28,7 @@ const Template = {
 export const ValidEntityInputWithOneEntity = {
     ...Template,
     args: {
-        crateManager,
+        readonly: false,
         property: "something",
         entities: generateEntities(1),
     },
@@ -37,7 +37,7 @@ export const ValidEntityInputWithOneEntity = {
 export const ValidEntityInputWithOneHundredEntities = {
     ...Template,
     args: {
-        crateManager,
+        readonly: false,
         property: "something",
         entities: generateEntities(100),
     },

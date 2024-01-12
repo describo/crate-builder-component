@@ -1,5 +1,6 @@
 <template>
     <div class="flex flex-col">
+        <!-- {{ props.entities }} -->
         <div class="flex flex-row">
             <div class="flex-grow">
                 <el-input
@@ -22,9 +23,8 @@
             <div v-for="instance of data.entities" :key="instance.idx">
                 <RenderLinkedItemComponent
                     class="m-1"
-                    :key="instance.tgtEntity['@id']"
-                    :crate-manager="props.crateManager"
-                    :entity="instance"
+                    :key="instance.value['@id']"
+                    :entity="instance.value"
                     :property="props.property"
                     :readonly="props.readonly"
                     @load:entity="loadEntity"
@@ -44,10 +44,6 @@ import { configurationKey } from "./keys";
 const configuration = inject(configurationKey);
 
 const props = defineProps({
-    crateManager: {
-        type: Object,
-        required: true,
-    },
     entities: {
         type: Array,
         required: true,
@@ -84,7 +80,7 @@ function filterAndChunkEntitiesForDisplay() {
     if (data.filter) {
         const re = new RegExp(data.filter, "i");
         let entities = props.entities.filter(
-            (e) => e.tgtEntity.name.match(re) || e.tgtEntity["@id"].match(re)
+            (e) => e.value.name.match(re) || e.value["@id"].match(re)
         );
         data.total = entities.length;
         data.entities = entities.slice(offset, offset + data.pageSize);

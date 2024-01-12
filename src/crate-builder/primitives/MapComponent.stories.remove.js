@@ -20,29 +20,25 @@ const entities = [
         "@id": "#geo_1",
         "@type": ["GeoCoordinates"],
         name: "geocoordinates",
-        "@properties": {
-            geojson: [
-                {
-                    idx: 0,
-                    property: "geojson",
-                    value: '{"type":"Feature","properties":{"name":"Nyaki Nyaki / Njaki Njaki"},"geometry":{"type":"Point","coordinates":["118.75508272649","-32.390945191928"]}}',
-                },
-            ],
-        },
+        geojson: [
+            {
+                idx: 0,
+                property: "geojson",
+                value: '{"type":"Feature","properties":{"name":"Nyaki Nyaki / Njaki Njaki"},"geometry":{"type":"Point","coordinates":["118.75508272649","-32.390945191928"]}}',
+            },
+        ],
     },
     {
         "@id": "#geo_2",
         "@type": ["GeoShape"],
         name: "geoshape",
-        "@properties": {
-            geojson: [
-                {
-                    idx: 0,
-                    property: "geojson",
-                    value: '{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[158.76561641693118,-7.710991655433217],[158.76561641693118,-47.040182144806664],[109.54686641693117,-47.040182144806664],[109.54686641693117,-7.710991655433217]]]}}',
-                },
-            ],
-        },
+        geojson: [
+            {
+                idx: 0,
+                property: "geojson",
+                value: '{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[158.76561641693118,-7.710991655433217],[158.76561641693118,-47.040182144806664],[109.54686641693117,-47.040182144806664],[109.54686641693117,-7.710991655433217]]]}}',
+            },
+        ],
     },
 ];
 

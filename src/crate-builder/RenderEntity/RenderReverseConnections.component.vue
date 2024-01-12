@@ -27,23 +27,27 @@
                 />
             </div>
         </div>
+        <pre>
+
+        {{ props.connections }}
+       </pre
+        >
     </div>
 </template>
 
 <script setup>
 import { ElPagination, ElInput } from "element-plus";
 import RenderItemLinkComponent from "./RenderItemLink.component.vue";
-import { computed, reactive, onMounted } from "vue";
+import { computed, reactive, onMounted, inject } from "vue";
 import isPlainObject from "lodash-es/isPlainObject.js";
 import uniqBy from "lodash-es/uniqBy.js";
 import { $t } from "../i18n";
+import { crateManagerKey } from "./keys.js";
+const cm = inject(crateManagerKey);
 
 const props = defineProps({
-    crateManager: {
+    entity: {
         type: Object,
-        required: true,
-    },
-    connections: {
         required: true,
     },
 });
@@ -81,11 +85,12 @@ let connections = computed(() => {
 });
 
 async function resolveConnections() {
-    if (isPlainObject(props.connections)) {
+    if (isPlainObject(props.entity)) {
         let entities = [];
-        for (let property of Object.keys(props.connections)) {
-            entities = [...entities, ...props.connections[property]];
+        for (let property of Object.keys(props.entity["@reverse"])) {
+            entities = [...entities, ...props.entity["@reverse"][property]];
         }
+        entities = entities.map((entity) => cm.value.getEntity({ id: entity["@id"], stub: true }));
 
         const re = new RegExp(data.query, "i");
         entities = entities.filter((entity) => {

@@ -22,7 +22,7 @@
 <script setup>
 import { ElButton, ElInput } from "element-plus";
 import { reactive, watch, computed } from "vue";
-import { isURL } from "../crate-manager.js";
+import { isURL } from "../CrateManager/lib.js";
 import throttle from "lodash-es/throttle.js";
 import { $t } from "../i18n";
 

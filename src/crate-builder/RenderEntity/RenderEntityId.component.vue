@@ -2,7 +2,10 @@
     <div class="flex flex-row">
         <div class="w-1/3 xl:w-1/5 flex flex-col describo-property-name">@id</div>
 
-        <div class="w-2/3 xl:w-4/5 flex flex-row describo-property-value" v-if="!configuration.readonly">
+        <div
+            class="w-2/3 xl:w-4/5 flex flex-row describo-property-value"
+            v-if="!configuration.readonly"
+        >
             <div
                 v-if="
                     props.entity['@id'] === './' ||
@@ -38,7 +41,7 @@
 <script setup>
 import TextComponent from "../primitives/Text.component.vue";
 import { reactive, inject } from "vue";
-import { isURL } from "../crate-manager.js";
+import { isURL } from "../CrateManager/lib.js";
 import { configurationKey } from "./keys.js";
 const configuration = inject(configurationKey);
 

@@ -1,13 +1,10 @@
 <template>
     <div class="flex flex-col">
-        <render-entity-component
-            v-if="data.ready && !data.error"
-            :crate-manager="crateManager"
-            :profile="profile"
+        <RenderEntity
+            ref="renderEntity"
+            v-if="ready && !error"
             :entity="contextEntity"
-            :configuration="configuration"
             @load:entity="setCurrentEntity"
-            @ready="ready"
             @save:crate="saveCrate"
             @save:entity:template="saveEntityAsTemplate"
         />
@@ -15,27 +12,46 @@
 </template>
 
 <script setup>
-import RenderEntityComponent from "./RenderEntity/Shell.component.vue";
+import RenderEntity from "./RenderEntity/Shell.component.vue";
 import {
+    ref,
     onMounted,
     onBeforeMount,
     onBeforeUnmount,
-    reactive,
     watch,
     getCurrentInstance,
     shallowRef,
+    toRaw,
+    provide,
+    computed,
 } from "vue";
-import flattenDeep from "lodash-es/flattenDeep";
-import cloneDeep from "lodash-es/cloneDeep";
-import isEmpty from "lodash-es/isEmpty";
-import debounce from "lodash-es/debounce";
-import isFunction from "lodash-es/isFunction";
-import { CrateManager } from "./crate-manager.js";
+import {
+    configurationKey,
+    crateManagerKey,
+    profileManagerKey,
+    lookupsKey,
+} from "./RenderEntity/keys.js";
+import isEmpty from "lodash-es/isEmpty.js";
+import debounce from "lodash-es/debounce.js";
+import isFunction from "lodash-es/isFunction.js";
+import { CrateManager } from "./CrateManager/crate-manager.js";
+import { ProfileManager } from "./CrateManager/profile-manager.js";
 import { useRouter, useRoute } from "vue-router";
 import { $t, i18next } from "./i18n";
 const debouncedEmitNavigation = debounce(emitNavigation, 500, { leading: true, trailing: false });
 
 let $route, $router;
+let watchers = [];
+let warnings = {};
+let errors = {};
+const cm = shallowRef({});
+const pm = shallowRef({});
+const configuration = shallowRef({});
+const lookups = shallowRef({});
+const contextEntity = shallowRef({});
+let ready = ref(false);
+let error = ref(false);
+let renderEntity = ref();
 
 const props = defineProps({
     crate: {
@@ -46,11 +62,6 @@ const props = defineProps({
     },
     entityId: {
         type: [String, undefined],
-    },
-    mode: {
-        type: [String, undefined],
-        default: "embedded",
-        validator: (val) => ["embedded", "online"].includes(val),
     },
     lookup: {
         type: [Object, undefined],
@@ -127,7 +138,6 @@ const props = defineProps({
 });
 
 const $emit = defineEmits([
-    "load",
     "ready",
     "error",
     "warning",
@@ -135,6 +145,36 @@ const $emit = defineEmits([
     "save:crate",
     "save:entity:template",
 ]);
+defineExpose({
+    cm,
+    setCurrentEntity,
+    setTab: (tabName) => renderEntity.value.setTab(tabName),
+    refresh: () => (contextEntity.value = { ...contextEntity.value }),
+});
+
+const $key = {
+    pm: 0,
+    cm: 0,
+    conf: 0,
+    lookups: 0,
+};
+
+provide(
+    configurationKey,
+    computed(() => configuration.value)
+);
+provide(
+    crateManagerKey,
+    computed(() => cm.value)
+);
+provide(
+    profileManagerKey,
+    computed(() => pm.value)
+);
+provide(
+    lookupsKey,
+    computed(() => lookups.value)
+);
 
 if (props.enableInternalRouting) {
     if (getCurrentInstance().appContext.config.globalProperties.$router) {
@@ -143,23 +183,10 @@ if (props.enableInternalRouting) {
     }
 }
 
-let warnings = {};
-let errors = {};
-const crateManager = shallowRef({});
-const crate = shallowRef({});
-const profile = shallowRef({});
-const configuration = shallowRef({});
-const contextEntity = shallowRef({});
-let watchers = [];
-
-const data = reactive({
-    ready: false,
-    error: false,
-});
-
 onBeforeMount(() => {
     $router?.replace({ query: "" });
     configuration.value = configure();
+    configuration.value.$key = $key.conf;
 });
 onMounted(async () => {
     await init();
@@ -188,15 +215,16 @@ onMounted(async () => {
         watch(
             () => props.profile,
             () => {
-                profile.value = isEmpty(props.profile) ? {} : cloneDeep(props.profile);
-                crateManager.value.profile = profile.value;
-
                 // does the profile have a context defined? yes - disable the context editor
-                if (profile?.context) {
+                if (props.profile?.context) {
                     configuration.value.enableContextEditor = false;
                 } else {
                     configuration.value.enableContextEditor = props.enableContextEditor;
                 }
+                pm.value = new ProfileManager({
+                    profile: structuredClone(toRaw(props.profile)) ?? {},
+                });
+                pm.value.$key = $key.pm += 1;
             }
         )
     );
@@ -226,6 +254,7 @@ onMounted(async () => {
             ],
             () => {
                 configuration.value = configure();
+                configuration.value.$key = $key.conf += 1;
                 i18next.changeLanguage(props.language);
             }
         )
@@ -239,46 +268,55 @@ onBeforeUnmount(() => {
 async function init() {
     const t0 = performance.now();
     if (!props.crate || isEmpty(props.crate)) {
-        data.ready = false;
-        crate.value = {};
+        ready.value = false;
         contextEntity.value = {};
         warnings = {};
         errors = {};
         return;
     }
-    data.error = false;
+    error.value = false;
 
-    profile.value = isEmpty(props.profile) ? {} : cloneDeep(props.profile);
-    crate.value = cloneDeep(props.crate);
+    // update the crate and profile managers
+    cm.value = new CrateManager({ crate: structuredClone(toRaw(props.crate)) });
+    pm.value = new ProfileManager({ profile: structuredClone(toRaw(props.profile)) ?? {} });
 
-    crateManager.value = new CrateManager();
-    crateManager.value.lookup = props.lookup;
-    let outcome = await crateManager.value.load({ crate: crate.value, profile: profile.value });
-    errors = { ...errors, ...outcome.errors };
-    warnings = { ...warnings, ...outcome.warnings };
-    $emit("warning", { warnings });
-    $emit("error", { errors });
+    // then bounce the $key which will trigger the watchers to
+    //   run their local setups if required
+    cm.value.$key = $key.cm += 1;
+    pm.value.$key = $key.pm += 1;
 
-    data.error =
-        flattenDeep(Object.keys(errors).map((errorType) => errors[errorType].data)).length > 0;
-    if (data.error) {
+    if (props.lookup) {
+        lookups.value = props.lookup;
+        lookups.value.$key = $key.lookups += 1;
+    }
+
+    errors = cm.value.getErrors();
+    if (errors.hasError) {
+        $emit("error", { errors });
+        ready.value = false;
+        error.value = true;
         return;
+    }
+
+    if (warnings.hasWarning) {
+        warnings = cm.value.getWarnings();
+        $emit("warning", { warnings });
     }
 
     if (props.entityId) {
         setCurrentEntity({ id: props.entityId });
     } else {
         contextEntity.value = {};
-        setCurrentEntity({ name: "RootDataset" });
+        setCurrentEntity({ id: "./" });
     }
 
-    ready();
+    ready.value = true;
+    $emit("ready");
     const t1 = performance.now();
     console.log(`Crate load time: ${t1 - t0}ms`);
 }
 function configure() {
     const configuration = {
-        mode: props.mode,
         enableContextEditor: props.enableContextEditor,
         enableCratePreview: props.enableCratePreview,
         enableBrowseEntities: props.enableBrowseEntities,
@@ -309,22 +347,17 @@ function configure() {
 
     return configuration;
 }
-async function setCurrentEntity({ id = undefined, name = undefined }) {
+async function setCurrentEntity({ id = undefined }) {
     // return if nothing requested
-    if (!id && !name) return;
+    if (!id) return;
 
-    let entity = {};
-    if (name === "RootDataset") {
-        entity = crateManager.value.getRootDataset();
-    } else if (id) {
-        entity = crateManager.value.getEntity({
-            id,
-        });
-    }
+    let entity = cm.value.getEntity({
+        id,
+    });
 
     if (!isEmpty(entity)) {
         updateRoute({ entity });
-        contextEntity.value = { ...entity };
+        contextEntity.value = entity;
     }
 }
 function updateRoute({ entity }) {
@@ -342,22 +375,21 @@ function updateRoute({ entity }) {
 function emitNavigation({ entity }) {
     $emit("navigation", { "@id": entity["@id"], "@type": entity["@type"], name: entity.name });
 }
-function ready() {
-    data.ready = true;
-    $emit("ready");
-}
 async function saveCrate() {
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    // await new Promise((resolve) => setTimeout(resolve, 100));
     if (props.purgeUnlinkedEntities) {
-        crateManager.value.purgeUnlinkedEntities();
+        cm.value.purgeUnlinkedEntities();
     }
-    let crate = crateManager.value.exportCrate();
+    let crate = cm.value.exportCrate();
     console.debug("export crate", crate);
     // console.log(crate["@graph"].length, crate["@graph"]);
     $emit("save:crate", { crate });
 }
-function saveEntityAsTemplate(template) {
-    let entity = crateManager.value.exportEntityTemplate({ id: contextEntity.value["@id"] });
+function saveEntityAsTemplate(data) {
+    let entity = cm.value.exportEntityTemplate({
+        id: contextEntity.value["@id"],
+        resolveDepth: parseInt(data.resolveDepth),
+    });
     $emit("save:entity:template", { entity });
 }
 </script>

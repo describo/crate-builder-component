@@ -2,53 +2,53 @@
     <div>
         <div v-if="configuration.readonly">
             <!-- Just render the value on screen (parse ISO dates for niceness though) -->
-            <div v-if="isDateTime(props.data.value)">{{ parseISO(props.data.value) }}</div>
-            <div v-else>{{ props.data.value }}</div>
+            <div v-if="isDateTime(props.value)">{{ parseISO(props.value) }}</div>
+            <div v-else>{{ props.value }}</div>
         </div>
         <div v-if="!configuration.readonly">
             <!--  not readonly - try to load the relevant display component-->
             <value-component v-if="isValue()" :definition="props.definition.value" />
             <date-time-component
-                v-else-if="isDateTime(props.data.value)"
-                :property="props.data.property"
-                :value="props.data.value"
+                v-else-if="isDateTime(props.value)"
+                :property="props.property"
+                :value="props.value"
                 @save:property="savePropertyValue"
             />
             <date-component
-                v-else-if="isDate(props.data.value)"
-                :property="props.data.property"
-                :value="props.data.value"
+                v-else-if="isDate(props.value)"
+                :property="props.property"
+                :value="props.value"
                 @save:property="savePropertyValue"
             />
             <time-component
-                v-else-if="isTime(props.data.value)"
-                :property="props.data.property"
-                :value="props.data.value"
+                v-else-if="isTime(props.value)"
+                :property="props.property"
+                :value="props.value"
                 @save:property="savePropertyValue"
             />
             <number-component
-                v-else-if="isNumber(props.data.value)"
-                :property="props.data.property"
-                :value="props.data.value"
+                v-else-if="isNumber(props.value)"
+                :property="props.property"
+                :value="props.value"
                 @save:property="savePropertyValue"
             />
             <select-component
                 v-else-if="isSelect()"
-                :property="props.data.property"
-                :value="props.data.value"
+                :property="props.property"
+                :value="props.value"
                 :definition="props.definition"
                 @save:property="savePropertyValue"
             />
             <url-component
-                v-else-if="isUrl(props.data.value)"
-                :property="props.data.property"
-                :value="props.data.value"
+                v-else-if="isUrl(props.value)"
+                :property="props.property"
+                :value="props.value"
                 @create:entity="createEntity"
             />
             <text-component
-                v-else-if="isText(props.data.value)"
-                :property="props.data.property"
-                :value="props.data.value"
+                v-else-if="isText(props.value)"
+                :property="props.property"
+                :value="props.value"
                 :definition="props.definition"
                 @save:property="savePropertyValue"
             />
@@ -65,24 +65,28 @@ import NumberComponent from "../primitives/Number.component.vue";
 import ValueComponent from "../primitives/Value.component.vue";
 import SelectComponent from "../primitives/Select.component.vue";
 import UrlComponent from "../primitives/Url.component.vue";
-import parseISO from "date-fns/esm/parseISO";
+import { parseISO } from "date-fns";
 import validatorIsDate from "validator/es/lib/isDate";
 import isDecimal from "validator/es/lib/isDecimal";
 import isInt from "validator/es/lib/isInt";
 import isFloat from "validator/es/lib/isFloat";
 import isNumeric from "validator/es/lib/isNumeric";
-import { computed, inject } from "vue";
-import { isURL } from "../crate-manager.js";
+import { inject } from "vue";
+import { isURL } from "../CrateManager/lib.js";
 import { configurationKey } from "./keys.js";
 const configuration = inject(configurationKey);
 
 const props = defineProps({
-    crateManager: {
-        type: Object,
+    property: {
+        type: String,
         required: true,
     },
-    data: {
-        type: Object,
+    value: {
+        type: [String, Number, Boolean, Date],
+        required: true,
+    },
+    idx: {
+        type: Number,
         required: true,
     },
     definition: {
@@ -91,13 +95,9 @@ const props = defineProps({
     },
 });
 const $emit = defineEmits(["save:property", "update:property", "create:entity"]);
-// let type = computed(() => {
-//     console.log(props.definition);
-//     return props?.definition?.type?.[0].toLowerCase();
-// });
 async function savePropertyValue(data) {
     if (!data.idx) {
-        data = { ...data, property: props.data.property, idx: props.data.idx };
+        data = { ...data, property: props.property, idx: props.idx };
     }
     $emit("save:property", data);
 }
@@ -145,7 +145,7 @@ function isValue() {
     return props?.definition?.type === "Value";
 }
 function isSelect() {
-    return props?.definition?.values?.includes(props.data.value) ? true : false;
+    return props?.definition?.values?.includes(props.value) ? true : false;
 }
 function isUrl(string) {
     let result = isURL(string);

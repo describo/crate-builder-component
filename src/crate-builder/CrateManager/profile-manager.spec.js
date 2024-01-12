@@ -1,10 +1,9 @@
-import "regenerator-runtime";
-import { range, round, compact, groupBy, random } from "lodash";
-import { ProfileManager } from "./profile-manager.bundle.js";
+import { describe, test, expect, beforeAll, vi } from "vitest";
+import { ProfileManager } from "./profile-manager.js";
 
 describe("Test working with profiles", () => {
     beforeAll(() => {
-        jest.spyOn(console, "debug").mockImplementation(() => {});
+        vi.spyOn(console, "debug").mockImplementation(() => {});
     });
     test("get type definition and inputs from the profile", () => {
         const profile = {

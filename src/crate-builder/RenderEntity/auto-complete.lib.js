@@ -18,6 +18,7 @@ export class Lookup {
             type,
             query: queryString,
         });
+        results = [...results];
 
         if (results) {
             return { endpoint: "internal", documents: stringifyDocumentType(results) ?? [] };

@@ -25,3 +25,5 @@ pnpm-debug.log*
 
 .parcel-cache
 *.bundle.js
+
+coverage

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Home - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="CrateManager.html">CrateManager</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#addEntity">addEntity</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#deleteEntity">deleteEntity</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#deleteProperty">deleteProperty</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#exportCrate">exportCrate</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#exportEntityTemplate">exportEntityTemplate</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#flatten">flatten</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#getContext">getContext</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#getEntities">getEntities</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#getEntity">getEntity</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#getErrors">getErrors</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#getRootDataset">getRootDataset</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#getWarnings">getWarnings</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#ingestAndLink">ingestAndLink</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#linkEntity">linkEntity</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#purgeUnlinkedEntities">purgeUnlinkedEntities</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#resolveLinkedEntityAssociations">resolveLinkedEntityAssociations</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#setProperty">setProperty</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#unlinkEntity">unlinkEntity</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#updateProperty">updateProperty</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#isURL">isURL</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#normalise">normalise</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#normaliseEntityType">normaliseEntityType</a></span></li>
+</nav>
+
+<div id="main">
+    
+
+    
+
+
+
+    
+
+
+
+
+
+
+
+
+
+    
+
+
+    <section class="readme">
+        <article><h1 id="crate-builder-component">Crate Builder Component</h1>
+<ul>
+<li><a href="#crate-builder-component">Crate Builder Component</a></li>
+<li><a href="#documentation">Documentation</a></li>
+<li><a href="#crate-manager-api-documentation">Crate Manager API Documentation</a></li>
+<li><a href="#developing-the-plugin">Developing the plugin</a>
+<ul>
+<li><a href="#storybook">Storybook</a></li>
+<li><a href="#development-application">Development application</a></li>
+</ul>
+</li>
+<li><a href="#building-and-publishing-a-release">Building and publishing a release</a></li>
+<li><a href="#repository-structure">Repository structure</a></li>
+</ul>
+<p>This is the core UI component for assembling an RO-Crate inside Describo. It is a self contained
+VueJS component that can be used inside your app. If you use this component, your app is responsible
+for loading the crate file from the storage layer (or minting a new one if none exists) and saving
+the updated crate back. Your app can also provide a profile to the component and a class to handle
+template lookups.</p>
+<h1 id="documentation">Documentation</h1>
+<p>Comprehensive documentation is available @
+<a href="https://describo.github.io/documentation/component/getting-started.html">https://describo.github.io/documentation/component/getting-started.html</a></p>
+<h1 id="crate-manager-api-documentation">Crate Manager API Documentation</h1>
+<p><a href="https://describo.github.io/crate-builder-component">https://describo.github.io/crate-builder-component</a></p>
+<h1 id="developing-the-plugin">Developing the plugin</h1>
+<h2 id="storybook">Storybook</h2>
+<p><a href="storybook.js.org/">Storybook</a> is used in this application. When you are just developing the
+components, storybook is what you want as you can focus just on the component in isolation. To start
+it run:</p>
+<pre class="prettyprint source"><code>npm run storybook
+</code></pre>
+<h2 id="development-application">Development application</h2>
+<p>When you want to see the component in action as a whole, there is a small VueJS app in this
+codebase. To start up the dev environment:</p>
+<pre class="prettyprint source"><code>> docker compose up (starts up an elastic search container for datapack lookups)
+> npm run develop
+
+--> browse to localhost:9000
+</code></pre>
+<h1 id="building-and-publishing-a-release">Building and publishing a release</h1>
+<ul>
+<li><code>npm run build</code>: This builds the plugin and styles that the react component uses</li>
+<li><code>npm version {minor|patch}</code></li>
+<li><code>git push origin master --tags</code></li>
+<li>Go to the repo and create a release from the tag, documenting what is in it.</li>
+<li>Publish to npm: <code>npm publish</code></li>
+<li>Create an issue in the
+<a href="https://github.com/describo/crate-builder-component-react/issues">React component issue tracker</a>
+to inform that a new release of that component needs to be built and published to npm.</li>
+</ul>
+<h1 id="repository-structure">Repository structure</h1>
+<ul>
+<li>The development app is at <code>./src/app</code>. In there you will find the file main.js where we import
+the plugin and wire it into Vue as well as an App.vue file where we load the component.</li>
+<li>The component is at <code>./src/crate-builder</code>.</li>
+</ul></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.2</a> on Wed Jan 10 2024 11:34:03 GMT+1100 (Australian Eastern Daylight Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

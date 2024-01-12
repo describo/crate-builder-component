@@ -6,26 +6,26 @@
         <div
             v-if="!showMap"
             class="flex flex-col m-2"
-            :class="{ 'm-2': entity?.tgtEntity?.associations.length }"
+            :class="{ 'm-2': entity?.associations?.length }"
         >
             <!--render the linking element  -->
             <div class="flex flex-row">
-                <RenderItemLinkComponent :entity="entity.tgtEntity" @load:entity="loadEntity" />
+                <RenderItemLinkComponent :entity="props.entity" @load:entity="loadEntity" />
                 <UnlinkEntityComponent
                     v-if="!configuration.readonly && !props.readonly"
-                    :entity="entity.tgtEntity"
+                    :entity="entity"
                     @unlink:entity="unlinkEntity"
                 />
             </div>
             <!-- if this target has associations, render them -->
             <div
-                v-if="entity?.tgtEntity?.associations.length"
+                v-if="associations?.length"
                 class="mt-2 flex-col space-y-2 border-l-2 pl-1 border-solid border-slate-700"
             >
                 <div
-                    v-for="instance of entity.tgtEntity.associations"
-                    @click="loadEntity({ id: instance.entity['@id'] })"
-                    :key="instance.entity['@id']"
+                    v-for="association of associations"
+                    @click="loadEntity({ id: association['@id'] })"
+                    :key="association['@id']"
                     class="cursor-pointer"
                 >
                     <div class="flex flex-row text-base border-solid border-black">
@@ -35,15 +35,13 @@
                             class="bg-purple-200 hover:bg-cyan-200 flex flex-row p-2 rounded space-x-2"
                         >
                             <div class="">
-                                {{ instance.property }}
+                                {{ association.property }}
                             </div>
                             <div><i class="fa-solid fa-arrow-right"></i></div>
                             <div class="flex flex-row space-x-1">
                                 <div>
-                                    <span v-if="instance.entity.name">{{
-                                        instance.entity.name
-                                    }}</span>
-                                    <span v-else>{{ instance.entity["@id"] }}</span>
+                                    <span v-if="association.name">{{ association.name }}</span>
+                                    <span v-else>{{ association["@id"] }}</span>
                                 </div>
                             </div>
                         </div>
@@ -57,20 +55,17 @@
             <div class="flex flex-col space-y-2">
                 <div class="flex flex-row p-2">
                     <div>
-                        {{ props.entity.tgtEntity.name }}
+                        {{ props.entity.name }}
                     </div>
                     <div class="flex-grow"></div>
 
                     <UnlinkEntityComponent
                         v-if="!configuration.readonly && !props.readonly"
-                        :entity="props.entity.tgtEntity"
+                        :entity="props.entity"
                         @unlink:entity="unlinkEntity"
                     />
                 </div>
-                <map-component
-                    :crate-manager="props.crateManager"
-                    :entity="props.entity.tgtEntity"
-                />
+                <map-component :entity="props.entity" />
             </div>
         </div>
     </div>
@@ -80,16 +75,14 @@
 import RenderItemLinkComponent from "./RenderItemLink.component.vue";
 import UnlinkEntityComponent from "./UnlinkEntity.component.vue";
 import MapComponent from "../primitives/Map.component.vue";
-import { computed, inject } from "vue";
-import { configurationKey } from "./keys.js";
+import { computed, inject, watch, ref } from "vue";
+import { configurationKey, crateManagerKey, profileManagerKey } from "./keys.js";
 const configuration = inject(configurationKey);
+const cm = inject(crateManagerKey);
+const pm = inject(profileManagerKey);
 
 const $emit = defineEmits(["load:entity", "unlink:entity"]);
 const props = defineProps({
-    crateManager: {
-        type: Object,
-        required: true,
-    },
     entity: {
         type: Object,
         required: true,
@@ -102,12 +95,26 @@ const props = defineProps({
         required: true,
     },
 });
+let associations = ref([]);
 let showMap = computed(() => {
-    return props.entity?.tgtEntity?.["@type"].join(", ").match(/Geo/) ? true : false;
+    return props.entity?.["@type"].join(", ").match(/Geo/) ? true : false;
 });
-let entity = computed(() => {
-    return props.entity;
-});
+resolveAssociations();
+
+watch(
+    () => pm.value.$key,
+    () => {
+        resolveAssociations();
+    }
+);
+
+function resolveAssociations() {
+    const profile = pm.value.profile;
+    associations.value = cm.value.resolveLinkedEntityAssociations({
+        entity: cm.value.getEntity({ id: props.entity["@id"] }),
+        profile,
+    });
+}
 
 function loadEntity(entity) {
     $emit("load:entity", entity);

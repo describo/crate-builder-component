@@ -28,31 +28,31 @@
 
 <script setup>
 import { ElSelect, ElOption, ElTag } from "element-plus";
-import { ref, computed, inject } from "vue";
-import { configurationKey } from "./keys.js";
+import { ref, shallowRef, computed, inject, watch } from "vue";
+import { configurationKey, profileManagerKey } from "./keys.js";
 const configuration = inject(configurationKey);
+const pm = inject(profileManagerKey);
 
 const props = defineProps({
-    crateManager: {
-        type: Object,
-        required: true,
-    },
     entity: {
         type: Object,
         required: true,
     },
 });
 let selectedClass = ref();
-
-const $emit = defineEmits(["update:entity"]);
-
-let classes = computed(() => {
-    return props.crateManager?.profileManager?.getClasses();
-});
-
+let classes = shallowRef(pm.value?.getClasses());
 let types = computed(() => {
     return props.entity["@type"];
 });
+
+const $emit = defineEmits(["update:entity"]);
+watch(
+    () => pm.value.$key,
+    () => {
+        classes.value = pm.value?.getClasses();
+    }
+);
+
 let closable = computed(() => props.entity["@type"].length > 1);
 
 function save() {

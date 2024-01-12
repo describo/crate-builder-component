@@ -20,13 +20,11 @@
 
 <script setup>
 import { ElButton } from "element-plus";
-import { computed } from "vue";
+import { computed, inject } from "vue";
+import { profileManagerKey } from "./keys.js";
+const pm = inject(profileManagerKey);
 
 const props = defineProps({
-    crateManager: {
-        type: Object,
-        required: true,
-    },
     types: {
         type: [String, Array],
         required: true,
@@ -41,7 +39,7 @@ let selectedType = computed(() => props.selectedType);
 let types = computed(() => props.types);
 
 function getTypeLabelFromProfile(type) {
-    return props.crateManager?.profileManager?.getTypeLabel(type);
+    return pm.value?.getTypeLabel(type);
 }
 function toggle(type) {
     if (props.selectedType === type) {

@@ -52,16 +52,14 @@ import { ElButton, ElSelect, ElOption, ElOptionGroup, vLoading } from "element-p
 import { reactive, watch, inject } from "vue";
 import debounce from "lodash-es/debounce";
 import { $t } from "../i18n";
-import { configurationKey } from "./keys.js";
+import { configurationKey, crateManagerKey, lookupsKey } from "./keys.js";
 const configuration = inject(configurationKey);
+const cm = inject(crateManagerKey);
+const lookupHandler = inject(lookupsKey);
 
 import { Lookup, wrapPromise } from "./auto-complete.lib";
 
 const props = defineProps({
-    crateManager: {
-        type: Object,
-        required: true,
-    },
     type: {
         type: String,
         required: true,
@@ -103,9 +101,9 @@ async function querySearch(queryString) {
     data.loading = true;
 
     const lookup = new Lookup({
-        config: props.crateManager.profile?.lookup,
-        lookup: props.crateManager.lookup,
-        crateManager: props.crateManager,
+        config: cm.value.profile?.lookup,
+        lookup: lookupHandler.value,
+        crateManager: cm.value,
     });
 
     // construct a definition for a new entity
@@ -121,12 +119,12 @@ async function querySearch(queryString) {
     let lookups = [];
 
     // wire up handler to find matching entities in the crate
-    if (props.crateManager?.getEntities) {
+    if (cm.value?.getEntities) {
         lookups.push(wrapPromise(lookup.getEntities(props.type, queryString), data.promiseTimeout));
     }
 
     // wire up handler to lookup datapacks externally
-    if (props.crateManager?.lookup?.dataPacks) {
+    if (lookupHandler.value.dataPacks) {
         lookups.push(
             wrapPromise(lookup.dataPacks(props.type, queryString), data.promiseTimeout, {
                 reason: "External Lookup Timeout",
@@ -135,7 +133,7 @@ async function querySearch(queryString) {
     }
 
     // wire up handler to lookup entityTemplates externally
-    if (props.crateManager?.lookup?.entityTemplates) {
+    if (lookupHandler.value.entityTemplates) {
         lookups.push(
             wrapPromise(lookup.entityTemplates(props.type, queryString), data.promiseTimeout, {
                 reason: "External Lookup Timeout",
@@ -144,7 +142,7 @@ async function querySearch(queryString) {
     }
 
     // wire up handler to lookup entities externally
-    if (props.crateManager?.lookup?.entities) {
+    if (lookupHandler.value.entities) {
         lookups.push(
             wrapPromise(lookup.entities(props.type, queryString), data.promiseTimeout, {
                 reason: "External Lookup Timeout",

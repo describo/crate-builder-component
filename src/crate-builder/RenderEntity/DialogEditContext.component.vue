@@ -1,17 +1,15 @@
 <template>
     <div class="flex flex-col space-y-2">
-        <div class="flex flex-row space-x-1">
-            <div>
-                <el-button @click="save" type="primary">
-                    <i class="fa-solid fa-floppy-disk"></i>
-                    &nbsp;{{ $t('save_label') }}
-                </el-button>
-            </div>
+        <div ref="codemirror" class=""></div>
+        <div>
+            <el-button @click="save" type="primary">
+                <i class="fa-solid fa-floppy-disk"></i>
+                &nbsp;{{ $t("save_label") }}
+            </el-button>
         </div>
         <div class="text-sm text-red-600" v-if="data.error">
             The context is not a valid JSON data structure.
         </div>
-        <div ref="codemirror" class=""></div>
     </div>
 </template>
 
@@ -21,16 +19,13 @@ import { EditorView, basicSetup } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import { javascript } from "@codemirror/lang-javascript";
 import { oneDark } from "@codemirror/theme-one-dark";
+import { inject } from "vue";
+import { crateManagerKey } from "./keys.js";
+const cm = inject(crateManagerKey);
 
 import { reactive, ref, watch } from "vue";
-import {$t} from '../i18n'
+import { $t } from "../i18n";
 
-const props = defineProps({
-    crateManager: {
-        type: Object,
-        required: true,
-    },
-});
 const emit = defineEmits(["close", "update:context"]);
 
 const data = reactive({
@@ -47,7 +42,7 @@ watch(
 );
 
 function setupCodeMirror() {
-    let context = props.crateManager.context;
+    let context = cm.value.getContext();
     let initialState = EditorState.create({
         doc: JSON.stringify(context, null, 2),
         extensions: [basicSetup, oneDark, javascript()],
@@ -63,6 +58,7 @@ function save() {
         emit("update:context", context);
         data.error = false;
     } catch (error) {
+        console.error(error.message);
         data.error = true;
     }
 }

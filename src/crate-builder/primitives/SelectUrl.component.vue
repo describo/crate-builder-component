@@ -14,10 +14,10 @@
             </el-option>
         </el-select>
         <div v-if="!data.isValidValue" class="text-xs text-gray-700">
-            {{ $t('invalid_selecturl_value', {value: props.value}) }}
+            {{ $t("invalid_selecturl_value", { value: props.value }) }}
         </div>
         <div v-if="!data.hasValidValues" class="text-xs text-gray-700">
-            {{ $t('invalid_selecturl_values') }}
+            {{ $t("invalid_selecturl_values") }}
         </div>
     </div>
 </template>
@@ -28,8 +28,8 @@ import { reactive, watch } from "vue";
 import isArray from "lodash-es/isArray";
 import isString from "lodash-es/isString";
 import uniq from "lodash-es/uniq";
-import { isURL } from "../crate-manager.js";
-import {$t} from '../i18n'
+import { isURL } from "../CrateManager/lib.js";
+import { $t } from "../i18n";
 
 const props = defineProps({
     property: {
