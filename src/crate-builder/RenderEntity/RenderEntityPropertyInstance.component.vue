@@ -12,14 +12,14 @@
                 v-else-if="isDateTime(props.value) &&
                     (!props.definition.dateGranularity || 
                     !props.definition.timeGranularity) || 
-                    props.definition.dateGranularity + ' ' + props.definition.timeGranularity === 'YYYY-MM-DD hh.mm.ss'"
+                    props.definition.dateGranularity + ' ' + props.definition.timeGranularity === 'day second'"
                 :property="props.property"
                 :value="props.value"
                 @save:property="savePropertyValue"
             />
             <date-component
                 v-else-if="isDate(props.value)&& 
-                    !props.definition.granularity || props.definition.granularity === 'YYYY-MM-DD'"
+                    !props.definition.granularity || props.definition.granularity === 'day'"
                 :property="props.property"
                 :value="props.value"
                 @save:property="savePropertyValue"
@@ -27,7 +27,7 @@
             <text-component
                 v-else-if="isDate(props.value) && 
                     (props.definition.granularity && 
-                    props.definition.granularity !== 'YYYY-MM-DD')"
+                    props.definition.granularity !== 'day')"
                 :property="props.property"
                 :value="props.value"
                 :definition="props.definition"
@@ -37,7 +37,7 @@
                 v-else-if="isDateTime(props.value) && 
                     ((props.definition.dateGranularity|| 
                     props.definition.timeGranularity) &&  
-                    props.definition.dateGranularity + ' ' + props.definition.timeGranularity !== 'YYYY-MM-DD hh.mm.ss')" 
+                    props.definition.dateGranularity + ' ' + props.definition.timeGranularity !== 'day second')" 
                 :property="props.property"
                 :value="props.value"
                 :definition="props.definition"

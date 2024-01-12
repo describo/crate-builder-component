@@ -99,13 +99,13 @@ function validateTextConstraints(value) {
         !validateDateFormat(value, data.constraints.dateGranularity + " " + data.constraints.timeGranularity, "datetime")
     ) return false;
     if (
-        data.constraints.dateGranularity && 
+        data.constraints.dateGranularity &&
         !data.constraints.timeGranularity &&
         !validateDateFormat(value, data.constraints.dateGranularity, "date")
     ) return false;
     if (
         data.constraints.timeGranularity &&
-        !data.constraints.dateGranularity && 
+        !data.constraints.dateGranularity &&
         !validateDateFormat(value, data.constraints.timeGranularity, "time")
     ) return false;
     return true;
@@ -113,15 +113,15 @@ function validateTextConstraints(value) {
 
 function validateDateFormat(inputString, granularity, granularityType) {
     const datePatterns = {
-        'YYYY': /^-?\d{4}$/,
-        'YYYY-MM': /^-?\d{4}-\d{2}$/,
-        'YYYY-MM-DD': /^-?\d{4}-\d{2}-\d{2}$/
+        'year': /^-?\d{4}$/,
+        'month': /^-?\d{4}-\d{2}$/,
+        'day': /^-?\d{4}-\d{2}-\d{2}$/
     };
 
     const timePatterns = {
-        'hh': /^(0[0-9]|1[0-9]|2[0-3])$/,
-        'hh.mm': /^(0[0-9]|1[0-9]|2[0-3])\.(0[0-5]|[1-5][0-9])$/,
-        'hh.mm.ss': /^(0[0-9]|1[0-9]|2[0-3])\.(0[0-5]|[1-5][0-9])\.(0[0-5]|[1-5][0-9])$/
+        'hour': /^(0[0-9]|1[0-9]|2[0-3])$/,
+        'minute': /^(0[0-9]|1[0-9]|2[0-3])\.(0[0-5]|[1-5][0-9])$/,
+        'second': /^(0[0-9]|1[0-9]|2[0-3])\.(0[0-5]|[1-5][0-9])\.(0[0-5]|[1-5][0-9])$/
     }
 
     if (granularityType === "date") return datePatterns[granularity].test(inputString)
@@ -136,10 +136,28 @@ function validateDateFormat(inputString, granularity, granularityType) {
 function getConstraintsString() {
     let message = []
     Object.entries(data.constraints).forEach(constraint => {
-        if (constraint[0], constraint[1]) {
-            message.push(`${constraint[0]}: ${constraint[1]}`)
+        const [name, value] = [...constraint]
+
+        if (name, value) {
+            const formattedValue = ["granularity", "dateGranularity", "timeGranularity"].includes(name)
+                ? getDateFormatString(value)
+                : value;
+            message.push(`${name}: ${formattedValue}`);
         }
     });
-    return message.join(', ')
+    return message.join(', ');
+}
+
+function getDateFormatString(granularity) {
+    const formats = {
+        'year': 'YYY',
+        'month': 'YYYY-MM',
+        'day': 'YYYY-MM-DD',
+        'hour': 'hh',
+        'minute': 'hh.mm',
+        'second': 'hh.mm.ss'
+    };
+
+    return formats[granularity];
 }
 </script>

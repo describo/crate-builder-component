@@ -34,7 +34,7 @@
             <text-component
                 v-if="data.addType === 'Date' && 
                     (props.definition.granularity && 
-                    props.definition.granularity !== 'YYYY-MM-DD')"
+                    props.definition.granularity !== 'day')"
                 :property="props.property"
                 type="text"
                 :definition="props.definition"
@@ -44,7 +44,7 @@
                 v-if="data.addType === 'DateTime' &&
                     ((props.definition.dateGranularity || 
                     props.definition.timeGranularity) &&  
-                    props.definition.dateGranularity + ' ' + props.definition.timeGranularity !== 'YYYY-MM-DD hh.mm.ss')"
+                    props.definition.dateGranularity + ' ' + props.definition.timeGranularity !== 'day second')"
                 :property="props.property"
                 type="text"
                 :definition="props.definition"
@@ -52,7 +52,7 @@
             />
             <date-component
                 v-if="data.addType === 'Date' && 
-                    !props.definition.granularity || props.definition.granularity === 'YYYY-MM-DD'"
+                    !props.definition.granularity || props.definition.granularity === 'day'"
                 :property="props.property"
                 @save:property="createProperty"
             />
@@ -60,7 +60,7 @@
                 v-if="data.addType === 'DateTime' &&
                     (!props.definition.dateGranularity && 
                     !props.definition.timeGranularity) ||  
-                    props.definition.dateGranularity + ' ' + props.definition.timeGranularity === 'YYYY-MM-DD hh.mm.ss'"
+                    props.definition.dateGranularity + ' ' + props.definition.timeGranularity === 'day second'"
                 :property="props.property"
                 @save:property="createProperty"
             />

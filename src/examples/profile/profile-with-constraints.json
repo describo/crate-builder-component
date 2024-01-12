@@ -150,7 +150,7 @@
                     "help": "Granularity: YYYY-MM-DD",
                     "required": false,
                     "multiple": true,
-                    "granularity": "YYYY-MM-DD",
+                    "granularity": "day",
                     "type": ["Date"]
                 },
                 {
@@ -160,7 +160,7 @@
                     "help": "Granularity: YYYY-MM",
                     "required": false,
                     "multiple": true,
-                    "granularity": "YYYY-MM",
+                    "granularity": "month",
                     "type": ["Date"]
                 },
                 {
@@ -170,7 +170,7 @@
                     "help": "Granularity: YYYY",
                     "required": false,
                     "multiple": true,
-                    "granularity": "YYYY",
+                    "granularity": "year",
                     "type": ["Date"]
                 },
                 {
@@ -189,8 +189,8 @@
                     "help": "Datetime with every constraints: dateGranularity, timeGranularity",
                     "required": false,
                     "multiple": true,
-                    "dateGranularity": "YYYY-MM",
-                    "timeGranularity": "hh.mm",
+                    "dateGranularity": "month",
+                    "timeGranularity": "minute",
                     "type": ["DateTime"]
                 },
                 {
@@ -200,7 +200,7 @@
                     "help": "Datetime with dateGranularity: YYYY-MM-DD",
                     "required": false,
                     "multiple": true,
-                    "dateGranularity": "YYYY-MM-DD",
+                    "dateGranularity": "day",
                     "type": ["DateTime"]
                 },
                 {
@@ -210,7 +210,7 @@
                     "help": "Datetime with dateGranularity: YYYY-MM",
                     "required": false,
                     "multiple": true,
-                    "dateGranularity": "YYYY-MM",
+                    "dateGranularity": "month",
                     "type": ["DateTime"]
                 },
                 {
@@ -220,7 +220,7 @@
                     "help": "Datetime with dateGranularity: YYYY",
                     "required": false,
                     "multiple": true,
-                    "dateGranularity": "YYYY",
+                    "dateGranularity": "year",
                     "type": ["DateTime"]
                 },
                 {
@@ -230,7 +230,7 @@
                     "help": "Datetime with dateGranularity: hh.mm.ss",
                     "required": false,
                     "multiple": true,
-                    "timeGranularity": "hh.mm.ss",
+                    "timeGranularity": "second",
                     "type": ["DateTime"]
                 },
                 {
@@ -240,7 +240,7 @@
                     "help": "Datetime with timeGranularity: hh.mm",
                     "required": false,
                     "multiple": true,
-                    "timeGranularity": "hh.mm",
+                    "timeGranularity": "minute",
                     "type": ["DateTime"]
                 },
                 {
@@ -250,7 +250,7 @@
                     "help": "Datetime with timeGranularity: hh",
                     "required": false,
                     "multiple": true,
-                    "timeGranularity": "hh",
+                    "timeGranularity": "hour",
                     "type": ["DateTime"]
                 },
                 {
@@ -260,8 +260,8 @@
                     "help": "Datetime with dateGranularity: YYYY-MM-DD, timeGranularity: hh.mm.ss.",
                     "required": false,
                     "multiple": true,
-                    "dateGranularity": "YYYY-MM-DD",
-                    "timeGranularity": "hh.mm.ss",
+                    "dateGranularity": "day",
+                    "timeGranularity": "second",
                     "type": ["DateTime"]
                 },
                 {
@@ -271,8 +271,8 @@
                     "help": "Datetime with dateGranularity: YYYY-MM-DD, timeGranularity: hh.mm",
                     "required": false,
                     "multiple": true,
-                    "dateGranularity": "YYYY-MM-DD",
-                    "timeGranularity": "hh.mm",
+                    "dateGranularity": "day",
+                    "timeGranularity": "minute",
                     "type": ["DateTime"]
                 },
                 {
@@ -282,8 +282,8 @@
                     "help": "Datetime with dateGranularity: YYYY-MM, timeGranularity: hh.mm.ss.",
                     "required": false,
                     "multiple": true,
-                    "dateGranularity": "YYYY-MM",
-                    "timeGranularity": "hh.mm.ss",
+                    "dateGranularity": "month",
+                    "timeGranularity": "second",
                     "type": ["DateTime"]
                 },
                 {

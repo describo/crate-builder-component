@@ -64,3 +64,34 @@ codebase. To start up the dev environment:
 -   The development app is at `./src/app`. In there you will find the file main.js where we import
     the plugin and wire it into Vue as well as an App.vue file where we load the component.
 -   The component is at `./src/crate-builder`.
+
+
+# Profile Constraints
+
+It is possible to add additional constraints in profiles for the following fields:
+
+**Text**
+* `minLength`: minimum required length for value 
+* `maxLength`: maximum allowed length for value
+* `regex`: a regular expression the value has to match
+
+**TextArea**
+* `minLength`: minimum required length for value 
+* `maxLength`: maximum allowed length for value
+* `regex`: a regular expression the value has to match
+
+**Number**
+* `minValue`: minimum possible value to be entered
+* `maxValue`: maximum possible value to be entered
+* `numberType`: one or many of "any", "long", "int", "float", "double". It maybe an array to allow specifying any of the possible numberType values
+
+**Date**
+* `granularity`: may have the values "year" (YYYY), "month" (YYYY-MM), "day" (YYYY-MM-DD). It maybe an array to allow specifying any of the possible granularity values.
+
+In case the granularity is "day", the datepicker widget will show, otherwise you can add your data in a Text field.
+
+**DateTime**
+* `dateGranularity`: may have the values "year" (YYYY), "month" (YYYY-MM), "day" (YYYY-MM-DD). It maybe an array to allow specifying any of the possible granularity values
+* `timeGranularity`: may have the values "hour" (hh), "minute" (hh.mm), "second" (hh.mm.ss).It maybe an array to allow specifying any of the possible granularity values
+
+In case the dateGranularity is "day" and the timeGranularity is "hour", the datepicker widget will show, otherwise you can add your data in a Text field.
