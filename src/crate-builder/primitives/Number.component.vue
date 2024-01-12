@@ -50,7 +50,6 @@ watch(
 );
 function save() {
     data.isValidNumber = checkIsNumeric(data.internalValue);
-    console.log(isValidNumberConstraints.value)
     if (data.isValidNumber && isValidNumberConstraints.value) {
         $emit("save:property", {
             property: props.property,

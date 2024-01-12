@@ -112,7 +112,6 @@ function validateTextConstraints(value) {
 }
 
 function validateDateFormat(inputString, granularity, granularityType) {
-    console.log(inputString, granularity)
     const datePatterns = {
         'YYYY': /^-?\d{4}$/,
         'YYYY-MM': /^-?\d{4}-\d{2}$/,
@@ -130,7 +129,6 @@ function validateDateFormat(inputString, granularity, granularityType) {
     if (inputString && granularityType === "datetime") {
         const [date, time] = inputString.split(" ")
         const [dateGranularity, timeGranularity] = granularity.split(" ")
-        console.log(date, time)
         return datePatterns[dateGranularity].test(date) && timePatterns[timeGranularity].test(time)
     }
 }

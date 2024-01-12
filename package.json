@@ -9,13 +9,13 @@
         "src/crate-builder"
     ],
     "scripts": {
-        "develop": "npm install && npm run start:elastic && vite && npm run stop:elastic",
+        "develop": "npm install && npm run update-dependencies && npm run start:elastic && vite && npm run stop:elastic",
         "update-dependencies": "bash -x ./update-deps.sh",
         "test:watch": "./node_modules/.bin/jest --watch --runInBand",
         "build": "npm run build:vue ",
         "build:vue": "vite build",
         "start:elastic": "docker compose up -d && npm run load:datapacks",
-        "load:datapacks": "timeout 10 && node ./load-data-packs.cjs",
+        "load:datapacks": "sleep 10 && node ./load-data-packs.cjs",
         "stop:elastic": "docker compose stop ; docker compose rm -f",
         "storybook": "storybook dev -p 6006",
         "storybook:hu": "STORYBOOK_LANG=hu storybook dev -p 6006",
