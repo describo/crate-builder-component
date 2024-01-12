@@ -7,7 +7,7 @@ config.autoReplaceSvg = "nest";
 import { createApp } from "vue";
 import App from "./App.vue";
 import DescriboCrateBuilder from "../crate-builder/index.js";
-// import "./override-styles.css";
+import "./override-styles.css";
 import { createRouter, createWebHistory } from "vue-router";
 
 const router = createRouter({

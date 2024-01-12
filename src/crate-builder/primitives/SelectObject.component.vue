@@ -29,7 +29,7 @@
 import { ElSelect, ElOption } from "element-plus";
 import { reactive, watch } from "vue";
 import isPlainObject from "lodash-es/isPlainObject";
-import { validateId } from "../crate-manager.js";
+import { validateId } from "../CrateManager/validate-identifier.js";
 import { $t } from "../i18n";
 
 const props = defineProps({

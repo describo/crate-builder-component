@@ -79,6 +79,15 @@
                     "help": "Textarea with no constraint",
                     "required": false,
                     "multiple": true,
+                    "type": ["TextArea"]
+                },
+                {
+                    "id": "https://schema.org/textarea0",
+                    "name": "textarea0",
+                    "label": "Textarea",
+                    "help": "Textarea with every constraint",
+                    "required": false,
+                    "multiple": true,
                     "minLength": 10,
                     "maxLength": 15,
                     "regex": "^b",

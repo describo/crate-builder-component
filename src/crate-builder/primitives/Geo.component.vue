@@ -78,16 +78,14 @@ let DefaultIcon = Leaflet.icon({
 });
 Leaflet.Marker.prototype.options.icon = DefaultIcon;
 import AreaSelectInit from "./Map.SelectArea.js";
-import { reactive, onMounted, onBeforeUnmount } from "vue";
+import { reactive, onMounted, onBeforeUnmount, inject } from "vue";
 import { $t } from "../i18n";
+import { crateManagerKey } from "../RenderEntity/keys.js";
+const cm = inject(crateManagerKey);
 
 AreaSelectInit(Leaflet);
 
 const props = defineProps({
-    crateManager: {
-        type: Object,
-        required: true,
-    },
     property: {
         type: String,
         required: true,
@@ -145,15 +143,19 @@ async function init() {
     updateHandlers();
 }
 
-async function loadGeoDataInCrate() {
-    let geoShape = await props.crateManager.getEntities({
-        limit: 5,
-        type: "GeoShape",
-    });
-    let geoCoordinates = await props.crateManager.getEntities({
-        limit: 5,
-        type: "GeoCoordinates",
-    });
+function loadGeoDataInCrate() {
+    let geoShape = [
+        ...cm.value.getEntities({
+            limit: 5,
+            type: "GeoShape",
+        }),
+    ];
+    let geoCoordinates = [
+        ...cm.value.getEntities({
+            limit: 5,
+            type: "GeoCoordinates",
+        }),
+    ];
     data.existingEntities = [...geoShape, ...geoCoordinates];
 }
 

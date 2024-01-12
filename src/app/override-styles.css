@@ -1,19 +1,96 @@
-/* set styles here to override the colour of the linking elements */
-.describo-render-item-link {
-    @apply bg-yellow-200 hover:bg-yellow-400
-}
+/*
 
-/* set styles here to override the colour of the property rows */
+    In all cases you have the full breadth of tailwindcss (https://tailwindcss.com/docs/installation)
+    at your disposal.
+
+    For example, to colour the property names red and make them larger:
+
+    .describo-property-name {
+        @apply text-red-600 text-2xl
+    }
+
+*/
+
+
+/**************************************
+*    Target all properties
+**************************************/
+.describo-property {
+    /* use this to target the whole area of each property */
+}
+.describo-property-name {
+    /* use this to target the property name */
+}
+.describo-property-value {
+    /* use this to target the value of a property */
+}
+.describo-property-help {
+    /* use this to target the help text of a property */
+}
+.describo-property-help-more {
+    /* use this to target the expanded help text of a property */
+}
 .describo-property-background {
-    @apply hover:bg-orange-100 bg-purple-200
+    /* target the background of all properties except core: '@id', '@type' and 'name' */
+}
+.describo-property-heading {
+    /* target the label of all proeprties except core: '@id', '@type' and 'name' */
+
+}
+.describo-property-value-readonly {
+    /* target properties that are set to readonly */
+}
+.describo-property-type-entity {
+    /* use this to target the autocomplete dropdown when adding an entity */
 
 }
 
-/* set styles here to override tab label styles */
+
+/**************************************
+*    Target specific properties
+**************************************/
+.describo-property-name-id {
+    /* specifically target the @id property */
+}
+.describo-property-name-type {
+    /* specifically target the @type property */
+}
+.describo-property-name-name {
+    /* specifically target the name property */
+}
+/* .describo-property-name-{property name} {
+} */
+
+
+/**************************************
+*    Target specific property types
+**************************************/
+.describo-property-type-datetime {}
+.describo-property-type-date {}
+.describo-property-type-select {}
+.describo-property-type-geo {}
+.describo-property-type-number {}
+.describo-property-type-map {}
+.describo-property-type-value {}
+.describo-property-type-time {}
+.describo-property-type-text {}
+.describo-property-type-url {}
+
+
+/**************************************
+*    Target item links
+**************************************/
+.describo-render-item-link {
+    /* target the whole of an item link */
+}
+
+
+/**************************************
+*    Target tab labels
+**************************************/
 .describo-tab-label {
-    @apply text-orange-600
+    /* use this to target the tab label */
 }
 .describo-tab-description {
-    @apply text-purple-600 text-xl text-left pb-4
+    /* use this to target the tab description */
 }
-

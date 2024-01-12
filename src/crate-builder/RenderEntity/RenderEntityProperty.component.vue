@@ -1,7 +1,10 @@
 <template>
     <div
         class="flex flex-row flex-grow p-2 describo-property-background"
-        :class="[{ 'bg-red-200': props.highlightRequired && isRequired && !isValid }, `describo-property describo-property-name-${props.property}`]"
+        :class="[
+            { 'bg-red-200': props.highlightRequired && isRequired && !isValid },
+            `describo-property describo-property-name-${props.property}`,
+        ]"
     >
         <div class="w-1/3 xl:w-1/5 flex flex-col describo-property-heading">
             <div>
@@ -26,14 +29,18 @@
             <!-- render all of the simple things (text, textarea, date etc) in a column -->
             <div class="flex flex-col space-y-1" v-if="data.simpleInstances.length">
                 <div v-for="instance of data.simpleInstances" :key="instance.idx">
-                    <div v-if="propertyDefinition.readonly" class="describo-property-value-readonly">
+                    <div
+                        v-if="propertyDefinition.readonly"
+                        class="describo-property-value-readonly"
+                    >
                         {{ instance.value }}
                     </div>
                     <div v-else class="flex flex-row space-x-2">
                         <render-entity-property-instance-component
                             class="flex-grow"
-                            :crate-manager="props.crateManager"
-                            :data="instance"
+                            :property="props.property"
+                            :value="instance.value"
+                            :idx="instance.idx"
                             :definition="propertyDefinition"
                             @save:property="saveProperty"
                             @create:entity="createEntity"
@@ -41,13 +48,13 @@
                         <delete-property-component
                             v-if="
                                 isNotValue &&
+                                !configuration.readonly &&
                                 instance.value &&
-                                !instance.tgtEntityId &&
-                                !configuration.readonly
+                                !instance.value?.['@id']
                             "
                             type="delete"
-                            :property="instance"
-                            @delete:property="deleteProperty(instance)"
+                            :property="property"
+                            @delete:property="deleteProperty(instance.idx)"
                         />
                     </div>
                 </div>
@@ -55,7 +62,6 @@
             <!-- render all the links in a wrapping row -->
             <div class="mt-2" v-if="data.linkInstances.length">
                 <PaginateLinkedEntitiesComponent
-                    :crate-manager="props.crateManager"
                     :entities="data.linkInstances"
                     :property="props.property"
                     :readonly="propertyDefinition.readonly"
@@ -68,7 +74,6 @@
                 :property="props.property"
                 :definition="propertyDefinition"
                 :embedded="false"
-                :crate-manager="props.crateManager"
                 @create:property="createProperty"
                 @create:entity="createEntity"
                 @link:entity="linkEntity"
@@ -85,19 +90,16 @@ import PaginateLinkedEntitiesComponent from "./PaginateLinkedEntities.component.
 import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import AddComponent from "./Add.component.vue";
 import DisplayPropertyNameComponent from "./DisplayPropertyName.component.vue";
-import { configurationKey } from "./keys.js";
+import { configurationKey, crateManagerKey, profileManagerKey } from "./keys.js";
 import { reactive, computed, onMounted, onBeforeMount, onBeforeUnmount, watch, inject } from "vue";
-import cloneDeep from "lodash-es/cloneDeep";
-import orderBy from "lodash-es/orderBy";
-import { ProfileManager } from "../profile-manager.js";
+import cloneDeep from "lodash-es/cloneDeep.js";
+import orderBy from "lodash-es/orderBy.js";
+import isPlainObject from "lodash-es/isPlainObject.js";
 import { $t } from "../i18n";
 const configuration = inject(configurationKey);
+const pm = inject(profileManagerKey);
 
 const props = defineProps({
-    crateManager: {
-        type: Object,
-        required: true,
-    },
     entity: {
         type: Object,
         required: true,
@@ -156,24 +158,33 @@ const isNotValue = computed(() => {
     return propertyDefinition.value?.type !== "Value";
 });
 const profileWarnMissingProperty = computed(() => {
-    return props.crateManager.profile.warnMissingProperty;
+    return pm.value.profile.warnMissingProperty;
 });
 const showAddControl = computed(() => {
     return propertyDefinition.value?.multiple || !props?.values?.length;
 });
 const propertyDefinition = computed(() => {
-    if (!props.crateManager?.profile) return {};
-    const profileManager = new ProfileManager({ profile: props.crateManager.profile });
-    let { propertyDefinition } = profileManager.getPropertyDefinition({
+    let { propertyDefinition } = pm.value.getPropertyDefinition({
         property: props.property,
         entity: props.entity,
     });
     return cloneDeep(propertyDefinition);
 });
 function sortInstances() {
-    data.simpleInstances = props.values.filter((v) => v.value);
+    data.simpleInstances = props.values
+        .map((v, i) => {
+            if (!isPlainObject(v)) {
+                return { idx: i, value: v };
+            }
+        })
+        .filter((v) => v);
+
     data.linkInstances = orderBy(
-        props.values.filter((v) => v?.tgtEntity),
+        props.values
+            .map((v, i) => {
+                if (isPlainObject(v)) return { idx: i, value: v };
+            })
+            .filter((v) => v),
         "@id"
     );
 }
@@ -192,10 +203,10 @@ function linkEntity(data) {
 function saveProperty(data) {
     $emit("save:property", data);
 }
-function deleteProperty(data) {
+function deleteProperty(idx) {
     $emit("delete:property", {
         property: props.property,
-        idx: data.idx,
+        idx,
     });
 }
 function unlinkEntity(data) {

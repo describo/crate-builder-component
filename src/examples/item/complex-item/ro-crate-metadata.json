@@ -90,7 +90,7 @@
             "value": "98007"
         },
         {
-            "@id": "/",
+            "@id": "./",
             "@type": ["Dataset"],
             "additionalType": "item",
             "bornDigital": 0,
@@ -763,7 +763,7 @@
             "@id": "ro-crate-metadata.json",
             "@type": "CreativeWork",
             "conformsTo": { "@id": "https://w3id.org/ro/crate/1.1" },
-            "about": { "@id": "/" }
+            "about": { "@id": "./" }
         }
     ]
 }

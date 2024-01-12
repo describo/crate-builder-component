@@ -38,7 +38,7 @@
             "name": "Geographical coverage for Erakor, Lelepa"
         },
         {
-            "@id": "/",
+            "@id": "./",
             "@type": ["Dataset"],
             "hasMember": [
                 { "@id": "https://catalog.paradisec.org.au/collections/NT5/items/200501" },
@@ -168,7 +168,7 @@
             "@id": "ro-crate-metadata.json",
             "@type": "CreativeWork",
             "conformsTo": { "@id": "https://w3id.org/ro/crate/1.1" },
-            "about": { "@id": "/" }
+            "about": { "@id": "./" }
         }
     ]
 }

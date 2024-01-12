@@ -144,14 +144,12 @@ import SelectUrlComponent from "../primitives/SelectUrl.component.vue";
 import SelectObjectComponent from "../primitives/SelectObject.component.vue";
 import GeoComponent from "../primitives/Geo.component.vue";
 import AutocompleteComponent from "./AutoComplete.component.vue";
-import { reactive, computed } from "vue";
+import { reactive, computed, inject } from "vue";
+import { profileManagerKey } from "./keys.js";
 import { $t } from "../i18n";
+const pm = inject(profileManagerKey);
 
 const props = defineProps({
-    crateManager: {
-        type: Object,
-        required: true,
-    },
     property: {
         type: String,
         required: true,
@@ -203,21 +201,21 @@ function close() {
 }
 function add({ type }) {
     data.addType = type;
-    data.localisedAddType = props.crateManager?.profileManager?.getTypeLabel(type);
+    data.localisedAddType = pm.value?.getTypeLabel(type);
 }
 function createProperty(data) {
     // console.debug("Add Component : emit(create:property)", data);
-    $emit("create:property", data);
+    $emit("create:property", { ...data, propertyId: props.definition.id });
     close();
 }
 function createEntity(data) {
     // console.debug("Add Component : emit(create:entity)", { ...data, property: props.property });
-    $emit("create:entity", { ...data, property: props.property });
+    $emit("create:entity", { ...data, property: props.property, propertyId: props.definition.id });
     close();
 }
 function linkEntity(data) {
     // console.debug("Add Component : emit(link:entity)", { ...data, property: props.property });
-    $emit("link:entity", { ...data, property: props.property });
+    $emit("link:entity", { ...data, property: props.property, propertyId: props.definition.id });
     close();
 }
 </script>

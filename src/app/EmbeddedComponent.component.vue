@@ -28,8 +28,12 @@
                         :value="item.name"
                     />
                 </el-select>
+                <el-button @click="add">add</el-button>
+                <el-button @click="setTab">set tab</el-button>
+                <el-button @click="setEntity">set entity</el-button>
             </div>
             <describo-crate-builder
+                ref="describo"
                 :crate="data.selectedCrate"
                 :profile="data.selectedProfile"
                 :lookup="lookup"
@@ -110,8 +114,8 @@
 </template>
 
 <script setup>
-import { ElForm, ElFormItem, ElSwitch, ElSelect, ElOption } from "element-plus";
-import { reactive } from "vue";
+import { ElForm, ElFormItem, ElSwitch, ElSelect, ElOption, ElButton } from "element-plus";
+import { reactive, ref } from "vue";
 import { Lookup } from "./lookup.js";
 import crateFile1 from "../examples/item/empty/ro-crate-metadata.json";
 import crateFile2 from "../examples/item/complex-collection/ro-crate-metadata.json";
@@ -178,6 +182,7 @@ const data = reactive({
         showControls: true,
     },
 });
+let describo = ref();
 
 function setCrate(name) {
     let crate = name ? data.crates.filter((c) => c.name === name)[0].value : undefined;
@@ -198,5 +203,28 @@ function logErrors({ errors }) {
 }
 function logWarnings({ warnings }) {
     console.warn(`warnings:`, { ...warnings });
+}
+
+function add() {
+    let { cm, setCurrentEntity, setTab, refresh } = describo.value;
+    cm.setProperty({ id: "./", property: "author", value: 1 });
+    cm.setProperty({ id: "./", property: "babies", value: 1 });
+    let e = cm.addEntity({ "@id": "#person", "@type": "Person", name: "a person" });
+    cm.linkEntity({
+        id: "./",
+        property: "contributor",
+        value: { "@id": e["@id"] },
+    });
+    refresh();
+}
+
+function setTab() {
+    let { cm, setCurrentEntity, setTab, refresh } = describo.value;
+    setTab("numbers");
+}
+
+function setEntity() {
+    let { cm, setCurrentEntity, setTab, refresh } = describo.value;
+    setCurrentEntity({ id: "#person" });
 }
 </script>

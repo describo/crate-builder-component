@@ -12,13 +12,11 @@ let DefaultIcon = Leaflet.icon({
     shadowUrl: iconShadow,
 });
 Leaflet.Marker.prototype.options.icon = DefaultIcon;
-import { reactive, onMounted, onBeforeUnmount } from "vue";
+import { reactive, onMounted, onBeforeUnmount, inject } from "vue";
+import { crateManagerKey } from "../RenderEntity/keys.js";
+const cm = inject(crateManagerKey);
 
 const props = defineProps({
-    crateManager: {
-        type: Object,
-        required: true,
-    },
     entity: { type: Object },
 });
 
@@ -44,7 +42,7 @@ onBeforeUnmount(() => {
 });
 
 async function init() {
-    const entity = props.crateManager.getEntity({ id: props.entity["@id"] });
+    const entity = cm.value.getEntity({ id: props.entity["@id"] });
 
     // we need to give leaflet and vue and the dom a couple seconds before barreling on
     await new Promise((resolve) => setTimeout(resolve, 200));
@@ -59,8 +57,8 @@ async function init() {
         }
     ).addTo(map);
 
-    if (entity["@properties"].geojson) {
-        let geojson = JSON.parse(entity["@properties"].geojson[0].value);
+    if (entity.geojson) {
+        let geojson = JSON.parse(entity.geojson[0]);
         removeExistingLayers();
 
         // we need to give leaflet and vue and the dom a couple seconds before barreling on

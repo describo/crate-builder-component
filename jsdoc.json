@@ -1,0 +1,24 @@
+{
+    "tags": {
+        "allowUnknownTags": true,
+        "dictionaries": ["jsdoc", "closure"]
+    },
+    "source": {
+        "include": [
+            "README.md",
+            "./src/crate-builder/CrateManager/crate-manager.js",
+            "./src/crate-builder/CrateManager/lib.js"
+        ]
+    },
+    "plugins": ["plugins/markdown"],
+    "sourceType": "module",
+    "opts": {
+        "recurse": true,
+        "destination": "./docs",
+        "template": "node_modules/minami"
+    },
+    "markdown": {
+        "hardwrap": false,
+        "idInHeadings": true
+    }
+}

@@ -18,7 +18,7 @@
 <script setup>
 import { ElDatePicker } from "element-plus";
 import { reactive, watch } from "vue";
-import startOfDay from "date-fns/esm/startOfDay";
+import { startOfDay } from "date-fns";
 import { checkDateIsValid } from "./date-libs";
 import { $t } from "../i18n";
 

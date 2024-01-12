@@ -96,76 +96,68 @@ const data = reactive({
         {
             "@id": "./",
             "@type": ["Dataset"],
-            "@properties": {
-                relationship: [
-                    {
-                        idx: 0,
-                        tgtEntity: {
-                            "@id": "#relationship",
-                            "@type": ["Relationship", "RelatedEntity"],
-                            associations: [],
-                        },
+            relationship: [
+                {
+                    idx: 0,
+                    tgtEntity: {
+                        "@id": "#relationship",
+                        "@type": ["Relationship", "RelatedEntity"],
+                        associations: [],
                     },
-                ],
-            },
+                },
+            ],
         },
         {
             "@id": "#relationship",
             "@type": ["Relationship", "RelatedEntity"],
-            "@properties": {
-                source: [
-                    {
-                        idx: 0,
-                        tgtEntity: {
-                            "@id": "#person1",
-                            "@type": ["Person"],
-                            associations: [],
-                        },
+            source: [
+                {
+                    idx: 0,
+                    tgtEntity: {
+                        "@id": "#person1",
+                        "@type": ["Person"],
+                        associations: [],
                     },
-                ],
-                target: [
-                    {
-                        idx: 0,
-                        tgtEntity: {
-                            "@id": "#thing1",
-                            "@type": ["Thing"],
-                            associations: [],
-                        },
+                },
+            ],
+            target: [
+                {
+                    idx: 0,
+                    tgtEntity: {
+                        "@id": "#thing1",
+                        "@type": ["Thing"],
+                        associations: [],
                     },
-                ],
-            },
+                },
+            ],
         },
         {
             "@id": "#person1",
             "@type": ["Person"],
-            "@properties": {
-                sourceOf: [
-                    {
-                        idx: 0,
-                        tgtEntity: {
-                            "@id": "#relationship",
-                            "@type": ["Relationship", "RelatedEntity"],
-                            associations: [],
-                        },
+            sourceOf: [
+                {
+                    idx: 0,
+                    tgtEntity: {
+                        "@id": "#relationship",
+                        "@type": ["Relationship", "RelatedEntity"],
+                        associations: [],
                     },
-                ],
-            },
+                },
+            ],
         },
         {
             "@id": "#thing1",
             "@type": ["Thing"],
-            "@properties": {
-                targetOf: [
-                    {
-                        idx: 0,
-                        tgtEntity: {
-                            "@id": "#relationship",
-                            "@type": ["Relationship", "RelatedEntity"],
-                            associations: [],
-                        },
+            targetOf: [
+                {
+                    idx: 0,
+                    tgtEntity: {
+                        "@id": "#relationship",
+                        "@type": ["Relationship", "RelatedEntity"],
+                        associations: [],
                     },
-                ],
-            },
+                },
+            ],
         },
     ],
     selectedEntity: {},
