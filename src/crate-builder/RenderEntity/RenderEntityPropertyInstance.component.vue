@@ -10,16 +10,15 @@
             <value-component v-if="isValue()" :definition="props.definition.value" />
             <date-time-component
                 v-else-if="isDateTime(props.value) &&
-                    (!props.definition.dateGranularity || 
-                    !props.definition.timeGranularity) || 
-                    props.definition.dateGranularity + ' ' + props.definition.timeGranularity === 'day second'"
+                    ((!props.definition.dateGranularity && !props.definition.timeGranularity) || 
+                    (JSON.stringify(props.definition.dateGranularity) === JSON.stringify(['day']) && JSON.stringify(props.definition.timeGranularity) === JSON.stringify(['second'])))"
                 :property="props.property"
                 :value="props.value"
                 @save:property="savePropertyValue"
             />
             <date-component
                 v-else-if="isDate(props.value)&& 
-                    !props.definition.granularity || props.definition.granularity === 'day'"
+                    !props.definition.granularity || JSON.stringify(props.definition.granularity) === JSON.stringify(['day'])"
                 :property="props.property"
                 :value="props.value"
                 @save:property="savePropertyValue"
@@ -27,7 +26,7 @@
             <text-component
                 v-else-if="isDate(props.value) && 
                     (props.definition.granularity && 
-                    props.definition.granularity !== 'day')"
+                    JSON.stringify(props.definition.granularity) !== JSON.stringify(['day']))"
                 :property="props.property"
                 :value="props.value"
                 :definition="props.definition"
@@ -35,9 +34,8 @@
             />
             <text-component
                 v-else-if="isDateTime(props.value) && 
-                    ((props.definition.dateGranularity|| 
-                    props.definition.timeGranularity) &&  
-                    props.definition.dateGranularity + ' ' + props.definition.timeGranularity !== 'day second')" 
+                    ((props.definition.dateGranularity || props.definition.timeGranularity) && 
+                    (JSON.stringify(props.definition.dateGranularity) !== JSON.stringify(['day']) || JSON.stringify(props.definition.timeGranularity) !== JSON.stringify(['second'])))" 
                 :property="props.property"
                 :value="props.value"
                 :definition="props.definition"

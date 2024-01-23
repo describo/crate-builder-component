@@ -96,7 +96,7 @@ function validateTextConstraints(value) {
     if (
         data.constraints.dateGranularity &&
         data.constraints.timeGranularity &&
-        !validateDateFormat(value, data.constraints.dateGranularity + " " + data.constraints.timeGranularity, "datetime")
+        !validateDateFormat(value, [data.constraints.dateGranularity, data.constraints.timeGranularity], "datetime")
     ) return false;
     if (
         data.constraints.dateGranularity &&
@@ -124,12 +124,13 @@ function validateDateFormat(inputString, granularity, granularityType) {
         'second': /^(0[0-9]|1[0-9]|2[0-3])\.(0[0-5]|[1-5][0-9])\.(0[0-5]|[1-5][0-9])$/
     }
 
-    if (granularityType === "date") return datePatterns[granularity].test(inputString)
-    if (granularityType === "time") return timePatterns[granularity].test(inputString)
+    if (granularityType === "date") return Array.isArray(granularity) && granularity.some(g => datePatterns[g].test(inputString))
+    if (granularityType === "time") return Array.isArray(granularity) && granularity.some(g => timePatterns[g].test(inputString))
     if (inputString && granularityType === "datetime") {
         const [date, time] = inputString.split(" ")
-        const [dateGranularity, timeGranularity] = granularity.split(" ")
-        return datePatterns[dateGranularity].test(date) && timePatterns[timeGranularity].test(time)
+        const [dateGranularity, timeGranularity] = [...granularity]
+        return Array.isArray(dateGranularity) && dateGranularity.some(g => datePatterns[g].test(date))
+            && Array.isArray(timeGranularity) && timeGranularity.some(g => timePatterns[g].test(time))
     }
 }
 
@@ -150,7 +151,7 @@ function getConstraintsString() {
 
 function getDateFormatString(granularity) {
     const formats = {
-        'year': 'YYY',
+        'year': 'YYYY',
         'month': 'YYYY-MM',
         'day': 'YYYY-MM-DD',
         'hour': 'hh',
@@ -158,6 +159,6 @@ function getDateFormatString(granularity) {
         'second': 'hh.mm.ss'
     };
 
-    return formats[granularity];
+    return granularity.map(g => " " + formats[g]);
 }
 </script>
