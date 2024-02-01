@@ -122,8 +122,8 @@ function validateDateFormat(inputString, granularity, granularityType) {
 
     const timePatterns = {
         'hour': /^(0[0-9]|1[0-9]|2[0-3])$/,
-        'minute': /^(0[0-9]|1[0-9]|2[0-3])\.(0[0-5]|[1-5][0-9])$/,
-        'second': /^(0[0-9]|1[0-9]|2[0-3])\.(0[0-5]|[1-5][0-9])\.(0[0-5]|[1-5][0-9])$/
+        'minute': /^(0[0-9]|1[0-9]|2[0-3])\:(0[0-5]|[1-5][0-9])$/,
+        'second': /^(0[0-9]|1[0-9]|2[0-3])\:(0[0-5]|[1-5][0-9])\:(0[0-5]|[1-5][0-9])$/
     }
 
     if (granularityType === "date") {
@@ -199,8 +199,8 @@ function getDateFormatString(granularity) {
         'month': 'YYYY-MM',
         'day': 'YYYY-MM-DD',
         'hour': 'hh',
-        'minute': 'hh.mm',
-        'second': 'hh.mm.ss'
+        'minute': 'hh:mm',
+        'second': 'hh:mm:ss'
     };
 
     return granularity.map(g => " " + formats[g]);
