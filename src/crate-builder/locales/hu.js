@@ -49,7 +49,7 @@ const hu = {
         // Text.component.vue
         invalid_type_for_text:
             "'{{type}}' típus nem használható ezzel a komponenssel. A típus csak 'text' vagy 'textarea' lehet",
-        text_constraints_error_message: "A megadott érték nem felel meg a következő megszorításoknak: {{value}}",
+        text_constraints_error_message: "A megadott érték nem felel meg a következő megszorításoknak: {{value}}, vagy érvénytelen.",
 
         // Date.component.vue
         pick_a_date: "Válassz dátumot!",

@@ -19,6 +19,8 @@ import { reactive, watch, computed } from "vue";
 import debounce from "lodash-es/debounce.js";
 import isBoolean from "lodash-es/isBoolean.js";
 import { $t } from "../i18n";
+import { isNavigationFailure } from "vue-router";
+import { isNaN } from "lodash";
 const debouncedSave = debounce(save, 200);
 
 const props = defineProps({
@@ -113,9 +115,9 @@ function validateTextConstraints(value) {
 
 function validateDateFormat(inputString, granularity, granularityType) {
     const datePatterns = {
-        'year': /^-?\d{4}$/,
-        'month': /^-?\d{4}-\d{2}$/,
-        'day': /^-?\d{4}-\d{2}-\d{2}$/
+        'year': /^-?\d{1,4}$/,
+        'month': /^-?\d{1,4}-(0[1-9]|1[0-2])$/,
+        'day': /^-?\d{1,4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01])$/
     };
 
     const timePatterns = {
@@ -124,14 +126,56 @@ function validateDateFormat(inputString, granularity, granularityType) {
         'second': /^(0[0-9]|1[0-9]|2[0-3])\.(0[0-5]|[1-5][0-9])\.(0[0-5]|[1-5][0-9])$/
     }
 
-    if (granularityType === "date") return Array.isArray(granularity) && granularity.some(g => datePatterns[g].test(inputString))
-    if (granularityType === "time") return Array.isArray(granularity) && granularity.some(g => timePatterns[g].test(inputString))
-    if (inputString && granularityType === "datetime") {
-        const [date, time] = inputString.split(" ")
-        const [dateGranularity, timeGranularity] = [...granularity]
-        return Array.isArray(dateGranularity) && dateGranularity.some(g => datePatterns[g].test(date))
-            && Array.isArray(timeGranularity) && timeGranularity.some(g => timePatterns[g].test(time))
+    if (granularityType === "date") {
+        const normalizedInput = inputString.startsWith("-") ? normalizeDate(inputString.substring(1)) : normalizeDate(inputString);
+        return Array.isArray(granularity) && granularity.some(g => datePatterns[g].test(normalizedInput) && isValidDate(normalizedInput));
     }
+
+    if (granularityType === "time") {
+        return Array.isArray(granularity) && granularity.some(g => timePatterns[g].test(inputString));
+    }
+
+    if (inputString && granularityType === "datetime") {
+        const [date, time] = inputString.split(" ");
+        const normalizedDate = inputString.startsWith("-") ? normalizeDate(date.substring(1)) : normalizeDate(date);
+        const [dateGranularity, timeGranularity] = [...granularity];
+        return Array.isArray(dateGranularity) && dateGranularity.some(g => datePatterns[g].test(normalizedDate) && isValidDate(normalizedDate))
+            && Array.isArray(timeGranularity) && timeGranularity.some(g => timePatterns[g].test(time));
+    }
+
+    return false;
+}
+
+function isValidDate(dateStr) {
+    const dateParts = dateStr.split("-")
+
+    const year = parseInt(dateParts[0]);
+    const month = parseInt(dateParts[1]) - 1;
+    const day = parseInt(dateParts[2]);
+
+    const isFullDate = dateParts.length === 3 && !dateParts.includes(NaN)
+    const date = new Date(year, month, day);
+    if (isFullDate) {
+        return date.getFullYear() === year && date.getMonth() === month && date.getDate() === day;
+    }
+    return true
+}
+
+function normalizeDate(dateStr) {
+    const dateParts = dateStr.split("-");
+    const year = dateParts[0];
+    let month = parseInt(dateParts[1]);
+    let day = parseInt(dateParts[2]);
+
+    if (day < 10) {
+        day = '0' + day;
+    }
+
+    if (month < 10) {
+        month = `0${month}`;
+    }
+
+    return `${year}${!isNaN(month) ? "-" + month : ""}${!isNaN(day) ? "-" + day : ""}`;
 }
 
 function getConstraintsString() {
