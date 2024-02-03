@@ -197,6 +197,10 @@ export class CrateManager {
                             this.reverse[instance["@id"]][property] = [];
                         }
                         this.reverse[instance["@id"]][property].push({ "@id": entity["@id"] });
+                        this.reverse[instance["@id"]][property] = uniqBy(
+                            this.reverse[instance["@id"]][property],
+                            "@id"
+                        );
                     }
                 });
             }
@@ -701,14 +705,15 @@ cm.updateProperty({ id: "./", property: "author", idx: 1, value: "new" });
         if (!property) throw new Error(`setProperty' requires 'property' to be defined`);
         if (!value) throw new Error(`'setProperty' requires 'value' to be defined`);
 
+        let entity;
         if (this.coreProperties.includes(property)) {
             let indexRef = this.entityIdIndex[id];
             if (!indexRef) {
-                let entity = this.__materialiseEntity({ id });
+                entity = this.__materialiseEntity({ id });
                 entity = this.addEntity(entity);
                 indexRef = this.entityIdIndex[entity["@id"]];
             }
-            let entity = this.crate["@graph"][indexRef];
+            entity = this.crate["@graph"][indexRef];
             if (property === "@id") {
                 //  update @id
                 this.__updateEntityId({ entity, newId: value });
@@ -728,7 +733,7 @@ cm.updateProperty({ id: "./", property: "author", idx: 1, value: "new" });
             let entity = this.crate["@graph"][indexRef];
             entity[property][idx] = value;
         }
-        return true;
+        return entity;
     }
 
     /**
@@ -782,10 +787,23 @@ cm.ingestAndLink({
         let flattened = this.flatten(json);
         flattened = flattened.map((entity) => {
             entity = normalise(entity, this.graphLength);
-            return this.addEntity(entity);
+            entity = this.addEntity(entity);
+            return entity;
         });
 
         this.linkEntity({ id, property, propertyId, value: { "@id": flattened[0]["@id"] } });
+
+        //  go through and set all of the reverse links
+        for (let entity of flattened) {
+            for (let prop of Object.keys(entity)) {
+                if (this.coreProperties.includes(prop)) continue;
+                entity[prop].forEach((instance) => {
+                    if (instance?.["@id"]) {
+                        this.__addReverse({ id: entity["@id"], property: prop, value: instance });
+                    }
+                });
+            }
+        }
     }
 
     /**
@@ -1217,6 +1235,10 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
         if (linkIndexRef) {
             if (!this.reverse[value["@id"]][property]) this.reverse[value["@id"]][property] = [];
             this.reverse[value["@id"]][property].push({ "@id": id });
+            this.reverse[value["@id"]][property] = uniqBy(
+                this.reverse[value["@id"]][property],
+                "@id"
+            );
         }
     }
     __removeAssociations(entity) {

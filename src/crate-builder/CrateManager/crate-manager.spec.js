@@ -1353,10 +1353,16 @@ describe("Test interacting with the crate", () => {
                         "@type": "Thing",
                         name: "level5",
                     },
+                    {
+                        "@id": "http://5.some.thing",
+                        "@type": "Thing",
+                        name: "level5",
+                    },
                 ],
             },
         };
         let flattened = cm.flatten(json);
+        // console.log(JSON.stringify(flattened, null, 2));
 
         expect(flattened).toMatchObject([
             {
@@ -1385,6 +1391,9 @@ describe("Test interacting with the crate", () => {
                     {
                         "@id": "http://5.some.thing",
                     },
+                    {
+                        "@id": "http://5.some.thing",
+                    },
                 ],
             },
             {
@@ -1396,6 +1405,11 @@ describe("Test interacting with the crate", () => {
                 "@id": "http://4.some.thing",
                 "@type": "Thing",
                 name: "level4",
+            },
+            {
+                "@id": "http://5.some.thing",
+                "@type": "Thing",
+                name: "level5",
             },
             {
                 "@id": "http://5.some.thing",
@@ -1427,6 +1441,9 @@ describe("Test interacting with the crate", () => {
                 level: {
                     "@id": "http://2.some.thing",
                 },
+                "@reverse": {
+                    language: { "@id": "./" },
+                },
             },
             {
                 "@id": "http://2.some.thing",
@@ -1441,19 +1458,34 @@ describe("Test interacting with the crate", () => {
                     {
                         "@id": "http://5.some.thing",
                     },
+                    {
+                        "@id": "http://5.some.thing",
+                    },
                 ],
+                "@reverse": {
+                    level: { "@id": "http://some.thing" },
+                },
             },
             {
                 "@id": "http://3.some.thing",
                 name: "level3",
+                "@reverse": {
+                    level: { "@id": "http://2.some.thing" },
+                },
             },
             {
                 "@id": "http://4.some.thing",
                 name: "level4",
+                "@reverse": {
+                    other: { "@id": "http://2.some.thing" },
+                },
             },
             {
                 "@id": "http://5.some.thing",
                 name: "level5",
+                "@reverse": {
+                    other: { "@id": "http://2.some.thing" },
+                },
             },
         ]);
     });
