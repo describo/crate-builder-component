@@ -493,6 +493,7 @@ function createEntity(patch) {
         ...patch,
     });
 
+    // console.log("ingest and link", JSON.stringify(patch.json, null, 2));
     cm.value.ingestAndLink({
         id: contextEntity.value["@id"],
         property: patch.property,
@@ -563,24 +564,12 @@ function saveProperty(patch) {
         ...patch,
     });
 
-    if (isString(patch.value) && isURL(patch.value)) {
-        createEntity({
-            property: patch.property,
-            json: {
-                "@id": patch.value,
-                "@type": "URL",
-                name: patch.value,
-            },
-        });
-        deleteProperty({
-            id: contextEntity.value["@id"],
-            property: patch.property,
-            idx: patch.idx,
-        });
+    let entity = cm.value.updateProperty({ id: contextEntity.value["@id"], ...patch });
+    if (entity["@id"] !== props.entity["@id"]) {
+        loadEntity(entity);
     } else {
-        cm.value.updateProperty({ id: contextEntity.value["@id"], ...patch });
+        refresh();
     }
-    refresh();
     saveCrate();
     notifySave(patch.property);
 }
