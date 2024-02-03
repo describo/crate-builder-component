@@ -19,14 +19,6 @@
             "overflow": {
                 "label": "Other"
             }
-        },
-        {
-            "appliesTo": ["Language"],
-            "about": { "label": "About", "description": "" },
-            "source": { "label": "More information", "description": "" },
-            "overflow": {
-                "label": "Other"
-            }
         }
     ],
     "classes": {
