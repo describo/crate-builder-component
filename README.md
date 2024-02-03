@@ -22,7 +22,8 @@ Comprehensive documentation is available @
 
 # Crate Manager API Documentation
 
-[https://describo.github.io/crate-builder-component](https://describo.github.io/crate-builder-component)
+[https://describo.github.io/crate-builder-component/CrateManager.html](https://describo.github.io/crate-builder-component/CrateManager.html)
+https://describo.github.io/crate-builder-component/CrateManager.html
 
 # Developing the plugin
 
