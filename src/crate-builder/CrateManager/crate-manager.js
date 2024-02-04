@@ -196,11 +196,11 @@ export class CrateManager {
                         if (!this.reverse[instance["@id"]][property]) {
                             this.reverse[instance["@id"]][property] = [];
                         }
-                        this.reverse[instance["@id"]][property].push({ "@id": entity["@id"] });
-                        this.reverse[instance["@id"]][property] = uniqBy(
-                            this.reverse[instance["@id"]][property],
-                            "@id"
-                        );
+
+                        let links = this.reverse[instance["@id"]][property].map((l) => l["@id"]);
+                        if (!links.includes(entity["@id"])) {
+                            this.reverse[instance["@id"]][property].push({ "@id": entity["@id"] });
+                        }
                     }
                 });
             }
@@ -1234,11 +1234,16 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
 
         if (linkIndexRef) {
             if (!this.reverse[value["@id"]][property]) this.reverse[value["@id"]][property] = [];
-            this.reverse[value["@id"]][property].push({ "@id": id });
-            this.reverse[value["@id"]][property] = uniqBy(
-                this.reverse[value["@id"]][property],
-                "@id"
-            );
+
+            let links = this.reverse[value["@id"]][property].map((l) => l["@id"]);
+            if (!links.includes(id)) {
+                this.reverse[value["@id"]][property].push({ "@id": id });
+            }
+            // this.reverse[value["@id"]][property].push({ "@id": id });
+            // this.reverse[value["@id"]][property] = uniqBy(
+            //     this.reverse[value["@id"]][property],
+            //     "@id"
+            // );
         }
     }
     __removeAssociations(entity) {
