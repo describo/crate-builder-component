@@ -105,12 +105,18 @@ function createEntity(data) {
     $emit("create:entity", data);
 }
 function isDate(string) {
-    const date = parseISO(string);
-    return validatorIsDate(date) && definitionIncludes("Date");
+    try {
+        const date = parseISO(string);
+        return validatorIsDate(date) && definitionIncludes("Date");
+    } catch (error) {
+        return false;
+    }
 }
 function isDateTime(string) {
-    const date = parseISO(string);
-    return validatorIsDate(date) && definitionIncludes("DateTime");
+    try {
+        const date = parseISO(string);
+        return validatorIsDate(date) && definitionIncludes("DateTime");
+    } catch (error) {}
 }
 function isTime(string) {
     string = string + "";
