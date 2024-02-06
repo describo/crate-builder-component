@@ -215,6 +215,46 @@
                     "type": ["Text"]
                 },
                 {
+                    "id": "https://schema.org/date8",
+                    "name": "date8",
+                    "label": "Text field with dateFormat, year 2 or 4 digits",
+                    "help": "dateFormat: ['YYYY', 'YY']",
+                    "required": false,
+                    "multiple": true,
+                    "dateFormat": ["YYYY", "YY"],
+                    "type": ["Text"]
+                },
+                {
+                    "id": "https://schema.org/date9",
+                    "name": "date9",
+                    "label": "Text field dateFormat with multiple possible separators",
+                    "help": "dateFormat: ['YYYY/MM/DD', 'YYYY-MM-DD', 'YYYY.MM.DD']",
+                    "required": false,
+                    "multiple": true,
+                    "dateFormat": ["YYYY/MM/DD", "YYYY-MM-DD", "YYYY.MM.DD"],
+                    "type": ["Text"]
+                },
+                {
+                    "id": "https://schema.org/date10",
+                    "name": "date10",
+                    "label": "Text field dateFormat, describe month or day with one digit",
+                    "help": "dateFormat: ['YYYY-M-D', 'YYYY-M-DD', 'YYYY-MM-D']",
+                    "required": false,
+                    "multiple": true,
+                    "dateFormat": ["YYYY-M-D", "YYYY-M-DD", "YYYY-MM-D"],
+                    "type": ["Text"]
+                },
+                {
+                    "id": "https://schema.org/date11",
+                    "name": "date11",
+                    "label": "Text field with reversed dateFormat",
+                    "help": "dateFormat: ['DD-MM-YYYY']",
+                    "required": false,
+                    "multiple": true,
+                    "dateFormat": ["DD-MM-YYYY"],
+                    "type": ["Text"]
+                },
+                {
                     "id": "https://schema.org/datetime",
                     "name": "datetime",
                     "label": "DateTime field",
