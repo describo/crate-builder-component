@@ -21,6 +21,7 @@ import isBoolean from "lodash-es/isBoolean.js";
 import { $t } from "../i18n";
 import { isNavigationFailure } from "vue-router";
 import { isNaN } from "lodash";
+import dayjs from 'dayjs'
 const debouncedSave = debounce(save, 200);
 
 const props = defineProps({
@@ -63,7 +64,7 @@ function save() {
     if (isValidTextValue) {
         $emit("save:property", {
             property: props.property,
-            value: normalizeDate(data.displayValue).trim(),
+            value: data.displayValue.trim(),
         });
     }
 }
@@ -98,81 +99,11 @@ function validateTextConstraints(value) {
 }
 
 function validateDateFormat(inputString, granularity) {
-    const datePatterns = {
-        'YYYY': /^-?\d{1,4}$/,
-        'YYYY-MM': /^-?\d{1,4}-(0[1-9]|1[0-2])$/,
-        'YYYY-MM-DD': /^-?\d{1,4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01])$/,
-        'hh': /^(0[0-9]|1[0-9]|2[0-3])$/,
-        'hh:mm': /^(0[0-9]|1[0-9]|2[0-3])\:(0[0-5]|[1-5][0-9])$/,
-        'hh:mm:ss': /^(0[0-9]|1[0-9]|2[0-3])\:(0[0-5]|[1-5][0-9])\:(0[0-5]|[1-5][0-9])$/,
-        'YYYY-MM-DD hh:mm:ss': /^-?\d{1,4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01]) (0[0-9]|1[0-9]|2[0-3])\:(0[0-5]|[1-5][0-9])\:(0[0-5]|[1-5][0-9])$/,
-        'YYYY-MM-DD hh:mm': /^-?\d{1,4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01]) (0[0-9]|1[0-9]|2[0-3])\:(0[0-5]|[1-5][0-9])$/,
-        'YYYY-MM-DD hh': /^-?\d{1,4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01]) (0[0-9]|1[0-9]|2[0-3])$/,
-    };
-
-    const normalizedDate = normalizeDate(inputString)
-    return Array.isArray(granularity) && granularity.some(g => datePatterns[g].test(normalizedDate) && isValidDate(normalizedDate));
-}
-
-function isValidDate(dateStr) {
-    const dateParts = dateStr.split(" ")
-
-    let negativeSign = "";
-    let yearPart = dateParts[0];
-    if (yearPart.startsWith('-')) {
-        negativeSign = "-";
-        yearPart = yearPart.substring(1);
+    let dateString = inputString 
+    if (inputString.startsWith("-")) {
+        dateString = dateString.substr(1)
     }
-
-    const dateComponents = yearPart.split("-");
-    const year = parseInt(negativeSign + dateComponents[0]);
-    const month = parseInt(dateComponents[1]) - 1;
-    const day = parseInt(dateComponents[2]);
-
-    const isFullDate = dateComponents.length === 3 && !dateComponents.includes(NaN)
-    const date = new Date(year, month, day);
-    if (isFullDate) {
-        return date.getFullYear() === year && date.getMonth() === month && date.getDate() === day;
-    }
-
-    return true
-}
-
-function normalizeDate(dateStr) {
-    const dateParts = dateStr.split(" ");
-    
-    let negativeSign = "";
-    let yearPart = dateParts[0];
-    if (yearPart.startsWith('-')) {
-        negativeSign = "-";
-        yearPart = yearPart.substring(1);
-    }
-
-    const dateComponents = yearPart.split("-");
-    const year = negativeSign + dateComponents[0];
-    let month = parseInt(dateComponents[1]);
-    let day = parseInt(dateComponents[2]);
-
-    if (day < 10) {
-        day = '0' + day;
-    }
-
-    if (month < 10) {
-        month = `0${month}`;
-    }
-
-    let normalizedDate = `${year}${!isNaN(month) ? "-" + month : ""}${!isNaN(day) ? "-" + day : ""}`;
-
-    if (dateParts.length > 1) {
-        const timeComponents = dateParts[1].split(":");
-        const hours = timeComponents[0];
-        const minutes = timeComponents[1];
-        const seconds = timeComponents[2];
-
-        normalizedDate += ` ${hours}:${minutes}${seconds ? `:${seconds}` : ""}`;
-    }
-
-    return normalizedDate;
+    return Array.isArray(granularity) && granularity.some(g => dayjs(dateString, g, true).isValid());
 }
 
 function getConstraintsString() {

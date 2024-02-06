@@ -195,6 +195,26 @@
                     "type": ["Text"]
                 },
                 {
+                    "id": "https://schema.org/date6",
+                    "name": "date6",
+                    "label": "Text field dateFormat with / separator",
+                    "help": "dateFormat: ['YYYY/MM/DD']",
+                    "required": false,
+                    "multiple": true,
+                    "dateFormat": ["YYYY/MM/DD"],
+                    "type": ["Text"]
+                },
+                {
+                    "id": "https://schema.org/date7",
+                    "name": "date7",
+                    "label": "Text field dateFormat with multiple possible separators",
+                    "help": "dateFormat: ['YYYY/MM/DD', 'YYYY-MM-DD', 'YYYY.MM.DD']",
+                    "required": false,
+                    "multiple": true,
+                    "dateFormat": ["YYYY/MM/DD", "YYYY-MM-DD", "YYYY.MM.DD"],
+                    "type": ["Text"]
+                },
+                {
                     "id": "https://schema.org/datetime",
                     "name": "datetime",
                     "label": "DateTime field",

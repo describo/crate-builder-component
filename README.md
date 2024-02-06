@@ -77,16 +77,7 @@ It is possible to add additional constraints in profiles for the following field
 * `regex`: a regular expression the value has to match
 * `dateFormat`: one or many of the possible date formats
 
-Date formats:
-* YYYY
-* YYYY-MM
-* YYYY-MM-DD
-* hh
-* hh:mm
-* hh:mm:ss
-* YYYY-MM-DD hh:mm:ss
-* YYYY-MM-DD hh:mm
-* YYYY-MM-DD hh
+Date formats: [Day.js formats](https://day.js.org/docs/en/display/format)
 
 **TextArea**
 * `minLength`: minimum required length for value 
