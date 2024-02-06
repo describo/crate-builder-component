@@ -22,7 +22,8 @@ Comprehensive documentation is available @
 
 # Crate Manager API Documentation
 
-[https://describo.github.io/crate-builder-component](https://describo.github.io/crate-builder-component)
+[https://describo.github.io/crate-builder-component/CrateManager.html](https://describo.github.io/crate-builder-component/CrateManager.html)
+https://describo.github.io/crate-builder-component/CrateManager.html
 
 # Developing the plugin
 
@@ -74,6 +75,18 @@ It is possible to add additional constraints in profiles for the following field
 * `minLength`: minimum required length for value 
 * `maxLength`: maximum allowed length for value
 * `regex`: a regular expression the value has to match
+* `dateFormat`: one or many of the possible date formats
+
+Date formats:
+* YYYY
+* YYYY-MM
+* YYYY-MM-DD
+* hh
+* hh:mm
+* hh:mm:ss
+* YYYY-MM-DD hh:mm:ss
+* YYYY-MM-DD hh:mm
+* YYYY-MM-DD hh
 
 **TextArea**
 * `minLength`: minimum required length for value 
@@ -84,14 +97,3 @@ It is possible to add additional constraints in profiles for the following field
 * `minValue`: minimum possible value to be entered
 * `maxValue`: maximum possible value to be entered
 * `numberType`: one or many of "any", "long", "int", "float", "double". It maybe an array to allow specifying any of the possible numberType values
-
-**Date**
-* `granularity`: may have the values "year" (YYYY), "month" (YYYY-MM), "day" (YYYY-MM-DD). It maybe an array to allow specifying any of the possible granularity values.
-
-In case the granularity is "day", the datepicker widget will show, otherwise you can add your data in a Text field.
-
-**DateTime**
-* `dateGranularity`: may have the values "year" (YYYY), "month" (YYYY-MM), "day" (YYYY-MM-DD). It maybe an array to allow specifying any of the possible granularity values
-* `timeGranularity`: may have the values "hour" (hh), "minute" (hh.mm), "second" (hh.mm.ss).It maybe an array to allow specifying any of the possible granularity values
-
-In case the dateGranularity is "day" and the timeGranularity is "hour", the datepicker widget will show, otherwise you can add your data in a Text field.

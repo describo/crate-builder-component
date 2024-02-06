@@ -137,8 +137,8 @@
                 {
                     "id": "https://schema.org/date",
                     "name": "date",
-                    "label": "Date",
-                    "help": "Date field with no constraints",
+                    "label": "Date field",
+                    "help": "Date field with datepicker",
                     "required": false,
                     "multiple": true,
                     "type": ["Date"]
@@ -146,48 +146,59 @@
                 {
                     "id": "https://schema.org/date1",
                     "name": "date1",
-                    "label": "Date with full granularity",
-                    "help": "Granularity: YYYY-MM-DD",
+                    "label": "Text field with full dateFormat",
+                    "help": "dateFormat: ['YYYY-MM-DD']",
                     "required": false,
                     "multiple": true,
-                    "granularity": ["day"],
-                    "type": ["Date"]
+                    "dateFormat": ["YYYY-MM-DD"],
+                    "type": ["Text"]
                 },
                 {
                     "id": "https://schema.org/date2",
                     "name": "date2",
-                    "label": "Date with year and month",
-                    "help": "Granularity: YYYY-MM",
+                    "label": "Text field with year and month",
+                    "help": "dateFormat: ['YYYY-MM']",
                     "required": false,
                     "multiple": true,
-                    "granularity": ["month"],
-                    "type": ["Date"]
+                    "dateFormat": ["YYYY-MM"],
+                    "type": ["Text"]
                 },
                 {
                     "id": "https://schema.org/date3",
                     "name": "date3",
-                    "label": "Date with year only",
-                    "help": "Granularity: YYYY",
+                    "label": "Text field with year only",
+                    "help": "dateFormat: ['YYYY']",
                     "required": false,
                     "multiple": true,
-                    "granularity": ["year"],
-                    "type": ["Date"]
+                    "dateFormat": ["YYYY"],
+                    "type": ["Text"]
                 },
                 {
                     "id": "https://schema.org/date4",
                     "name": "date4",
-                    "label": "Date with year or month",
-                    "help": "Granularity: YYYY or YYYY-MM",
+                    "label": "Text field with year or year and month",
+                    "help": "dateFormat: ['YYYY', 'YYYY-MM']",
                     "required": false,
                     "multiple": true,
-                    "granularity": ["year", "month"],
-                    "type": ["Date"]
+                    "dateFormat": ["YYYY", "YYYY-MM"],
+                    "type": ["Text"]
+                },
+                {
+                    "id": "https://schema.org/date5",
+                    "name": "date5",
+                    "label": "Text field with dateFormat and regex",
+                    "help": "dateFormat: YYYY, and regex: '^(1\\d{3}|2000)$' (number between 1000-2000)",
+                    "required": false,
+                    "multiple": true,
+                    "dateFormat": ["YYYY"],
+                    "regex": "^(1\\d{3}|2000)$",
+                    "type": ["Text"]
                 },
                 {
                     "id": "https://schema.org/datetime",
                     "name": "datetime",
-                    "label": "Datetime",
-                    "help": "Datetime with no constraints",
+                    "label": "DateTime field",
+                    "help": "DateTime field with datepicker",
                     "required": false,
                     "multiple": true,
                     "type": ["DateTime"]
@@ -195,106 +206,32 @@
                 {
                     "id": "https://schema.org/datetime1",
                     "name": "datetime1",
-                    "label": "Datetime with every constraints",
-                    "help": "Datetime with every constraints: dateGranularity: YYYY-MM, timeGranularity: hh:mm",
+                    "label": "Text field with datetime dateFormat",
+                    "help": "Datetime with dateFormat: ['YYYY-MM-DD hh:mm']",
                     "required": false,
                     "multiple": true,
-                    "dateGranularity": ["month"],
-                    "timeGranularity": ["minute"],
-                    "type": ["DateTime"]
-                },
-                {
-                    "id": "https://schema.org/datetime2",
-                    "name": "datetime2",
-                    "label": "Datetime with full dateGranularity",
-                    "help": "Datetime with dateGranularity: YYYY-MM-DD",
-                    "required": false,
-                    "multiple": true,
-                    "dateGranularity": ["day"],
-                    "type": ["DateTime"]
-                },
-                {
-                    "id": "https://schema.org/datetime3",
-                    "name": "datetime3",
-                    "label": "Datetime with dateGranularity, year and month",
-                    "help": "Datetime with dateGranularity: YYYY-MM",
-                    "required": false,
-                    "multiple": true,
-                    "dateGranularity": ["month"],
-                    "type": ["DateTime"]
-                },
-                {
-                    "id": "https://schema.org/datetime4",
-                    "name": "datetime4",
-                    "label": "Datetime with dateGranularity, year only",
-                    "help": "Datetime with dateGranularity: YYYY",
-                    "required": false,
-                    "multiple": true,
-                    "dateGranularity": ["year"],
-                    "type": ["DateTime"]
-                },
-                {
-                    "id": "https://schema.org/datetime5",
-                    "name": "datetime5",
-                    "label": "Datetime with full timeGranularity",
-                    "help": "Datetime with timeGranularity: hh:mm:ss",
-                    "required": false,
-                    "multiple": true,
-                    "timeGranularity": ["second"],
-                    "type": ["DateTime"]
-                },
-                {
-                    "id": "https://schema.org/datetime6",
-                    "name": "datetime6",
-                    "label": "Datetime with timeGranularity, hour and minute",
-                    "help": "Datetime with timeGranularity: hh:mm",
-                    "required": false,
-                    "multiple": true,
-                    "timeGranularity": ["minute"],
-                    "type": ["DateTime"]
-                },
-                {
-                    "id": "https://schema.org/datetime7",
-                    "name": "datetime7",
-                    "label": "Datetime with timeGranularity, hour only",
-                    "help": "Datetime with timeGranularity: hh",
-                    "required": false,
-                    "multiple": true,
-                    "timeGranularity": ["hour"],
-                    "type": ["DateTime"]
+                    "dateFormat": ["YYYY-MM-DD hh:mm"],
+                    "type": ["Text"]
                 },
                 {
                     "id": "https://schema.org/datetime8",
                     "name": "datetime8",
-                    "label": "Datetime with date/timeGranularity, full granularity",
-                    "help": "Datetime with dateGranularity: YYYY-MM-DD, timeGranularity: hh:mm:ss",
+                    "label": "Text fields with full datetime format",
+                    "help": "Datetime with dateFormat: ['YYYY-MM-DD hh:mm:ss']",
                     "required": false,
                     "multiple": true,
-                    "dateGranularity": ["day"],
-                    "timeGranularity": ["second"],
-                    "type": ["DateTime"]
+                    "dateFormat": ["YYYY-MM-DD hh:mm:ss"],
+                    "type": ["Text"]
                 },
                 {
                     "id": "https://schema.org/datetime9",
                     "name": "datetime9",
-                    "label": "Datetime with date/timeGranularity, full date, partial time granularity",
-                    "help": "Datetime with dateGranularity: YYYY-MM-DD, timeGranularity: hh:mm",
+                    "label": "Text field with time format",
+                    "help": "dateFormat: 'hh:mm'",
                     "required": false,
                     "multiple": true,
-                    "dateGranularity": ["day"],
-                    "timeGranularity": ["minute"],
-                    "type": ["DateTime"]
-                },
-                {
-                    "id": "https://schema.org/datetime10",
-                    "name": "datetime10",
-                    "label": "Datetime with date/timeGranularity, full time, partial date granularity",
-                    "help": "Datetime with dateGranularity: YYYY-MM, timeGranularity: hh:mm:ss",
-                    "required": false,
-                    "multiple": true,
-                    "dateGranularity": ["month"],
-                    "timeGranularity": ["second"],
-                    "type": ["DateTime"]
+                    "dateFormat": ["hh:mm"],
+                    "type": ["Text"]
                 },
                 {
                     "id": "https://schema.org/number",

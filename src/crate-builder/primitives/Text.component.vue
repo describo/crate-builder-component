@@ -48,9 +48,7 @@ const data = reactive({
         minLength: props.definition?.minLength,
         maxLength: props.definition?.maxLength,
         regex: props.definition?.regex,
-        granularity: props.definition?.granularity,
-        dateGranularity: props.definition?.dateGranularity,
-        timeGranularity: props.definition?.timeGranularity
+        dateFormat: props.definition?.dateFormat,
     }
 });
 watch(
@@ -65,7 +63,7 @@ function save() {
     if (isValidTextValue) {
         $emit("save:property", {
             property: props.property,
-            value: data.displayValue.trim(),
+            value: normalizeDate(data.displayValue).trim(),
         });
     }
 }
@@ -92,80 +90,68 @@ function validateTextConstraints(value) {
         !new RegExp(data.constraints.regex).test(value)
     ) return false;
     if (
-        data.constraints.granularity &&
-        !validateDateFormat(value, data.constraints.granularity, "date")
+        data.constraints.dateFormat !== undefined &&
+        !validateDateFormat(value, data.constraints.dateFormat)
     ) return false;
-    if (
-        data.constraints.dateGranularity &&
-        data.constraints.timeGranularity &&
-        !validateDateFormat(value, [data.constraints.dateGranularity, data.constraints.timeGranularity], "datetime")
-    ) return false;
-    if (
-        data.constraints.dateGranularity &&
-        !data.constraints.timeGranularity &&
-        !validateDateFormat(value, data.constraints.dateGranularity, "date")
-    ) return false;
-    if (
-        data.constraints.timeGranularity &&
-        !data.constraints.dateGranularity &&
-        !validateDateFormat(value, data.constraints.timeGranularity, "time")
-    ) return false;
+
     return true;
 }
 
-function validateDateFormat(inputString, granularity, granularityType) {
+function validateDateFormat(inputString, granularity) {
     const datePatterns = {
-        'year': /^-?\d{1,4}$/,
-        'month': /^-?\d{1,4}-(0[1-9]|1[0-2])$/,
-        'day': /^-?\d{1,4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01])$/
+        'YYYY': /^-?\d{1,4}$/,
+        'YYYY-MM': /^-?\d{1,4}-(0[1-9]|1[0-2])$/,
+        'YYYY-MM-DD': /^-?\d{1,4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01])$/,
+        'hh': /^(0[0-9]|1[0-9]|2[0-3])$/,
+        'hh:mm': /^(0[0-9]|1[0-9]|2[0-3])\:(0[0-5]|[1-5][0-9])$/,
+        'hh:mm:ss': /^(0[0-9]|1[0-9]|2[0-3])\:(0[0-5]|[1-5][0-9])\:(0[0-5]|[1-5][0-9])$/,
+        'YYYY-MM-DD hh:mm:ss': /^-?\d{1,4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01]) (0[0-9]|1[0-9]|2[0-3])\:(0[0-5]|[1-5][0-9])\:(0[0-5]|[1-5][0-9])$/,
+        'YYYY-MM-DD hh:mm': /^-?\d{1,4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01]) (0[0-9]|1[0-9]|2[0-3])\:(0[0-5]|[1-5][0-9])$/,
+        'YYYY-MM-DD hh': /^-?\d{1,4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01]) (0[0-9]|1[0-9]|2[0-3])$/,
     };
 
-    const timePatterns = {
-        'hour': /^(0[0-9]|1[0-9]|2[0-3])$/,
-        'minute': /^(0[0-9]|1[0-9]|2[0-3])\:(0[0-5]|[1-5][0-9])$/,
-        'second': /^(0[0-9]|1[0-9]|2[0-3])\:(0[0-5]|[1-5][0-9])\:(0[0-5]|[1-5][0-9])$/
-    }
-
-    if (granularityType === "date") {
-        const normalizedInput = inputString.startsWith("-") ? normalizeDate(inputString.substring(1)) : normalizeDate(inputString);
-        return Array.isArray(granularity) && granularity.some(g => datePatterns[g].test(normalizedInput) && isValidDate(normalizedInput));
-    }
-
-    if (granularityType === "time") {
-        return Array.isArray(granularity) && granularity.some(g => timePatterns[g].test(inputString));
-    }
-
-    if (inputString && granularityType === "datetime") {
-        const [date, time] = inputString.split(" ");
-        const normalizedDate = inputString.startsWith("-") ? normalizeDate(date.substring(1)) : normalizeDate(date);
-        const [dateGranularity, timeGranularity] = [...granularity];
-        return Array.isArray(dateGranularity) && dateGranularity.some(g => datePatterns[g].test(normalizedDate) && isValidDate(normalizedDate))
-            && Array.isArray(timeGranularity) && timeGranularity.some(g => timePatterns[g].test(time));
-    }
-
-    return false;
+    const normalizedDate = normalizeDate(inputString)
+    return Array.isArray(granularity) && granularity.some(g => datePatterns[g].test(normalizedDate) && isValidDate(normalizedDate));
 }
 
 function isValidDate(dateStr) {
-    const dateParts = dateStr.split("-")
+    const dateParts = dateStr.split(" ")
 
-    const year = parseInt(dateParts[0]);
-    const month = parseInt(dateParts[1]) - 1;
-    const day = parseInt(dateParts[2]);
+    let negativeSign = "";
+    let yearPart = dateParts[0];
+    if (yearPart.startsWith('-')) {
+        negativeSign = "-";
+        yearPart = yearPart.substring(1);
+    }
 
-    const isFullDate = dateParts.length === 3 && !dateParts.includes(NaN)
+    const dateComponents = yearPart.split("-");
+    const year = parseInt(negativeSign + dateComponents[0]);
+    const month = parseInt(dateComponents[1]) - 1;
+    const day = parseInt(dateComponents[2]);
+
+    const isFullDate = dateComponents.length === 3 && !dateComponents.includes(NaN)
     const date = new Date(year, month, day);
     if (isFullDate) {
         return date.getFullYear() === year && date.getMonth() === month && date.getDate() === day;
     }
+
     return true
 }
 
 function normalizeDate(dateStr) {
-    const dateParts = dateStr.split("-");
-    const year = dateParts[0];
-    let month = parseInt(dateParts[1]);
-    let day = parseInt(dateParts[2]);
+    const dateParts = dateStr.split(" ");
+    
+    let negativeSign = "";
+    let yearPart = dateParts[0];
+    if (yearPart.startsWith('-')) {
+        negativeSign = "-";
+        yearPart = yearPart.substring(1);
+    }
+
+    const dateComponents = yearPart.split("-");
+    const year = negativeSign + dateComponents[0];
+    let month = parseInt(dateComponents[1]);
+    let day = parseInt(dateComponents[2]);
 
     if (day < 10) {
         day = '0' + day;
@@ -175,7 +161,18 @@ function normalizeDate(dateStr) {
         month = `0${month}`;
     }
 
-    return `${year}${!isNaN(month) ? "-" + month : ""}${!isNaN(day) ? "-" + day : ""}`;
+    let normalizedDate = `${year}${!isNaN(month) ? "-" + month : ""}${!isNaN(day) ? "-" + day : ""}`;
+
+    if (dateParts.length > 1) {
+        const timeComponents = dateParts[1].split(":");
+        const hours = timeComponents[0];
+        const minutes = timeComponents[1];
+        const seconds = timeComponents[2];
+
+        normalizedDate += ` ${hours}:${minutes}${seconds ? `:${seconds}` : ""}`;
+    }
+
+    return normalizedDate;
 }
 
 function getConstraintsString() {
@@ -184,25 +181,10 @@ function getConstraintsString() {
         const [name, value] = [...constraint]
 
         if (name, value) {
-            const formattedValue = ["granularity", "dateGranularity", "timeGranularity"].includes(name)
-                ? getDateFormatString(value)
-                : value;
-            message.push(`${name}: ${formattedValue}`);
+            message.push(`${name}: ${value}`);
         }
     });
     return message.join(', ');
 }
 
-function getDateFormatString(granularity) {
-    const formats = {
-        'year': 'YYYY',
-        'month': 'YYYY-MM',
-        'day': 'YYYY-MM-DD',
-        'hour': 'hh',
-        'minute': 'hh:mm',
-        'second': 'hh:mm:ss'
-    };
-
-    return granularity.map(g => " " + formats[g]);
-}
 </script>

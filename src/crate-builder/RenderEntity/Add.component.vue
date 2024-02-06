@@ -31,34 +31,13 @@
                 :definition="props.definition"
                 @save:property="createProperty"
             />
-            <text-component
-                v-if="data.addType === 'Date' && 
-                    (props.definition.granularity && 
-                    JSON.stringify(props.definition.granularity) !== JSON.stringify(['day']))"
-                :property="props.property"
-                type="text"
-                :definition="props.definition"
-                @save:property="createProperty"
-            />
-            <text-component
-                v-if="data.addType === 'DateTime' &&
-                    ((props.definition.dateGranularity || props.definition.timeGranularity) && 
-                    (JSON.stringify(props.definition.dateGranularity) !== JSON.stringify(['day']) || JSON.stringify(props.definition.timeGranularity) !== JSON.stringify(['second'])))" 
-                :property="props.property"
-                type="text"
-                :definition="props.definition"
-                @save:property="createProperty"
-            />
             <date-component
-                v-if="data.addType === 'Date' && 
-                    !props.definition.granularity || JSON.stringify(props.definition.granularity) === JSON.stringify(['day'])"
+                v-if="data.addType === 'Date'"
                 :property="props.property"
                 @save:property="createProperty"
             />
             <date-time-component
-                v-if="data.addType === 'DateTime' &&
-                    ((!props.definition.dateGranularity && !props.definition.timeGranularity) || 
-                    (JSON.stringify(props.definition.dateGranularity) === JSON.stringify(['day']) && JSON.stringify(props.definition.timeGranularity) === JSON.stringify(['second'])))" 
+                v-if="data.addType === 'DateTime'" 
                 :property="props.property"
                 @save:property="createProperty"
             />

@@ -19,14 +19,6 @@
             "overflow": {
                 "label": "Other"
             }
-        },
-        {
-            "appliesTo": ["Language"],
-            "about": { "label": "About", "description": "" },
-            "source": { "label": "More information", "description": "" },
-            "overflow": {
-                "label": "Other"
-            }
         }
     ],
     "classes": {
@@ -158,7 +150,6 @@
                     "id": "https://w3id.org/ro/terms/text-commons#recorder",
                     "name": "recorder",
                     "help": "The participant operated the recording machinery used to create the resource.",
-                    "group": "who",
                     "bundlePropertyAs": "contributor",
                     "multiple": true,
                     "type": ["Person", "Organization"],

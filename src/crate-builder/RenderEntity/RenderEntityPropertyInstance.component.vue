@@ -9,36 +9,15 @@
             <!--  not readonly - try to load the relevant display component-->
             <value-component v-if="isValue()" :definition="props.definition.value" />
             <date-time-component
-                v-else-if="isDateTime(props.value) &&
-                    ((!props.definition.dateGranularity && !props.definition.timeGranularity) || 
-                    (JSON.stringify(props.definition.dateGranularity) === JSON.stringify(['day']) && JSON.stringify(props.definition.timeGranularity) === JSON.stringify(['second'])))"
+                v-else-if="isDateTime(props.value)"
                 :property="props.property"
                 :value="props.value"
                 @save:property="savePropertyValue"
             />
             <date-component
-                v-else-if="isDate(props.value)&& 
-                    !props.definition.granularity || JSON.stringify(props.definition.granularity) === JSON.stringify(['day'])"
+                v-else-if="isDate(props.value)"
                 :property="props.property"
                 :value="props.value"
-                @save:property="savePropertyValue"
-            />
-            <text-component
-                v-else-if="isDate(props.value) && 
-                    (props.definition.granularity && 
-                    JSON.stringify(props.definition.granularity) !== JSON.stringify(['day']))"
-                :property="props.property"
-                :value="props.value"
-                :definition="props.definition"
-                @save:property="savePropertyValue"
-            />
-            <text-component
-                v-else-if="isDateTime(props.value) && 
-                    ((props.definition.dateGranularity || props.definition.timeGranularity) && 
-                    (JSON.stringify(props.definition.dateGranularity) !== JSON.stringify(['day']) || JSON.stringify(props.definition.timeGranularity) !== JSON.stringify(['second'])))" 
-                :property="props.property"
-                :value="props.value"
-                :definition="props.definition"
                 @save:property="savePropertyValue"
             />
             <time-component
@@ -127,12 +106,18 @@ function createEntity(data) {
     $emit("create:entity", data);
 }
 function isDate(string) {
-    const date = parseISO(string);
-    return validatorIsDate(date) && definitionIncludes("Date");
+    try {
+        const date = parseISO(string);
+        return validatorIsDate(date) && definitionIncludes("Date");
+    } catch (error) {
+        return false;
+    }
 }
 function isDateTime(string) {
-    const date = parseISO(string);
-    return validatorIsDate(date) && definitionIncludes("DateTime");
+    try {
+        const date = parseISO(string);
+        return validatorIsDate(date) && definitionIncludes("DateTime");
+    } catch (error) {}
 }
 function isTime(string) {
     string = string + "";

@@ -8,7 +8,7 @@
                 }}</el-tag>
             </div>
             <el-select
-                class="m-1"
+                class="m-1 select-style"
                 v-model="selectedClass"
                 clearable
                 filterable
@@ -71,3 +71,9 @@ function deleteType(etype) {
     selectedClass.value = undefined;
 }
 </script>
+
+<style scoped>
+.select-style {
+    @apply w-64 !important;
+}
+</style>

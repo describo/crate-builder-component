@@ -243,16 +243,21 @@ let isRootDescriptor = computed(() => {
     );
 });
 let definition = shallowRef({});
+loadEntityDefinition();
+
 watch(
     () => pm.value.$key,
     () => {
-        if (!props.entity?.["@type"] || !pm.value?.getTypeDefinition) {
-            definition.value = "inherit";
-        } else {
-            definition.value = pm.value.getTypeDefinition({ entity: props.entity });
-        }
+        loadEntityDefinition();
     }
 );
+function loadEntityDefinition() {
+    if (!props.entity?.["@type"] || !pm.value?.getTypeDefinition) {
+        definition.value = "inherit";
+    } else {
+        definition.value = pm.value.getTypeDefinition({ entity: props.entity });
+    }
+}
 
 function toggle(dialog) {
     data.dialog[dialog] = !data.dialog[dialog];
