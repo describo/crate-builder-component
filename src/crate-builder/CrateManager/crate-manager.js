@@ -730,7 +730,7 @@ cm.updateProperty({ id: "./", property: "author", idx: 1, value: "new" });
             if (idx !== 0 && !idx) throw new Error(`setProperty' requires 'idx' to be defined`);
 
             let indexRef = this.entityIdIndex[id];
-            let entity = this.crate["@graph"][indexRef];
+            entity = this.crate["@graph"][indexRef];
             entity[property][idx] = value;
         }
         return entity;
