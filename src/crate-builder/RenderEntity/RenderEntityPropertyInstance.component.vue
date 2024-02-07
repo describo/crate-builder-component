@@ -71,7 +71,7 @@ import NumberComponent from "../primitives/Number.component.vue";
 import ValueComponent from "../primitives/Value.component.vue";
 import SelectComponent from "../primitives/Select.component.vue";
 import UrlComponent from "../primitives/Url.component.vue";
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 import isDecimal from "validator/es/lib/isDecimal";
 import isInt from "validator/es/lib/isInt";
 import isFloat from "validator/es/lib/isFloat";

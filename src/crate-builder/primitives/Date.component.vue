@@ -18,7 +18,7 @@
 <script setup>
 import { ElDatePicker } from "element-plus";
 import { reactive, watch } from "vue";
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 
 import { checkDateIsValid } from "./date-libs";
 import { $t } from "../i18n";

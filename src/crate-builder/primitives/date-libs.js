@@ -1,4 +1,4 @@
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 
 export function checkDateIsValid(date) {
     if (!date) return false;
