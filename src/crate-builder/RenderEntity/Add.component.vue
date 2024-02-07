@@ -8,6 +8,7 @@
         }"
     >
         <add-control-component
+            :crate-manager="props.crateManager"
             :types="types"
             :selected-type="data.addType"
             @add="add"
@@ -19,6 +20,7 @@
                 v-if="data.addType === 'Text'"
                 :property="props.property"
                 type="text"
+                :definition="props.definition"
                 @save:property="createProperty"
                 :placeholder="$t('add_text')"
             />
@@ -26,6 +28,7 @@
                 v-if="data.addType === 'TextArea'"
                 :property="props.property"
                 type="textarea"
+                :definition="props.definition"
                 @save:property="createProperty"
             />
             <date-component
@@ -34,13 +37,14 @@
                 @save:property="createProperty"
             />
             <date-time-component
-                v-if="data.addType === 'DateTime'"
+                v-if="data.addType === 'DateTime'" 
                 :property="props.property"
                 @save:property="createProperty"
             />
             <number-component
                 v-if="['Number', 'Float', 'Integer'].includes(data.addType)"
                 :property="props.property"
+                :definition="props.definition"
                 @save:property="createProperty"
             />
             <time-component
@@ -74,6 +78,7 @@
             />
             <geo-component
                 v-if="['Geo', 'GeoCoordinates', 'GeoShape'].includes(data.addType)"
+                :crate-manager="props.crateManager"
                 :property="props.property"
                 @create:entity="createEntity"
                 @link:entity="linkEntity"
@@ -92,6 +97,7 @@
                         {{ $t("associate_existing_prompt", { addType: data.localisedAddType }) }}
                     </div>
                     <autocomplete-component
+                        :crate-manager="props.crateManager"
                         :type="data.addType"
                         @link:entity="linkEntity"
                         @create:entity="createEntity"

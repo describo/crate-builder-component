@@ -30,6 +30,7 @@
                 v-else-if="isNumber(props.value)"
                 :property="props.property"
                 :value="props.value"
+                :definition="props.definition"
                 @save:property="savePropertyValue"
             />
             <select-component

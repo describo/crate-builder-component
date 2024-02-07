@@ -117,7 +117,6 @@ const props = defineProps({
         default: false,
     },
 });
-
 const data = reactive({
     propertyDefinition: {},
     simpleInstances: [],
