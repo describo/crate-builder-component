@@ -1,13 +1,13 @@
 # Crate Builder Component
 
-- [Crate Builder Component](#crate-builder-component)
-- [Documentation](#documentation)
-- [Crate Manager API Documentation](#crate-manager-api-documentation)
-- [Developing the plugin](#developing-the-plugin)
-  - [Storybook](#storybook)
-  - [Development application](#development-application)
-- [Building and publishing a release](#building-and-publishing-a-release)
-- [Repository structure](#repository-structure)
+-   [Crate Builder Component](#crate-builder-component)
+-   [Documentation](#documentation)
+-   [Crate Manager API Documentation](#crate-manager-api-documentation)
+-   [Developing the plugin](#developing-the-plugin)
+    -   [Storybook](#storybook)
+    -   [Development application](#development-application)
+-   [Building and publishing a release](#building-and-publishing-a-release)
+-   [Repository structure](#repository-structure)
 
 This is the core UI component for assembling an RO-Crate inside Describo. It is a self contained
 VueJS component that can be used inside your app. If you use this component, your app is responsible
@@ -65,26 +65,3 @@ codebase. To start up the dev environment:
 -   The development app is at `./src/app`. In there you will find the file main.js where we import
     the plugin and wire it into Vue as well as an App.vue file where we load the component.
 -   The component is at `./src/crate-builder`.
-
-
-# Profile Constraints
-
-It is possible to add additional constraints in profiles for the following fields:
-
-**Text**
-* `minLength`: minimum required length for value 
-* `maxLength`: maximum allowed length for value
-* `regex`: a regular expression the value has to match
-* `dateFormat`: one or many of the possible date formats
-
-Date formats: [Day.js formats](https://day.js.org/docs/en/display/format)
-
-**TextArea**
-* `minLength`: minimum required length for value 
-* `maxLength`: maximum allowed length for value
-* `regex`: a regular expression the value has to match
-
-**Number**
-* `minValue`: minimum possible value to be entered
-* `maxValue`: maximum possible value to be entered
-* `numberType`: one or many of "any", "long", "int", "float", "double". It maybe an array to allow specifying any of the possible numberType values
