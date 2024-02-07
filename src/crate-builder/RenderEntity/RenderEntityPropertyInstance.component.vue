@@ -2,7 +2,12 @@
     <div>
         <div v-if="configuration.readonly">
             <!-- Just render the value on screen (parse ISO dates for niceness though) -->
-            <div v-if="isDateTime(props.value)">{{ parseISO(props.value) }}</div>
+            <div v-if="isDate(props.value)">
+                {{ dayjs(props.value).format("dddd, MMM DD, YYYY") }}
+            </div>
+            <div v-else-if="isDateTime(props.value)">
+                {{ dayjs(props.value).format("dddd, MMM DD, YYYY hh:mm A") }}
+            </div>
             <div v-else>{{ props.value }}</div>
         </div>
         <div v-if="!configuration.readonly">
@@ -66,8 +71,7 @@ import NumberComponent from "../primitives/Number.component.vue";
 import ValueComponent from "../primitives/Value.component.vue";
 import SelectComponent from "../primitives/Select.component.vue";
 import UrlComponent from "../primitives/Url.component.vue";
-import { parseISO } from "date-fns";
-import validatorIsDate from "validator/es/lib/isDate";
+import * as dayjs from "dayjs";
 import isDecimal from "validator/es/lib/isDecimal";
 import isInt from "validator/es/lib/isInt";
 import isFloat from "validator/es/lib/isFloat";
@@ -107,17 +111,19 @@ function createEntity(data) {
 }
 function isDate(string) {
     try {
-        const date = parseISO(string);
-        return validatorIsDate(date) && definitionIncludes("Date");
+        const date = dayjs(string);
+        return date.isValid() && definitionIncludes("Date");
     } catch (error) {
         return false;
     }
 }
 function isDateTime(string) {
     try {
-        const date = parseISO(string);
-        return validatorIsDate(date) && definitionIncludes("DateTime");
-    } catch (error) {}
+        const date = dayjs(string);
+        return date.isValid() && definitionIncludes("DateTime");
+    } catch (error) {
+        console.log(error);
+    }
 }
 function isTime(string) {
     string = string + "";

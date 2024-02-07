@@ -18,7 +18,8 @@
 <script setup>
 import { ElDatePicker } from "element-plus";
 import { reactive, watch } from "vue";
-import { startOfDay } from "date-fns";
+import * as dayjs from "dayjs";
+
 import { checkDateIsValid } from "./date-libs";
 import { $t } from "../i18n";
 
@@ -50,7 +51,8 @@ function save() {
         if (!data.isValidDate) return;
         $emit("save:property", {
             property: props.property,
-            value: startOfDay(data.internalValue).toISOString(),
+            // value: startOfDay(data.internalValue).toISOString(),
+            value: dayjs(data.internalValue).startOf("day").toISOString(),
         });
     } catch (error) {
         // invalid date - do nothing

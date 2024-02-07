@@ -1,12 +1,13 @@
-import { parseISO } from "date-fns";
-import isDate from "validator/es/lib/isDate.js";
+import * as dayjs from "dayjs";
 
 export function checkDateIsValid(date) {
     if (!date) return false;
     try {
-        date = parseISO(date);
-    } catch (error) {}
-    if (isDate(date)) {
+        date = dayjs(date);
+    } catch (error) {
+        console.log(error);
+    }
+    if (date.isValid()) {
         return true;
     } else {
         return false;
