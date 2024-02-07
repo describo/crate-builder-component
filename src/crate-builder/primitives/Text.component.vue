@@ -27,7 +27,7 @@ import { reactive, watch, computed } from "vue";
 import debounce from "lodash-es/debounce.js";
 import isBoolean from "lodash-es/isBoolean.js";
 import { $t } from "../i18n";
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 const debouncedSave = debounce(save, 200);
 
 const props = defineProps({
