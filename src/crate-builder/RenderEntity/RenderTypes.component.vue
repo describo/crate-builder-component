@@ -5,7 +5,7 @@
                 <div class="" v-if="data.types[etype]">
                     <i class="fa-solid fa-fw" :class="data.types[etype]"></i>
                 </div>
-                <div class="">{{ etype }}</div>
+                <div class="">{{ getTypeLabelFromProfile(etype) }}</div>
             </div>
         </el-tag>
     </div>
@@ -13,13 +13,20 @@
 
 <script setup>
 import { ElTag } from "element-plus";
-import { reactive } from "vue";
+import { reactive, inject } from "vue";
+import { profileManagerKey } from "./keys.js";
+const pm = inject(profileManagerKey);
+
 const props = defineProps({
     types: {
         type: Array,
         required: true,
     },
 });
+
+function getTypeLabelFromProfile(type) {
+    return pm.value?.getTypeLabel(type);
+}
 
 const data = reactive({
     types: {
