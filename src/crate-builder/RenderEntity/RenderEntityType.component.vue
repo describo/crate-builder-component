@@ -4,7 +4,7 @@
         <div class="w-2/3 xl:w-4/5 flex flex-row flex-wrap">
             <div v-for="etype of types" :key="etype" class="m-1">
                 <el-tag size="large" :closable="closable" @close="deleteType(etype)">{{
-                    etype
+                    getTypeLabelFromProfile(etype)
                 }}</el-tag>
             </div>
             <el-select
@@ -54,6 +54,10 @@ watch(
 );
 
 let closable = computed(() => props.entity["@type"].length > 1);
+
+function getTypeLabelFromProfile(type) {
+    return pm.value?.getTypeLabel(type);
+}
 
 function save() {
     $emit("update:entity", {
