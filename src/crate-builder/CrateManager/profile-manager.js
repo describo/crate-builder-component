@@ -164,7 +164,14 @@ export class ProfileManager {
         for (let type of types) {
             if (this.profile?.classes?.[type]) {
                 //   yes - get it
-                inputs = [...inputs, ...cloneDeep(this.profile?.classes?.[type].inputs)];
+                const inputsOfType = cloneDeep(this.profile?.classes?.[type].inputs).map(input => {
+                    return {
+                        ...input,
+                        id: input.name + "::" + input.id
+                    }
+                })
+                console.log(inputsOfType)
+                inputs = [...inputs, ...inputsOfType];
             }
         }
         return uniqBy(inputs, "id");

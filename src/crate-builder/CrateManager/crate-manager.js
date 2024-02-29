@@ -681,7 +681,10 @@ cm.setProperty({ id: "./", property: "author", value: 3 });
             // value doesn't make sense - bail
             throw new Error(`value must be a string, number, boolean or object with '@id'`);
         }
-        this.__updateContext({ name: property, id: propertyId });
+
+        const propertyTypeUrl = propertyId.split("::")[1]
+        console.log(propertyTypeUrl)
+        this.__updateContext({ name: property, id: propertyTypeUrl ? propertyTypeUrl : propertyId });
         return true;
     }
 
@@ -1062,7 +1065,7 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
     }
 
     __updateContext({ name, id }) {
-        if (id && !(id in this.contextDefinitions)) {
+        if (id && (!(id in this.contextDefinitions) || !(name in this.contextDefinitions))) {
             // the property or class isn't defined in the context
             //   add it in the definitions for lookups later
             //   store it in the local context which gets joined
