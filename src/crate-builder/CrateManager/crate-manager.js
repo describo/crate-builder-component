@@ -682,8 +682,7 @@ cm.setProperty({ id: "./", property: "author", value: 3 });
             throw new Error(`value must be a string, number, boolean or object with '@id'`);
         }
 
-        const propertyTypeUrl = propertyId.split("::")[1]
-        console.log(propertyTypeUrl)
+        const propertyTypeUrl = propertyId.split("|")[1]
         this.__updateContext({ name: property, id: propertyTypeUrl ? propertyTypeUrl : propertyId });
         return true;
     }

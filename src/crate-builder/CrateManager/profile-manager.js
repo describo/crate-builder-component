@@ -167,7 +167,7 @@ export class ProfileManager {
                 const inputsOfType = cloneDeep(this.profile?.classes?.[type].inputs).map(input => {
                     return {
                         ...input,
-                        id: input.name + "::" + input.id
+                        id: input.name + "|" + input.id
                     }
                 })
                 console.log(inputsOfType)
