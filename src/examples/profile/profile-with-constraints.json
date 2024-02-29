@@ -20,7 +20,7 @@
                     "type": ["Text"]
                 },
                 {
-                    "id": "https://schema.org/text1",
+                    "id": "https://schema.org/text",
                     "name": "text1",
                     "label": "Text field with every constraint",
                     "help": "Text field with every constraint: minLength: 5, maxLength: 10, regex: ^a",
@@ -32,7 +32,7 @@
                     "type": ["Text"]
                 },
                 {
-                    "id": "https://schema.org/text2",
+                    "id": "https://schema.org/text",
                     "name": "text2",
                     "label": "Text field with minLength",
                     "help": "Text field with minLength: 5",
@@ -42,7 +42,7 @@
                     "type": ["Text"]
                 },
                 {
-                    "id": "https://schema.org/text3",
+                    "id": "https://schema.org/text",
                     "name": "text3",
                     "label": "Text field with maxLength",
                     "help": "Text field with maxLength: 10",
@@ -52,7 +52,7 @@
                     "type": ["Text"]
                 },
                 {
-                    "id": "https://schema.org/text4",
+                    "id": "https://schema.org/text",
                     "name": "text4",
                     "label": "Text field with regex",
                     "help": "Text field with regex: ^a",
@@ -62,7 +62,7 @@
                     "type": ["Text"]
                 },
                 {
-                    "id": "https://schema.org/text5",
+                    "id": "https://schema.org/text",
                     "name": "text5",
                     "label": "Text field with min/maxLength",
                     "help": "Text field with minLength: 1, maxLength: 10",
@@ -82,7 +82,7 @@
                     "type": ["TextArea"]
                 },
                 {
-                    "id": "https://schema.org/textarea0",
+                    "id": "https://schema.org/textarea",
                     "name": "textarea0",
                     "label": "Textarea",
                     "help": "Textarea with every constraint, minLength: 10, maxLength: 15, regex: ^b",
@@ -94,7 +94,7 @@
                     "type": ["TextArea"]
                 },
                 {
-                    "id": "https://schema.org/textarea1",
+                    "id": "https://schema.org/textarea",
                     "name": "textarea1",
                     "label": "Textarea with minLength",
                     "help": "Textarea with minLength: 10",
@@ -104,7 +104,7 @@
                     "type": ["TextArea"]
                 },
                 {
-                    "id": "https://schema.org/textarea2",
+                    "id": "https://schema.org/textarea",
                     "name": "textarea2",
                     "label": "Textarea with maxLength",
                     "help": "Textarea with maxLength: 15",
@@ -114,7 +114,7 @@
                     "type": ["TextArea"]
                 },
                 {
-                    "id": "https://schema.org/textarea3",
+                    "id": "https://schema.org/textarea",
                     "name": "textarea3",
                     "label": "Textarea with regex",
                     "help": "Textarea with regex: ^b",
@@ -124,7 +124,7 @@
                     "type": ["TextArea"]
                 },
                 {
-                    "id": "https://schema.org/textarea4",
+                    "id": "https://schema.org/textarea",
                     "name": "textarea4",
                     "label": "Textarea with min/maxLength",
                     "help": "Textarea with minLength: 10, maxLength: 15",
@@ -144,7 +144,7 @@
                     "type": ["Date"]
                 },
                 {
-                    "id": "https://schema.org/date1",
+                    "id": "https://schema.org/date",
                     "name": "date1",
                     "label": "Text field with full dateFormat",
                     "help": "dateFormat: ['YYYY-MM-DD']",
@@ -154,7 +154,7 @@
                     "type": ["Text"]
                 },
                 {
-                    "id": "https://schema.org/date2",
+                    "id": "https://schema.org/date",
                     "name": "date2",
                     "label": "Text field with year and month",
                     "help": "dateFormat: ['YYYY-MM']",
@@ -164,7 +164,7 @@
                     "type": ["Text"]
                 },
                 {
-                    "id": "https://schema.org/date3",
+                    "id": "https://schema.org/date",
                     "name": "date3",
                     "label": "Text field with year only",
                     "help": "dateFormat: ['YYYY']",
@@ -174,7 +174,7 @@
                     "type": ["Text"]
                 },
                 {
-                    "id": "https://schema.org/date4",
+                    "id": "https://schema.org/date",
                     "name": "date4",
                     "label": "Text field with year or year and month",
                     "help": "dateFormat: ['YYYY', 'YYYY-MM']",
@@ -184,7 +184,7 @@
                     "type": ["Text"]
                 },
                 {
-                    "id": "https://schema.org/date5",
+                    "id": "https://schema.org/date",
                     "name": "date5",
                     "label": "Text field with dateFormat and regex",
                     "help": "dateFormat: YYYY, and regex: '^(1\\d{3}|2000)$' (number between 1000-2000)",
@@ -195,7 +195,7 @@
                     "type": ["Text"]
                 },
                 {
-                    "id": "https://schema.org/date6",
+                    "id": "https://schema.org/date",
                     "name": "date6",
                     "label": "Text field dateFormat with / separator",
                     "help": "dateFormat: ['YYYY/MM/DD']",
@@ -205,7 +205,7 @@
                     "type": ["Text"]
                 },
                 {
-                    "id": "https://schema.org/date7",
+                    "id": "https://schema.org/date",
                     "name": "date7",
                     "label": "Text field dateFormat with multiple possible separators",
                     "help": "dateFormat: ['YYYY/MM/DD', 'YYYY-MM-DD', 'YYYY.MM.DD']",
@@ -215,7 +215,7 @@
                     "type": ["Text"]
                 },
                 {
-                    "id": "https://schema.org/date8",
+                    "id": "https://schema.org/date",
                     "name": "date8",
                     "label": "Text field with dateFormat, year 2 or 4 digits",
                     "help": "dateFormat: ['YYYY', 'YY']",
@@ -225,7 +225,7 @@
                     "type": ["Text"]
                 },
                 {
-                    "id": "https://schema.org/date9",
+                    "id": "https://schema.org/date",
                     "name": "date9",
                     "label": "Text field dateFormat with multiple possible separators",
                     "help": "dateFormat: ['YYYY/MM/DD', 'YYYY-MM-DD', 'YYYY.MM.DD']",
@@ -235,7 +235,7 @@
                     "type": ["Text"]
                 },
                 {
-                    "id": "https://schema.org/date10",
+                    "id": "https://schema.org/date",
                     "name": "date10",
                     "label": "Text field dateFormat, describe month or day with one digit",
                     "help": "dateFormat: ['YYYY-M-D', 'YYYY-M-DD', 'YYYY-MM-D']",
@@ -245,7 +245,7 @@
                     "type": ["Text"]
                 },
                 {
-                    "id": "https://schema.org/date11",
+                    "id": "https://schema.org/date",
                     "name": "date11",
                     "label": "Text field with reversed dateFormat",
                     "help": "dateFormat: ['DD-MM-YYYY']",
@@ -264,7 +264,7 @@
                     "type": ["DateTime"]
                 },
                 {
-                    "id": "https://schema.org/datetime1",
+                    "id": "https://schema.org/datetime",
                     "name": "datetime1",
                     "label": "Text field with datetime dateFormat",
                     "help": "Datetime with dateFormat: ['YYYY-MM-DD hh:mm']",
@@ -274,8 +274,8 @@
                     "type": ["Text"]
                 },
                 {
-                    "id": "https://schema.org/datetime8",
-                    "name": "datetime8",
+                    "id": "https://schema.org/datetime",
+                    "name": "datetime2",
                     "label": "Text fields with full datetime format",
                     "help": "Datetime with dateFormat: ['YYYY-MM-DD hh:mm:ss']",
                     "required": false,
@@ -284,8 +284,8 @@
                     "type": ["Text"]
                 },
                 {
-                    "id": "https://schema.org/datetime9",
-                    "name": "datetime9",
+                    "id": "https://schema.org/datetime",
+                    "name": "datetime3",
                     "label": "Text field with time format",
                     "help": "dateFormat: 'hh:mm'",
                     "required": false,
@@ -303,7 +303,7 @@
                     "type": ["Number"]
                 },
                 {
-                    "id": "https://schema.org/number1",
+                    "id": "https://schema.org/number",
                     "name": "number1",
                     "label": "Number with every constraint",
                     "help": "Number with every constraint: minValue, maxValue, numberType",
@@ -315,7 +315,7 @@
                     "type": ["Number"]
                 },
                 {
-                    "id": "https://schema.org/number2",
+                    "id": "https://schema.org/number",
                     "name": "number2",
                     "label": "Number with minValue",
                     "help": "Number with minValue constraint",
@@ -325,7 +325,7 @@
                     "type": ["Number"]
                 },
                 {
-                    "id": "https://schema.org/number3",
+                    "id": "https://schema.org/number",
                     "name": "number3",
                     "label": "Number with maxValue",
                     "help": "Number with maxValue constraint",
@@ -335,7 +335,7 @@
                     "type": ["Number"]
                 },
                 {
-                    "id": "https://schema.org/number4",
+                    "id": "https://schema.org/number",
                     "name": "number4",
                     "label": "Number with min/maxValue",
                     "help": "Number with minValue and maxValue constraint",
@@ -346,7 +346,7 @@
                     "type": ["Number"]
                 },
                 {
-                    "id": "https://schema.org/number5",
+                    "id": "https://schema.org/number",
                     "name": "number5",
                     "label": "Number with Int numberType",
                     "help": "Number with numberType: ['Int'] constraint",
@@ -356,7 +356,7 @@
                     "type": ["Number"]
                 },
                 {
-                    "id": "https://schema.org/number6",
+                    "id": "https://schema.org/number",
                     "name": "number6",
                     "label": "Number with Float numberType",
                     "help": "Number with numberType: ['Float'] constraint",
@@ -366,7 +366,7 @@
                     "type": ["Number"]
                 },
                 {
-                    "id": "https://schema.org/number7",
+                    "id": "https://schema.org/number",
                     "name": "number7",
                     "label": "Number with Double numberType",
                     "help": "Number with numberType: ['Double'] constraint",
@@ -376,7 +376,7 @@
                     "type": ["Number"]
                 },
                 {
-                    "id": "https://schema.org/number8",
+                    "id": "https://schema.org/number",
                     "name": "number8",
                     "label": "Number with Long numberType",
                     "help": "Number with numberType: ['Long'] constraint",
@@ -386,7 +386,7 @@
                     "type": ["Number"]
                 },
                 {
-                    "id": "https://schema.org/number9",
+                    "id": "https://schema.org/number",
                     "name": "number9",
                     "label": "Number with Any numberType",
                     "help": "Number with numberType: ['Any'] constraint",
@@ -396,7 +396,7 @@
                     "type": ["Number"]
                 },
                 {
-                    "id": "https://schema.org/number10",
+                    "id": "https://schema.org/number",
                     "name": "number10",
                     "label": "Number with multiple numberType",
                     "help": "Number with numberType: ['Int', 'Float', 'Long'] constraint",
