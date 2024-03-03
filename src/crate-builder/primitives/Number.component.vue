@@ -62,7 +62,7 @@ function save() {
     if (data.isValidNumber && isValidNumberConstraints.value) {
         $emit("save:property", {
             property: props.property,
-            value: data.internalValue,
+            value: Number(data.internalValue),
         });
     }
 }
