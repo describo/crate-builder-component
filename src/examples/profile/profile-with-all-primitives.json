@@ -150,6 +150,15 @@
                     "required": true,
                     "multiple": true,
                     "type": ["Geo"]
+                },
+                {
+                    "id": "http://schema.org/boolean",
+                    "name": "boolean",
+                    "label": "boolean",
+                    "help": "help message",
+                    "required": true,
+                    "multiple": false,
+                    "type": ["Boolean"]
                 }
             ]
         },

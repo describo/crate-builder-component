@@ -83,6 +83,11 @@
                 @create:entity="createEntity"
                 @link:entity="linkEntity"
             />
+            <boolean-component
+                v-if="data.addType === 'Boolean'"
+                :property="props.property"
+                @save:property="createProperty"
+            />
         </div>
         <div v-else class="p-1 w-full describo-property-type-entity">
             <div
@@ -121,6 +126,7 @@ import SelectUrlComponent from "../primitives/SelectUrl.component.vue";
 import SelectObjectComponent from "../primitives/SelectObject.component.vue";
 import GeoComponent from "../primitives/Geo.component.vue";
 import AutocompleteComponent from "./AutoComplete.component.vue";
+import BooleanComponent from "../primitives/Boolean.component.vue";
 import { reactive, computed, inject } from "vue";
 import { profileManagerKey } from "./keys.js";
 import { $t } from "../i18n";
@@ -160,6 +166,7 @@ const data = reactive({
         "Geo",
         "GeoCoordinates",
         "GeoShape",
+        "Boolean"
     ],
     addType: undefined,
     localisedAddType: undefined,
@@ -181,6 +188,7 @@ function add({ type }) {
     data.localisedAddType = pm.value?.getTypeLabel(type);
 }
 function createProperty(data) {
+    console.log(data)
     // console.debug("Add Component : emit(create:property)", data);
     $emit("create:property", { ...data, propertyId: props.definition.id });
     close();

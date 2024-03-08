@@ -656,7 +656,7 @@ cm.setProperty({ id: "./", property: "author", value: 3 });
         }
         if (!id) throw new Error(`'setProperty' requires 'id' to be defined`);
         if (!property) throw new Error(`setProperty' requires 'property' to be defined`);
-        if (!value) throw new Error(`'setProperty' requires 'value' to be defined`);
+        if (value !== false && !value) throw new Error(`'setProperty' requires 'value' to be defined`);
 
         const indexRef = this.entityIdIndex[id];
         const entity = this.crate["@graph"][indexRef];
@@ -703,7 +703,7 @@ cm.updateProperty({ id: "./", property: "author", idx: 1, value: "new" });
     updateProperty({ id, property, idx, value }) {
         if (!id) throw new Error(`'setProperty' requires 'id' to be defined`);
         if (!property) throw new Error(`setProperty' requires 'property' to be defined`);
-        if (!value) throw new Error(`'setProperty' requires 'value' to be defined`);
+        if (value !== false && !value) throw new Error(`'setProperty' requires 'value' to be defined`);
 
         let entity;
         if (this.coreProperties.includes(property)) {

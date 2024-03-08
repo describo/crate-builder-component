@@ -49,7 +49,7 @@
                             v-if="
                                 isNotValue &&
                                 !configuration.readonly &&
-                                instance.value &&
+                                (instance.value || instance.value == false) &&
                                 !instance.value?.['@id']
                             "
                             type="delete"

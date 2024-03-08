@@ -13,6 +13,12 @@
         <div v-if="!configuration.readonly">
             <!--  not readonly - try to load the relevant display component-->
             <value-component v-if="isValue()" :definition="props.definition.value" />
+            <boolean-component
+                v-else-if="isBoolean()"
+                :property="props.property"
+                :value="props.value"
+                @save:property="savePropertyValue"
+            />
             <date-time-component
                 v-else-if="isDateTime(props.value)"
                 :property="props.property"
@@ -71,6 +77,7 @@ import NumberComponent from "../primitives/Number.component.vue";
 import ValueComponent from "../primitives/Value.component.vue";
 import SelectComponent from "../primitives/Select.component.vue";
 import UrlComponent from "../primitives/Url.component.vue";
+import BooleanComponent from "../primitives/Boolean.component.vue";
 import dayjs from "dayjs";
 import isDecimal from "validator/es/lib/isDecimal";
 import isInt from "validator/es/lib/isInt";
@@ -135,6 +142,7 @@ function isTime(string) {
 }
 function isText(string) {
     if (
+        !isBoolean() &&
         !isDate(string) &&
         !isDateTime(string) &&
         !isTime(string) &&
@@ -163,6 +171,10 @@ function isSelect() {
 function isUrl(string) {
     let result = isURL(string);
     return result;
+}
+function isBoolean() {
+    console.log(props?.definition?.type)
+    return props?.definition?.type == "Boolean";
 }
 function definitionIncludes(type) {
     return props.definition?.type?.includes(type);
