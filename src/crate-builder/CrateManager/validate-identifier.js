@@ -52,7 +52,7 @@ export function validateId({ id, type }) {
             const message = `${result.message.replace(
                 /Invalid IRI according to RFC 3987:/,
                 "Invalid identifier"
-            )}. See https://github.com/describo/crate-builder-component/blob/master/README.identifiers.md for more information.`;
+            )}. See https://describo.github.io/documentation/component/identifiers.html for more information.`;
             return { isValid: false, message };
         }
     } catch (error) {
