@@ -27,8 +27,8 @@
         </div>
         <div class="w-2/3 xl:w-4/5 flex flex-col flex-grow describo-property-value">
             <!-- render all of the simple things (text, textarea, date etc) in a column -->
-            <div class="flex flex-col space-y-1" v-if="data.simpleInstances.length">
-                <div v-for="instance of data.simpleInstances" :key="instance.idx">
+            <div class="flex flex-col space-y-1">
+                <div v-for="instance of simpleInstances" :key="instance.idx">
                     <div
                         v-if="propertyDefinition.readonly"
                         class="describo-property-value-readonly"
@@ -60,9 +60,9 @@
                 </div>
             </div>
             <!-- render all the links in a wrapping row -->
-            <div class="mt-2" v-if="data.linkInstances.length">
+            <div class="mt-2">
                 <PaginateLinkedEntitiesComponent
-                    :entities="data.linkInstances"
+                    :entities="linkInstances"
                     :property="props.property"
                     :readonly="propertyDefinition.readonly"
                     @load:entity="loadEntity"
@@ -90,8 +90,17 @@ import PaginateLinkedEntitiesComponent from "./PaginateLinkedEntities.component.
 import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import AddComponent from "./Add.component.vue";
 import DisplayPropertyNameComponent from "./DisplayPropertyName.component.vue";
-import { configurationKey, crateManagerKey, profileManagerKey } from "./keys.js";
-import { reactive, computed, onMounted, onBeforeMount, onBeforeUnmount, watch, inject } from "vue";
+import { configurationKey, profileManagerKey } from "./keys.js";
+import {
+    reactive,
+    shallowRef,
+    computed,
+    onMounted,
+    onBeforeMount,
+    onBeforeUnmount,
+    watch,
+    inject,
+} from "vue";
 import cloneDeep from "lodash-es/cloneDeep.js";
 import orderBy from "lodash-es/orderBy.js";
 import isPlainObject from "lodash-es/isPlainObject.js";
@@ -117,10 +126,12 @@ const props = defineProps({
         default: false,
     },
 });
+
+const linkInstances = shallowRef([]);
+const simpleInstances = shallowRef([]);
+
 const data = reactive({
     propertyDefinition: {},
-    simpleInstances: [],
-    linkInstances: [],
     watchers: [],
 });
 
@@ -171,7 +182,7 @@ const propertyDefinition = computed(() => {
     return cloneDeep(propertyDefinition);
 });
 function sortInstances() {
-    data.simpleInstances = props.values
+    simpleInstances.value = props.values
         .map((v, i) => {
             if (!isPlainObject(v)) {
                 return { idx: i, value: v };
@@ -179,7 +190,7 @@ function sortInstances() {
         })
         .filter((v) => v);
 
-    data.linkInstances = orderBy(
+    linkInstances.value = orderBy(
         props.values
             .map((v, i) => {
                 if (isPlainObject(v)) return { idx: i, value: v };
