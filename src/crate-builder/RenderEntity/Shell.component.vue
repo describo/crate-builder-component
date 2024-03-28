@@ -559,7 +559,6 @@ function createProperty(patch) {
     notifySave(patch.property);
 }
 function saveProperty(patch) {
-    console.log(patch)
     console.debug("Render Entity component: emit(save:property)", {
         id: contextEntity.value["@id"],
         ...patch,
