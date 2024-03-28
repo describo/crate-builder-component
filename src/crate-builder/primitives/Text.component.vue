@@ -3,7 +3,7 @@
         <div class="flex flex-row space-x-2">
             <!--if type === 'text' - display an input component -->
             <el-input
-                v-if="type !== 'textarea'"
+                v-if="props.type !== 'textarea'"
                 class="w-full"
                 :type="type"
                 v-model="data.displayValue"
@@ -23,7 +23,7 @@
                 contenteditable
                 @blur="debouncedSave"
                 @input="validateTextConstraints()"
-                class="bg-white text-slate-800 border border-solid border-slate-200 p-2 w-full"
+                class="whitespace-pre-wrap bg-white text-slate-800 border border-solid border-slate-200 p-2 w-full"
             >
                 {{ data.displayValue }}
             </div>
