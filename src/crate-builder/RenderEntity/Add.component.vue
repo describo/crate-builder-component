@@ -37,7 +37,7 @@
                 @save:property="createProperty"
             />
             <date-time-component
-                v-if="data.addType === 'DateTime'" 
+                v-if="data.addType === 'DateTime'"
                 :property="props.property"
                 @save:property="createProperty"
             />
@@ -166,7 +166,7 @@ const data = reactive({
         "Geo",
         "GeoCoordinates",
         "GeoShape",
-        "Boolean"
+        "Boolean",
     ],
     addType: undefined,
     localisedAddType: undefined,
@@ -188,7 +188,6 @@ function add({ type }) {
     data.localisedAddType = pm.value?.getTypeLabel(type);
 }
 function createProperty(data) {
-    console.log(data)
     // console.debug("Add Component : emit(create:property)", data);
     $emit("create:property", { ...data, propertyId: props.definition.id });
     close();
