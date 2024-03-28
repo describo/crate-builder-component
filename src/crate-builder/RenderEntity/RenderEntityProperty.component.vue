@@ -60,7 +60,7 @@
                 </div>
             </div>
             <!-- render all the links in a wrapping row -->
-            <div class="mt-2">
+            <div :class="{ 'mt-2': simpleInstances.length && linkInstances.length }">
                 <PaginateLinkedEntitiesComponent
                     :entities="linkInstances"
                     :property="props.property"
