@@ -1,7 +1,9 @@
 <template>
     <div class="flex flex-col">
-        <!-- {{ props.entities }} -->
-        <div class="flex flex-row">
+        <div
+            class="flex flex-row space-x-2 items-center"
+            v-if="props.entities.length > data.pageSize"
+        >
             <div class="flex-grow">
                 <el-input
                     :key="configuration.language"
@@ -20,7 +22,7 @@
             />
         </div>
         <div class="flex flex-row flex-wrap mt-2">
-            <div v-for="instance of data.entities" :key="instance.idx">
+            <div v-for="instance of entities" :key="instance.idx">
                 <RenderLinkedItemComponent
                     class="m-1"
                     :key="instance.value['@id']"
@@ -38,7 +40,7 @@
 <script setup>
 import { ElInput, ElPagination } from "element-plus";
 import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";
-import { reactive, watch, inject } from "vue";
+import { reactive, shallowRef, watch, inject } from "vue";
 import { $t } from "../i18n";
 import { configurationKey } from "./keys";
 const configuration = inject(configurationKey);
@@ -59,12 +61,12 @@ const props = defineProps({
 });
 const $emit = defineEmits(["load:entity", "unlink:entity"]);
 
+const entities = shallowRef([]);
 const data = reactive({
     filter: undefined,
     total: props.entities.length,
     pageSize: 10,
     currentPage: 1,
-    entities: [],
 });
 watch(
     () => props.entities,
@@ -79,14 +81,12 @@ function filterAndChunkEntitiesForDisplay() {
     let offset = (data.currentPage - 1) * data.pageSize;
     if (data.filter) {
         const re = new RegExp(data.filter, "i");
-        let entities = props.entities.filter(
-            (e) => e.value.name.match(re) || e.value["@id"].match(re)
-        );
-        data.total = entities.length;
-        data.entities = entities.slice(offset, offset + data.pageSize);
+        let es = props.entities.filter((e) => e.value.name.match(re) || e.value["@id"].match(re));
+        data.total = es.length;
+        entities.value = es.slice(offset, offset + data.pageSize);
     } else {
         data.total = props.entities.length;
-        data.entities = props.entities.slice(offset, offset + data.pageSize);
+        entities.value = props.entities.slice(offset, offset + data.pageSize);
     }
 }
 
