@@ -58,7 +58,15 @@
                 @create:entity="createEntity"
             />
             <text-component
-                v-else-if="isText(props.value)"
+                v-else-if="isText(props.value) && props.definition.type.includes('TextArea')"
+                type="textarea"
+                :property="props.property"
+                :value="props.value"
+                :definition="props.definition"
+                @save:property="savePropertyValue"
+            />
+            <text-component
+                v-else="isText(props.value)"
                 :property="props.property"
                 :value="props.value"
                 :definition="props.definition"
@@ -173,7 +181,6 @@ function isUrl(string) {
     return result;
 }
 function isBoolean() {
-    console.log(props?.definition?.type)
     return props?.definition?.type == "Boolean";
 }
 function definitionIncludes(type) {
