@@ -137,77 +137,73 @@
                         </div>
                     </template>
 
-                    <span v-if="data.activeTab === tab.name">
-                        <div
-                            class="text-red-600 float-right"
-                            v-if="!configuration.readonly && tab.missingRequiredData"
+                    <div
+                        class="text-red-600 float-right"
+                        v-if="!configuration.readonly && tab.missingRequiredData"
+                    >
+                        <el-button
+                            type="danger"
+                            @click="
+                                data.highlightRequiredProperties = !data.highlightRequiredProperties
+                            "
                         >
-                            <el-button
-                                type="danger"
-                                @click="
-                                    data.highlightRequiredProperties =
-                                        !data.highlightRequiredProperties
-                                "
-                            >
-                                <i class="fa-solid fa-triangle-exclamation text-xl"></i>
-                            </el-button>
-                        </div>
-                        <div v-if="tab.name === 'about'">
-                            <render-entity-id-component
-                                class="my-2 p-2 describo-property describo-property-name-id"
-                                :class="{
-                                    'bg-green-200 rounded p-1 my-1': data.savedProperty === '@id',
-                                }"
-                                :entity="contextEntity"
-                                @update:entity="saveProperty"
-                            />
-                            <render-entity-type-component
-                                class="my-2 p-2 describo-property describo-property-name-type"
-                                :entity="contextEntity"
-                                @update:entity="saveProperty"
-                            />
-                            <render-entity-name-component
-                                class="my-2 p-2 describo-property describo-property-name-name"
-                                :class="{
-                                    'bg-green-200 rounded p-1 my-1': data.savedProperty === 'name',
-                                }"
-                                :entity="contextEntity"
-                                @update:entity="saveProperty"
-                            />
-                        </div>
+                            <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                        </el-button>
+                    </div>
+                    <div v-if="tab.name === 'about'">
+                        <render-entity-id-component
+                            class="my-2 p-2 describo-property describo-property-name-id"
+                            :class="{
+                                'bg-green-200 rounded p-1 my-1': data.savedProperty === '@id',
+                            }"
+                            :entity="contextEntity"
+                            @update:entity="saveProperty"
+                        />
+                        <render-entity-type-component
+                            class="my-2 p-2 describo-property describo-property-name-type"
+                            :entity="contextEntity"
+                            @update:entity="saveProperty"
+                        />
+                        <render-entity-name-component
+                            class="my-2 p-2 describo-property describo-property-name-name"
+                            :class="{
+                                'bg-green-200 rounded p-1 my-1': data.savedProperty === 'name',
+                            }"
+                            :entity="contextEntity"
+                            @update:entity="saveProperty"
+                        />
+                    </div>
 
-                        <!-- render the entity properties in this tab definition -->
-                        <div v-for="input of tab.inputs">
-                            <div
-                                :class="{
-                                    'hover:bg-sky-100':
-                                        !configuration.readonly &&
-                                        data.savedProperty !== input.name,
-                                    'bg-green-200 hover:bg-green-200':
-                                        data.savedProperty === input.name,
-                                }"
-                                v-if="
-                                    tab.name === data.activeTab &&
-                                    !['@id', '@type', 'name', '@reverse'].includes(input.name)
-                                "
-                            >
-                                <render-entity-property-component
-                                    class="my-2"
-                                    :entity="contextEntity"
-                                    :property="input.name"
-                                    :values="contextEntity[input.name]"
-                                    :highlight-required="data.highlightRequiredProperties"
-                                    @load:entity="loadEntity"
-                                    @create:entity="createEntity"
-                                    @link:entity="linkEntity"
-                                    @unlink:entity="unlinkEntity"
-                                    @create:property="createProperty"
-                                    @save:property="saveProperty"
-                                    @delete:property="deleteProperty"
-                                />
-                            </div>
+                    <!-- render the entity properties in this tab definition -->
+                    <div v-for="input of tab.inputs">
+                        <div
+                            :class="{
+                                'hover:bg-sky-100':
+                                    !configuration.readonly && data.savedProperty !== input.name,
+                                'bg-green-200 hover:bg-green-200':
+                                    data.savedProperty === input.name,
+                            }"
+                            v-if="
+                                tab.name === data.activeTab &&
+                                !['@id', '@type', 'name', '@reverse'].includes(input.name)
+                            "
+                        >
+                            <render-entity-property-component
+                                class="my-2"
+                                :entity="contextEntity"
+                                :property="input.name"
+                                :values="contextEntity[input.name]"
+                                :highlight-required="data.highlightRequiredProperties"
+                                @load:entity="loadEntity"
+                                @create:entity="createEntity"
+                                @link:entity="linkEntity"
+                                @unlink:entity="unlinkEntity"
+                                @create:property="createProperty"
+                                @save:property="saveProperty"
+                                @delete:property="deleteProperty"
+                            />
                         </div>
-                    </span>
+                    </div>
                 </el-tab-pane>
             </el-tabs>
         </div>
