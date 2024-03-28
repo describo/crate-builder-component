@@ -80,6 +80,10 @@ const en = {
         invalid_url_value:
             "The entry needs to be a valid url. The accepted protocols are: http, https, ftp, ftps and arcp.",
 
+        // Boolean.component.vue
+        true_label: "True",
+        false_label: "False",
+
         // SelectUrl.component.vue
         // select: as above
         invalid_selecturl_value:

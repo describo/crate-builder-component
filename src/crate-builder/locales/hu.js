@@ -80,6 +80,10 @@ const hu = {
         invalid_url_value:
             "A bejegyzésnek érvényes URL-nek kell lennie. Az elfogadott protokollok: http, https, ftp, ftps és arcp.",
 
+        // Boolean.component.vue
+        true_label: "Igaz",
+        false_label: "Hamis",
+
         // SelectUrl.component.vue
         // select: as above
         invalid_selecturl_value:
