@@ -538,18 +538,18 @@ function createProperty(patch) {
         id: contextEntity.value["@id"],
         ...patch,
     });
-    if (isURL(patch.value)) {
-        createEntity({
-            property: patch.property,
-            json: {
-                "@id": patch.value,
-                "@type": "URL",
-                name: patch.value,
-            },
-        });
-    } else {
+    // if (isURL(patch.value)) {
+    //     createEntity({
+    //         property: patch.property,
+    //         json: {
+    //             "@id": patch.value,
+    //             "@type": "URL",
+    //             name: patch.value,
+    //         },
+    //     });
+    // } else {
         cm.value.setProperty({ id: contextEntity.value["@id"], ...patch });
-    }
+    // }
     refresh();
     saveCrate();
     notifySave(patch.property);
