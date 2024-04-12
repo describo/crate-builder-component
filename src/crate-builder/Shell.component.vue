@@ -135,6 +135,11 @@ const props = defineProps({
         type: String,
         default: "en",
     },
+    enableUrlMarkup: {
+        type: Boolean,
+        default: true,
+        validator: (val) => [true, false].includes(val),
+    }
 });
 
 const $emit = defineEmits([
@@ -244,6 +249,7 @@ onMounted(async () => {
                 () => props.enableBrowseEntities,
                 () => props.enableTemplateSave,
                 () => props.enableReverseLinkBrowser,
+                () => props.enableUrlMarkup,
                 () => props.purgeUnlinkedEntities,
                 () => props.readonly,
                 () => props.language,
@@ -322,6 +328,7 @@ function configure() {
         enableBrowseEntities: props.enableBrowseEntities,
         enableTemplateSave: props.enableTemplateSave,
         enableReverseLinkBrowser: props.enableReverseLinkBrowser,
+        enableUrlMarkup: props.enableUrlMarkup,
         readonly: props.readonly,
         webComponent: props.webComponent,
         purgeUnlinkedEntities: props.purgeUnlinkedEntities,
