@@ -96,6 +96,11 @@ const props = defineProps({
         default: true,
         validator: (val) => [true, false].includes(val),
     },
+    enableUrlMarkup: {
+        type: Boolean,
+        default: true,
+        validator: (val) => [true, false].includes(val),
+    },
     purgeUnlinkedEntities: {
         type: Boolean,
         default: true,
@@ -135,11 +140,6 @@ const props = defineProps({
         type: String,
         default: "en",
     },
-    enableUrlMarkup: {
-        type: Boolean,
-        default: true,
-        validator: (val) => [true, false].includes(val),
-    }
 });
 
 const $emit = defineEmits([

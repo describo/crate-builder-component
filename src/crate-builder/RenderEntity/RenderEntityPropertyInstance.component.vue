@@ -177,7 +177,7 @@ function isSelect() {
     return props?.definition?.values?.includes(props.value) ? true : false;
 }
 function isUrl(string) {
-    let result = isURL(string) && configuration.value.enableUrlMarkup;
+    let result = isURL(string);
     return result;
 }
 function isBoolean() {
