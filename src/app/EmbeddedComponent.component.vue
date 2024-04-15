@@ -45,6 +45,7 @@
                 :enable-internal-routing="true"
                 :enable-reverse-link-browser="data.configuration.enableReverseLinkBrowser"
                 :purge-unlinked-entities="data.configuration.purgeUnlinkedEntities"
+                :enable-url-markup="data.configuration.enableUrlMarkup"
                 :web-component="false"
                 :language="data.configuration.language"
                 :tab-location="data.configuration.tabLocation"
@@ -173,6 +174,7 @@ const data = reactive({
         enableBrowseEntities: true,
         enableTemplateSave: true,
         enableReverseLinkBrowser: true,
+        enableUrlMarkup: true,
         purgeUnlinkedEntities: true,
         readonly: false,
         language: "en",

@@ -538,7 +538,7 @@ function createProperty(patch) {
         id: contextEntity.value["@id"],
         ...patch,
     });
-    if (isURL(patch.value)) {
+    if (isURL(patch.value) && configuration.value.enableUrlMarkup) {
         createEntity({
             property: patch.property,
             json: {
