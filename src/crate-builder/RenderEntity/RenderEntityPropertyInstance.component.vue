@@ -52,7 +52,7 @@
                 @save:property="savePropertyValue"
             />
             <url-component
-                v-else-if="isUrl(props.value)"
+                v-else-if="isUrl(props.value) && configuration.enableUrlMarkup"
                 :property="props.property"
                 :value="props.value"
                 @create:entity="createEntity"
