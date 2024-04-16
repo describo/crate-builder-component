@@ -1,5 +1,9 @@
 // Context setup - load all of the defined contexts
-const modules = import.meta.glob("./contexts/*.jsonld", { eager: true, as: "raw" });
+const modules = import.meta.glob("./contexts/*.jsonld", {
+    eager: true,
+    query: "?raw",
+    import: "default",
+});
 
 // The RO Crate context can be referenced in different ways in a crate
 //  so this mapping allows us to find the definitions loaded above

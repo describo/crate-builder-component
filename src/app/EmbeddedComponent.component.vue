@@ -100,6 +100,9 @@
                 <el-form-item label="Enable Template Save">
                     <el-switch v-model="data.configuration.enableTemplateSave" />
                 </el-form-item>
+                <el-form-item label="Enable URL Markup">
+                    <el-switch v-model="data.configuration.enableUrlMarkup" />
+                </el-form-item>
                 <el-form-item label="Purge Unlinked Entities">
                     <el-switch v-model="data.configuration.purgeUnlinkedEntities" />
                 </el-form-item>
