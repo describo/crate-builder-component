@@ -1,5 +1,6 @@
 import { describe, test, expect, beforeAll, beforeEach, vi } from "vitest";
 import { CrateManager } from "./crate-manager.js";
+import { ProfileManager } from "./profile-manager.js";
 import { readJSON } from "fs-extra";
 import Chance from "chance";
 const chance = Chance();
@@ -334,6 +335,21 @@ describe("Test interacting with the crate", () => {
     test("get context", () => {
         let context = cm.getContext();
         expect(context).toEqual(["https://w3id.org/ro/crate/1.1/context"]);
+    });
+    test("set context", () => {
+        cm.setContext({});
+        expect(cm.getContext()).toEqual([]);
+    });
+    test("set profile manager", () => {
+        const profile = {
+            metadata: {},
+            classes: {},
+        };
+        const pm = new ProfileManager({ profile });
+        expect(pm).toMatchObject({ profile: { metadata: {}, classes: {} } });
+
+        cm.setProfileManager(pm);
+        expect(cm.pm).toMatchObject({ profile: { metadata: {}, classes: {} } });
     });
     test(`getting entities from the crate`, () => {
         // no id provided
@@ -1013,6 +1029,261 @@ describe("Test interacting with the crate", () => {
         } catch (error) {
             expect(error.message).toEqual(`value must be an object with '@id' defined`);
         }
+    });
+    test("linking / unlinking two entities and handling inverse property associations", () => {
+        const profile = {
+            propertyAssociations: [
+                {
+                    property: "keywords",
+                    propertyId: "https://schema.org/keywords",
+                    inverse: {
+                        property: "isKeywordOf",
+                        propertyId: "https://schema.org/isKeywordOf",
+                    },
+                },
+                {
+                    property: "hasMember",
+                    propertyId: "https://schema.org/hasMember",
+                    inverse: {
+                        property: "isMemberOf",
+                        propertyId: "https://schema.org/isMemberOf",
+                    },
+                },
+            ],
+        };
+
+        const pm = new ProfileManager({ profile });
+        cm.setProfileManager(pm);
+
+        const url = chance.url();
+        let entity = {
+            "@id": "#term",
+            "@type": "DefinedTerm",
+            name: "a term",
+        };
+        const e = cm.addEntity(entity);
+
+        // link to root dataset and check
+        cm.linkEntity({
+            id: "./",
+            property: "keywords",
+            propertyId: "http://schema.org/keywords",
+            value: { "@id": e["@id"] },
+        });
+        let crate = cm.exportCrate();
+        // console.log(JSON.stringify(crate["@graph"], null, 2));
+        expect(crate["@graph"][1]).toMatchObject({
+            "@id": "./",
+            keywords: {
+                "@id": "#term",
+            },
+            "@reverse": {
+                isKeywordOf: {
+                    "@id": "#term",
+                },
+            },
+        });
+        expect(crate["@graph"][2]).toMatchObject({
+            "@id": "#term",
+            isKeywordOf: {
+                "@id": "./",
+            },
+            "@reverse": {
+                keywords: {
+                    "@id": "./",
+                },
+            },
+        });
+
+        cm.unlinkEntity({
+            id: "./",
+            property: "keywords",
+            value: { "@id": e["@id"] },
+        });
+        crate = cm.exportCrate();
+        expect(crate["@graph"][1]).toMatchObject({
+            "@id": "./",
+            "@reverse": {},
+        });
+        expect(crate["@graph"][2]).toMatchObject({
+            "@id": "#term",
+            "@reverse": {},
+        });
+        // console.log(JSON.stringify(crate["@graph"], null, 2));
+    });
+
+    test("more complex:: linking / unlinking two entities and handling inverse property associations", () => {
+        const profile = {
+            propertyAssociations: [
+                {
+                    property: "keywords",
+                    propertyId: "https://schema.org/keywords",
+                    inverse: {
+                        property: "isKeywordOf",
+                        propertyId: "https://schema.org/isKeywordOf",
+                    },
+                },
+                {
+                    property: "hasMember",
+                    propertyId: "https://schema.org/hasMember",
+                    inverse: {
+                        property: "isMemberOf",
+                        propertyId: "https://schema.org/isMemberOf",
+                    },
+                },
+            ],
+        };
+
+        const pm = new ProfileManager({ profile });
+        cm.setProfileManager(pm);
+
+        const url = chance.url();
+        let entity = {
+            "@id": "#term",
+            "@type": "DefinedTerm",
+            name: "a term",
+        };
+        const e = cm.addEntity(entity);
+
+        // link to root dataset and check
+        cm.linkEntity({
+            id: "./",
+            property: "keywords",
+            propertyId: "http://schema.org/keywords",
+            value: { "@id": e["@id"] },
+        });
+        let crate = cm.exportCrate();
+        // console.log(JSON.stringify(crate["@graph"], null, 2));
+        expect(crate["@context"][1]).toMatchObject({
+            isKeywordOf: "https://schema.org/isKeywordOf",
+        });
+        expect(crate["@graph"][1].keywords).toEqual({ "@id": "#term" });
+        expect(crate["@graph"][1]["@reverse"].isKeywordOf).toEqual({ "@id": "#term" });
+        expect(crate["@graph"][2].isKeywordOf).toEqual({ "@id": "./" });
+        expect(crate["@graph"][2]["@reverse"].keywords).toEqual({ "@id": "./" });
+
+        // link to itself and check
+        cm.linkEntity({
+            id: e["@id"],
+            property: "keywords",
+            value: { "@id": e["@id"] },
+        });
+        crate = cm.exportCrate();
+        // console.log(JSON.stringify(crate["@graph"], null, 2));
+        expect(crate["@graph"][2]).toMatchObject({
+            isKeywordOf: [{ "@id": "./" }, { "@id": "#term" }],
+            keywords: { "@id": "#term" },
+            "@reverse": {
+                keywords: [{ "@id": "./" }, { "@id": "#term" }],
+                isKeywordOf: { "@id": "#term" },
+            },
+        });
+
+        // link to root dataset via an inverse association
+        cm.linkEntity({
+            id: e["@id"],
+            property: "isMemberOf",
+            value: { "@id": "./" },
+        });
+        crate = cm.exportCrate();
+
+        expect(crate["@graph"][2]).toMatchObject({
+            isMemberOf: { "@id": "./" },
+            "@reverse": {
+                keywords: [{ "@id": "./" }, { "@id": "#term" }],
+                isKeywordOf: { "@id": "#term" },
+                hasMember: { "@id": "./" },
+            },
+        });
+        expect(crate["@graph"][1]).toMatchObject({
+            hasMember: { "@id": "#term" },
+            "@reverse": { isMemberOf: { "@id": "#term" } },
+        });
+        // console.log(JSON.stringify(crate["@graph"], null, 2));
+
+        cm.unlinkEntity({
+            id: e["@id"],
+            property: "keywords",
+            value: {
+                "@id": e["@id"],
+            },
+        });
+        crate = cm.exportCrate();
+        // console.log(JSON.stringify(crate["@graph"][1], null, 2));
+        // console.log(JSON.stringify(crate["@graph"], null, 2));
+        expect(crate["@graph"][1]).toMatchObject({
+            "@id": "./",
+            "@type": "Dataset",
+            keywords: {
+                "@id": "#term",
+            },
+            hasMember: {
+                "@id": "#term",
+            },
+            "@reverse": {
+                about: {
+                    "@id": "ro-crate-metadata.json",
+                },
+                isKeywordOf: {
+                    "@id": "#term",
+                },
+                isMemberOf: {
+                    "@id": "#term",
+                },
+            },
+        });
+        expect(crate["@graph"][2]).toMatchObject({
+            "@id": "#term",
+            "@type": "DefinedTerm",
+            name: "a term",
+            isKeywordOf: {
+                "@id": "./",
+            },
+            isMemberOf: {
+                "@id": "./",
+            },
+            "@reverse": {
+                keywords: {
+                    "@id": "./",
+                },
+                hasMember: {
+                    "@id": "./",
+                },
+            },
+        });
+
+        // cm.deleteEntity({ id: e["@id"] });
+
+        // console.log("BEFORE");
+        // crate = cm.exportCrate();
+        // // console.log(JSON.stringify(crate["@graph"], null, 2));
+        // expect(crate["@graph"].length).toEqual(2);
+
+        // // add it back in and link it to root dataset via keywords
+        // cm.addEntity(entity);
+        // cm.linkEntity({
+        //     id: "./",
+        //     property: "keywords",
+        //     value: { "@id": e["@id"] },
+        // });
+        // crate = cm.exportCrate();
+        // // console.log(JSON.stringify(crate["@graph"], null, 2));
+
+        // // now unlink from the root dataset via keywords prop
+        // cm.unlinkEntity({
+        //     id: "./",
+        //     property: "keywords",
+        //     value: {
+        //         "@id": e["@id"],
+        //     },
+        // });
+        // crate = cm.exportCrate();
+        // expect(crate["@graph"][2]).toMatchObject({
+        //     "@id": "#term",
+        //     "@type": "DefinedTerm",
+        //     name: "a term",
+        //     "@reverse": {},
+        // });
     });
     test("a sequence of complex '@id' updates across the crate", () => {
         let entity = {

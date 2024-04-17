@@ -19,6 +19,23 @@
         "context": {
             "anyOf": [{ "type": "array" }, { "type": "string" }, { "type": "object" }]
         },
+        "propertyAssociations": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "property": { "type": "string" },
+                    "propertyId": { "type": "string" },
+                    "inverse": {
+                        "type": "object",
+                        "properties": {
+                            "property": { "type": "string" },
+                            "propertyId": { "type": "string" }
+                        }
+                    }
+                }
+            }
+        },
         "layouts": {
             "description": "Layout definitions for property groups",
             "type": "array",

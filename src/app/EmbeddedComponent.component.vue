@@ -135,6 +135,7 @@ import profile4 from "../examples/profile/profile-with-resolve.json";
 import profile5 from "../examples/profile/nyingarn-item-profile.json";
 import profile6 from "../examples/profile/vocabulary-creation-profile.json";
 import profile7 from "../examples/profile/profile-with-constraints.json";
+import profile8 from "../examples/profile/profile-to-test-inverse-associations.json";
 const lookup = new Lookup();
 import { validateProfile } from "../crate-builder/helpers.js";
 
@@ -162,6 +163,7 @@ const data = reactive({
         { value: profile5, name: profile5.metadata.name },
         { value: profile6, name: profile6.metadata.name },
         { value: profile7, name: profile7.metadata.name },
+        { value: profile8, name: profile8.metadata.name },
     ],
     languages: [
         { name: "English", value: "en" },

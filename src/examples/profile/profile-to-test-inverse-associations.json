@@ -1,0 +1,73 @@
+{
+    "metadata": {
+        "name": "A profile to test creating inverse associations",
+        "description": "",
+        "version": 0.1,
+        "warnMissingProperty": true
+    },
+    "propertyAssociations": [
+        {
+            "property": "keywords",
+            "propertyId": "https://schema.org/keywords",
+            "inverse": { "property": "isKeywordOf", "propertyId": "https://schema.org/isKeywordOf" }
+        },
+        {
+            "property": "hasMember",
+            "propertyId": "https://schema.org/hasMember",
+            "inverse": {
+                "property": "isMemberOf",
+                "propertyId": "https://schema.org/isMemberOf"
+            }
+        }
+    ],
+    "classes": {
+        "Dataset": {
+            "definition": "inherit",
+            "subClassOf": [],
+            "inputs": [
+                {
+                    "id": "https://schema.org/keywords",
+                    "name": "keywords",
+                    "help": "This entity has these keywords",
+                    "multiple": true,
+                    "type": ["DefinedTerm", "Text"]
+                },
+                {
+                    "id": "https://schema.org/isKeywordOf",
+                    "name": "isKeywordOf",
+                    "help": "This keyword is a keyword of the linked entity",
+                    "multiple": true,
+                    "type": ["Dataset", "Person"]
+                },
+                {
+                    "id": "https://schema.org/isMemberOf",
+                    "name": "isMemberOf",
+                    "help": "This entity is a member of the linked entity",
+                    "multiple": true,
+                    "type": ["Dataset"]
+                },
+                {
+                    "id": "https://schema.org/hasMember",
+                    "name": "hasMember",
+                    "help": "This entity has these members",
+                    "multiple": true,
+                    "type": ["Person", "Dataset"]
+                }
+            ]
+        }
+    },
+    "lookup": {
+        "Language": {
+            "fields": [
+                "@id",
+                "name",
+                "alternateName",
+                "iso639-3",
+                "austlangCode",
+                "glottologCode",
+                "languageCode"
+            ],
+            "datapacks": []
+        }
+    }
+}

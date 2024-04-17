@@ -139,7 +139,7 @@ const props = defineProps({
         type: Boolean,
         default: true,
         validator: (val) => [true, false].includes(val),
-    }
+    },
 });
 
 const $emit = defineEmits([
@@ -151,7 +151,8 @@ const $emit = defineEmits([
     "save:entity:template",
 ]);
 defineExpose({
-    cm,
+    cm: cm.value,
+    pm: pm.value,
     setCurrentEntity,
     setTab: (tabName) => renderEntity.value.setTab(tabName),
     refresh: () => (contextEntity.value = { ...contextEntity.value }),
@@ -229,6 +230,9 @@ onMounted(async () => {
                 pm.value = new ProfileManager({
                     profile: structuredClone(toRaw(props.profile)) ?? {},
                 });
+
+                cm.value.setProfileManager(pm.value);
+                cm.value.$key = $key.cm += 1;
                 pm.value.$key = $key.pm += 1;
             }
         )
@@ -285,6 +289,7 @@ async function init() {
     // update the crate and profile managers
     cm.value = new CrateManager({ crate: structuredClone(toRaw(props.crate)) });
     pm.value = new ProfileManager({ profile: structuredClone(toRaw(props.profile)) ?? {} });
+    cm.value.setProfileManager(pm.value);
 
     // then bounce the $key which will trigger the watchers to
     //   run their local setups if required

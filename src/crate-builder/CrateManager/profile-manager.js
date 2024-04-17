@@ -18,7 +18,11 @@ export class ProfileManager {
     }
     /**
      *
-     * Get the layout properties from the profile if defined
+     * Get the layout for an entity from the profile
+     *
+     * @description Returns the first matching layout from the profile
+     * @param { Object } options
+     * @param { Object } options.entity - the entity whose layout is required
      *
      */
     getLayout({ entity }) {
@@ -37,10 +41,26 @@ export class ProfileManager {
     }
 
     /**
+     * Get inverse associations from the profile if any are defined
+     */
+    getPropertyAssociations() {
+        if (!this.profile?.propertyAssociations) return {};
+
+        // create the associations both ways and return
+        const associations = {};
+        this.profile.propertyAssociations.forEach((a) => {
+            associations[a.property] = a.inverse;
+            associations[a.inverse.property] = { property: a.property, propertyId: a.propertyId };
+        });
+        return associations;
+    }
+
+    /**
      *
      * Get the available classes
      *   if a profile is defined, get those
-     *   otherwise, get schema.org classes
+     * @description Returns the classes defined in the profile if one is applied
+     *   or all of the classes built into the base, schema.org profile
      *
      */
     getClasses() {
@@ -55,6 +75,10 @@ export class ProfileManager {
      *
      * Return the type hierarchy for the given entity
      *
+     * @param { Object } options
+     * @param { Object } options.entity - the entity whose hierarchy is required
+     *
+     *
      */
     getEntityTypeHierarchy({ entity }) {
         let types = entity["@type"];
@@ -67,11 +91,14 @@ export class ProfileManager {
      * Given an entity, try to find a definition for the property in the profile or
      *  right across the hierarchy
      *
+     * @param { Object } options
+     * @param { Object } options.property - the property to define
+     * @param { Object } options.entity - the entity this property is a part of
+     *
      */
     getPropertyDefinition({ property, entity }) {
         let propertyDefinition;
         let inputs = this.getInputsFromProfile({ entity });
-        // console.debug("ENTITY definition:", JSON.stringify(entityDefinition, null, 2));
         if (inputs.length) {
             // we found an entity definition in the profile - do we have a property definition?
             propertyDefinition = inputs.filter(
@@ -87,8 +114,6 @@ export class ProfileManager {
         }
         // unable to locate a property definition in the profile - look in schema.org
         if (isEmpty(propertyDefinition)) {
-            // const types = flattenDeep(this.mapTypeHierarchies(type));
-            // let inputs = this.collectInputs({ types });
             let { inputs } = this.getAllInputs({ entity });
             propertyDefinition = inputs.filter(
                 (p) => p.name.toLowerCase() === property.toLowerCase()
@@ -156,6 +181,9 @@ export class ProfileManager {
      *
      * Given an entity, get the inputs defined in the profile
      *
+     * @param { Object } options
+     * @param { Object } options.entity - the entity
+     *
      */
     getInputsFromProfile({ entity }) {
         let types = entity["@type"];
@@ -174,6 +202,8 @@ export class ProfileManager {
      *
      * Given an entity, get all available inputs by joining the profile with schema.org
      *
+     * @param { Object } options
+     * @param { Object } options.entity - the entity
      */
     getAllInputs({ entity }) {
         getInputs = getInputs.bind(this);
@@ -208,7 +238,12 @@ export class ProfileManager {
 
     /**
      *
-     * try to get all types from the profile,
+     * Try to get a definition from the profile and see if it's override or inherit
+     *
+     * @description If there's an override then return override - otherwise inherit. Exclusive rather than inclusive.
+     *
+     * @param { Object } options
+     * @param { Object } options.entity - the entity
      * if there's an override then set to override - otherwise inherit
      * be exclusive rather than inclusive
      */
@@ -220,6 +255,8 @@ export class ProfileManager {
 
     /**
      * Get an entity label if defined
+     *
+     * @property the type name to localise
      */
     getTypeLabel(type) {
         return this.profile?.localisation?.[type] ?? type;

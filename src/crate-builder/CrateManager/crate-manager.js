@@ -28,9 +28,12 @@ const structuredClone = function (data) {
  * @description A class to work with RO-Crates
  */
 export class CrateManager {
-    constructor({ crate, context = undefined }) {
+    constructor({ crate, pm, context = undefined }) {
         // the crate
         this.crate = undefined;
+
+        // the profile manager - if you've set  profile
+        this.pm = undefined;
 
         // entity reverse associations
         this.reverse = {};
@@ -253,6 +256,15 @@ export class CrateManager {
      */
     setContext(context) {
         this.providedContext = this.__normaliseContext(context);
+    }
+
+    /**
+     * Set a profile
+     * @description  CrateManager can set reverse associations if defined in a profile.
+     *
+     * */
+    setProfileManager(pm) {
+        this.pm = pm;
     }
 
     /**
@@ -591,7 +603,7 @@ cm.deleteEntity({ id: '#e1' })
             if (this.coreProperties.includes(property)) continue;
             for (let instance of instances) {
                 if (instance?.["@id"]) {
-                    console.log(instance["@id"], this.reverse[instance["@id"]]);
+                    // console.log(instance["@id"], this.reverse[instance["@id"]]);
                     this.reverse[instance["@id"]][property] = this.reverse[instance["@id"]][
                         property
                     ].filter((i) => i["@id"] !== id);
@@ -847,6 +859,8 @@ let arrayOfObjects = cm.flatten(json)
     /**
      * Link two entities
      *
+     * @description Link two entities via a property. If there is a profile defined
+     *      and it has reverse associations, then they will be added.
      * @param {Object} options
      * @param {string} options.id - the id of the entity to add the association to
      * @param {string} options.property - the property to add the association to
@@ -865,11 +879,25 @@ cm.linkEntity({ id: './', property: 'author', value: { '@id': '#e1' }})
             throw new Error(`value must be an object with '@id' defined`);
         }
         this.setProperty({ id, property, propertyId, value });
+
+        // set inverse association if required
+        const associations = this.pm?.getPropertyAssociations() ?? {};
+        if (associations[property]) {
+            let inverse = associations[property];
+            this.setProperty({
+                id: value["@id"],
+                property: inverse.property,
+                propertyId: inverse.propertyId,
+                value: { "@id": id },
+            });
+        }
     }
 
     /**
      * Unlink two entities
      *
+     * @description Remove an association between two entities. If there is a profile defined
+     *      and it has reverse associations, then they will be removed as well.
      * @param {Object} options
      * @param {string} options.id - the id of the entity to remove the association from
      * @param {string} options.property - the property containing the association
@@ -881,7 +909,7 @@ const cm = new CrateManager({ crate })
 cm.unlinkEntity({ id: './', property: 'author', value: { '@id': '#e1' }})
 
      **/
-    unlinkEntity({ id = undefined, property, value }) {
+    unlinkEntity({ id = undefined, property = undefined, value = undefined, stop = false }) {
         if (!id) throw new Error(`'unlinkEntity' requires 'id' to be defined`);
         if (!property) throw new Error(`'unlinkEntity' requires 'property' to be defined`);
         if (!value) throw new Error(`'unlinkEntity' requires 'value' to be defined`);
@@ -889,8 +917,13 @@ cm.unlinkEntity({ id: './', property: 'author', value: { '@id': '#e1' }})
             throw new Error(`value must be an object with '@id' defined`);
         }
 
+        // console.log("START", id, property, value["@id"]);
+        // get the source entity
         let indexRef = this.entityIdIndex[id];
         let entity = this.crate["@graph"][indexRef];
+        // console.log("SOURCE ENTITY BEFORE ", entity);
+
+        // and remove the linked entity from the specified property
         entity[property] = entity[property].filter((v) => {
             if (v?.["@id"] && v["@id"] === value["@id"]) {
                 // do nothing - we don't want it
@@ -899,14 +932,33 @@ cm.unlinkEntity({ id: './', property: 'author', value: { '@id': '#e1' }})
             }
         });
         if (!entity[property].length) delete entity[property];
+        // console.log("SOURCE ENTITY AFTER", entity);
+
+        // clean up the reverse mapping back value['@id'] -> id
+
+        // console.log(`TARGET ENTITY BEFORE REVERSE`, this.reverse[value["@id"]]);
+        // console.log();
         if (this.reverse[value["@id"]]) {
             this.reverse[value["@id"]][property] = this.reverse[value["@id"]][property].filter(
                 (v) => {
-                    v["@id"] !== value["@id"];
+                    return v["@id"] !== id;
                 }
             );
             if (!this.reverse[value["@id"]][property].length)
                 delete this.reverse[value["@id"]][property];
+        }
+        // console.log(`TARGET ENTITY AFTER REVERSE`, this.reverse[value["@id"]]);
+        // remove any inverse associations
+        const associations = this.pm?.getPropertyAssociations() ?? {};
+        if (associations[property] && !stop) {
+            const inverse = associations[property];
+            // console.log(inverse, value["@id"], property, id);
+            this.unlinkEntity({
+                id: value["@id"],
+                property: inverse.property,
+                value: { "@id": id },
+                stop: true, // V. IMPORTANT so we don't get into an infinite loop
+            });
         }
     }
 

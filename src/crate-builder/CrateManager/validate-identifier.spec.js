@@ -69,14 +69,14 @@ describe("Test @id's that should NOT be valid", () => {
     });
     test(`aaa should not be valid`, () => {
         expect(validateId({ id: "aaa", type: "Person" }).message).toEqual(
-            "Invalid identifier 'aaa'. See https://github.com/describo/crate-builder-component/blob/master/README.identifiers.md for more information."
+            "Invalid identifier 'aaa'. See https://describo.github.io/documentation/component/identifiers.html for more information."
         );
     });
     test(`32a423d6-52ab-47e3-a9cd-54f418a48571 should not be valid`, () => {
         expect(
             validateId({ id: "32a423d6-52ab-47e3-a9cd-54f418a48571", type: "Person" }).message
         ).toEqual(
-            `Invalid identifier '32a423d6-52ab-47e3-a9cd-54f418a48571'. See https://github.com/describo/crate-builder-component/blob/master/README.identifiers.md for more information.`
+            `Invalid identifier '32a423d6-52ab-47e3-a9cd-54f418a48571'. See https://describo.github.io/documentation/component/identifiers.html for more information.`
         );
     });
 });
