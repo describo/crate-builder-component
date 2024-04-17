@@ -151,8 +151,8 @@ const $emit = defineEmits([
     "save:entity:template",
 ]);
 defineExpose({
-    cm: cm.value,
-    pm: pm.value,
+    cm,
+    pm,
     setCurrentEntity,
     setTab: (tabName) => renderEntity.value.setTab(tabName),
     refresh: () => (contextEntity.value = { ...contextEntity.value }),
