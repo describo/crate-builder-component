@@ -60,15 +60,15 @@
                 </div>
             </div>
             <!-- render all the links in a wrapping row -->
-            <div :class="{ 'mt-2': simpleInstances.length && linkInstances.length }">
-                <PaginateLinkedEntitiesComponent
-                    :entities="linkInstances"
-                    :property="props.property"
-                    :readonly="propertyDefinition.readonly"
-                    @load:entity="loadEntity"
-                    @unlink:entity="unlinkEntity"
-                />
-            </div>
+            <PaginateLinkedEntitiesComponent
+                v-if="linkInstances.length"
+                :class="{ 'mt-2': simpleInstances.length && linkInstances.length }"
+                :entities="linkInstances"
+                :property="props.property"
+                :readonly="propertyDefinition.readonly"
+                @load:entity="loadEntity"
+                @unlink:entity="unlinkEntity"
+            />
             <add-component
                 v-if="showAddControl && !configuration.readonly"
                 :property="props.property"
