@@ -42,8 +42,27 @@ export class ProfileManager {
         // no matching layout found
         if (!layout.length) return null;
 
-        // match found - return it
-        return layout[0];
+        // match found - make sure it has about and overflow placeholders
+        layout = layout[0];
+        if (!layout.about) {
+            layout.about = {
+                name: "about",
+                label: "About",
+                inputs: [],
+                order: 0,
+            };
+        }
+        if (!layout.overflow) {
+            layout.overflow = {
+                name: "overflow",
+                label: "...",
+                inputs: [],
+                order: Object.keys(layout).length,
+            };
+        }
+
+        // return it
+        return layout;
     }
 
     /**
@@ -199,6 +218,14 @@ export class ProfileManager {
             if (this.profile?.classes?.[type]) {
                 //   yes - get it
                 inputs = [...inputs, ...cloneDeep(this.profile?.classes?.[type].inputs)];
+            }
+
+            // if this class is a subclass of others, and they have a definition in the profile
+            //   go and get those inputs as well
+            if (this.profile?.classes?.[type]?.subClassOf) {
+                for (let parentClass of this.profile?.classes?.[type]?.subClassOf) {
+                    inputs = [...inputs, ...cloneDeep(this.profile?.classes?.[parentClass].inputs)];
+                }
             }
         }
         return uniqBy(inputs, "id");

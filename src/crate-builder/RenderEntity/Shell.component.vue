@@ -250,10 +250,8 @@ import RenderEntityNameComponent from "./RenderEntityName.component.vue";
 import RenderEntityPropertyComponent from "./RenderEntityProperty.component.vue";
 import RenderReverseConnectionsComponent from "./RenderReverseConnections.component.vue";
 import RenderControlsComponent from "./RenderControls.component.vue";
-import difference from "lodash-es/difference.js";
-import orderBy from "lodash-es/orderBy.js";
-import isString from "lodash-es/isString.js";
 import { isURL } from "../CrateManager/lib.js";
+import { applyLayout } from "./layout.js";
 
 const props = defineProps({
     entity: {
@@ -352,123 +350,18 @@ function init({ entity }) {
         window.scrollTo(0, 0);
     }
 
-    const inputs = pm.value.getInputsFromProfile({ entity });
-    data.missingRequiredData = false;
+    const layout = applyLayout({
+        configuration: configuration.value,
+        profileManager: pm.value,
+        entity,
+        extraProperties: [],
+    });
+    contextEntity.value = layout.entity;
+    data.renderTabs = layout.renderTabs;
+    data.missingRequiredData = layout.missingRequiredData;
+    tabs.value = layout.tabs;
 
-    for (let input of inputs) {
-        if (input.name === "name") continue;
-        if (!input.id) {
-            console.error(`Excluding invalid input - missing id: ${input}`);
-            continue;
-        }
-        if (!entity[input.name] && !configuration.value.readonly) {
-            entity[input.name] = [];
-        }
-
-        if (input.required && !entity[input.name].length) {
-            data.missingRequiredData = true;
-        }
-    }
-    if (data.extraProperties.length) {
-        data.extraProperties.forEach((property) => {
-            if (!entity[property]) entity[property] = [];
-        });
-    }
-    let properties = {};
-    let propertyNames = [];
-    Object.keys(entity).forEach((k) => (propertyNames[k.toLowerCase()] = k));
-    Object.keys(entity)
-        .map((k) => k.toLowerCase())
-        .sort()
-        .forEach((k) => (properties[propertyNames[k]] = entity[propertyNames[k]]));
-
-    contextEntity.value = entity;
-    let layout = pm.value.getLayout({ entity });
-    if (!layout) {
-        data.renderTabs = false;
-    } else {
-        data.renderTabs = true;
-        tabs.value = applyTabDataIndicators({
-            tabs: applyLayout({ layout, inputs, entity }),
-            entity,
-        });
-    }
     $emit("ready");
-}
-function applyLayout({ layout, inputs, entity }) {
-    let sort = false;
-    for (let name of Object.keys(layout)) {
-        layout[name].name = name;
-        layout[name].inputs = [];
-        if (layout[name].order) sort = true;
-    }
-    if (!layout.about) {
-        layout.about = {
-            name: "about",
-            label: "About",
-            inputs: [],
-            order: 0,
-        };
-    }
-    if (!layout.overflow) {
-        layout.overflow = {
-            name: "overflow",
-            label: "...",
-            inputs: [],
-            order: Object.keys(layout).length,
-        };
-    }
-    // sort the inputs into their groups
-    for (let input of inputs) {
-        if (!entity[input.name]) continue;
-        if (input.hide) {
-            continue;
-        } else if (input.group && layout[input.group]) {
-            layout[input.group].inputs.push(input);
-        } else {
-            layout.overflow.inputs.push(input);
-        }
-    }
-
-    // get a list of the properties defined on the input
-    //   but which have no input definition and pop them
-    //   into the overflow group with a default Text configuration
-    let profileInputs = inputs.map((i) => i.name);
-    let entityProperties = Object.keys(entity);
-    let missingInputs = difference(entityProperties, profileInputs);
-    for (let input of missingInputs) {
-        layout.overflow.inputs.push({
-            name: input,
-            multiple: true,
-            values: ["Text"],
-        });
-    }
-
-    let tabs = Object.keys(layout)
-        .map((k) => layout[k])
-        .filter((t) => t.name !== "appliesTo");
-    if (sort) tabs = orderBy(tabs, "order");
-    return tabs;
-}
-function applyTabDataIndicators({ tabs, entity }) {
-    for (let tab of tabs) {
-        if (configuration.readonly) {
-            tab.hasData = false;
-            tab.missingRequiredData = false;
-        } else {
-            tab.missingRequiredData = false;
-            tab.hasData = false;
-            for (let input of tab.inputs) {
-                if (input.required && !entity[input.name].length) {
-                    tab.missingRequiredData = true;
-                }
-                if (entity[input.name].length) {
-                    tab.hasData = true;
-                }
-            }
-        }
-    }
-    return tabs;
 }
 function refresh() {
     const entity = cm.value.getEntity({ id: props.entity["@id"] });
