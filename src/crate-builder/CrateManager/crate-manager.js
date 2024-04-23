@@ -1036,8 +1036,10 @@ let crate = cm.exportCrate()
                 }
                 return e;
             });
+
+        const context = this.getContext();
         const crate = {
-            "@context": this.getContext(),
+            "@context": context.length === 1 ? context[0] : context,
             "@graph": entities,
         };
         const t1 = performance.now();
