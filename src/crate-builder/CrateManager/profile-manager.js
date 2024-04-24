@@ -185,7 +185,11 @@ export class ProfileManager {
         types = flattenDeep(types.map((type) => [type, this.profile?.classes?.[type]?.subClassOf]));
         types = compact(types);
 
-        types = flattenDeep(types.map((type) => schemaOrgTypeDefinitions[type].hierarchy));
+        types = flattenDeep(
+            types.map((type) => {
+                return schemaOrgTypeDefinitions[type]?.hierarchy ?? ["Thing"];
+            })
+        );
         types = uniq(types);
         return types;
         // types = flattenDeep(
