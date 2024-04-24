@@ -185,21 +185,24 @@ export class ProfileManager {
         types = flattenDeep(types.map((type) => [type, this.profile?.classes?.[type]?.subClassOf]));
         types = compact(types);
 
-        types = flattenDeep(
-            types.map((type) => {
-                if (schemaOrgTypeDefinitions[type]?.subClassOf.length) {
-                    return [
-                        type,
-                        this.mapTypeHierarchies({
-                            types: schemaOrgTypeDefinitions[type]?.subClassOf,
-                        }),
-                    ];
-                } else {
-                    return type;
-                }
-            })
-        );
-        return uniq(types);
+        types = flattenDeep(types.map((type) => schemaOrgTypeDefinitions[type].hierarchy));
+        types = uniq(types);
+        return types;
+        // types = flattenDeep(
+        //     types.map((type) => {
+        //         if (schemaOrgTypeDefinitions[type]?.subClassOf.length) {
+        //             return [
+        //                 type,
+        //                 this.mapTypeHierarchies({
+        //                     types: schemaOrgTypeDefinitions[type]?.subClassOf,
+        //                 }),
+        //             ];
+        //         } else {
+        //             return type;
+        //         }
+        //     })
+        // );
+        // return uniq(types);
     }
 
     /**
