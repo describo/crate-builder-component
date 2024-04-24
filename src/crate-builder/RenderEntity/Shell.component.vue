@@ -354,7 +354,7 @@ function init({ entity }) {
         configuration: configuration.value,
         profileManager: pm.value,
         entity,
-        extraProperties: [],
+        extraProperties: data.extraProperties,
     });
     contextEntity.value = layout.entity;
     data.renderTabs = layout.renderTabs;
