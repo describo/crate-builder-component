@@ -1,6 +1,6 @@
 <template>
     <div
-        class="describo-render-item-link py-2 rounded bg-blue-200 hover:text-black hover:bg-blue-300 hover:rounded-r-none"
+        class="describo-render-item-link py-1 rounded bg-blue-200 hover:text-black hover:bg-blue-300 hover:rounded-r-none"
     >
         <!-- if the entity does NOT have geography -->
         <div
@@ -9,7 +9,7 @@
             :class="{ 'm-2': entity?.associations?.length }"
         >
             <!--render the linking element  -->
-            <div class="flex flex-row">
+            <div class="flex flex-row space-x-2 items-start">
                 <RenderItemLinkComponent :entity="props.entity" @load:entity="loadEntity" />
                 <UnlinkEntityComponent
                     v-if="!configuration.readonly && !props.readonly"

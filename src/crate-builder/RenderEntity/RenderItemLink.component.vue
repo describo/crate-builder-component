@@ -4,7 +4,7 @@
             <div class="border-b border-gray-500 text-sm flex-grow">
                 {{ decodeURIComponent(entity["@id"]) }}
             </div>
-            <div class="flex flex-row space-x-2">
+            <div class="flex flex-row space-x-2 items-center">
                 <div class="text-base flex flex-row space-x-1">
                     <RenderTypesComponent :types="entity['@type']" />
                 </div>
