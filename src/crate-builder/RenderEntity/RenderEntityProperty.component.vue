@@ -6,7 +6,7 @@
             `describo-property describo-property-name-${props.property}`,
         ]"
     >
-        <div class="w-1/3 xl:w-1/5 flex flex-col describo-property-heading">
+        <div class="min-w-64 w-1/3 xl:w-1/5 flex flex-col describo-property-heading">
             <div>
                 <display-property-name-component
                     :property="props.property"
