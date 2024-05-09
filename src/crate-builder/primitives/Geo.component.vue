@@ -12,7 +12,8 @@
                 <div class="flex flex-row space-x-4 py-1">
                     <div>
                         <el-button @click="centerMap" type="primary">
-                            <i class="fa-solid fa-crosshairs"></i>&nbsp; {{ $t("center_map") }}
+                            <FontAwesomeIcon :icon="faCrosshairs"></FontAwesomeIcon>
+                            &nbsp; {{ $t("center_map") }}
                         </el-button>
                     </div>
                     <div class="flex flex-col">
@@ -65,6 +66,8 @@
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faCrosshairs } from "@fortawesome/free-solid-svg-icons";
 // https://macwright.com/lonlat/
 
 import { ElButton, ElRadio, ElSelect, ElOption, ElForm, ElFormItem, ElInput } from "element-plus";

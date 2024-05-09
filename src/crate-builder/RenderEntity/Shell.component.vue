@@ -34,7 +34,10 @@
                                 data.highlightRequiredProperties = !data.highlightRequiredProperties
                             "
                         >
-                            <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                            <FontAwesomeIcon
+                                :icon="faTriangleExclamation"
+                                size="lg"
+                            ></FontAwesomeIcon>
                         </el-button>
                     </div>
                 </div>
@@ -120,13 +123,19 @@
                                     </div>
                                 </div>
                                 <div v-if="tab.missingRequiredData" class="text-red-600">
-                                    <i class="fa-regular fa-circle-xmark fa-lg"></i>
+                                    <FontAwesomeIcon
+                                        :icon="faCircleXmark"
+                                        size="lg"
+                                    ></FontAwesomeIcon>
                                 </div>
                                 <div
                                     v-if="tab.hasData && !tab.missingRequiredData"
                                     class="text-green-600"
                                 >
-                                    <i class="fa-regular fa-circle-check fa-lg"></i>
+                                    <FontAwesomeIcon
+                                        :icon="faCircleCheck"
+                                        size="lg"
+                                    ></FontAwesomeIcon>
                                 </div>
                             </div>
                             <div
@@ -147,7 +156,10 @@
                                 data.highlightRequiredProperties = !data.highlightRequiredProperties
                             "
                         >
-                            <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                            <FontAwesomeIcon
+                                :icon="faTriangleExclamation"
+                                size="lg"
+                            ></FontAwesomeIcon>
                         </el-button>
                     </div>
                     <div v-if="tab.name === 'about'">
@@ -214,11 +226,10 @@
             @click="data.reverseSidebarVisible = !data.reverseSidebarVisible"
         >
             <div v-show="!data.reverseSidebarVisible">
-                <i class="fa-solid fa-chevron-left"></i>
-                <!-- <i class="fa-solid fa-link"></i> -->
+                <FontAwesomeIcon :icon="faChevronLeft"></FontAwesomeIcon>
             </div>
             <div v-show="data.reverseSidebarVisible">
-                <i class="fa-solid fa-chevron-right"></i>
+                <FontAwesomeIcon :icon="faChevronRight"></FontAwesomeIcon>
             </div>
         </div>
         <!-- reverse links panel as a drawer-->
@@ -241,6 +252,13 @@
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import {
+    faTriangleExclamation,
+    faChevronLeft,
+    faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
+import { faCircleCheck, faCircleXmark } from "@fortawesome/free-regular-svg-icons";
 import { configurationKey, crateManagerKey, profileManagerKey } from "./keys.js";
 import { reactive, shallowRef, onMounted, onBeforeUnmount, watch, inject } from "vue";
 import { ElTabs, ElTabPane, ElDrawer, ElButton } from "element-plus";

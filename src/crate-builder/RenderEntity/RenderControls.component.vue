@@ -9,21 +9,21 @@
                 <div>
                     <!-- back -->
                     <el-button @click="back" type="primary">
-                        <i class="fa-solid fa-arrow-left"></i>
+                        <FontAwesomeIcon :icon="faArrowLeft"></FontAwesomeIcon>
                         <!-- &nbsp; {{ $t("root_dataset_label") }} -->
                     </el-button>
                 </div>
                 <div>
                     <!-- go to root dataset -->
                     <el-button @click="loadRootDataset" type="primary" :disabled="isRootDataset">
-                        <i class="fa-solid fa-house"></i>
+                        <FontAwesomeIcon :icon="faHouse"></FontAwesomeIcon>
                         <!-- &nbsp; {{ $t("root_dataset_label") }} -->
                     </el-button>
                 </div>
                 <div>
                     <!-- forward -->
                     <el-button @click="forward" type="primary">
-                        <i class="fa-solid fa-arrow-right"></i>
+                        <FontAwesomeIcon :icon="faArrowRight"></FontAwesomeIcon>
                         <!-- &nbsp; {{ $t("root_dataset_label") }} -->
                     </el-button>
                 </div>
@@ -35,28 +35,28 @@
                     type="primary"
                     :disabled="definition !== 'inherit'"
                 >
-                    <i class="fas fa-code"></i>
+                    <FontAwesomeIcon :icon="faCode"></FontAwesomeIcon>
                     &nbsp; {{ $t("add_label") }}
                 </el-button>
             </div>
             <div v-if="configuration.enableContextEditor">
                 <!-- edit context -->
                 <el-button @click="toggle('editContext')" type="primary">
-                    <i class="fa-solid fa-pen-to-square"></i>
+                    <FontAwesomeIcon :icon="faPenToSquare"></FontAwesomeIcon>
                     &nbsp;{{ $t("edit_context_label") }}
                 </el-button>
             </div>
             <div v-if="configuration.enableCratePreview">
                 <!-- preview crate -->
                 <el-button @click="toggle('previewCrate')" type="primary">
-                    <i class="fa-solid fa-eye"></i>
+                    <FontAwesomeIcon :icon="faEye"></FontAwesomeIcon>
                     &nbsp;{{ $t("preview_label") }}
                 </el-button>
             </div>
             <div v-if="configuration.enableBrowseEntities">
                 <!-- browse crate entities -->
                 <el-button @click="toggle('browseEntities')" type="primary">
-                    <i class="fa-solid fa-layer-group"></i>
+                    <FontAwesomeIcon :icon="faLayerGroup"></FontAwesomeIcon>
                     &nbsp;{{ $t("browse_entities_label") }}
                 </el-button>
             </div>
@@ -70,7 +70,7 @@
                         type="primary"
                     >
                         <div class="inline-block">
-                            <i class="fas fa-save"></i>
+                            <FontAwesomeIcon :icon="faSave"></FontAwesomeIcon>
                         </div>
                         <div
                             class="inline-block ml-1 xl:inline-block xl:ml-1"
@@ -92,7 +92,7 @@
                         <template #reference>
                             <el-button type="danger">
                                 <div class="inline-block">
-                                    <i class="fas fa-trash"></i>
+                                    <FontAwesomeIcon :icon="faTrash"></FontAwesomeIcon>
                                 </div>
                                 <div
                                     class="inline-block ml-1 xl:inline-block xl:ml-1"
@@ -196,6 +196,18 @@
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import {
+    faArrowLeft,
+    faHouse,
+    faArrowRight,
+    faCode,
+    faPenToSquare,
+    faEye,
+    faLayerGroup,
+    faSave,
+    faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 import { ElDrawer, ElPopconfirm, ElButton } from "element-plus";
 import AddPropertyDialog from "./DialogAddProperty.component.vue";
 import EditContextDialog from "./DialogEditContext.component.vue";

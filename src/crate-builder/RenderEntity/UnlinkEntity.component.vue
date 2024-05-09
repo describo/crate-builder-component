@@ -1,12 +1,14 @@
 <template>
     <div class="">
         <el-button @click="unlinkEntity" type="danger">
-            <i class="fas fa-unlink"></i>
+            <FontAwesomeIcon :icon="faUnlink"></FontAwesomeIcon>
         </el-button>
     </div>
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faUnlink } from "@fortawesome/free-solid-svg-icons";
 import { ElButton } from "element-plus";
 const $emit = defineEmits(["unlink:entity"]);
 const props = defineProps({

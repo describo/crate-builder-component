@@ -1,17 +1,19 @@
 <template>
     <div class="">
         <el-button @click="deleteProperty" type="danger">
-            <div v-show="props.type === 'unlink'" class="inline-block">
-                <i class="fas fa-unlink"></i>
-            </div>
+            <!-- <div v-show="props.type === 'unlink'" class="inline-block">
+                <FontAwesomeIcon :icon="faUnlink"></FontAwesomeIcon>
+            </div> -->
             <div v-show="props.type === 'delete'" class="inline-block">
-                <i class="fas fa-trash"></i>
+                <FontAwesomeIcon :icon="faTrash"></FontAwesomeIcon>
             </div>
         </el-button>
     </div>
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faUnlink, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ElButton } from "element-plus";
 const emit = defineEmits(["delete:property"]);
 const props = defineProps({

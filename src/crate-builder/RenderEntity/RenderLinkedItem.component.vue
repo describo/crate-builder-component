@@ -37,7 +37,7 @@
                             <div class="">
                                 {{ association.property }}
                             </div>
-                            <div><i class="fa-solid fa-arrow-right"></i></div>
+                            <div><FontAwesomeIcon :icon="faArrowRight"></FontAwesomeIcon></div>
                             <div class="flex flex-row space-x-1">
                                 <div>
                                     <span v-if="association.name">{{ association.name }}</span>
@@ -72,6 +72,8 @@
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import RenderItemLinkComponent from "./RenderItemLink.component.vue";
 import UnlinkEntityComponent from "./UnlinkEntity.component.vue";
 import MapComponent from "../primitives/Map.component.vue";

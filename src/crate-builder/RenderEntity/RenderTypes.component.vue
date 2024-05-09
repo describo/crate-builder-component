@@ -3,7 +3,7 @@
         <el-tag size="large">
             <div class="text-gray-800 font-light flex flex-row space-x-1">
                 <div class="" v-if="data.types[etype]">
-                    <i class="fa-solid fa-fw" :class="data.types[etype]"></i>
+                    <FontAwesomeIcon :icon="data.types[etype]" fixed-width></FontAwesomeIcon>
                 </div>
                 <div class="">{{ getTypeLabelFromProfile(etype) }}</div>
             </div>
@@ -12,6 +12,33 @@
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import {
+    faBookOpen,
+    faAddressCard,
+    faPlus,
+    faImage,
+    faFlag,
+    faFolder,
+    faDownload,
+    faFile,
+    faMapMarkerAlt,
+    faBarcode,
+    faSignLanguage,
+    faUniversity,
+    faUser,
+    faGlobe,
+    faParagraph,
+    faNewspaper,
+    faCubes,
+    faCube,
+    faScroll,
+    faCode,
+    faLink,
+    faProjectDiagram,
+} from "@fortawesome/free-solid-svg-icons";
+import { faJs } from "@fortawesome/free-brands-svg-icons";
+
 import { ElTag } from "element-plus";
 import { reactive, inject } from "vue";
 import { profileManagerKey } from "./keys.js";
@@ -30,34 +57,34 @@ function getTypeLabelFromProfile(type) {
 
 const data = reactive({
     types: {
-        Book: "fa-book-open",
-        ContactPoint: "fa-address-card",
-        ComputerLanguage: "fa-brands fa-js",
-        CreateAction: "fa-plus",
-        CreativeWork: "fa-image",
-        Country: "fa-flag",
-        Dataset: "fa-folder",
-        DataDownload: "fa-download",
-        DerivedMaterial: "fa-download",
-        File: "fa-file",
-        GeoCoordinates: "fa-map-marker-alt",
-        GeoShape: "fa-map-marker-alt",
-        IndividualProduct: "fa-barcode",
-        Language: "fa-sign-language",
-        Organization: "fa-university",
-        Organisation: "fa-university",
-        Person: "fa-user",
-        Place: "fa-globe",
-        PropertyValue: "fa-paragraph",
-        Publication: "fa-newspaper",
-        RepositoryCollection: "fa-cubes",
-        RepositoryObject: "fa-cube",
-        ScholarlyArticle: "fa-scroll",
-        Script: "fa-code",
-        SoftwareApplication: "fa-code",
-        URL: "fa-link",
-        Workflow: "fa-project-diagram",
-        WorkflowSketch: "fa-project-diagram",
+        Book: faBookOpen,
+        ContactPoint: faAddressCard,
+        ComputerLanguage: faJs,
+        CreateAction: faPlus,
+        CreativeWork: faImage,
+        Country: faFlag,
+        Dataset: faFolder,
+        DataDownload: faDownload,
+        DerivedMaterial: faDownload,
+        File: faFile,
+        GeoCoordinates: faMapMarkerAlt,
+        GeoShape: faMapMarkerAlt,
+        IndividualProduct: faBarcode,
+        Language: faSignLanguage,
+        Organization: faUniversity,
+        Organisation: faUniversity,
+        Person: faUser,
+        Place: faGlobe,
+        PropertyValue: faParagraph,
+        Publication: faNewspaper,
+        RepositoryCollection: faCubes,
+        RepositoryObject: faCube,
+        ScholarlyArticle: faScroll,
+        Script: faCode,
+        SoftwareApplication: faCode,
+        URL: faLink,
+        Workflow: faProjectDiagram,
+        WorkflowSketch: faProjectDiagram,
     },
 });
 </script>

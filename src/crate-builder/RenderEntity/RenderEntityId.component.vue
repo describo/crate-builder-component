@@ -31,7 +31,7 @@
                     props.entity["@id"]
                 }}</a>
                 &nbsp;
-                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                <FontAwesomeIcon :icon="faArrowUpRightFromSquare"></FontAwesomeIcon>
             </div>
             <div v-else>{{ props.entity["@id"] }}</div>
         </div>
@@ -39,6 +39,8 @@
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
 import TextComponent from "../primitives/Text.component.vue";
 import { reactive, inject } from "vue";
 import { isURL } from "../CrateManager/lib.js";

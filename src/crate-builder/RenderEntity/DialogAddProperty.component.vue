@@ -21,7 +21,7 @@
                     <div v-else class="text-black">
                         {{ item.name }}
                     </div>
-                    <div><i class="fa-solid fa-arrow-right"></i></div>
+                    <div><FontAwesomeIcon :icon="faArrowRight"></FontAwesomeIcon></div>
                     <div>{{ item.type.map((t) => `"${t}"`).join(", ") }}</div>
                 </div>
                 <div class="text-gray-600 w-full">
@@ -33,6 +33,8 @@
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { ElInput } from "element-plus";
 import { reactive, computed, watch, inject } from "vue";
 import { $t } from "../i18n";

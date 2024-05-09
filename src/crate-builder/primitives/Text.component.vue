@@ -35,7 +35,7 @@
                 size="default"
                 :disabled="!isValidTextValue"
             >
-                <i class="fas fa-check fa-fw"></i>
+                <FontAwesomeIcon :icon="faCheck" fixed-width></FontAwesomeIcon>
             </el-button>
         </div>
         <div class="text-xs" v-if="!isValidTextValue && getConstraintsString()">
@@ -45,6 +45,8 @@
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { ElInput, ElButton } from "element-plus";
 import { reactive, watch, ref } from "vue";
 import debounce from "lodash-es/debounce.js";

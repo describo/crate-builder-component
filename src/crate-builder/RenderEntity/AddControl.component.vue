@@ -7,10 +7,10 @@
                 class="focus:outline-none focus:border-2 focus:border-green-600 m-1"
             >
                 <div v-show="!selectedType || selectedType !== type">
-                    <i class="fas fa-plus"></i>
+                    <FontAwesomeIcon :icon="faPlus"></FontAwesomeIcon>
                 </div>
                 <div v-show="selectedType === type">
-                    <i class="fas fa-times"></i>
+                    <FontAwesomeIcon :icon="faTimes"></FontAwesomeIcon>
                 </div>
                 &nbsp;{{ getTypeLabelFromProfile(type) }}
             </el-button>
@@ -19,6 +19,8 @@
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faPlus, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { ElButton } from "element-plus";
 import { computed, inject } from "vue";
 import { profileManagerKey } from "./keys.js";

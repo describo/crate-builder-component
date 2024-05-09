@@ -3,7 +3,7 @@
         <div ref="codemirror" class=""></div>
         <div>
             <el-button @click="save" type="primary">
-                <i class="fa-solid fa-floppy-disk"></i>
+                <FontAwesomeIcon :icon="faSave"></FontAwesomeIcon>
                 &nbsp;{{ $t("save_label") }}
             </el-button>
         </div>
@@ -14,6 +14,8 @@
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faSave } from '@fortawesome/free-solid-svg-icons'
 import { ElButton } from "element-plus";
 import { EditorView, basicSetup } from "codemirror";
 import { EditorState } from "@codemirror/state";

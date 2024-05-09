@@ -10,7 +10,7 @@
                 resize="vertical"
             ></el-input>
             <el-button @click="save" type="success" :disabled="!isValidUrl">
-                <i class="fas fa-check fa-fw"></i>
+                <FontAwesomeIcon :icon="faCheck" fixed-width></FontAwesomeIcon>
             </el-button>
         </div>
         <div class="text-xs" v-if="!isValidUrl">
@@ -20,6 +20,8 @@
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { ElButton, ElInput } from "element-plus";
 import { reactive, watch, computed } from "vue";
 import { isURL } from "../CrateManager/lib.js";
