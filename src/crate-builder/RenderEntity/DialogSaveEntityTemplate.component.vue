@@ -3,8 +3,8 @@
         <div class="flex flex-row space-x-4">
             <div>
                 <el-radio-group v-model="data.resolveDepth">
-                    <el-radio label="0">Depth: 0</el-radio>
-                    <el-radio label="1">Depth: 1</el-radio>
+                    <el-radio value="0">Depth: 0</el-radio>
+                    <el-radio value="1">Depth: 1</el-radio>
                 </el-radio-group>
             </div>
             <div>
@@ -24,8 +24,6 @@
 <script setup>
 import { ElButton, ElRadio, ElRadioGroup } from "element-plus";
 import { reactive, computed, inject } from "vue";
-import compact from "lodash-es/compact";
-import { $t } from "../i18n";
 import { crateManagerKey } from "./keys.js";
 const cm = inject(crateManagerKey);
 

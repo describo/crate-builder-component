@@ -11,6 +11,7 @@ import uniqBy from "lodash-es/uniqBy.js";
 import isPlainObject from "lodash-es/isPlainObject.js";
 import flattenDeep from "lodash-es/flattenDeep.js";
 import intersection from "lodash-es/intersection.js";
+import compact from "lodash-es/compact.js";
 import { validateId } from "./validate-identifier.js";
 import { normalise, isURL } from "./lib.js";
 import { toRaw } from "vue";
@@ -1075,7 +1076,7 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
         let entity = structuredClone(this.crate["@graph"][indexRef]);
 
         for (let property of Object.keys(entity)) {
-            if (["@id", "@type", "name"].includes(property)) continue;
+            if (this.coreProperties.includes(property)) continue;
 
             entity[property] = entity[property]
                 .map((value) => {
@@ -1084,18 +1085,21 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
                         let linkedIndexRef = this.entityIdIndex[value["@id"]];
                         let linkedEntity = structuredClone(this.crate["@graph"][linkedIndexRef]);
                         linkedEntity = this.__removeAssociations(linkedEntity);
+                        delete linkedEntity["@reverse"];
                         return linkedEntity;
                     } else {
                         return value;
                     }
                 })
                 .map((v) => v);
+            entity[property] = compact(entity[property]);
             if (entity[property].length === 0) {
                 delete entity[property];
             } else if (entity[property].length === 1) {
                 entity[property] = entity[property][0];
             }
         }
+        delete entity["@reverse"];
         return entity;
     }
 
