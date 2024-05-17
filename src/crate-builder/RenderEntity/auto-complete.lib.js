@@ -84,7 +84,6 @@ export class Lookup {
         } else {
             return { endpoint: "entities", documents: [] };
         }
-        // return stringifyDocumentType(documents) ?? [];
     }
 
     async entityTemplates(type, queryString) {
@@ -95,8 +94,11 @@ export class Lookup {
             filter: queryString,
             limit: resultsLimit,
         });
-        if (results) {
-            return { endpoint: "templates", documents: stringifyDocumentType(results) ?? [] };
+        if (results?.documents) {
+            return {
+                endpoint: "templates",
+                documents: stringifyDocumentType(results.documents) ?? [],
+            };
         } else {
             return { endpoint: "templates", documents: [] };
         }

@@ -169,8 +169,8 @@ async function querySearch(queryString) {
         } else if (response.endpoint === "templates" && response.documents?.length) {
             matches.push({
                 label: $t("associate_entity_from_template"),
-                entities: response.documents.map((template) => ({
-                    ...template.entity,
+                entities: response.documents.map((entity) => ({
+                    ...entity,
                     type: "template",
                 })),
             });

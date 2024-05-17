@@ -5,6 +5,7 @@ export class Lookup {
      * @param {Array | String} type: the type array or type string of the entity being looked up
      * @param {String} queryString: the query string typed in by the user
      * @param {Number} limit=5: the number of matches to return - default = 5
+     * @returns {Object} { documents: [...]} - Object with documents array
      */
     async entityTemplates({ type = undefined, queryString = undefined, limit = 5 }) {
         // code to lookup entity templates in *YOUR* system
@@ -13,6 +14,11 @@ export class Lookup {
         // queryString: what the user is looking for. You probably want to look in the
         //   @id and name fields at least
         // limit: number of matches to return
+        //
+        // return array of json-ld objects matching the query:
+        // ---------------------------------------------------
+        // let documents = [{json-ld object}, {json-ld object}, ...]
+        // return { documents }
     }
 
     /**
@@ -23,8 +29,7 @@ export class Lookup {
      * @param {Array | String} fields: the fields to search against in the data pack json objects
      * @param {Array | String} datapack: the datapack or packs with the data to be used for this entity type
      * @param {Number} limit=10: the number of matches to return - default = 10
-     *
-     * @returns
+     * @returns {Object} { documents: [...]} - Object with documents array
      */
     async dataPacks({
         elasticQuery = undefined,
@@ -41,7 +46,7 @@ export class Lookup {
             // It's up to you to get it to the elastic search server. In this example
             //   it's hardcoded in the _execute method
             let results = await this._execute({ query: elasticQuery, indexPath: "data" });
-            return results;
+            return { documents: results };
         } else {
             // do the lookup yourself in whatever way you want
             //
@@ -52,7 +57,7 @@ export class Lookup {
             // return array of json-ld objects matching the query:
             // ---------------------------------------------------
             // let documents = [{json-ld object}, {json-ld object}, ...]
-            // return { total: documents.length, documents }
+            // return { documents }
         }
     }
 
@@ -64,6 +69,7 @@ export class Lookup {
      * @param {Array | String} fields: the fields to search against in the data pack json objects
      * @param {Array | String} datapack: the datapack or packs with the data to be used for this entity type
      * @param {Number} limit=10: the number of matches to return - default = 10
+     * @returns {Object} { documents: [...]} - Object with documents array
      *
      * @returns
      */
@@ -81,18 +87,14 @@ export class Lookup {
             // It's up to you to get it to the elastic search server. In this example
             //   it's hardcoded in the _execute method
             let results = await this._execute({ query: elasticQuery, indexPath: "entities" });
-            return results;
+            return { documents: results };
         } else {
             // do the lookup yourself in whatever way you want
-            //
-            // the value of 'datapack' will be whatever the profile author defined so
-            //  that's your datasource. How you implement that lookup is totally
-            //  up to you.
             //
             // return array of json-ld objects matching the query:
             // ---------------------------------------------------
             // let documents = [{json-ld object}, {json-ld object}, ...]
-            // return { total: documents.length, documents }
+            // return { documents }
         }
     }
 
