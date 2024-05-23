@@ -171,7 +171,10 @@
                 <div>{{ $t("browse_entities") }}</div></template
             >
             <template #default>
-                <browse-entities-dialog @load:entity="loadEntity" />
+                <browse-entities-dialog
+                    @load:entity="loadEntity"
+                    @close="data.dialog.browseEntities = false"
+                />
             </template>
         </el-drawer>
 

@@ -44,7 +44,7 @@ const data = reactive({
     query: "",
     entities: [],
 });
-const emit = defineEmits(["load:entity"]);
+const $emit = defineEmits(["close", "load:entity"]);
 
 let entities = computed(() => {
     let offset = (data.currentPage - 1) * data.pageSize;
@@ -69,6 +69,7 @@ function filterConnections(query) {
 }
 
 function loadEntity(entity) {
-    emit("load:entity", entity);
+    $emit("load:entity", entity);
+    $emit("close");
 }
 </script>
