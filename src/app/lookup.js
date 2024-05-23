@@ -1,6 +1,10 @@
 export class Lookup {
     constructor() {}
     /**
+     * This method is used to lookup entities created by users and saved for their
+     *  own personal use. How you implement that, if you do at all, is up to you.
+     *  In desktop for example, when the user save a template that entity gets stored
+     *  in their local database.
      *
      * @param {Array | String} type: the type array or type string of the entity being looked up
      * @param {String} queryString: the query string typed in by the user
@@ -19,9 +23,13 @@ export class Lookup {
         // ---------------------------------------------------
         // let documents = [{json-ld object}, {json-ld object}, ...]
         // return { documents }
+        return { documents: [] };
     }
 
     /**
+     *
+     * This method is used to lookup data packs. Data packs are JSON-LD snippets that
+     *  have been created an expert/s and can be trusted as being valid and correct.
      *
      * @param {Object} elasticQuery: a query object to be used against an elastic search server
      * @param {Array | String} type: the type array or type string of the entity being looked up
@@ -45,8 +53,8 @@ export class Lookup {
             // The crate builder component will pass a fully formed elastic search query to this method
             // It's up to you to get it to the elastic search server. In this example
             //   it's hardcoded in the _execute method
-            let results = await this._execute({ query: elasticQuery, indexPath: "data" });
-            return { documents: results };
+            const documents = await this._execute({ query: elasticQuery, indexPath: "data" });
+            return { documents };
         } else {
             // do the lookup yourself in whatever way you want
             //
@@ -58,10 +66,18 @@ export class Lookup {
             // ---------------------------------------------------
             // let documents = [{json-ld object}, {json-ld object}, ...]
             // return { documents }
+            return { documents: [] };
         }
     }
 
     /**
+     * This method is used to lookup user created entities in, for example, a repository. Imagine
+     *  a user creates an entity of type Country that overlaps with a Country in the data pack.
+     *  The user created Country may not be correct but if it has the same @id and is stored
+     *  in the same index, it will overrwrite the datapack version which is valid and correct.
+     *
+     * So by separating out general entity lookups from data packs, you can store data in a way
+     *  where user created stuff doesn't accidently cause issues.
      *
      * @param {Object} elasticQuery: a query object to be used against an elastic search server
      * @param {Array | String} type: the type array or type string of the entity being looked up
@@ -86,15 +102,15 @@ export class Lookup {
             // The crate builder component will pass a fully formed elastic search query to this method
             // It's up to you to get it to the elastic search server. In this example
             //   it's hardcoded in the _execute method
-            let results = await this._execute({ query: elasticQuery, indexPath: "entities" });
-            return { documents: results };
+            const documents = await this._execute({ query: elasticQuery, indexPath: "entities" });
+            return { documents };
         } else {
             // do the lookup yourself in whatever way you want
             //
             // return array of json-ld objects matching the query:
             // ---------------------------------------------------
             // let documents = [{json-ld object}, {json-ld object}, ...]
-            // return { documents }
+            return { documents: [] };
         }
     }
 
@@ -112,8 +128,9 @@ export class Lookup {
         if (status !== 200) {
             return response;
         }
-        const total = response.hits.total.value;
+        // const total = response.hits.total.value;
         const documents = response.hits.hits.map((doc) => ({ ...doc._source }));
-        return { total, documents };
+        // return { total, documents };
+        return documents;
     }
 }

@@ -18,13 +18,12 @@ export class Lookup {
             type,
             query: queryString,
         });
-        results = [...results];
+        const documents = stringifyDocumentType([...results]);
 
-        if (results) {
-            return { endpoint: "internal", documents: stringifyDocumentType(results) ?? [] };
-        } else {
-            return { endpoint: "internal", documents: [] };
-        }
+        return {
+            endpoint: "internal",
+            documents,
+        };
     }
 
     async dataPacks(type, queryString) {
@@ -40,7 +39,6 @@ export class Lookup {
         }
 
         let query = assembleQuery(type, fields, queryString);
-        // console.log("***", JSON.stringify(query, null, 2));
         let results = await this.lookup?.dataPacks({
             type,
             elasticQuery: query,
@@ -49,15 +47,10 @@ export class Lookup {
             queryString,
             limit: 10,
         });
-        if (results?.documents) {
-            return {
-                endpoint: "datapacks",
-                documents: stringifyDocumentType(results.documents) ?? [],
-            };
-        } else {
-            return { endpoint: "datapacks", documents: [] };
-        }
-        // return stringifyDocumentType(documents) ?? [];
+        return {
+            endpoint: "datapacks",
+            documents: stringifyDocumentType(results.documents),
+        };
     }
 
     async entities(type, queryString) {
@@ -67,7 +60,6 @@ export class Lookup {
         let fields = defaultFields;
 
         let query = assembleQuery(type, fields, queryString);
-        // console.log("***", JSON.stringify(query, null, 2));
         let results = await this.lookup?.entities({
             type,
             elasticQuery: query,
@@ -76,14 +68,10 @@ export class Lookup {
             limit: 10,
         });
 
-        if (results?.documents) {
-            return {
-                endpoint: "entities",
-                documents: stringifyDocumentType(results.documents) ?? [],
-            };
-        } else {
-            return { endpoint: "entities", documents: [] };
-        }
+        return {
+            endpoint: "entities",
+            documents: stringifyDocumentType(results.documents),
+        };
     }
 
     async entityTemplates(type, queryString) {
@@ -94,14 +82,10 @@ export class Lookup {
             filter: queryString,
             limit: resultsLimit,
         });
-        if (results?.documents) {
-            return {
-                endpoint: "templates",
-                documents: stringifyDocumentType(results.documents) ?? [],
-            };
-        } else {
-            return { endpoint: "templates", documents: [] };
-        }
+        return {
+            endpoint: "templates",
+            documents: stringifyDocumentType(results.documents),
+        };
     }
 
     async ror(queryString) {
@@ -120,12 +104,10 @@ export class Lookup {
             };
         });
 
-        if (results) {
-            return { endpoint: "ror", documents: results };
-        } else {
-            return { endpoint: "ror", documents: [] };
-        }
-        // return results;
+        return {
+            endpoint: "ror",
+            documents: stringifyDocumentType(results),
+        };
     }
 }
 
