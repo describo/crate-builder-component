@@ -3,7 +3,7 @@ export class Lookup {
     /**
      * This method is used to lookup entities created by users and saved for their
      *  own personal use. How you implement that, if you do at all, is up to you.
-     *  In desktop for example, when the user save a template that entity gets stored
+     *  In desktop for example, when the user saves a template, that entity gets stored
      *  in their local database.
      *
      * @param {Array | String} type: the type array or type string of the entity being looked up
@@ -29,7 +29,7 @@ export class Lookup {
     /**
      *
      * This method is used to lookup data packs. Data packs are JSON-LD snippets that
-     *  have been created an expert/s and can be trusted as being valid and correct.
+     *  have been created by an expert/s and can be trusted as being valid and correct.
      *
      * @param {Object} elasticQuery: a query object to be used against an elastic search server
      * @param {Array | String} type: the type array or type string of the entity being looked up
@@ -72,12 +72,12 @@ export class Lookup {
 
     /**
      * This method is used to lookup user created entities in, for example, a repository. Imagine
-     *  a user creates an entity of type Country that overlaps with a Country in the data pack.
+     *  a user creates an entity of type Country that overlaps with a Country in the data pack (same @id for both).
      *  The user created Country may not be correct but if it has the same @id and is stored
      *  in the same index, it will overrwrite the datapack version which is valid and correct.
      *
-     * So by separating out general entity lookups from data packs, you can store data in a way
-     *  where user created stuff doesn't accidently cause issues.
+     * So, by separating out general entity lookups from data packs, you can store data in a way
+     *  where user created stuff doesn't trample known good content.
      *
      * @param {Object} elasticQuery: a query object to be used against an elastic search server
      * @param {Array | String} type: the type array or type string of the entity being looked up
