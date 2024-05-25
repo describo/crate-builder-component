@@ -170,18 +170,20 @@ onMounted(async () => {
                 () => props.enableTemplateSave,
                 () => props.enableReverseLinkBrowser,
                 () => props.enableUrlMarkup,
+                () => props.enableEntityTimestamps,
                 () => props.purgeUnlinkedEntities,
                 () => props.readonly,
-                () => props.language,
                 () => props.tabLocation,
                 () => props.resetTabOnEntityChange,
                 () => props.resetTabOnProfileChange,
                 () => props.showControls,
+                () => props.language,
             ],
             () => {
                 configuration.value = configure();
                 configuration.value.$key = $key.conf += 1;
                 i18next.changeLanguage(props.language);
+                cm.value.entityTimestamps = props.enableEntityTimestamps;
             }
         )
     );
