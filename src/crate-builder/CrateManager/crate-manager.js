@@ -34,7 +34,7 @@ export class CrateManager {
         this.crate = undefined;
 
         // the profile manager - if you've set  profile
-        this.pm = undefined;
+        this.pm = pm;
 
         // entity reverse associations
         this.reverse = {};
@@ -56,6 +56,9 @@ export class CrateManager {
         // otherwise, Crate Manager will manage the context
         this.contextDefinitions = undefined;
         this.localContext = {};
+
+        // entity types in the crate - for browse entities; filter by type
+        this.entityTypes = {};
 
         this.coreProperties = ["@id", "@type", "@reverse", "name"];
         this.errors = {
@@ -139,6 +142,9 @@ export class CrateManager {
             crate["@graph"][i] = normalise(entity, i);
             this.entityIdIndex[entity["@id"]] = i;
             this.reverse[entity["@id"]] = {};
+
+            // store the entity type for lookups by type
+            this.__storeEntityType(entity);
         }
 
         // if we get to here and haven't located a root descriptor; bail - this
@@ -329,6 +335,15 @@ rd = cm.getEntity({ id: './', stub: true })
             }
         }
         return entity;
+    }
+
+    /**
+     *  Get Entity Types
+     *
+     * @returns an array of entity types, sorted, found in the crate
+     */
+    getEntityTypes() {
+        return Object.keys(this.entityTypes).sort();
     }
 
     /**
@@ -573,6 +588,7 @@ let r = cm.addEntity(entity);
         this.graphLength = this.crate["@graph"].length;
         this.entityIdIndex[entity["@id"]] = this.graphLength - 1;
         this.reverse[entity["@id"]] = {};
+        this.__storeEntityType(entity);
 
         return entity;
     }
@@ -598,6 +614,7 @@ cm.deleteEntity({ id: '#e1' })
 
         const indexRef = this.entityIdIndex[id];
         const entity = this.crate["@graph"][indexRef];
+        this.__removeEntityType(entity);
 
         // get the entity, find what it links to and remove it from the reverse of those linkages
         for (let [property, instances] of Object.entries(entity)) {
@@ -735,7 +752,15 @@ cm.updateProperty({ id: "./", property: "author", idx: 1, value: "new" });
                 this.__updateEntityId({ entity, newId: value });
             } else if (property === "@type") {
                 //  update @type
+                //   ensure it's an array first though or weird sh*t happens
+                value = [].concat(value);
+
+                //  when updating the type we first need to clear out the
+                //   old types and then set the new so we end up with correct
+                //   reference counts
+                this.__removeEntityType(entity);
                 entity["@type"] = uniq(value);
+                this.__storeEntityType(entity);
             } else if (property === "name") {
                 // update name
                 // ensure we're setting a string value for the name property
@@ -1150,7 +1175,23 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
         if (!isEmpty(entries)) context = [...context, entries];
         return context;
     }
-
+    __storeEntityType(entity) {
+        // store the entity type for lookups by type
+        entity["@type"].forEach((type) => {
+            if (!this.entityTypes[type]) {
+                this.entityTypes[type] = 1;
+            } else {
+                this.entityTypes[type] += 1;
+            }
+        });
+    }
+    __removeEntityType(entity) {
+        // store the entity type for lookups by type
+        entity["@type"].forEach((type) => {
+            this.entityTypes[type] -= 1;
+            if (this.entityTypes[type] === 0) delete this.entityTypes[type];
+        });
+    }
     __collectAllDefinitions(context) {
         let definitions = {};
 
@@ -1172,7 +1213,6 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
         // console.log(definitions);
         return definitions;
     }
-
     __setError(error, entity) {
         let errorPath = error === "init" ? "messages" : "entity";
         this.errors[error][errorPath].push(entity);

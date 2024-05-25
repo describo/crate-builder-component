@@ -1111,7 +1111,6 @@ describe("Test interacting with the crate", () => {
         });
         // console.log(JSON.stringify(crate["@graph"], null, 2));
     });
-
     test("more complex:: linking / unlinking two entities and handling inverse property associations", () => {
         const profile = {
             propertyAssociations: [
@@ -2103,6 +2102,26 @@ describe("Test interacting with the crate", () => {
                 },
             ],
         });
+    });
+    test(`storing / removing entity types for lookups`, () => {
+        let cm = new CrateManager({ crate });
+
+        expect(cm.entityTypes).toEqual({ CreativeWork: 1, Dataset: 1 });
+        expect(cm.getEntityTypes()).toEqual(["CreativeWork", "Dataset"]);
+
+        let entity = {
+            "@id": "file1.jpg",
+            "@type": "File",
+            name: "file1.jpg",
+        };
+        let r = cm.addEntity(entity);
+        expect(cm.getEntityTypes()).toEqual(["CreativeWork", "Dataset", "File"]);
+
+        r = cm.updateProperty({ id: r["@id"], property: "@type", idx: 0, value: "Cow" });
+        expect(cm.getEntityTypes()).toEqual(["Cow", "CreativeWork", "Dataset"]);
+
+        cm.deleteEntity({ id: r["@id"] });
+        expect(cm.getEntityTypes()).toEqual(["CreativeWork", "Dataset"]);
     });
 });
 

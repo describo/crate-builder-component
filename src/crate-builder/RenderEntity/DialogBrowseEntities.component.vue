@@ -8,8 +8,17 @@
                 v-model:current-page="data.currentPage"
                 @current-change="changePage"
             />
-            <div class="flex-grow">
+            <div class="flex flex-row space-x-1">
+                <el-select
+                    v-model="data.selectedEntityType"
+                    placeholder="Filter by type"
+                    clearable
+                    filterable
+                >
+                    <el-option v-for="t in entityTypes" :key="t" :label="t" :value="t" />
+                </el-select>
                 <el-input
+                    class="w-full"
                     v-model="data.filterInputModel"
                     @input="filterConnections"
                     :placeholder="$t('search_for_connection')"
@@ -27,8 +36,8 @@
 </template>
 
 <script setup>
-import { ElInput, ElPagination } from "element-plus";
-import { reactive, computed, inject } from "vue";
+import { ElInput, ElPagination, ElSelect, ElOption } from "element-plus";
+import { reactive, ref, computed, inject } from "vue";
 import compact from "lodash-es/compact";
 import RenderItemLinkComponent from "./RenderItemLink.component.vue";
 import { $t } from "../i18n";
@@ -42,17 +51,25 @@ const data = reactive({
     currentPage: 1,
     total: 0,
     query: "",
-    entities: [],
+    selectedEntityType: undefined,
+    // entities: [],
 });
 const $emit = defineEmits(["close", "load:entity"]);
 
+const entityTypes = ref(cm.value.getEntityTypes());
 let entities = computed(() => {
     let offset = (data.currentPage - 1) * data.pageSize;
     let entities;
     if (data.query) {
-        entities = [...cm.value.getEntities({ query: data.query, limit: data.pageSize })];
+        entities = [
+            ...cm.value.getEntities({
+                type: data.selectedEntityType,
+                query: data.query,
+                limit: data.pageSize,
+            }),
+        ];
     } else {
-        entities = [...cm.value.getEntities()];
+        entities = [...cm.value.getEntities({ type: data.selectedEntityType })];
     }
     entities = compact(entities);
     data.total = entities.length;
