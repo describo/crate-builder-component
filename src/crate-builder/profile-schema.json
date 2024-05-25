@@ -11,7 +11,8 @@
                 "description": { "type": "string" },
                 "version": { "type": "number" },
                 "keywords": { "type": "array", "items": { "type": "string" } },
-                "warnMissingProperty": { "type": "boolean" }
+                "warnMissingProperty": { "type": "boolean" },
+                "enableEntityTimestamps": { "type": "boolean" }
             },
             "required": ["name", "description", "version"],
             "additionalProperties": false
