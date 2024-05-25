@@ -12,6 +12,7 @@
 </template>
 
 <script setup>
+import { propertyDefinitions } from "./property-definitions.js";
 import RenderEntity from "./RenderEntity/Shell.component.vue";
 import {
     ref,
@@ -53,94 +54,8 @@ let ready = ref(false);
 let error = ref(false);
 let renderEntity = ref();
 
-const props = defineProps({
-    crate: {
-        type: [Object, undefined],
-    },
-    profile: {
-        type: [Object, undefined],
-    },
-    entityId: {
-        type: [String, undefined],
-    },
-    lookup: {
-        type: [Object, undefined],
-    },
-    enableContextEditor: {
-        type: Boolean,
-        default: true,
-        validator: (val) => [true, false].includes(val),
-    },
-    enableCratePreview: {
-        type: Boolean,
-        default: true,
-        validator: (val) => [true, false].includes(val),
-    },
-    enableBrowseEntities: {
-        type: Boolean,
-        default: true,
-        validator: (val) => [true, false].includes(val),
-    },
-    enableTemplateSave: {
-        type: Boolean,
-        default: false,
-        validator: (val) => [true, false].includes(val),
-    },
-    enableInternalRouting: {
-        type: Boolean,
-        default: true,
-        validator: (val) => [true, false].includes(val),
-    },
-    enableReverseLinkBrowser: {
-        type: Boolean,
-        default: true,
-        validator: (val) => [true, false].includes(val),
-    },
-    purgeUnlinkedEntities: {
-        type: Boolean,
-        default: true,
-        validator: (val) => [true, false].includes(val),
-    },
-    readonly: {
-        type: Boolean,
-        default: false,
-        validator: (val) => [true, false].includes(val),
-    },
-    webComponent: {
-        type: Boolean,
-        default: false,
-        validator: (val) => [true, false].includes(val),
-    },
-    tabLocation: {
-        type: String,
-        default: "left",
-        validator: (val) => ["top", "bottom", "left", "right"].includes(val),
-    },
-    resetTabOnEntityChange: {
-        type: Boolean,
-        default: true,
-        validator: (val) => [true, false].includes(val),
-    },
-    resetTabOnProfileChange: {
-        type: Boolean,
-        default: true,
-        validator: (val) => [true, false].includes(val),
-    },
-    showControls: {
-        type: Boolean,
-        default: true,
-        validator: (val) => [true, false].includes(val),
-    },
-    language: {
-        type: String,
-        default: "en",
-    },
-    enableUrlMarkup: {
-        type: Boolean,
-        default: true,
-        validator: (val) => [true, false].includes(val),
-    },
-});
+// Property definitions are now in the file: ./property-definitions.js
+const props = defineProps(propertyDefinitions);
 
 const $emit = defineEmits([
     "ready",
@@ -232,6 +147,7 @@ onMounted(async () => {
                 });
 
                 cm.value.setProfileManager(pm.value);
+                if (pm.value.context) cm.value.setContext(pm.value.context);
                 cm.value.$key = $key.cm += 1;
                 pm.value.$key = $key.pm += 1;
             }
@@ -287,8 +203,12 @@ async function init() {
     error.value = false;
 
     // update the crate and profile managers
-    cm.value = new CrateManager({ crate: structuredClone(toRaw(props.crate)) });
+    cm.value = new CrateManager({
+        crate: structuredClone(toRaw(props.crate)),
+        entityTimestamps: props.enableEntityTimestamps,
+    });
     pm.value = new ProfileManager({ profile: structuredClone(toRaw(props.profile)) ?? {} });
+    if (pm.value.content) cm.value.setContext(pm.value.context);
     cm.value.setProfileManager(pm.value);
 
     // then bounce the $key which will trigger the watchers to
@@ -334,16 +254,17 @@ function configure() {
         enableTemplateSave: props.enableTemplateSave,
         enableReverseLinkBrowser: props.enableReverseLinkBrowser,
         enableUrlMarkup: props.enableUrlMarkup,
+        enableEntityTimestamps: props.enableEntityTimestamps,
+        purgeUnlinkedEntities: props.purgeUnlinkedEntities,
         readonly: props.readonly,
         webComponent: props.webComponent,
-        purgeUnlinkedEntities: props.purgeUnlinkedEntities,
-        enableTemplateLookups: false,
-        enableDataPackLookups: false,
-        language: props.language,
         tabLocation: props.tabLocation,
         resetTabOnEntityChange: props.resetTabOnEntityChange,
         resetTabOnProfileChange: props.resetTabOnProfileChange,
         showControls: props.showControls,
+        language: props.language,
+        enableTemplateLookups: false,
+        enableDataPackLookups: false,
     };
 
     i18next.changeLanguage(configuration.language);

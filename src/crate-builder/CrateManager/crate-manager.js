@@ -17,6 +17,9 @@ import { normalise, isURL } from "./lib.js";
 import { toRaw } from "vue";
 import { getContextDefinition } from "./contexts.js";
 
+const entityDateCreatedProperty = "hasCreationDate";
+const entityDateUpdatedProperty = "hasModificationDate";
+
 const structuredClone = function (data) {
     return window.structuredClone(toRaw(data));
 };
@@ -29,11 +32,11 @@ const structuredClone = function (data) {
  * @description A class to work with RO-Crates
  */
 export class CrateManager {
-    constructor({ crate, pm, context = undefined }) {
+    constructor({ crate, pm, context = undefined, entityTimestamps = false }) {
         // the crate
         this.crate = undefined;
 
-        // the profile manager - if you've set  profile
+        // the profile manager - if you've set a profile
         this.pm = pm;
 
         // entity reverse associations
@@ -60,6 +63,10 @@ export class CrateManager {
         // entity types in the crate - for browse entities; filter by type
         this.entityTypes = {};
 
+        // should entity created and updated timestamps be automatically managed / added
+        this.entityTimestamps = entityTimestamps;
+
+        // entity core properties
         this.coreProperties = ["@id", "@type", "@reverse", "name"];
         this.errors = {
             hasError: false,
@@ -581,6 +588,12 @@ let r = cm.addEntity(entity);
             if (!entity[property].length) delete entity[property];
         }
 
+        // manage timestamps
+        if (this.entityTimestamps) {
+            entity[entityDateCreatedProperty] = [new Date().toISOString()];
+            entity[entityDateUpdatedProperty] = [new Date().toISOString()];
+        }
+
         // push it into the graph
         this.crate["@graph"].push(entity);
 
@@ -714,6 +727,11 @@ cm.setProperty({ id: "./", property: "author", value: 3 });
             throw new Error(`value must be a string, number, boolean or object with '@id'`);
         }
         this.__updateContext({ name: property, id: propertyId });
+
+        // manage timestamps
+        if (this.entityTimestamps) {
+            entity[entityDateUpdatedProperty] = [new Date().toISOString()];
+        }
         return true;
     }
 
@@ -774,6 +792,11 @@ cm.updateProperty({ id: "./", property: "author", idx: 1, value: "new" });
             entity = this.crate["@graph"][indexRef];
             entity[property][idx] = value;
         }
+
+        // manage timestamps
+        if (this.entityTimestamps) {
+            entity[entityDateUpdatedProperty] = [new Date().toISOString()];
+        }
         return entity;
     }
 
@@ -799,6 +822,11 @@ cm.deleteProperty({ id: "./", property: "author", idx: 1 });
         const entity = this.crate["@graph"][indexRef];
         entity[property].splice(idx, 1);
         if (!entity[property].length) delete entity[property];
+
+        // manage timestamps
+        if (this.entityTimestamps) {
+            entity[entityDateUpdatedProperty] = [new Date().toISOString()];
+        }
     }
 
     /**
@@ -958,6 +986,11 @@ cm.unlinkEntity({ id: './', property: 'author', value: { '@id': '#e1' }})
             }
         });
         if (!entity[property].length) delete entity[property];
+
+        // manage timestamps
+        if (this.entityTimestamps) {
+            entity[entityDateUpdatedProperty] = [new Date().toISOString()];
+        }
         // console.log("SOURCE ENTITY AFTER", entity);
 
         // clean up the reverse mapping back value['@id'] -> id

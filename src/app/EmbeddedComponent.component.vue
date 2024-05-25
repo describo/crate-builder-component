@@ -42,6 +42,7 @@
                 :enable-crate-preview="data.configuration.enableCratePreview"
                 :enable-browse-entities="data.configuration.enableBrowseEntities"
                 :enable-template-save="data.configuration.enableTemplateSave"
+                :enable-entity-timestamps="data.configuration.enableEntityTimestamps"
                 :enable-internal-routing="true"
                 :enable-reverse-link-browser="data.configuration.enableReverseLinkBrowser"
                 :purge-unlinked-entities="data.configuration.purgeUnlinkedEntities"
@@ -100,6 +101,7 @@
                 <el-form-item label="Enable Template Save">
                     <el-switch v-model="data.configuration.enableTemplateSave" />
                 </el-form-item>
+
                 <el-form-item label="Enable URL Markup">
                     <el-switch v-model="data.configuration.enableUrlMarkup" />
                 </el-form-item>
@@ -112,6 +114,14 @@
                 <el-form-item label="Reset Tab on Profile Change">
                     <el-switch v-model="data.configuration.resetTabOnProfileChange" />
                 </el-form-item>
+
+                <el-form-item label="Enable Entity Timestamps">
+                    <el-switch v-model="data.configuration.enableEntityTimestamps" />
+                </el-form-item>
+                <div class="text-sm">
+                    Enable Entity Timestamps is not reactive. It's applied only when a crate is
+                    loaded. If a crate is already loaded and you change this, nothing happens.
+                </div>
             </el-form>
         </div>
     </div>
@@ -181,6 +191,7 @@ const data = reactive({
         enableReverseLinkBrowser: true,
         enableUrlMarkup: true,
         purgeUnlinkedEntities: true,
+        enableEntityTimestamps: true,
         readonly: false,
         language: "en",
         tabLocation: "left",

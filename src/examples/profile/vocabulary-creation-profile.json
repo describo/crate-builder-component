@@ -4,11 +4,6 @@
         "description": "Describo profile for creating Schema.org style vocabularies",
         "version": 0.1
     },
-    "rootDatasets": {
-        "Schema": {
-            "type": "Dataset"
-        }
-    },
     "classes": {
         "Dataset": {
             "definition": "override",
