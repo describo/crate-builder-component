@@ -6,9 +6,11 @@ export class Lookup {
      *  In desktop for example, when the user saves a template, that entity gets stored
      *  in their local database.
      *
-     * @param {Array | String} type: the type array or type string of the entity being looked up
-     * @param {String} queryString: the query string typed in by the user
-     * @param {Number} limit=5: the number of matches to return - default = 5
+     * @param {Object} params
+     * @param {Array | String} params.type: the type array or type string of the entity being looked up
+     * @param {String} params.queryString: the query string typed in by the user
+     * @param {Number} params.limit=5: the number of matches to return - default = 5
+     *
      * @returns {Object} { documents: [...]} - Object with documents array
      */
     async entityTemplates({ type = undefined, queryString = undefined, limit = 5 }) {
@@ -31,12 +33,14 @@ export class Lookup {
      * This method is used to lookup data packs. Data packs are JSON-LD snippets that
      *  have been created by an expert/s and can be trusted as being valid and correct.
      *
-     * @param {Object} elasticQuery: a query object to be used against an elastic search server
-     * @param {Array | String} type: the type array or type string of the entity being looked up
-     * @param {String} queryString: the query string typed in by the user
-     * @param {Array | String} fields: the fields to search against in the data pack json objects
-     * @param {Array | String} datapack: the datapack or packs with the data to be used for this entity type
-     * @param {Number} limit=10: the number of matches to return - default = 10
+     * @param {Object} params
+     * @param {Object} params.elasticQuery: a query object to be used against an elastic search server
+     * @param {Array | String} params.type: the type array or type string of the entity being looked up
+     * @param {String} params.queryString: the query string typed in by the user
+     * @param {Array | String} params.fields: the fields to search against in the data pack json objects
+     * @param {Array | String} params.datapack: the datapack or packs with the data to be used for this entity type
+     * @param {Number} params.limit=10: the number of matches to return - default = 10
+     *
      * @returns {Object} { documents: [...]} - Object with documents array
      */
     async dataPacks({
@@ -79,12 +83,13 @@ export class Lookup {
      * So, by separating out general entity lookups from data packs, you can store data in a way
      *  where user created stuff doesn't trample known good content.
      *
-     * @param {Object} elasticQuery: a query object to be used against an elastic search server
-     * @param {Array | String} type: the type array or type string of the entity being looked up
-     * @param {String} queryString: the query string typed in by the user
-     * @param {Array | String} fields: the fields to search against in the data pack json objects
-     * @param {Array | String} datapack: the datapack or packs with the data to be used for this entity type
-     * @param {Number} limit=10: the number of matches to return - default = 10
+     * @param {Object} params
+     * @param {Object} params.elasticQuery: a query object to be used against an elastic search server
+     * @param {Array | String} params.type: the type array or type string of the entity being looked up
+     * @param {String} params.queryString: the query string typed in by the user
+     * @param {Array | String} params.fields: the fields to search against in the data pack json objects
+     * @param {Array | String} params.datapack: the datapack or packs with the data to be used for this entity type
+     * @param {Number} params.limit=10: the number of matches to return - default = 10
      * @returns {Object} { documents: [...]} - Object with documents array
      *
      * @returns
