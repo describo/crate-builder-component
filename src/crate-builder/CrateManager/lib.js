@@ -85,3 +85,29 @@ export function normaliseEntityType({ entity }) {
         entity["@type"] = entity["@type"].split(",").map((t) => t.trim());
     return entity;
 }
+
+/**
+ *
+ * Mint an empty RO-Crate that conforms to the spec
+ *
+ * @returns a skeleton crate ready to be used
+ */
+export function mintNewCrate() {
+    return {
+        "@context": "https://w3id.org/ro/crate/1.1/context",
+        "@graph": [
+            {
+                "@type": "CreativeWork",
+                "@id": "ro-crate-metadata.json",
+                about: { "@id": "./" },
+                conformsTo: { "@id": "https://w3id.org/ro/crate/1.1" },
+            },
+
+            {
+                "@id": "./",
+                "@type": "Dataset",
+                name: "My Research Object Crate",
+            },
+        ],
+    };
+}
