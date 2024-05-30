@@ -51,6 +51,8 @@ codebase. To start up the dev environment:
 
 # Building and publishing a release
 
+-   `npm run generate-docs`: Update the jsdoc documentation
+-   `git add. && git commit -a`
 -   `npm run build`: This builds the plugin and styles that the react component uses
 -   `npm version {minor|patch}`
 -   `git push origin master --tags`
