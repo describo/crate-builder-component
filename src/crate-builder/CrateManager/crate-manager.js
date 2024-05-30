@@ -12,6 +12,7 @@ import isPlainObject from "lodash-es/isPlainObject.js";
 import flattenDeep from "lodash-es/flattenDeep.js";
 import intersection from "lodash-es/intersection.js";
 import compact from "lodash-es/compact.js";
+import isEqual from "lodash-es/isEqual.js";
 import { validateId } from "./validate-identifier.js";
 import { normalise, isURL } from "./lib.js";
 import { toRaw } from "vue";
@@ -65,6 +66,10 @@ export class CrateManager {
 
         // should entity created and updated timestamps be automatically managed / added
         this.entityTimestamps = entityTimestamps;
+
+        // keep track of blank nodes for when we mint new ones
+        // this.blankNodes = [ '_:Relationship1', '_:Relationship2', '_:CreateAction1', '_:CreateAction2', ... ]
+        this.blankNodes = [];
 
         // entity core properties
         this.coreProperties = ["@id", "@type", "@reverse", "name"];
@@ -145,6 +150,10 @@ export class CrateManager {
                 continue;
             }
 
+            // is it a blank node? Store it if it is
+            if (entity["@id"].match(/^_:/)) {
+                this.blankNodes.push(entity["@id"]);
+            }
             // create the id to index reference
             crate["@graph"][i] = normalise(entity, i);
             this.entityIdIndex[entity["@id"]] = i;
@@ -301,9 +310,12 @@ let rd = cm.getRootDataset()
      * Get an entity
      *
      * @param {Object} options
-     * @param {string} - the id of the entity to get
-     * @param {boolean} - if true, only the `@id, @type and name` prop's will be returned. That is,
-     *                           you get a stub entry not the complete entity data.
+     * @param {string} options.id - the id of the entity to get
+     * @param {boolean} options.stub - if true, only the `@id, @type and name` prop's will be returned. That is,
+     *                   you get a stub entry not the complete entity data.
+     * @param {boolean} options.link - if true, all the associated entities are filled out as stubs
+     * @param {boolean} options.materialise - if true, the entity will be created if it doesn't exist (consider
+     *                  when URL's point outside the crate, in this case, they will be created as entities inside it)
      * @returns the entity
      *
      * @example
@@ -317,14 +329,15 @@ let rd = cm.getEntity({ id: './' })
 rd = cm.getEntity({ id: './', stub: true })
 
      */
-    getEntity({ id, stub = false, link = true }) {
+    getEntity({ id, stub = false, link = true, materialise = true }) {
         if (!id) throw new Error(`An id must be provided`);
         let indexRef = this.entityIdIndex[id];
         let entity = structuredClone(this.crate["@graph"][indexRef]);
 
         // id's pointing outside the crate won't resolve so we
         //   'materialise' them here
-        if (!entity) return this.__materialiseEntity({ id });
+        if (!entity && materialise) return this.__materialiseEntity({ id });
+        if (!entity && !materialise) return undefined;
 
         entity["@reverse"] = structuredClone(this.reverse[entity["@id"]]) ?? {};
         if (stub) {
@@ -434,6 +447,51 @@ entities = cm.getEntities({ query: 'person', type: 'Person', limit: 10 })
 
             if (limit && count === limit) return;
         }
+    }
+
+    /**
+     *
+     * locateEntity
+     *
+     * @description Given a set of id's, find the entity or entities that links to all of them.
+     *  This is really for finding grouping type entities like Relationships and Actions so that
+     *  you can augment their description.
+     *  @param { array } entityIds - an array of entity id's that are linked to from another entity
+     *  @returns
+     */
+    locateEntity(entityIds) {
+        // console.log(entityIds);
+        // get one id and use that to resolve what it links to
+        //  can't use getEntity here as it will materialise non existent entities
+        let entity = this.getEntity({ id: entityIds[0], materialise: false });
+
+        //   if it doesn't link to anything then there's no match
+        if (!entity) return undefined;
+
+        // if it does, for each match walk the entity forward and find out what it links to
+        // console.log(entity, this.reverse);
+        let thisEntityLinksTo = this.reverse[entity["@id"]];
+
+        let matches = {};
+        for (let property of Object.keys(thisEntityLinksTo)) {
+            for (let e of thisEntityLinksTo[property]) {
+                matches[e["@id"]] = [];
+            }
+        }
+
+        for (let entityId of Object.keys(matches)) {
+            let entity = this.getEntity({ id: entityId });
+            for (let property of Object.keys(entity)) {
+                if (this.coreProperties.includes(property)) continue;
+                for (let instance of entity[property]) {
+                    if (instance?.["@id"]) matches[entityId].push(instance["@id"]);
+                }
+            }
+
+            if (isEqual(matches[entityId].sort(), entityIds.sort())) return entity;
+        }
+
+        //   find the overlap
     }
 
     /**
@@ -604,6 +662,40 @@ let r = cm.addEntity(entity);
         this.__storeEntityType(entity);
 
         return entity;
+    }
+
+    /**
+     * Add an entity with a blank node id ('_:...') to the graph.
+     *
+     * @description Use this when you want to add a non contextual entity to the graph. In thoses
+     *   cases providing an @id and name don't really make sense even though those properties are still required
+     *   therefore this method simplifies the process of adding those entity types. For example,
+     *   Actions (e.g. CreateAction), Relationships, GeoShape, GeoCoordinates etc
+     *
+     * @param {string} type - the entity type to configure for the new entity
+     * @returns the entity
+     * @example
+
+const cm = new CrateManager({ crate })
+let r = cm.addBlankNode('Relationship);
+
+r === {
+    '@id': '_:Relationship1',
+    '@type': [ 'Relationship' ],
+    name: '_:Relationship1'
+}
+
+     */
+    addBlankNode(type) {
+        let blankNodeTypeMatches = this.blankNodes.filter((n) => n.match(type));
+        const id = `_:${type}${blankNodeTypeMatches.length + 1}`;
+        this.blankNodes.push(id);
+        let entity = {
+            "@id": id,
+            "@type": type,
+            name: id,
+        };
+        return this.addEntity(entity);
     }
 
     /**
