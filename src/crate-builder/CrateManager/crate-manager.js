@@ -457,7 +457,7 @@ entities = cm.getEntities({ query: 'person', type: 'Person', limit: 10 })
      *  This is really for finding grouping type entities like Relationships and Actions so that
      *  you can augment their description.
      *  @param { array } entityIds - an array of entity id's that are linked to from another entity
-     *  @returns
+     *  @returns entity
      */
     locateEntity(entityIds) {
         // console.log(entityIds);
