@@ -64,7 +64,8 @@ codebase. To start up the dev environment:
 # Building and publishing API docs - has to be separate stage
 
 -   `npm run generate-docs`: Update the jsdoc documentation
--   `git add. && git commit -a`
+-   `git add . && git commit -a`
+-   `git push origin master --tags`
 
 # Repository structure
 
