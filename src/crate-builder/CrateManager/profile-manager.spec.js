@@ -387,6 +387,8 @@ describe("Test working with profiles", () => {
             "https://schema.org/date",
             "http://schema.org/description",
             "http://schema.org/disambiguatingDescription",
+            "https://www.ica.org/standards/RiC/RiC-O_1-0-1.html#hasCreationDate",
+            "https://www.ica.org/standards/RiC/RiC-O_1-0-1.html#hasModificationDate",
             "http://schema.org/identifier",
             "http://schema.org/image",
             "http://schema.org/mainEntityOfPage",
@@ -396,7 +398,7 @@ describe("Test working with profiles", () => {
             "http://schema.org/subjectOf",
             "http://schema.org/url",
         ]);
-        expect(inputs.length).toEqual(13);
+        expect(inputs.length).toEqual(15);
     });
     test("get inputs for type defined in profile - subClass in profile, definition inherit, props dup'ed", () => {
         const profile = {
@@ -504,6 +506,8 @@ describe("Test working with profiles", () => {
             "http://schema.org/alternateName",
             "http://schema.org/description",
             "http://schema.org/disambiguatingDescription",
+            "https://www.ica.org/standards/RiC/RiC-O_1-0-1.html#hasCreationDate",
+            "https://www.ica.org/standards/RiC/RiC-O_1-0-1.html#hasModificationDate",
             "http://schema.org/identifier",
             "http://schema.org/image",
             "http://schema.org/mainEntityOfPage",
@@ -538,6 +542,8 @@ describe("Test working with profiles", () => {
             "http://schema.org/disambiguatingDescription",
             "http://schema.org/funding",
             "http://schema.org/guideline",
+            "https://www.ica.org/standards/RiC/RiC-O_1-0-1.html#hasCreationDate",
+            "https://www.ica.org/standards/RiC/RiC-O_1-0-1.html#hasModificationDate",
             "http://schema.org/identifier",
             "http://schema.org/image",
             "http://schema.org/legalStatus",
