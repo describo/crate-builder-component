@@ -7,6 +7,7 @@
   - [Storybook](#storybook)
   - [Development application](#development-application)
 - [Building and publishing a release](#building-and-publishing-a-release)
+- [Building and publishing API docs - has to be separate stage](#building-and-publishing-api-docs---has-to-be-separate-stage)
 - [Repository structure](#repository-structure)
 
 This is the core UI component for assembling an RO-Crate inside Describo. It is a self contained
@@ -51,8 +52,6 @@ codebase. To start up the dev environment:
 
 # Building and publishing a release
 
--   `npm run generate-docs`: Update the jsdoc documentation
--   `git add. && git commit -a`
 -   `npm run build`: This builds the plugin and styles that the react component uses
 -   `npm version {minor|patch}`
 -   `git push origin master --tags`
@@ -61,6 +60,11 @@ codebase. To start up the dev environment:
 -   Create an issue in the
     [React component issue tracker](https://github.com/describo/crate-builder-component-react/issues)
     to inform that a new release of that component needs to be built and published to npm.
+
+# Building and publishing API docs - has to be separate stage
+
+-   `npm run generate-docs`: Update the jsdoc documentation
+-   `git add. && git commit -a`
 
 # Repository structure
 
