@@ -1917,6 +1917,67 @@ describe("Test interacting with the crate", () => {
         entity = cm.locateEntity(["/file2.pdf", "/file1.txt"]);
         expect(entity).toEqual(undefined);
     });
+    test("add files and folders to the crate", () => {
+        cm.addFile("/file.txt");
+        expect(cm.exportCrate()["@graph"]).toMatchObject([
+            { "@id": "ro-crate-metadata.json" },
+            { "@id": "./" },
+            { "@id": "file.txt", "@type": "File" },
+        ]);
+
+        cm.addFolder("images");
+        expect(cm.exportCrate()["@graph"]).toMatchObject([
+            { "@id": "ro-crate-metadata.json" },
+            { "@id": "./" },
+            { "@id": "file.txt", "@type": "File" },
+            { "@id": "images/", "@type": "Dataset" },
+        ]);
+
+        cm.addFile("/folder/file.txt");
+        // console.log(cm.exportCrate()["@graph"]);
+        expect(cm.exportCrate()["@graph"]).toMatchObject([
+            { "@id": "ro-crate-metadata.json" },
+            { "@id": "./" },
+            { "@id": "file.txt", "@type": "File" },
+            { "@id": "images/", "@type": "Dataset" },
+            { "@id": "folder/", "@type": "Dataset" },
+            { "@id": "folder/file.txt", "@type": "File" },
+        ]);
+
+        cm.addFile("/a/b/c/d/file.png");
+        expect(cm.exportCrate()["@graph"]).toMatchObject([
+            { "@id": "ro-crate-metadata.json" },
+            { "@id": "./" },
+            { "@id": "file.txt", "@type": "File" },
+            { "@id": "images/", "@type": "Dataset" },
+            { "@id": "folder/", "@type": "Dataset" },
+            { "@id": "folder/file.txt", "@type": "File" },
+            { "@id": "a/", "@type": "Dataset" },
+            { "@id": "a/b/", "@type": "Dataset" },
+            { "@id": "a/b/c/", "@type": "Dataset" },
+            { "@id": "a/b/c/d/", "@type": "Dataset" },
+            { "@id": "a/b/c/d/file.png", "@type": "File" },
+        ]);
+
+        cm.addFolder("/a/j/f/g");
+        // console.log(JSON.ddstringify(cm.exportCrate()["@graph"], null, 2));
+        expect(cm.exportCrate()["@graph"]).toMatchObject([
+            { "@id": "ro-crate-metadata.json" },
+            { "@id": "./" },
+            { "@id": "file.txt", "@type": "File" },
+            { "@id": "images/", "@type": "Dataset" },
+            { "@id": "folder/", "@type": "Dataset" },
+            { "@id": "folder/file.txt", "@type": "File" },
+            { "@id": "a/", "@type": "Dataset" },
+            { "@id": "a/b/", "@type": "Dataset" },
+            { "@id": "a/b/c/", "@type": "Dataset" },
+            { "@id": "a/b/c/d/", "@type": "Dataset" },
+            { "@id": "a/b/c/d/file.png", "@type": "File" },
+            { "@id": "a/j/", "@type": "Dataset" },
+            { "@id": "a/j/f/", "@type": "Dataset" },
+            { "@id": "a/j/f/g/", "@type": "Dataset" },
+        ]);
+    });
 });
 
 function getBaseCrate() {

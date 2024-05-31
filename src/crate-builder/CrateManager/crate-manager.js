@@ -699,6 +699,110 @@ r === {
     }
 
     /**
+     * Add files or folders - use addFile or addFolder in preference to this
+     *
+     * @description This is a helper method specifically for adding files and folders in the crate. This method
+     *   will add the intermediate paths as 'Datasets' (as per the spec) and link everything via the hasPart
+     *   property as required. It is assumed that the path is relative to the root of the folder.
+     *
+     * @param {object} params
+     * @param {string} params.path - a file or folder path
+     * @param {string} params.type - the type of thing being added - File or Dataset
+     * @example
+
+const cm = new CrateManager({ crate })
+let r = cm.addFileOrFolder('/a/b/c/file.txt);
+     */
+    addFileOrFolder({ path, type = "File" }) {
+        if (!["File", "Dataset"].includes(type)) {
+            throw new Error(`'addFileOrFolder' type must be File or Dataset`);
+        }
+
+        // remove initial slash if there is one
+        if (path.match(/^\//)) {
+            path = path.substring(1);
+        }
+
+        //  create the file path as individual datasets before joining
+        //   the file into the right place
+        let paths = path.split("/").slice(0, -1);
+        let i = 0;
+        paths = paths.map((path) => {
+            let entity = {
+                "@id": i > 0 ? `${paths.slice(0, i).join("/")}/${path}/` : `${path}/`,
+                "@type": ["Dataset"],
+                name: i > 0 ? `${paths.slice(0, i).join("/")}/${path}/` : `${path}/`,
+            };
+            entity = this.addEntity(entity);
+            i += 1;
+            return entity;
+        });
+        i = 0;
+        for (let path of paths) {
+            if (i === 0) {
+                this.linkEntity({
+                    id: "./",
+                    property: "hasPart",
+                    value: { "@id": path["@id"] },
+                });
+            } else {
+                this.linkEntity({
+                    id: paths[i - 1]["@id"],
+                    property: "hasPart",
+                    value: { "@id": path["@id"] },
+                });
+            }
+            i += 1;
+        }
+
+        let entity = {
+            "@id": encodeURI(path),
+            "@type": [type],
+            name: path,
+        };
+
+        this.ingestAndLink({
+            id: paths.length ? paths.slice(-1)[0]["@id"] : "./",
+            property: "hasPart",
+            json: entity,
+        });
+    }
+
+    /**
+     * Add file
+     *
+     * @description This is a helper method specifically for adding files to the crate. This method
+     *   will add the intermediate paths as 'Datasets' (as per the spec) and link everything via the hasPart
+     *   property as required. It is assumed that the path is relative to the root of the folder.
+     *
+     * @param {string} path - a file path to add - ensure the file path is relative to the folder root
+     * @example
+
+const cm = new CrateManager({ crate })
+let r = cm.addFile('/a/b/c/file.txt);
+     */
+    addFile(path) {
+        this.addFileOrFolder({ path, type: "File" });
+    }
+
+    /**
+     * Add folder
+     *
+     * @description This is a helper method specifically for adding folders to the crate. This method
+     *   will add the intermediate paths as 'Datasets' (as per the spec) and link everything via the hasPart
+     *   property as required. It is assumed that the path is relative to the root of the folder.
+     *
+     * @param {string} path - a folder path to add - ensure the folder path is relative to the folder root
+     * @example
+
+const cm = new CrateManager({ crate })
+let r = cm.addFile('/a/b/c/file.txt);
+     */
+    addFolder(path) {
+        this.addFileOrFolder({ path, type: "Dataset" });
+    }
+
+    /**
      * Delete an entity
      *
      * @param {Object} options
