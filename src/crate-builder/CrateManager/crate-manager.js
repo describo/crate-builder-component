@@ -334,6 +334,9 @@ rd = cm.getEntity({ id: './', stub: true })
         let indexRef = this.entityIdIndex[id];
         let entity = structuredClone(this.crate["@graph"][indexRef]);
 
+        // encode the id
+        id = encodeURI(id);
+
         // id's pointing outside the crate won't resolve so we
         //   'materialise' them here
         if (!entity && materialise) return this.__materialiseEntity({ id });
@@ -459,10 +462,13 @@ entities = cm.getEntities({ query: 'person', type: 'Person', limit: 10 })
      *  @param { array } entityIds - an array of entity id's that are linked to from another entity
      *  @returns entity
      */
+
     locateEntity(entityIds) {
+        // encode entityIds
+        entityIds = entityIds.map((eid) => encodeURI(eid));
+
         // console.log(entityIds);
         // get one id and use that to resolve what it links to
-        //  can't use getEntity here as it will materialise non existent entities
         let entity = this.getEntity({ id: entityIds[0], materialise: false });
 
         //   if it doesn't link to anything then there's no match
@@ -487,7 +493,6 @@ entities = cm.getEntities({ query: 'person', type: 'Person', limit: 10 })
                     if (instance?.["@id"]) matches[entityId].push(instance["@id"]);
                 }
             }
-
             if (isEqual(matches[entityId].sort(), entityIds.sort())) return entity;
         }
 

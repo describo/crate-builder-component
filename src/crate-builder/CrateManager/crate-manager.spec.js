@@ -1856,13 +1856,15 @@ describe("Test interacting with the crate", () => {
             name: "_:Relationship3",
         });
     });
-    test(`find linking entity`, () => {
+    test(`test locating entities`, () => {
         let cm = new CrateManager({ crate });
 
         const r1 = cm.addBlankNode("Relationship");
         const r2 = cm.addBlankNode("Relationship");
-        let e1 = cm.addEntity({ "@id": "/file1.txt", "@type": "File", name: "/file1.txt" });
-        let e2 = cm.addEntity({ "@id": "/file2.txt", "@type": "File", name: "/file2.txt" });
+        const e1 = cm.addEntity({ "@id": "/a/b/file1.txt", "@type": "File", name: "/file1.txt" });
+        const e2 = cm.addEntity({ "@id": "/file2.txt", "@type": "File", name: "/file2.txt" });
+        const e3 = cm.addFile("/a/c/d/file.png");
+        const e4 = cm.addFile("/a/c/d/file with spaces.png");
 
         // link both entities to r1
         cm.linkEntity({
@@ -1886,6 +1888,18 @@ describe("Test interacting with the crate", () => {
             propertyId: "https://schema.org/object",
             value: { "@id": e2["@id"] },
         });
+        cm.linkEntity({
+            id: r2["@id"],
+            property: "object",
+            propertyId: "https://schema.org/object",
+            value: { "@id": e3["@id"] },
+        });
+        cm.linkEntity({
+            id: r2["@id"],
+            property: "object",
+            propertyId: "https://schema.org/object",
+            value: { "@id": e4["@id"] },
+        });
 
         // console.log(JSON.stringify(cm.exportCrate()["@graph"], null, 2));
 
@@ -1898,7 +1912,7 @@ describe("Test interacting with the crate", () => {
         expect(entity).toEqual(undefined);
 
         // will find a matching entity - an exact match
-        entity = cm.locateEntity(["/file1.txt", "/file2.txt"]);
+        entity = cm.locateEntity(["/a/b/file1.txt", "/file2.txt"]);
         expect(entity).toMatchObject({
             "@id": "_:Relationship1",
             "@type": ["Relationship"],
@@ -1906,7 +1920,7 @@ describe("Test interacting with the crate", () => {
         });
 
         // will find a matching entity - an exact match
-        entity = cm.locateEntity(["/file2.txt", "/file1.txt"]);
+        entity = cm.locateEntity(["/file2.txt", "/a/b/file1.txt"]);
         expect(entity).toMatchObject({
             "@id": "_:Relationship1",
             "@type": ["Relationship"],
@@ -1916,6 +1930,28 @@ describe("Test interacting with the crate", () => {
         // will not find a matching entity - no match
         entity = cm.locateEntity(["/file2.pdf", "/file1.txt"]);
         expect(entity).toEqual(undefined);
+
+        // will find a matching entity - an exact match
+        entity = cm.locateEntity(["a/c/d/file.png", "/file2.txt", "a/c/d/file with spaces.png"]);
+        expect(entity).toMatchObject({
+            "@id": "_:Relationship2",
+            "@type": ["Relationship"],
+            name: "_:Relationship2",
+        });
+
+        entity = cm.locateEntity(["/file2.txt", "a/c/d/file.png", "a/c/d/file with spaces.png"]);
+        expect(entity).toMatchObject({
+            "@id": "_:Relationship2",
+            "@type": ["Relationship"],
+            name: "_:Relationship2",
+        });
+
+        entity = cm.locateEntity(["/file2.txt", "a/c/d/file.png", "a/c/d/file with spaces.png"]);
+        expect(entity).toMatchObject({
+            "@id": "_:Relationship2",
+            "@type": ["Relationship"],
+            name: "_:Relationship2",
+        });
     });
     test("add files and folders to the crate", () => {
         let e = cm.addFile("/file.txt");
