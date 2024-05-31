@@ -708,6 +708,7 @@ r === {
      * @param {object} params
      * @param {string} params.path - a file or folder path
      * @param {string} params.type - the type of thing being added - File or Dataset
+     * @returns the entity
      * @example
 
 const cm = new CrateManager({ crate })
@@ -716,6 +717,11 @@ let r = cm.addFileOrFolder('/a/b/c/file.txt);
     addFileOrFolder({ path, type = "File" }) {
         if (!["File", "Dataset"].includes(type)) {
             throw new Error(`'addFileOrFolder' type must be File or Dataset`);
+        }
+
+        // ensure folders end in '/'
+        if (type === "Dataset" && !path.match(/.*\/$/)) {
+            path = `${path}/`;
         }
 
         // remove initial slash if there is one
@@ -760,12 +766,16 @@ let r = cm.addFileOrFolder('/a/b/c/file.txt);
             "@type": [type],
             name: path,
         };
-
-        this.ingestAndLink({
+        const sourceEntity = this.getEntity({
             id: paths.length ? paths.slice(-1)[0]["@id"] : "./",
+            stub: true,
+        });
+        this.ingestAndLink({
+            id: sourceEntity["@id"],
             property: "hasPart",
             json: entity,
         });
+        return this.getEntity({ id: entity["@id"], stub: true });
     }
 
     /**
@@ -776,13 +786,14 @@ let r = cm.addFileOrFolder('/a/b/c/file.txt);
      *   property as required. It is assumed that the path is relative to the root of the folder.
      *
      * @param {string} path - a file path to add - ensure the file path is relative to the folder root
+     * @returns the entity
      * @example
 
 const cm = new CrateManager({ crate })
 let r = cm.addFile('/a/b/c/file.txt);
      */
     addFile(path) {
-        this.addFileOrFolder({ path, type: "File" });
+        return this.addFileOrFolder({ path, type: "File" });
     }
 
     /**
@@ -793,13 +804,14 @@ let r = cm.addFile('/a/b/c/file.txt);
      *   property as required. It is assumed that the path is relative to the root of the folder.
      *
      * @param {string} path - a folder path to add - ensure the folder path is relative to the folder root
+     * @returns the entity
      * @example
 
 const cm = new CrateManager({ crate })
-let r = cm.addFile('/a/b/c/file.txt);
+let r = cm.addFolder('/a/b/c);
      */
     addFolder(path) {
-        this.addFileOrFolder({ path, type: "Dataset" });
+        return this.addFileOrFolder({ path, type: "Dataset" });
     }
 
     /**

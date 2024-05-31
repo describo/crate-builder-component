@@ -1918,20 +1918,22 @@ describe("Test interacting with the crate", () => {
         expect(entity).toEqual(undefined);
     });
     test("add files and folders to the crate", () => {
-        cm.addFile("/file.txt");
+        let e = cm.addFile("/file.txt");
         expect(cm.exportCrate()["@graph"]).toMatchObject([
             { "@id": "ro-crate-metadata.json" },
             { "@id": "./" },
             { "@id": "file.txt", "@type": "File" },
         ]);
+        expect(e).toEqual({ "@id": "file.txt", "@type": ["File"], name: "file.txt" });
 
-        cm.addFolder("images");
+        e = cm.addFolder("images");
         expect(cm.exportCrate()["@graph"]).toMatchObject([
             { "@id": "ro-crate-metadata.json" },
             { "@id": "./" },
             { "@id": "file.txt", "@type": "File" },
             { "@id": "images/", "@type": "Dataset" },
         ]);
+        expect(e).toEqual({ "@id": "images/", "@type": ["Dataset"], name: "images/" });
 
         cm.addFile("/folder/file.txt");
         // console.log(cm.exportCrate()["@graph"]);
@@ -1959,7 +1961,7 @@ describe("Test interacting with the crate", () => {
             { "@id": "a/b/c/d/file.png", "@type": "File" },
         ]);
 
-        cm.addFolder("/a/j/f/g");
+        e = cm.addFolder("/a/j/f/g");
         // console.log(JSON.ddstringify(cm.exportCrate()["@graph"], null, 2));
         expect(cm.exportCrate()["@graph"]).toMatchObject([
             { "@id": "ro-crate-metadata.json" },
@@ -1977,6 +1979,7 @@ describe("Test interacting with the crate", () => {
             { "@id": "a/j/f/", "@type": "Dataset" },
             { "@id": "a/j/f/g/", "@type": "Dataset" },
         ]);
+        expect(e).toEqual({ "@id": "a/j/f/g/", "@type": ["Dataset"], name: "a/j/f/g/" });
     });
 });
 
