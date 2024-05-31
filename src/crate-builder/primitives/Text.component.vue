@@ -115,7 +115,11 @@ function decodeValue(value) {
     if (isBoolean(value)) {
         return String(value);
     } else {
-        return decodeURI(value) === "undefined" ? "" : decodeURI(value);
+        try {
+            return decodeURI(value) === "undefined" ? "" : decodeURI(value);
+        } catch (error) {
+            return value;
+        }
     }
 }
 
