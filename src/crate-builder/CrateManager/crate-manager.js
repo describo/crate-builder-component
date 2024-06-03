@@ -1245,13 +1245,38 @@ cm.purgeUnlinkedEntities()
 
      */
     purgeUnlinkedEntities() {
+        walker = walker.bind(this);
         let linkedEntities = { "ro-crate-metadata.json": true };
-        let indexRef = this.entityIdIndex["./"];
+        let indexRef = this.entityIdIndex["ro-crate-metadata.json"];
         if (indexRef !== undefined) {
+            // we first need to walk the graph from the root descriptor
+            //  and assemble a list of linked entities that we get to by
+            //  following forward looking associations
             let entity = this.crate["@graph"][indexRef];
-            walker = walker.bind(this);
             walker(entity);
 
+            // then, we walk the entire graph and look for entities
+            //   that are not already linked. When we find one, we walk
+            //   it forwards to see if it links to anything already linked
+            //   and if yes, then we link it
+            // think things like relationships and actions that may link
+            //   to enities in the graph even though they themselves are not linked to
+            for (let i = 0; i < this.graphLength; i++) {
+                let entity = this.crate["@graph"][i];
+                if (!entity) continue;
+                if (!linkedEntities[entity["@id"]]) {
+                    for (let property of Object.keys(entity)) {
+                        if (this.coreProperties.includes(property)) continue;
+                        entity[property].forEach((instance) => {
+                            if (instance?.["@id"] && linkedEntities[instance["@id"]]) {
+                                linkedEntities[entity["@id"]] = true;
+                            }
+                        });
+                    }
+                }
+            }
+
+            // now we can remove everything we couldn't get to
             for (let i = 0; i < this.graphLength; i++) {
                 let entity = this.crate["@graph"][i];
                 if (entity && !linkedEntities[entity["@id"]]) {

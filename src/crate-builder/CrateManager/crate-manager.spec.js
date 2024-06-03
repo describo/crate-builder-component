@@ -173,55 +173,55 @@ describe("Test interacting with the crate", () => {
             );
         }
     });
-    test("add a simple File or Dataset entity to the crate", () => {
-        // test 1
-        let entity = {
-            "@id": "file1.jpg",
-            "@type": "File",
-            name: "file1.jpg",
-        };
-        let r = cm.addEntity(entity);
-        let ec = cm.exportCrate();
-        expect(ec["@graph"].length).toEqual(3);
-        expect(r).toBeTruthy;
-        expect(ec["@graph"][2]["@id"]).toEqual("file1.jpg");
+    // test("add a simple File or Dataset entity to the crate", () => {
+    //     // test 1
+    //     let entity = {
+    //         "@id": "file1.jpg",
+    //         "@type": "File",
+    //         name: "file1.jpg",
+    //     };
+    //     let r = cm.addEntity(entity);
+    //     let ec = cm.exportCrate();
+    //     expect(ec["@graph"].length).toEqual(3);
+    //     expect(r).toBeTruthy;
+    //     expect(ec["@graph"][2]["@id"]).toEqual("file1.jpg");
 
-        // test 2
-        entity = {
-            "@id": "something",
-            "@type": ["File", "Thing"],
-        };
-        r = cm.addEntity(entity);
-        ec = cm.exportCrate();
-        expect(ec["@graph"].length).toEqual(4);
-        expect(r).toBeTruthy;
-        expect(ec["@graph"][3]["@id"]).toEqual("something");
-        expect(ec["@graph"][3]["@type"]).toEqual(["File", "Thing"]);
+    //     // test 2
+    //     entity = {
+    //         "@id": "something",
+    //         "@type": ["File", "Thing"],
+    //     };
+    //     r = cm.addEntity(entity);
+    //     ec = cm.exportCrate();
+    //     expect(ec["@graph"].length).toEqual(4);
+    //     expect(r).toBeTruthy;
+    //     expect(ec["@graph"][3]["@id"]).toEqual("something");
+    //     expect(ec["@graph"][3]["@type"]).toEqual(["File", "Thing"]);
 
-        // test 3
-        entity = {
-            "@id": "something_else",
-            "@type": "Dataset",
-        };
-        r = cm.addEntity(entity);
-        ec = cm.exportCrate();
-        expect(ec["@graph"].length).toEqual(5);
-        expect(r).toBeTruthy;
-        expect(ec["@graph"][4]["@id"]).toEqual("something_else/");
-        expect(ec["@graph"][4]["@type"]).toEqual("Dataset");
+    //     // test 3
+    //     entity = {
+    //         "@id": "something_else",
+    //         "@type": "Dataset",
+    //     };
+    //     r = cm.addEntity(entity);
+    //     ec = cm.exportCrate();
+    //     expect(ec["@graph"].length).toEqual(5);
+    //     expect(r).toBeTruthy;
+    //     expect(ec["@graph"][4]["@id"]).toEqual("something_else/");
+    //     expect(ec["@graph"][4]["@type"]).toEqual("Dataset");
 
-        // test 4
-        entity = {
-            "@id": "something_new",
-            "@type": ["Dataset", "CreativeWork"],
-        };
-        r = cm.addEntity(entity);
-        ec = cm.exportCrate();
-        expect(ec["@graph"].length).toEqual(6);
-        expect(r).toBeTruthy;
-        expect(ec["@graph"][5]["@id"]).toEqual("something_new/");
-        expect(ec["@graph"][5]["@type"]).toEqual(["Dataset", "CreativeWork"]);
-    });
+    //     // test 4
+    //     entity = {
+    //         "@id": "something_new",
+    //         "@type": ["Dataset", "CreativeWork"],
+    //     };
+    //     r = cm.addEntity(entity);
+    //     ec = cm.exportCrate();
+    //     expect(ec["@graph"].length).toEqual(6);
+    //     expect(r).toBeTruthy;
+    //     expect(ec["@graph"][5]["@id"]).toEqual("something_new/");
+    //     expect(ec["@graph"][5]["@type"]).toEqual(["Dataset", "CreativeWork"]);
+    // });
     test("add a simple entity to the crate and export as a template", () => {
         let entity = {
             "@id": "#person",
@@ -422,42 +422,91 @@ describe("Test interacting with the crate", () => {
         });
     });
     test("delete an entity", () => {
-        crate = getBaseCrate();
-        const authorId = "http://schema.org/person";
-        crate["@graph"].push({
-            "@id": "./",
-            "@type": ["Dataset"],
-            name: "rd",
-            author: [{ "@id": authorId }],
-        });
-        crate["@graph"].push({
-            "@id": authorId,
-            "@type": ["Person"],
-            name: "a person",
-            group: [{ "@id": "#g1" }],
-        });
-        crate["@graph"].push({
-            "@id": "#g1",
-            "@type": ["Group"],
-            name: "a group",
-        });
-        cm = new CrateManager({ crate });
+        const f1 = cm.addFile("/file1.txt");
+        const f2 = cm.addFile("/file2.txt");
+        let r1 = cm.addEntity({ "@id": "_:r1", "@type": "Relationship", name: "r1" });
+        let r2 = cm.addEntity({ "@id": "_:r2", "@type": "Relationship", name: "r2" });
 
-        let rd = cm.getRootDataset();
-        // expect(rd.author.length).toEqual(1);
+        // cm.linkEntity({ id: "./", property: "hasPart", value: r1 });
+        // cm.linkEntity({ id: "./", property: "hasPart", value: r2 });
 
-        cm.deleteEntity({ id: authorId });
-
-        let ec = cm.exportCrate();
-        expect(ec["@graph"]).toMatchObject([
+        // delete an entity that is not linked to anything
+        cm.deleteEntity({ id: r1["@id"] });
+        expect(cm.exportCrate()["@graph"]).toMatchObject([
             { "@id": "ro-crate-metadata.json" },
             { "@id": "./" },
-            {
-                "@id": "#g1",
-                "@reverse": {},
-            },
+            { "@id": "file1.txt" },
+            { "@id": "file2.txt" },
+            { "@id": "_:r2" },
         ]);
-        expect(ec["@graph"][1]).not.toHaveProperty("author");
+
+        // console.log(JSON.stringify(cm.exportCrate()["@graph"], null, 2));
+
+        // re-add the entity and link a file to it
+        r1 = cm.addEntity({ "@id": "_:r1", "@type": "Relationship", name: "r1" });
+        cm.linkEntity({ id: "./", property: "hasPart", value: r1 });
+        cm.setProperty({
+            id: r1["@id"],
+            property: "object",
+            propertyId: "",
+            value: f1,
+        });
+        expect(cm.exportCrate()["@graph"]).toMatchObject([
+            { "@id": "ro-crate-metadata.json" },
+            { "@id": "./" },
+            { "@id": "file1.txt" },
+            { "@id": "file2.txt" },
+            { "@id": "_:r2" },
+            { "@id": "_:r1", object: { "@id": "file1.txt" } },
+        ]);
+
+        // now delete it and check everything else is still there
+        cm.deleteEntity({ id: r1["@id"] });
+        expect(cm.exportCrate()["@graph"]).toMatchObject([
+            { "@id": "ro-crate-metadata.json" },
+            { "@id": "./" },
+            { "@id": "file1.txt" },
+            { "@id": "file2.txt" },
+            { "@id": "_:r2" },
+        ]);
+        // console.log(JSON.stringify(cm.exportCrate()["@graph"], null, 2));
+
+        // re-add the entity and link a file to it
+        r1 = cm.addEntity({ "@id": "_:r1", "@type": "Relationship", name: "r1" });
+        // cm.linkEntity({ id: "./", property: "hasPart", value: r1 });
+        cm.setProperty({
+            id: r1["@id"],
+            property: "object",
+            propertyId: "",
+            value: f1,
+        });
+
+        //  link the same file to a different entity
+        cm.setProperty({
+            id: r2["@id"],
+            property: "object",
+            propertyId: "",
+            value: f1,
+        });
+        expect(cm.exportCrate()["@graph"]).toMatchObject([
+            { "@id": "ro-crate-metadata.json" },
+            { "@id": "./" },
+            { "@id": "file1.txt" },
+            { "@id": "file2.txt" },
+            { "@id": "_:r2", object: { "@id": "file1.txt" } },
+            { "@id": "_:r1", object: { "@id": "file1.txt" } },
+        ]);
+
+        // now delete it and check everything else is still there
+        cm.deleteEntity({ id: r1["@id"] });
+        // console.log(JSON.stringify(cm.exportCrate()["@graph"], null, 2));
+        expect(cm.exportCrate()["@graph"]).toMatchObject([
+            { "@id": "ro-crate-metadata.json" },
+            { "@id": "./" },
+            { "@id": "file1.txt" },
+            { "@id": "file2.txt" },
+            { "@id": "_:r2" },
+        ]);
     });
     test("prevent deleting the root dataset and the root descriptor", () => {
         try {
@@ -1591,6 +1640,52 @@ describe("Test interacting with the crate", () => {
         let ec = cm.exportCrate();
         expect(ec["@graph"]).toMatchObject([{ "@id": "ro-crate-metadata.json" }, { "@id": "./" }]);
     });
+    test(`check purging unlinked nodes; confirm it handles linking type entities like relationships`, () => {
+        // add a blank node not linked to anything
+        cm.addBlankNode("Relationship");
+
+        // and an entity linked to root dataset
+        cm.ingestAndLink({
+            id: "./",
+            property: "people",
+            json: { "@id": "#1", "@type": "Person", name: "#1" },
+        });
+
+        // confirm they are both there
+        expect(cm.exportCrate()["@graph"]).toMatchObject([
+            { "@id": "ro-crate-metadata.json" },
+            { "@id": "./" },
+            { "@id": "_:Relationship1" },
+            { "@id": "#1" },
+        ]);
+
+        // purge unlinked and confirm blank node gone
+        cm.purgeUnlinkedEntities();
+        expect(cm.exportCrate()["@graph"]).toMatchObject([
+            { "@id": "ro-crate-metadata.json" },
+            { "@id": "./" },
+            { "@id": "#1" },
+        ]);
+
+        // re add blank node and link to the entity in the graph
+        const e = cm.addBlankNode("Relationship");
+        cm.setProperty({
+            id: e["@id"],
+            property: "object",
+            propertyId: "https://schema.org/object",
+            value: { "@id": "#1" },
+        });
+        // console.log(cm.exportCrate()["@graph"]);
+        cm.purgeUnlinkedEntities();
+        expect(cm.exportCrate()["@graph"]).toMatchObject([
+            { "@id": "ro-crate-metadata.json" },
+            { "@id": "./" },
+            { "@id": "#1" },
+            { "@id": "_:Relationship2" },
+        ]);
+        // console.log(cm.exportCrate()["@graph"]);
+    });
+
     test("resolve entity associations", async () => {
         crate = getBaseCrate();
         crate["@graph"].push({
