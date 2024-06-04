@@ -375,6 +375,9 @@ rd = cm.getEntity({ id: './', stub: true })
         let indexRef = this.entityIdIndex[id];
         let entity = structuredClone(this.crate["@graph"][indexRef]);
 
+        // encode the id
+        id = encodeURI(id);
+
         // id's pointing outside the crate won't resolve so we
         //   'materialise' them here
         if (!entity &amp;&amp; materialise) return this.__materialiseEntity({ id });
@@ -494,16 +497,22 @@ entities = cm.getEntities({ query: 'person', type: 'Person', limit: 10 })
      *
      * locateEntity
      *
-     * @description Given a set of id's, find the entity or entities that links to all of them.
+     * @description Given a set of id's, find the entity or entities that link to all of them.
      *  This is really for finding grouping type entities like Relationships and Actions so that
      *  you can augment their description.
-     *  @param { array } entityIds - an array of entity id's that are linked to from another entity
-     *  @returns entity
+     *  @param { object } params
+     *  @param { array } params.entityIds - an array of entity id's that are linked to from another entity
+     *  @param { boolean } params.strict - if true return entities that have exactly entityIds linked. If false,
+     *                          return entities that have at least entityIds linked
+     *  @returns [] entities matching or undefined
      */
-    locateEntity(entityIds) {
+
+    locateEntity({ entityIds, strict = true }) {
+        // encode entityIds
+        entityIds = entityIds.map((eid) => encodeURI(eid));
+
         // console.log(entityIds);
         // get one id and use that to resolve what it links to
-        //  can't use getEntity here as it will materialise non existent entities
         let entity = this.getEntity({ id: entityIds[0], materialise: false });
 
         //   if it doesn't link to anything then there's no match
@@ -520,6 +529,8 @@ entities = cm.getEntities({ query: 'person', type: 'Person', limit: 10 })
             }
         }
 
+        let entityMatches = [];
+
         for (let entityId of Object.keys(matches)) {
             let entity = this.getEntity({ id: entityId });
             for (let property of Object.keys(entity)) {
@@ -528,11 +539,17 @@ entities = cm.getEntities({ query: 'person', type: 'Person', limit: 10 })
                     if (instance?.["@id"]) matches[entityId].push(instance["@id"]);
                 }
             }
-
-            if (isEqual(matches[entityId].sort(), entityIds.sort())) return entity;
+            if (strict) {
+                // if strict is true then check if the linked entities match exactly
+                if (isEqual(matches[entityId].sort(), entityIds.sort())) entityMatches.push(entity);
+            } else {
+                // otherwise, check that entityIds is a subset of matches
+                if (intersection(matches[entityId], entityIds).length === entityIds.length) {
+                    entityMatches.push(entity);
+                }
+            }
         }
-
-        //   find the overlap
+        return entityMatches;
     }
 
     /**
@@ -1281,13 +1298,38 @@ cm.purgeUnlinkedEntities()
 
      */
     purgeUnlinkedEntities() {
+        walker = walker.bind(this);
         let linkedEntities = { "ro-crate-metadata.json": true };
-        let indexRef = this.entityIdIndex["./"];
+        let indexRef = this.entityIdIndex["ro-crate-metadata.json"];
         if (indexRef !== undefined) {
+            // we first need to walk the graph from the root descriptor
+            //  and assemble a list of linked entities that we get to by
+            //  following forward looking associations
             let entity = this.crate["@graph"][indexRef];
-            walker = walker.bind(this);
             walker(entity);
 
+            // then, we walk the entire graph and look for entities
+            //   that are not already linked. When we find one, we walk
+            //   it forwards to see if it links to anything already linked
+            //   and if yes, then we link it
+            // think things like relationships and actions that may link
+            //   to enities in the graph even though they themselves are not linked to
+            for (let i = 0; i &lt; this.graphLength; i++) {
+                let entity = this.crate["@graph"][i];
+                if (!entity) continue;
+                if (!linkedEntities[entity["@id"]]) {
+                    for (let property of Object.keys(entity)) {
+                        if (this.coreProperties.includes(property)) continue;
+                        entity[property].forEach((instance) => {
+                            if (instance?.["@id"] &amp;&amp; linkedEntities[instance["@id"]]) {
+                                linkedEntities[entity["@id"]] = true;
+                            }
+                        });
+                    }
+                }
+            }
+
+            // now we can remove everything we couldn't get to
             for (let i = 0; i &lt; this.graphLength; i++) {
                 let entity = this.crate["@graph"][i];
                 if (entity &amp;&amp; !linkedEntities[entity["@id"]]) {
@@ -1650,7 +1692,7 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.3</a> on Fri May 31 2024 13:57:25 GMT+1000 (Australian Eastern Standard Time) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.3</a> on Tue Jun 04 2024 11:30:42 GMT+1000 (Australian Eastern Standard Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
