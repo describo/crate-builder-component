@@ -456,14 +456,17 @@ entities = cm.getEntities({ query: 'person', type: 'Person', limit: 10 })
      *
      * locateEntity
      *
-     * @description Given a set of id's, find the entity or entities that links to all of them.
+     * @description Given a set of id's, find the entity or entities that link to all of them.
      *  This is really for finding grouping type entities like Relationships and Actions so that
      *  you can augment their description.
-     *  @param { array } entityIds - an array of entity id's that are linked to from another entity
-     *  @returns entity
+     *  @param { object } params
+     *  @param { array } params.entityIds - an array of entity id's that are linked to from another entity
+     *  @param { boolean } params.strict - if true return entities that have exactly entityIds linked. If false,
+     *                          return entities that have at least entityIds linked
+     *  @returns [] entities matching or undefined
      */
 
-    locateEntity(entityIds) {
+    locateEntity({ entityIds, strict = true }) {
         // encode entityIds
         entityIds = entityIds.map((eid) => encodeURI(eid));
 
@@ -485,6 +488,8 @@ entities = cm.getEntities({ query: 'person', type: 'Person', limit: 10 })
             }
         }
 
+        let entityMatches = [];
+
         for (let entityId of Object.keys(matches)) {
             let entity = this.getEntity({ id: entityId });
             for (let property of Object.keys(entity)) {
@@ -493,10 +498,17 @@ entities = cm.getEntities({ query: 'person', type: 'Person', limit: 10 })
                     if (instance?.["@id"]) matches[entityId].push(instance["@id"]);
                 }
             }
-            if (isEqual(matches[entityId].sort(), entityIds.sort())) return entity;
+            if (strict) {
+                // if strict is true then check if the linked entities match exactly
+                if (isEqual(matches[entityId].sort(), entityIds.sort())) entityMatches.push(entity);
+            } else {
+                // otherwise, check that entityIds is a subset of matches
+                if (intersection(matches[entityId], entityIds).length === entityIds.length) {
+                    entityMatches.push(entity);
+                }
+            }
         }
-
-        //   find the overlap
+        return entityMatches;
     }
 
     /**
