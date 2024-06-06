@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-row">
-        <div class="w-1/3 xl:w-1/5 flex flex-col">
+        <div class="min-w-32 w-1/3 xl:w-1/5 flex flex-col">
             <div class="describo-property-name">{{ $t("name_field_label") }}</div>
             <div class="text-gray-600 font-light text-xs pr-1 describo-property-help">
                 {{ $t("name_field_help") }}

@@ -86,6 +86,11 @@ export const propertyDefinitions = {
         default: true,
         validator: (val) => [true, false].includes(val),
     },
+    showReverseLinksBrowser: {
+        type: Boolean,
+        default: false,
+        validator: (val) => [true, false].includes(val),
+    },
     language: {
         type: String,
         default: "en",

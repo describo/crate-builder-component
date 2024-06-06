@@ -1,16 +1,35 @@
 <template>
     <div class="flex flex-row">
-        <div class="flex flex-col pr-4 w-full">
-            <!-- render controls -->
-            <render-controls-component
-                v-if="!configuration.readonly && configuration.showControls"
-                :entity="contextEntity"
-                @load:entity="loadEntity"
-                @add:property:placeholder="addPropertyPlaceholder"
-                @delete:entity="deleteEntity"
-                @save:entity:template="saveEntityAsTemplate"
-                @update:context="updateContext"
-            />
+        <div class="flex flex-col w-full">
+            <div
+                class="flex flex-row place-content-between pb-1 border-b border-slate-700"
+                v-if="configuration.showControls || configuration.enableReverseLinkBrowser"
+            >
+                <!-- render controls -->
+                <render-controls-component
+                    ref="renderControlsComponent"
+                    class="w-full"
+                    v-if="!configuration.readonly && configuration.showControls"
+                    :entity="contextEntity"
+                    @load:entity="loadEntity"
+                    @add:property:placeholder="addPropertyPlaceholder"
+                    @delete:entity="deleteEntity"
+                    @save:entity:template="saveEntityAsTemplate"
+                    @update:context="updateContext"
+                />
+                <div class="flex-grow"></div>
+
+                <!--show reverse links panel  -->
+                <el-button
+                    type="primary"
+                    v-if="configuration.enableReverseLinkBrowser && !data.reverseSidebarVisible"
+                    @click="data.reverseSidebarVisible = !data.reverseSidebarVisible"
+                >
+                    <FontAwesomeIcon
+                        :icon="data.reverseSidebarVisible ? faChevronRight : faChevronLeft"
+                    ></FontAwesomeIcon>
+                </el-button>
+            </div>
 
             <!-- <pre>{{ data.entity }}</pre> -->
 
@@ -219,19 +238,7 @@
                 </el-tab-pane>
             </el-tabs>
         </div>
-        <!--show reverse links panel  -->
-        <div
-            v-if="configuration.enableReverseLinkBrowser && !data.reverseSidebarVisible"
-            class="p-2 h-12 rounded text-2xl bg-gray-200 text-blue-600 cursor-pointer"
-            @click="data.reverseSidebarVisible = !data.reverseSidebarVisible"
-        >
-            <div v-show="!data.reverseSidebarVisible">
-                <FontAwesomeIcon :icon="faChevronLeft"></FontAwesomeIcon>
-            </div>
-            <div v-show="data.reverseSidebarVisible">
-                <FontAwesomeIcon :icon="faChevronRight"></FontAwesomeIcon>
-            </div>
-        </div>
+
         <!-- reverse links panel as a drawer-->
         <el-drawer
             v-model="data.reverseSidebarVisible"
@@ -312,6 +319,7 @@ const $emit = defineEmits([
 ]);
 defineExpose({
     setTab: (tabName) => (data.activeTab = tabName),
+    toggleReverseLinkBrowser: () => (data.reverseSidebarVisible = !data.reverseSidebarVisible),
 });
 
 onMounted(() => {
@@ -355,6 +363,10 @@ onMounted(() => {
             const entity = cm.value.getEntity({ id: props.entity["@id"] });
             init({ entity });
         }
+    );
+    watchers[2] = watch(
+        () => configuration.value.showReverseLinksBrowser,
+        () => (data.reverseSidebarVisible = configuration.value.showReverseLinksBrowser)
     );
 });
 onBeforeUnmount(() => {

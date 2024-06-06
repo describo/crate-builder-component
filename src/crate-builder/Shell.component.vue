@@ -1,14 +1,12 @@
 <template>
-    <div class="flex flex-col">
-        <RenderEntity
-            ref="renderEntity"
-            v-if="ready && !error"
-            :entity="contextEntity"
-            @load:entity="setCurrentEntity"
-            @save:crate="saveCrate"
-            @save:entity:template="saveEntityAsTemplate"
-        />
-    </div>
+    <RenderEntity
+        ref="renderEntity"
+        v-if="ready && !error"
+        :entity="contextEntity"
+        @load:entity="setCurrentEntity"
+        @save:crate="saveCrate"
+        @save:entity:template="saveEntityAsTemplate"
+    />
 </template>
 
 <script setup>
@@ -70,6 +68,7 @@ defineExpose({
     pm,
     setCurrentEntity,
     setTab: (tabName) => renderEntity.value.setTab(tabName),
+    toggleReverseLinkBrowser: () => renderEntity.value.toggleReverseLinkBrowser(),
     refresh: () => (contextEntity.value = { ...contextEntity.value }),
 });
 
@@ -177,6 +176,7 @@ onMounted(async () => {
                 () => props.resetTabOnEntityChange,
                 () => props.resetTabOnProfileChange,
                 () => props.showControls,
+                () => props.showReverseLinksBrowser,
                 () => props.language,
             ],
             () => {
@@ -264,6 +264,7 @@ function configure() {
         resetTabOnEntityChange: props.resetTabOnEntityChange,
         resetTabOnProfileChange: props.resetTabOnProfileChange,
         showControls: props.showControls,
+        showReverseLinksBrowser: props.showReverseLinksBrowser,
         language: props.language,
         enableTemplateLookups: false,
         enableDataPackLookups: false,

@@ -1,11 +1,8 @@
 <template>
     <div>
-        <div
-            class="flex flex-row space-x-1 py-2 mb-2 border-b-2 border-gray-700"
-            :key="configuration.language"
-        >
+        <div class="flex flex-row space-x-1" :key="configuration.language">
             <!-- navbar : controls -->
-            <div class="flex flex-row space-x-1 mr-4">
+            <div class="flex flex-row space-x-1">
                 <div>
                     <!-- back -->
                     <el-button @click="back" type="primary">
@@ -113,7 +110,7 @@
             v-model="data.dialog.addProperty"
             direction="ltr"
             destroy-on-close
-            size="50%"
+            size="40%"
             @close="data.dialog.addProperty = false"
         >
             <template #header>
@@ -132,7 +129,7 @@
             v-model="data.dialog.editContext"
             direction="ltr"
             destroy-on-close
-            size="70%"
+            size="40%"
             @close="data.dialog.editContext = false"
         >
             <template #header>
@@ -148,7 +145,7 @@
             v-model="data.dialog.previewCrate"
             direction="ltr"
             destroy-on-close
-            size="60%"
+            size="40%"
             @close="data.dialog.previewCrate = false"
         >
             <template #header>
@@ -164,7 +161,7 @@
             v-model="data.dialog.browseEntities"
             direction="rtl"
             :destroy-on-close="true"
-            size="60%"
+            size="40%"
             @close="data.dialog.browseEntities = false"
         >
             <template #header>

@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-row">
-        <div class="w-1/3 xl:w-1/5 flex flex-col describo-property-name">@id</div>
+        <div class="min-w-32 w-1/3 xl:w-1/5 flex flex-col describo-property-name">@id</div>
 
         <div
             class="w-2/3 xl:w-4/5 flex flex-row describo-property-value"

@@ -31,6 +31,7 @@
                 <el-button @click="add">add</el-button>
                 <el-button @click="setTab">set tab</el-button>
                 <el-button @click="setEntity">set entity</el-button>
+                <el-button @click="toggleReverseLinkBrowser">toggle reverse links</el-button>
             </div>
             <describo-crate-builder
                 ref="describo"
@@ -51,6 +52,7 @@
                 :language="data.configuration.language"
                 :tab-location="data.configuration.tabLocation"
                 :show-controls="data.configuration.showControls"
+                :show-reverse-links-browser="data.configuration.showReverseLinksBrowser"
                 @error="logErrors"
                 @warning="logWarnings"
             />
@@ -116,6 +118,9 @@
                 </el-form-item>
                 <el-form-item label="Enable Entity Timestamps">
                     <el-switch v-model="data.configuration.enableEntityTimestamps" />
+                </el-form-item>
+                <el-form-item label="Show Reverse Links Browser">
+                    <el-switch v-model="data.configuration.showReverseLinksBrowser" />
                 </el-form-item>
             </el-form>
         </div>
@@ -193,6 +198,7 @@ const data = reactive({
         resetTabOnEntityChange: true,
         resetTabOnProfileChange: true,
         showControls: true,
+        showReverseLinksBrowser: false,
     },
 });
 let describo = ref();
@@ -239,5 +245,10 @@ function setTab() {
 function setEntity() {
     let { cm, setCurrentEntity, setTab, refresh } = describo.value;
     setCurrentEntity({ id: "#person" });
+}
+
+function toggleReverseLinkBrowser() {
+    let { toggleReverseLinkBrowser } = describo.value;
+    toggleReverseLinkBrowser();
 }
 </script>
