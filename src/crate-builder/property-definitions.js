@@ -38,7 +38,7 @@ export const propertyDefinitions = {
     },
     enableReverseLinkBrowser: {
         type: Boolean,
-        default: true,
+        default: false,
         validator: (val) => [true, false].includes(val),
     },
     enableUrlMarkup: {
@@ -84,11 +84,6 @@ export const propertyDefinitions = {
     showControls: {
         type: Boolean,
         default: true,
-        validator: (val) => [true, false].includes(val),
-    },
-    showReverseLinksBrowser: {
-        type: Boolean,
-        default: false,
         validator: (val) => [true, false].includes(val),
     },
     language: {

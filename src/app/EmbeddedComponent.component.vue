@@ -52,7 +52,6 @@
                 :language="data.configuration.language"
                 :tab-location="data.configuration.tabLocation"
                 :show-controls="data.configuration.showControls"
-                :show-reverse-links-browser="data.configuration.showReverseLinksBrowser"
                 @error="logErrors"
                 @warning="logWarnings"
             />
@@ -118,9 +117,6 @@
                 </el-form-item>
                 <el-form-item label="Enable Entity Timestamps">
                     <el-switch v-model="data.configuration.enableEntityTimestamps" />
-                </el-form-item>
-                <el-form-item label="Show Reverse Links Browser">
-                    <el-switch v-model="data.configuration.showReverseLinksBrowser" />
                 </el-form-item>
             </el-form>
         </div>
@@ -188,7 +184,7 @@ const data = reactive({
         enableCratePreview: true,
         enableBrowseEntities: true,
         enableTemplateSave: true,
-        enableReverseLinkBrowser: true,
+        enableReverseLinkBrowser: false,
         enableUrlMarkup: true,
         purgeUnlinkedEntities: true,
         enableEntityTimestamps: true,
@@ -198,7 +194,6 @@ const data = reactive({
         resetTabOnEntityChange: true,
         resetTabOnProfileChange: true,
         showControls: true,
-        showReverseLinksBrowser: false,
     },
 });
 let describo = ref();

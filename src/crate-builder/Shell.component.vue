@@ -176,7 +176,6 @@ onMounted(async () => {
                 () => props.resetTabOnEntityChange,
                 () => props.resetTabOnProfileChange,
                 () => props.showControls,
-                () => props.showReverseLinksBrowser,
                 () => props.language,
             ],
             () => {
@@ -264,7 +263,6 @@ function configure() {
         resetTabOnEntityChange: props.resetTabOnEntityChange,
         resetTabOnProfileChange: props.resetTabOnProfileChange,
         showControls: props.showControls,
-        showReverseLinksBrowser: props.showReverseLinksBrowser,
         language: props.language,
         enableTemplateLookups: false,
         enableDataPackLookups: false,

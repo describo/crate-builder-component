@@ -25,7 +25,7 @@
                     </el-button>
                 </div>
             </div>
-            <div>
+            <div v-if="!configuration.readonly">
                 <!-- add property -->
                 <el-button
                     @click="toggle('addProperty')"
@@ -36,7 +36,7 @@
                     &nbsp; {{ $t("add_label") }}
                 </el-button>
             </div>
-            <div v-if="configuration.enableContextEditor">
+            <div v-if="configuration.enableContextEditor && !configuration.readonly">
                 <!-- edit context -->
                 <el-button @click="toggle('editContext')" type="primary">
                     <FontAwesomeIcon :icon="faPenToSquare"></FontAwesomeIcon>
