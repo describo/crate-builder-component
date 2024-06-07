@@ -665,6 +665,14 @@ describe("Test interacting with the crate", () => {
 
         e = cm.getEntity({ id: e["@id"] });
         expect(e).not.toHaveProperty("text");
+
+        // ensure it doesn't fail when prop doesn't exist
+        cm.deleteAllProperties({
+            id: e["@id"],
+            property: "text",
+        });
+        e = cm.getEntity({ id: e["@id"] });
+        expect(e).not.toHaveProperty("text");
     });
     test("a sequence of operations around deleting a property on an entity", () => {
         cm.setProperty({ id: "./", property: "new", value: "some text" });

@@ -1074,8 +1074,10 @@ cm.deleteAllProperties({ id: "./", property: "author" });
         const indexRef = this.entityIdIndex[id];
         const entity = this.crate["@graph"][indexRef];
 
-        for (let idx of rangeRight(entity[property].length)) {
-            this.deleteProperty({ id: entity["@id"], property, idx });
+        if (entity[property]?.length) {
+            for (let idx of rangeRight(entity[property].length)) {
+                this.deleteProperty({ id: entity["@id"], property, idx });
+            }
         }
     }
 
