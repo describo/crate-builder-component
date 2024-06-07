@@ -13,6 +13,7 @@ import flattenDeep from "lodash-es/flattenDeep.js";
 import intersection from "lodash-es/intersection.js";
 import compact from "lodash-es/compact.js";
 import isEqual from "lodash-es/isEqual.js";
+import rangeRight from "lodash-es/rangeRight.js";
 import { validateId } from "./validate-identifier.js";
 import { normalise, isURL } from "./lib.js";
 import { toRaw } from "vue";
@@ -1026,7 +1027,7 @@ cm.updateProperty({ id: "./", property: "author", idx: 1, value: "new" });
     }
 
     /**
-     * Delete a property from the entity
+     * Delete a specific property from the entity. That is, an instance of a property.
      *
      * @param {Object}
      * @param {string} options.id - the id of the entity to remove the property value from
@@ -1051,6 +1052,30 @@ cm.deleteProperty({ id: "./", property: "author", idx: 1 });
         // manage timestamps
         if (this.entityTimestamps) {
             entity[entityDateUpdatedProperty] = [new Date().toISOString()];
+        }
+    }
+
+    /**
+     * Delete all data attached to a property. That is, all instances.
+     *
+     * @param {Object}
+     * @param {string} options.id - the id of the entity to remove the property value from
+     * @param {string} options.property - the property
+     * @example
+
+const cm = new CrateManager({ crate })
+cm.deleteAllProperties({ id: "./", property: "author" });
+
+     */
+    deleteAllProperties({ id, property }) {
+        if (!id) throw new Error(`'deleteProperty' requires 'id' to be defined`);
+        if (!property) throw new Error(`deleteProperty' requires 'property' to be defined`);
+
+        const indexRef = this.entityIdIndex[id];
+        const entity = this.crate["@graph"][indexRef];
+
+        for (let idx of rangeRight(entity[property].length)) {
+            this.deleteProperty({ id: entity["@id"], property, idx });
         }
     }
 

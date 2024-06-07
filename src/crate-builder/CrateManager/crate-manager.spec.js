@@ -627,7 +627,7 @@ describe("Test interacting with the crate", () => {
         });
         // console.log(entity);
     });
-    test("delete a property", () => {
+    test("delete a instance of data attached to a property", () => {
         const url = chance.url();
         let entity = {
             "@id": url,
@@ -642,6 +642,25 @@ describe("Test interacting with the crate", () => {
             id: e["@id"],
             property: "text",
             idx: 0,
+        });
+
+        e = cm.getEntity({ id: e["@id"] });
+        expect(e).not.toHaveProperty("text");
+    });
+    test("delete all data connected to a property", () => {
+        const url = chance.url();
+        let entity = {
+            "@id": url,
+            "@type": "Person",
+            name: chance.sentence(),
+            text: ["some text", "some other text"],
+        };
+        let e = cm.addEntity(entity);
+        e = cm.getEntity({ id: e["@id"] });
+
+        cm.deleteAllProperties({
+            id: e["@id"],
+            property: "text",
         });
 
         e = cm.getEntity({ id: e["@id"] });
@@ -1685,7 +1704,6 @@ describe("Test interacting with the crate", () => {
         ]);
         // console.log(cm.exportCrate()["@graph"]);
     });
-
     test("resolve entity associations", async () => {
         crate = getBaseCrate();
         crate["@graph"].push({
