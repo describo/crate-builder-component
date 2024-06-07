@@ -1,7 +1,10 @@
 <template>
     <div class="flex flex-row">
         <div class="flex flex-col w-full">
-            <div class="flex flex-row place-content-between pb-1 border-b border-slate-700">
+            <div
+                class="flex flex-row place-content-between pb-1 border-b border-slate-700"
+                v-if="configuration.showControls"
+            >
                 <!-- render controls -->
                 <render-controls-component
                     ref="renderControlsComponent"
