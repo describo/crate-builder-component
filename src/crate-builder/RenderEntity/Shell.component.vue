@@ -116,16 +116,14 @@
                 >
                     <template #label>
                         <div
-                            class="flex flex-col"
+                            class="flex flex-col min-w-32 max-w-40"
                             :class="{
                                 'items-end': configuration.tabLocation === 'left',
                                 'items-start': configuration.tabLocation !== 'left',
                             }"
                         >
-                            <div class="flex flex-row text-right items-center space-x-2">
-                                <div
-                                    class="flex flex-col whitespace-normal text-lg text-gray-600 text-right"
-                                >
+                            <div class="flex flex-row items-center space-x-2">
+                                <div class="flex flex-col whitespace-normal text-lg text-gray-600">
                                     <div
                                         class="cursor-pointer hover:text-yellow-600 describo-tab-label"
                                         v-if="tab.label"
@@ -156,7 +154,7 @@
                                 </div>
                             </div>
                             <div
-                                class="text-gray-600 font-light text-xs pr-1 pb-4 describo-tab-description"
+                                class="text-gray-600 font-light text-xs pb-4 text-wrap describo-tab-description"
                             >
                                 {{ tab.description }}
                             </div>
