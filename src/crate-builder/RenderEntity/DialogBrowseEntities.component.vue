@@ -1,5 +1,5 @@
 <template>
-    <div class="overflow-scroll pr-2">
+    <div class="scrollbar overflow-scroll pr-2">
         <div class="flex flex-col space-y-2">
             <el-pagination
                 layout="prev, pager, next, total"
