@@ -231,7 +231,10 @@ export class ProfileManager {
             //   go and get those inputs as well
             if (this.profile?.classes?.[type]?.subClassOf) {
                 for (let parentClass of this.profile?.classes?.[type]?.subClassOf) {
-                    inputs = [...inputs, ...cloneDeep(this.profile?.classes?.[parentClass].inputs)];
+                    inputs = [
+                        ...inputs,
+                        ...cloneDeep(this.profile?.classes?.[parentClass]?.inputs ?? []),
+                    ];
                 }
             }
         }
