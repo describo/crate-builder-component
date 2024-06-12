@@ -187,7 +187,7 @@ const data = reactive({
         enableReverseLinkBrowser: false,
         enableUrlMarkup: true,
         purgeUnlinkedEntities: true,
-        enableEntityTimestamps: true,
+        enableEntityTimestamps: false,
         readonly: false,
         language: "en",
         tabLocation: "left",

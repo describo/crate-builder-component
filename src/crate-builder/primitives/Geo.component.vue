@@ -1,21 +1,29 @@
 <template>
-    <div class="flex flex-row text-gray-600 describo-property-type-geo">
-        <div
-            class="flex flex-col p-4"
-            :class="{
-                'w-full': !data.existingEntities.length,
-                'w-2/3': data.existingEntities.length,
-            }"
-        >
-            <div>{{ $t("define_location") }}</div>
-            <div class="flex flex-col">
-                <div class="flex flex-row space-x-4 py-1">
-                    <div>
-                        <el-button @click="centerMap" type="primary">
-                            <FontAwesomeIcon :icon="faCrosshairs"></FontAwesomeIcon>
-                            &nbsp; {{ $t("center_map") }}
-                        </el-button>
-                    </div>
+    <div class="flex flex-col text-gray-600 describo-property-type-geo">
+        <div class="flex flex-col space-y-4">
+            <div v-if="data.existingEntities.length">
+                <div>{{ $t("select_existing_location") }}</div>
+                <el-select
+                    v-model="data.selectValue"
+                    :placeholder="$t('select')"
+                    @change="emitSelection"
+                >
+                    <el-option
+                        v-for="entity in data.existingEntities"
+                        :key="entity['@id']"
+                        :label="entity.name"
+                        :value="entity['@id']"
+                    />
+                </el-select>
+            </div>
+            <div v-if="data.existingEntities.length" class="border border-gray-400"></div>
+            <div class="flex flex-col space-y-2">
+                <div>{{ $t("define_location") }}</div>
+                <el-input
+                    v-model="data.locationName"
+                    :placeholder="$t('provide_name_for_location')"
+                ></el-input>
+                <div class="flex flex-row space-x-4">
                     <div class="flex flex-col">
                         <el-radio v-model="data.mode" label="box" @change="updateHandlers">
                             {{ $t("select_region") }}
@@ -31,43 +39,15 @@
                         {{ $t("click_on_map_to_select_point") }}
                     </div>
                 </div>
-                <el-form class="mt-1" :model="data.form" @submit.prevent.native="emitFeature">
-                    <el-form-item :label="$t('location_name')">
-                        <el-input
-                            v-model="data.locationName"
-                            :placeholder="$t('provide_name_for_location')"
-                        ></el-input>
-                        <div v-if="data.error" class="text-sm text-red-700">{{ data.error }}</div>
-                    </el-form-item>
-                </el-form>
             </div>
             <div id="map" class="map-style"></div>
-        </div>
-        <div class="w-1/3 p-4" v-if="data.existingEntities.length">
-            <div class="flex flex-col p-2">
-                <div>{{ $t("select_existing_location") }}</div>
-                <el-select
-                    v-model="data.selectValue"
-                    class="m-2"
-                    :placeholder="$t('select')"
-                    size="large"
-                    @change="emitSelection"
-                >
-                    <el-option
-                        v-for="entity in data.existingEntities"
-                        :key="entity['@id']"
-                        :label="entity.name"
-                        :value="entity['@id']"
-                    />
-                </el-select>
-            </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faCrosshairs } from "@fortawesome/free-solid-svg-icons";
+// import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+// import { faCrosshairs } from "@fortawesome/free-solid-svg-icons";
 // https://macwright.com/lonlat/
 
 import { ElButton, ElRadio, ElSelect, ElOption, ElForm, ElFormItem, ElInput } from "element-plus";
@@ -85,6 +65,8 @@ import { reactive, onMounted, onBeforeUnmount, inject } from "vue";
 import { $t } from "../i18n";
 import { crateManagerKey } from "../RenderEntity/keys.js";
 const cm = inject(crateManagerKey);
+import Terraformer from "terraformer-wkt-parser";
+import flattenDeep from "lodash-es/flattenDeep.js";
 
 AreaSelectInit(Leaflet);
 
@@ -147,19 +129,16 @@ async function init() {
 }
 
 function loadGeoDataInCrate() {
-    let geoShape = [
-        ...cm.value.getEntities({
-            limit: 5,
-            type: "GeoShape",
-        }),
-    ];
-    let geoCoordinates = [
-        ...cm.value.getEntities({
-            limit: 5,
-            type: "GeoCoordinates",
-        }),
-    ];
-    data.existingEntities = [...geoShape, ...geoCoordinates];
+    const geometryClasses = ["Geo", "Geomtery", "GeoShape", "GeoCoordinates"];
+    let geos = geometryClasses.map((g) => {
+        return [
+            ...cm.value.getEntities({
+                limit: 5,
+                type: g,
+            }),
+        ];
+    });
+    data.existingEntities = flattenDeep(geos);
 }
 
 function centerMap() {
@@ -221,18 +200,24 @@ function handlePointSelect(e) {
 }
 
 function emitFeature() {
-    if (!data.locationName || !data.feature.geojson) {
-        data.error = $t("provide_name_for_location_error");
-        return;
-    }
-    data.error = undefined;
-
+    // get a blank node definition for the geometry
+    let node = cm.value.addBlankNode("Geometry");
     let entity = {
-        ...data.feature,
-        "@id": `#${data.locationName.replace(/ /g, "_")}`,
+        // ...data.feature,
+        // "@id": `#${data.locationName.replace(/ /g, "_")}`,
+        // "@type": "Geometry",
+        ...node,
         name: data.locationName,
         geojson: JSON.stringify(data.feature.geojson),
+        asWKT: Terraformer.convert(data.feature.geojson.geometry),
     };
+
+    // we need to delete the blank node so the emit adds the actual entity
+    //  technically we should be emitting a sequence of setProperty emits
+    //  but this is way easier.
+    cm.value.deleteEntity({ id: node["@id"] });
+
+    // console.log(JSON.stringify(entity, null, 2));
     // console.debug("GEO Component : emit(create:entity)", entity);
     $emit("create:entity", { property: props.property, json: entity });
 }

@@ -49,7 +49,8 @@ const en = {
         // Text.component.vue
         invalid_type_for_text:
             "The type '{{type}}' is not valid for this component. It can only be 'text' or 'textarea'",
-        text_constraints_error_message: "The specified value does not meet the following constraints: {{- value}}, or it is considered invalid.",
+        text_constraints_error_message:
+            "The specified value does not meet the following constraints: {{- value}}, or it is considered invalid.",
 
         // Date.component.vue
         pick_a_date: "Pick a date",
@@ -69,7 +70,8 @@ const en = {
         // Number.component.vue
         invalid_number_value:
             "The supplied number '{{value}}' is invalid. The value must be a valid number passed in as a String or a Number.",
-        number_constraints_error_message: "The specified number does not meet the following constraints: {{value}}",
+        number_constraints_error_message:
+            "The specified number does not meet the following constraints: {{value}}",
 
         // Select.component.vue
         select: "Select",
@@ -104,9 +106,9 @@ const en = {
         press_shift_drag_to_select: "Press the shift key and drag the mouse to select an area",
         click_on_map_to_select_point: "Click on the map to select a point",
         location_name: "Location Name",
-        provide_name_for_location: "Please provide a name for this location",
+        provide_name_for_location: "Please provide a name for this location - optional",
         provide_name_for_location_error: "You need to provide a name for this location",
-        select_existing_location: "Select existing location defined in the crate",
+        select_existing_location: "Select a location that has already been defined",
 
         // Value.component.vue
         invalid_value_value: "The supplied value '{{value}}' is invalid. It can only be a string.",

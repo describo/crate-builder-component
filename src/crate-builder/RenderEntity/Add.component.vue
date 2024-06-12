@@ -1,10 +1,9 @@
 <template>
     <div
-        class="flex my-2 p-1 rounded"
+        class="flex flex-col my-2 p-1 rounded"
         :class="{
             'bg-indigo-200': data.addType,
-            'flex-row space-x-2 space-y-0': types.length === 1,
-            'flex-col space-y-2 space-x-0': types.length > 1,
+            'max-w-[715px]': data.addType?.match(/geo/gi),
         }"
     >
         <add-control-component
@@ -15,7 +14,7 @@
             @close="close"
         />
 
-        <div v-if="addSimpleType" class="p-1 w-full">
+        <div v-if="addSimpleType" class="p-1">
             <text-component
                 v-if="data.addType === 'Text'"
                 :property="props.property"
@@ -77,7 +76,7 @@
                 @create:entity="createEntity"
             />
             <geo-component
-                v-if="['Geo', 'GeoCoordinates', 'GeoShape'].includes(data.addType)"
+                v-if="['Geo', 'Geometry', 'GeoCoordinates', 'GeoShape'].includes(data.addType)"
                 :crate-manager="props.crateManager"
                 :property="props.property"
                 @create:entity="createEntity"
@@ -89,9 +88,9 @@
                 @save:property="createProperty"
             />
         </div>
-        <div v-else class="p-1 w-full describo-property-type-entity">
+        <div v-else class="describo-property-type-entity">
             <div
-                class="flex flex-row space-x-2 divide-y divide-gray-300 text-gray-600"
+                class="p-1 flex flex-row space-x-2 divide-y divide-gray-300 text-gray-600"
                 v-if="data.addType"
             >
                 <div class="w-full">
@@ -164,6 +163,7 @@ const data = reactive({
         "SelectURL",
         "SelectObject",
         "Geo",
+        "Geometry",
         "GeoCoordinates",
         "GeoShape",
         "Boolean",
