@@ -47,15 +47,19 @@ const props = defineProps({
         required: true,
     },
 });
+const emit = defineEmits(["close", "add:property:placeholder"]);
+
 const data = reactive({
     selectedProperty: undefined,
     addType: undefined,
     filter: undefined,
 });
-const emit = defineEmits(["close", "add:property:placeholder"]);
+
 watch(
     () => props.entity,
-    () => (data.filter = undefined)
+    (n, o) => {
+        if (n["@id"] !== o["@id"]) data.filter = undefined;
+    }
 );
 
 let inputs = computed(() => {
