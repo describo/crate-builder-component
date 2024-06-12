@@ -81,7 +81,9 @@ function filterAndChunkEntitiesForDisplay() {
     let offset = (data.currentPage - 1) * data.pageSize;
     if (data.filter) {
         const re = new RegExp(data.filter, "i");
-        let es = props.entities.filter((e) => e.value.name.match(re) || e.value["@id"].match(re));
+        let es = props.entities.filter(
+            (e) => e.value?.name?.match(re) || e.value?.["@id"]?.match(re)
+        );
         data.total = es.length;
         entities.value = es.slice(offset, offset + data.pageSize);
     } else {
