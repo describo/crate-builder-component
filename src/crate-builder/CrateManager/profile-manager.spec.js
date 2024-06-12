@@ -384,11 +384,12 @@ describe("Test working with profiles", () => {
         expect(inputs).toEqual([
             "http://schema.org/additionalType",
             "http://schema.org/alternateName",
+            "http://purl.org/dc/terms/conformsTo",
             "https://schema.org/date",
             "http://schema.org/description",
             "http://schema.org/disambiguatingDescription",
-            "https://www.ica.org/standards/RiC/RiC-O_1-0-1.html#hasCreationDate",
-            "https://www.ica.org/standards/RiC/RiC-O_1-0-1.html#hasModificationDate",
+            "https://www.ica.org/standards/RiC/ontology#hasCreationDate",
+            "https://www.ica.org/standards/RiC/ontology#hasModificationDate",
             "http://schema.org/identifier",
             "http://schema.org/image",
             "http://schema.org/mainEntityOfPage",
@@ -396,9 +397,13 @@ describe("Test working with profiles", () => {
             "http://schema.org/potentialAction",
             "http://schema.org/sameAs",
             "http://schema.org/subjectOf",
+            "https://www.ica.org/standards/RiC/ontology#thingIsConnectedToRelation",
+            "https://www.ica.org/standards/RiC/ontology#thingIsContextOfRelation",
+            "https://www.ica.org/standards/RiC/ontology#thingIsSourceOfRelation",
+            "https://www.ica.org/standards/RiC/ontology#thingIsTargetOfRelation",
             "http://schema.org/url",
         ]);
-        expect(inputs.length).toEqual(15);
+        expect(inputs.length).toEqual(20);
     });
     test("get inputs for type defined in profile - subClass in profile, definition inherit, props dup'ed", () => {
         const profile = {
@@ -504,10 +509,11 @@ describe("Test working with profiles", () => {
         expect(inputs).toEqual([
             "http://schema.org/additionalType",
             "http://schema.org/alternateName",
+            "http://purl.org/dc/terms/conformsTo",
             "http://schema.org/description",
             "http://schema.org/disambiguatingDescription",
-            "https://www.ica.org/standards/RiC/RiC-O_1-0-1.html#hasCreationDate",
-            "https://www.ica.org/standards/RiC/RiC-O_1-0-1.html#hasModificationDate",
+            "https://www.ica.org/standards/RiC/ontology#hasCreationDate",
+            "https://www.ica.org/standards/RiC/ontology#hasModificationDate",
             "http://schema.org/identifier",
             "http://schema.org/image",
             "http://schema.org/mainEntityOfPage",
@@ -515,6 +521,10 @@ describe("Test working with profiles", () => {
             "http://schema.org/potentialAction",
             "http://schema.org/sameAs",
             "http://schema.org/subjectOf",
+            "https://www.ica.org/standards/RiC/ontology#thingIsConnectedToRelation",
+            "https://www.ica.org/standards/RiC/ontology#thingIsContextOfRelation",
+            "https://www.ica.org/standards/RiC/ontology#thingIsSourceOfRelation",
+            "https://www.ica.org/standards/RiC/ontology#thingIsTargetOfRelation",
             "http://schema.org/url",
         ]);
     });
@@ -538,12 +548,13 @@ describe("Test working with profiles", () => {
             "http://schema.org/additionalType",
             "http://schema.org/alternateName",
             "http://schema.org/code",
+            "http://purl.org/dc/terms/conformsTo",
             "http://schema.org/description",
             "http://schema.org/disambiguatingDescription",
             "http://schema.org/funding",
             "http://schema.org/guideline",
-            "https://www.ica.org/standards/RiC/RiC-O_1-0-1.html#hasCreationDate",
-            "https://www.ica.org/standards/RiC/RiC-O_1-0-1.html#hasModificationDate",
+            "https://www.ica.org/standards/RiC/ontology#hasCreationDate",
+            "https://www.ica.org/standards/RiC/ontology#hasModificationDate",
             "http://schema.org/identifier",
             "http://schema.org/image",
             "http://schema.org/legalStatus",
@@ -556,6 +567,10 @@ describe("Test working with profiles", () => {
             "http://schema.org/sameAs",
             "http://schema.org/study",
             "http://schema.org/subjectOf",
+            "https://www.ica.org/standards/RiC/ontology#thingIsConnectedToRelation",
+            "https://www.ica.org/standards/RiC/ontology#thingIsContextOfRelation",
+            "https://www.ica.org/standards/RiC/ontology#thingIsSourceOfRelation",
+            "https://www.ica.org/standards/RiC/ontology#thingIsTargetOfRelation",
             "http://schema.org/url",
         ]);
     });
