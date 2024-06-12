@@ -15,14 +15,14 @@
         >
             <div class="flex flex-col text-black">
                 <div class="flex flex-row space-x-1 border-b border-gray-700">
-                    <div v-if="item.label">
+                    <div v-if="item.label" class="text-nowrap">
                         {{ item.label }}
                     </div>
                     <div v-else class="text-black">
                         {{ item.name }}
                     </div>
                     <div><FontAwesomeIcon :icon="faArrowRight"></FontAwesomeIcon></div>
-                    <div>{{ item.type.map((t) => `"${t}"`).join(", ") }}</div>
+                    <div class="text-balance">{{ item.type.map((t) => `${t}`).join(", ") }}</div>
                 </div>
                 <div class="text-gray-600 w-full">
                     {{ item.help }}
