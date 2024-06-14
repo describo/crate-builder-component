@@ -65,7 +65,7 @@ import { reactive, onMounted, onBeforeUnmount, inject } from "vue";
 import { $t } from "../i18n";
 import { crateManagerKey } from "../RenderEntity/keys.js";
 const cm = inject(crateManagerKey);
-import Terraformer from "terraformer-wkt-parser";
+import { geojsonToWKT } from "@terraformer/wkt";
 import flattenDeep from "lodash-es/flattenDeep.js";
 
 AreaSelectInit(Leaflet);
@@ -209,7 +209,7 @@ function emitFeature() {
         ...node,
         name: data.locationName,
         geojson: JSON.stringify(data.feature.geojson),
-        asWKT: Terraformer.convert(data.feature.geojson.geometry),
+        asWKT: geojsonToWKT(data.feature.geojson.geometry),
     };
 
     // we need to delete the blank node so the emit adds the actual entity
