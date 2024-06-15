@@ -3,6 +3,7 @@ import isNumber from "lodash-es/isNumber.js";
 import isBoolean from "lodash-es/isBoolean.js";
 import isString from "lodash-es/isString.js";
 import isEmpty from "lodash-es/isEmpty.js";
+import isNil from "lodash-es/isNil.js";
 import isUndefined from "lodash-es/isUndefined.js";
 import difference from "lodash-es/difference.js";
 import round from "lodash-es/round.js";
@@ -115,6 +116,9 @@ export class CrateManager {
         for (let i = 0; i < graphLength; i++) {
             const entity = crate["@graph"][i];
 
+            // if the entity is empty - ignore it
+            if (isPlainObject(entity) && isEmpty(entity)) continue;
+
             // if the entity is the root descriptor, store it
             if (entity["@id"] === "ro-crate-metadata.json") {
                 this.rootDescriptor = entity;
@@ -206,7 +210,7 @@ export class CrateManager {
         }
 
         // one final iteration over the crate to record the reverse links
-        //  and make sure every property is an array
+        //  and make sure every property looks sensible
         for (let i = 0; i < graphLength; i++) {
             let entity = crate["@graph"][i];
 
@@ -216,6 +220,9 @@ export class CrateManager {
                 if (this.coreProperties.includes(property)) continue;
 
                 entity[property] = [].concat(entity[property]);
+
+                // ensure we don't have any empty properties
+                entity[property] = entity[property].filter((i) => !isEmpty(i) && !isNil(i));
 
                 // now find the linked entities and populate the reverse links array
                 entity[property].forEach((instance) => {
