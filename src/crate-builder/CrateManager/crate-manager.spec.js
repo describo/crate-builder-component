@@ -173,55 +173,6 @@ describe("Test interacting with the crate", () => {
             );
         }
     });
-    // test("add a simple File or Dataset entity to the crate", () => {
-    //     // test 1
-    //     let entity = {
-    //         "@id": "file1.jpg",
-    //         "@type": "File",
-    //         name: "file1.jpg",
-    //     };
-    //     let r = cm.addEntity(entity);
-    //     let ec = cm.exportCrate();
-    //     expect(ec["@graph"].length).toEqual(3);
-    //     expect(r).toBeTruthy;
-    //     expect(ec["@graph"][2]["@id"]).toEqual("file1.jpg");
-
-    //     // test 2
-    //     entity = {
-    //         "@id": "something",
-    //         "@type": ["File", "Thing"],
-    //     };
-    //     r = cm.addEntity(entity);
-    //     ec = cm.exportCrate();
-    //     expect(ec["@graph"].length).toEqual(4);
-    //     expect(r).toBeTruthy;
-    //     expect(ec["@graph"][3]["@id"]).toEqual("something");
-    //     expect(ec["@graph"][3]["@type"]).toEqual(["File", "Thing"]);
-
-    //     // test 3
-    //     entity = {
-    //         "@id": "something_else",
-    //         "@type": "Dataset",
-    //     };
-    //     r = cm.addEntity(entity);
-    //     ec = cm.exportCrate();
-    //     expect(ec["@graph"].length).toEqual(5);
-    //     expect(r).toBeTruthy;
-    //     expect(ec["@graph"][4]["@id"]).toEqual("something_else/");
-    //     expect(ec["@graph"][4]["@type"]).toEqual("Dataset");
-
-    //     // test 4
-    //     entity = {
-    //         "@id": "something_new",
-    //         "@type": ["Dataset", "CreativeWork"],
-    //     };
-    //     r = cm.addEntity(entity);
-    //     ec = cm.exportCrate();
-    //     expect(ec["@graph"].length).toEqual(6);
-    //     expect(r).toBeTruthy;
-    //     expect(ec["@graph"][5]["@id"]).toEqual("something_new/");
-    //     expect(ec["@graph"][5]["@type"]).toEqual(["Dataset", "CreativeWork"]);
-    // });
     test("add a simple entity to the crate and export as a template", () => {
         let entity = {
             "@id": "#person",
@@ -386,6 +337,7 @@ describe("Test interacting with the crate", () => {
         });
 
         let ec = cm.exportCrate();
+
         // console.log(JSON.stringify(ec["@graph"], null, 2));
         expect(ec["@graph"]).toMatchObject([
             { "@id": "ro-crate-metadata.json" },

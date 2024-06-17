@@ -651,7 +651,7 @@ let r = cm.addEntity(entity);
 
         const e = structuredClone(entity);
         entity = normalise(e, this.graphLength);
-        entity = this.__confirmNoClash(entity);
+        entity = this.__confirmNoClash({ entity });
         if (!entity) {
             entity = normalise(e, this.graphLength);
             return this.getEntity({ id: entity["@id"] });
@@ -936,6 +936,9 @@ cm.setProperty({ id: "./", property: "author", value: 3 });
         if (value !== false && !value)
             throw new Error(`'setProperty' requires 'value' to be defined`);
 
+        //  just don't set an empty object on a property
+        if (isPlainObject(value) && isEmpty(value)) return;
+
         const indexRef = this.entityIdIndex[id];
         const entity = this.crate["@graph"][indexRef];
         if (!(property in entity)) {
@@ -989,18 +992,16 @@ cm.updateProperty({ id: "./", property: "author", idx: 1, value: "new" });
         if (value !== false && !value)
             throw new Error(`'setProperty' requires 'value' to be defined`);
 
-        let entity;
+        //  just don't set an empty object on a property
+        if (isPlainObject(value) && isEmpty(value)) return;
+
+        let indexRef = this.entityIdIndex[id];
+        if (!indexRef) return `No such entity: ${id}`;
+        const entity = this.crate["@graph"][indexRef];
         if (this.coreProperties.includes(property)) {
-            let indexRef = this.entityIdIndex[id];
-            if (!indexRef) {
-                entity = this.__materialiseEntity({ id });
-                entity = this.addEntity(entity);
-                indexRef = this.entityIdIndex[entity["@id"]];
-            }
-            entity = this.crate["@graph"][indexRef];
             if (property === "@id") {
                 //  update @id
-                this.__updateEntityId({ entity, newId: value });
+                this.__updateEntityId({ oldId: entity["@id"], newId: value });
             } else if (property === "@type") {
                 //  update @type
                 //   ensure it's an array first though or weird sh*t happens
@@ -1020,9 +1021,6 @@ cm.updateProperty({ id: "./", property: "author", idx: 1, value: "new" });
             }
         } else {
             if (idx !== 0 && !idx) throw new Error(`setProperty' requires 'idx' to be defined`);
-
-            let indexRef = this.entityIdIndex[id];
-            entity = this.crate["@graph"][indexRef];
             entity[property][idx] = value;
         }
 
@@ -1503,7 +1501,7 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
         });
     }
     __removeEntityType(entity) {
-        // store the entity type for lookups by type
+        // update the entity type's store
         entity["@type"].forEach((type) => {
             this.entityTypes[type] -= 1;
             if (this.entityTypes[type] === 0) delete this.entityTypes[type];
@@ -1546,7 +1544,7 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
             name: id,
         };
     }
-    __confirmNoClash(entity) {
+    __confirmNoClash({ entity, mintNewId = true }) {
         // if it looks like the root dataset - throw an error
         //  can't have multiple root datasets
         if (entity["@id"] === "./") {
@@ -1573,69 +1571,103 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
         if (!difference(entityLookup?.["@type"], entity["@type"]).length) {
             return false;
         } else {
-            const id = `e${this.graphLength + 1}`;
-            entity["@id"] = `#${id}`;
-            return entity;
+            // if get to here then there's a clash
+
+            if (mintNewId) {
+                const id = `e${this.graphLength + 1}`;
+                entity["@id"] = `#${id}`;
+                return entity;
+            } else {
+                throw new Error("That id is already used on another entity");
+            }
         }
     }
-    __updateEntityId({ entity, newId }) {
-        const originalId = entity["@id"];
-        entity = structuredClone(entity);
+    __updateEntityId({ oldId, newId }) {
+        if (!oldId) throw new Error(`You must provide the id to change: oldId`);
+        if (!newId) throw new Error(`You must provide the id for the change: newId`);
+        // get the original entity and see if we can set this new id on it
+        //  we clone the original entity as we don't want to set anything yet
+        let indexRef = this.entityIdIndex[oldId];
+        // console.log("ORIGINAL ENTITY", JSON.stringify(this.crate["@graph"][indexRef], null, 2));
+        let entity = structuredClone(this.crate["@graph"][indexRef]);
         entity["@id"] = newId;
         entity = normalise(entity, this.graphLength);
-        entity = this.__confirmNoClash(entity);
+        entity = this.__confirmNoClash({ entity, mintNewId: false });
+        // console.log("NEW ENTITY", JSON.stringify(entity, null, 2));
 
         // get the entity using the original id and then walk the properties forward
         //  to find what it links to. For each of those, set the reverse link to the new id
-        let indexRef = this.entityIdIndex[originalId];
+        indexRef = this.entityIdIndex[oldId];
         let oe = this.crate["@graph"][indexRef];
         for (let [property, instances] of Object.entries(oe)) {
             if (this.coreProperties.includes(property)) continue;
             for (let instance of instances) {
                 if (instance?.["@id"]) {
+                    // console.log(
+                    //     "FORWARD LINKED ENTITY BEFORE",
+                    //     property,
+                    //     this.reverse[instance["@id"]][property]
+                    // );
                     this.reverse[instance["@id"]][property].push({ "@id": entity["@id"] });
-
                     this.reverse[instance["@id"]][property] = this.reverse[instance["@id"]][
                         property
-                    ].filter((i) => i["@id"] !== originalId);
+                    ].filter((i) => i["@id"] !== oldId);
                     this.reverse[instance["@id"]][property] = uniqBy(
                         this.reverse[instance["@id"]][property],
                         "@id"
                     );
+                    // console.log(
+                    //     "FORWARD LINKED ENTITY AFTER",
+                    //     property,
+                    //     this.reverse[instance["@id"]][property]
+                    // );
                 }
             }
         }
 
+        // walk the reverse links from this entity and update the forrward links
         // now walk the reverse links of the entity to update the references to it
-        if (this.reverse[originalId]) {
-            for (let [property, links] of Object.entries(this.reverse[originalId])) {
+        if (this.reverse[oldId]) {
+            for (let [property, links] of Object.entries(this.reverse[oldId])) {
                 for (let link of links) {
                     let linkIndexRef = this.entityIdIndex[link["@id"]];
                     let linkedEntity = this.crate["@graph"][linkIndexRef];
 
+                    // console.log("REVERSE LINKED ENTITY BEFORE", property, linkedEntity[property]);
                     linkedEntity[property].push({ "@id": entity["@id"] });
                     linkedEntity[property] = linkedEntity[property].filter(
-                        (i) => i["@id"] !== originalId
+                        (i) => i["@id"] !== oldId
                     );
+                    // console.log("REVERSE LINKED ENTITY AFTER", property, linkedEntity[property]);
                 }
             }
         }
 
-        // finally update the entity @id
-        indexRef = this.entityIdIndex[originalId];
+        // now we can update the original entity in the graph
+        // set the new id on the entity itself
+        indexRef = this.entityIdIndex[oldId];
         this.crate["@graph"][indexRef]["@id"] = entity["@id"];
+        // console.log("NEW ENTITY IN GRAPH", JSON.stringify(this.crate["@graph"][indexRef], null, 2));
 
-        // remove the original index ref
-        delete this.entityIdIndex[originalId];
-
-        // add the new one
+        // update the index ref's
+        delete this.entityIdIndex[oldId];
+        // console.log("OLDID lookup", this.entityIdIndex[oldId]);
         this.entityIdIndex[entity["@id"]] = indexRef;
+        // console.log("NEWID lookup", this.entityIdIndex[entity["@id"]]);
+        // console.log(
+        //     "NEW ENTITY IN GRAPH",
+        //     JSON.stringify(this.crate["@graph"][this.entityIdIndex[entity["@id"]]], null, 2)
+        // );
 
         // copy the reverse associations to the new id
-        this.reverse[entity["@id"]] = structuredClone(this.reverse[originalId]);
-
-        // and remove the original reverse associations
-        delete this.reverse[originalId];
+        //   and then remove the original reverse associations
+        this.reverse[entity["@id"]] = structuredClone(this.reverse[oldId]);
+        delete this.reverse[oldId];
+        // console.log(
+        //     "NEW ENTITY REVERSE CONNECTIONS",
+        //     entity["@id"],
+        //     JSON.stringify(this.reverse[entity["@id"]], null, 2)
+        // );
 
         // console.log(JSON.stringify(this.crate["@graph"], null, 2));
         // console.log("");
