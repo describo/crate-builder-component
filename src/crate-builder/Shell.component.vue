@@ -34,7 +34,9 @@ import { ProfileManager } from "./CrateManager/profile-manager.js";
 import { $t, i18next } from "./i18n";
 import { useStateStore } from "./store.js";
 import { createPinia } from "pinia";
-getCurrentInstance().appContext.app.use(createPinia());
+if (!getCurrentInstance().appContext.app.config.globalProperties.$pinia) {
+    getCurrentInstance().appContext.app.use(createPinia());
+}
 
 let watchers = [];
 let warnings = {};
