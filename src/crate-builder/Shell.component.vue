@@ -1,12 +1,14 @@
 <template>
-    <RenderEntity
-        ref="renderEntity"
-        v-if="ready && !error"
-        :entity="contextEntity"
-        @load:entity="setCurrentEntity"
-        @save:crate="saveCrate"
-        @save:entity:template="saveEntityAsTemplate"
-    />
+    <div>
+        <RenderEntity
+            ref="renderEntity"
+            v-if="ready && !error"
+            :entity="contextEntity"
+            @load:entity="setCurrentEntity"
+            @save:crate="saveCrate"
+            @save:entity:template="saveEntityAsTemplate"
+        />
+    </div>
 </template>
 
 <script setup>
@@ -18,41 +20,34 @@ import {
     onBeforeMount,
     onBeforeUnmount,
     watch,
-    getCurrentInstance,
     shallowRef,
     toRaw,
     provide,
     computed,
+    getCurrentInstance,
 } from "vue";
-import {
-    configurationKey,
-    crateManagerKey,
-    profileManagerKey,
-    lookupsKey,
-} from "./RenderEntity/keys.js";
+import { crateManagerKey, profileManagerKey, lookupsKey } from "./RenderEntity/keys.js";
 import isEmpty from "lodash-es/isEmpty.js";
-import debounce from "lodash-es/debounce.js";
 import isFunction from "lodash-es/isFunction.js";
 import { CrateManager } from "./CrateManager/crate-manager.js";
 import { ProfileManager } from "./CrateManager/profile-manager.js";
-import { useRouter, useRoute } from "vue-router";
 import { $t, i18next } from "./i18n";
-const debouncedEmitNavigation = debounce(emitNavigation, 500, { leading: true, trailing: false });
+import { useStateStore } from "./store.js";
+import { createPinia } from "pinia";
+getCurrentInstance().appContext.app.use(createPinia());
 
-let $route, $router;
 let watchers = [];
 let warnings = {};
 let errors = {};
 const cm = shallowRef({});
 const pm = shallowRef({});
-const configuration = shallowRef({});
 const lookups = shallowRef({});
 const contextEntity = shallowRef({});
+const state = useStateStore();
 let ready = ref(false);
 let error = ref(false);
 let renderEntity = ref();
 
-// Property definitions are now in the file: ./property-definitions.js
 const props = defineProps(propertyDefinitions);
 
 const $emit = defineEmits([
@@ -66,10 +61,14 @@ const $emit = defineEmits([
 defineExpose({
     cm,
     pm,
+    state,
     setCurrentEntity,
     setTab: (tabName) => renderEntity.value.setTab(tabName),
     toggleReverseLinkBrowser: () => renderEntity.value.toggleReverseLinkBrowser(),
-    refresh: () => (contextEntity.value = { ...contextEntity.value }),
+    refresh: () => {
+        const id = state.editorState.latest().id;
+        setCurrentEntity({ id, updateState: false });
+    },
 });
 
 const $key = {
@@ -79,10 +78,6 @@ const $key = {
     lookups: 0,
 };
 
-provide(
-    configurationKey,
-    computed(() => configuration.value)
-);
 provide(
     crateManagerKey,
     computed(() => cm.value)
@@ -95,38 +90,26 @@ provide(
     lookupsKey,
     computed(() => lookups.value)
 );
-
-if (props.enableInternalRouting) {
-    if (getCurrentInstance().appContext.config.globalProperties.$router) {
-        $router = useRouter();
-        $route = useRoute();
-    }
-}
-
 onBeforeMount(() => {
-    $router?.replace({ query: "" });
-    configuration.value = configure();
-    configuration.value.$key = $key.conf;
+    state.configuration = configure();
 });
 onMounted(async () => {
     await init();
-
-    if (props.enableInternalRouting) {
-        watchers.push(
-            watch(
-                () => $route?.query?.id,
-                (n, o) => {
-                    if (n && n !== o) {
-                        setCurrentEntity({ id: atob($route?.query?.id) });
-                    }
-                }
-            )
-        );
-    }
+    watchers.push(
+        watch(
+            () => state.editorState.current,
+            () => {
+                const id = state.editorState.latest()?.id;
+                if (id && id !== contextEntity.value["@id"])
+                    setCurrentEntity({ id, updateState: false });
+            }
+        )
+    );
     watchers.push(
         watch(
             () => props.crate,
             () => {
+                state.editorState.reset();
                 init();
             }
         )
@@ -137,9 +120,9 @@ onMounted(async () => {
             () => {
                 // does the profile have a context defined? yes - disable the context editor
                 if (props.profile?.context) {
-                    configuration.value.enableContextEditor = false;
+                    state.configuration.enableContextEditor = false;
                 } else {
-                    configuration.value.enableContextEditor = props.enableContextEditor;
+                    state.configuration.enableContextEditor = props.enableContextEditor;
                 }
                 pm.value = new ProfileManager({
                     profile: structuredClone(toRaw(props.profile)) ?? {},
@@ -179,8 +162,7 @@ onMounted(async () => {
                 () => props.language,
             ],
             () => {
-                configuration.value = configure();
-                configuration.value.$key = $key.conf += 1;
+                state.configuration = configure();
                 i18next.changeLanguage(props.language);
                 cm.value.entityTimestamps = props.enableEntityTimestamps;
             }
@@ -260,8 +242,8 @@ function configure() {
         readonly: props.readonly,
         webComponent: props.webComponent,
         tabLocation: props.tabLocation,
-        resetTabOnEntityChange: props.resetTabOnEntityChange,
-        resetTabOnProfileChange: props.resetTabOnProfileChange,
+        // resetTabOnEntityChange: props.resetTabOnEntityChange,
+        // resetTabOnProfileChange: props.resetTabOnProfileChange,
         showControls: props.showControls,
         language: props.language,
         enableTemplateLookups: false,
@@ -281,7 +263,7 @@ function configure() {
 
     return configuration;
 }
-async function setCurrentEntity({ id = undefined }) {
+async function setCurrentEntity({ id = undefined, updateState = true }) {
     // return if nothing requested
     if (!id) return;
 
@@ -290,23 +272,17 @@ async function setCurrentEntity({ id = undefined }) {
     });
 
     if (!isEmpty(entity)) {
-        updateRoute({ entity });
         contextEntity.value = entity;
+        emitNavigation({ entity });
+        if (updateState) manageState();
     }
 }
-function updateRoute({ entity }) {
-    debouncedEmitNavigation({ entity });
-
-    if (!$router || !$route || !props.enableInternalRouting) return;
-    const encodedId = btoa(entity["@id"]);
-
-    if (isEmpty($route?.query)) {
-        $router?.replace({ query: { id: encodedId } });
-    } else {
-        $router?.push({ query: { id: encodedId } });
-    }
+function manageState() {
+    state.editorState.push({ id: contextEntity.value["@id"] });
 }
+
 function emitNavigation({ entity }) {
+    // console.log("Navigation", entity["@id"], entity.name);
     $emit("navigation", { "@id": entity["@id"], "@type": entity["@type"], name: entity.name });
 }
 async function saveCrate() {

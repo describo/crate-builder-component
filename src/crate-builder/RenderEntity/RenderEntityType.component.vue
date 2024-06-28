@@ -13,7 +13,7 @@
                 clearable
                 filterable
                 @change="save"
-                v-if="!configuration.readonly"
+                v-if="!state.configuration.readonly"
             >
                 <el-option
                     v-for="entity in classes"
@@ -29,9 +29,10 @@
 <script setup>
 import { ElSelect, ElOption, ElTag } from "element-plus";
 import { ref, shallowRef, computed, inject, watch } from "vue";
-import { configurationKey, profileManagerKey } from "./keys.js";
-const configuration = inject(configurationKey);
+import { profileManagerKey } from "./keys.js";
 const pm = inject(profileManagerKey);
+import { useStateStore } from "../store.js";
+const state = useStateStore();
 
 const props = defineProps({
     entity: {

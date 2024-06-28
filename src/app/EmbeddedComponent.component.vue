@@ -32,6 +32,8 @@
                 <el-button @click="setTab">set tab</el-button>
                 <el-button @click="setEntity">set entity</el-button>
                 <el-button @click="toggleReverseLinkBrowser">toggle reverse links</el-button>
+                <el-button @click="back"><</el-button>
+                <el-button @click="forward">></el-button>
             </div>
             <describo-crate-builder
                 ref="describo"
@@ -44,7 +46,6 @@
                 :enable-browse-entities="data.configuration.enableBrowseEntities"
                 :enable-template-save="data.configuration.enableTemplateSave"
                 :enable-entity-timestamps="data.configuration.enableEntityTimestamps"
-                :enable-internal-routing="true"
                 :enable-reverse-link-browser="data.configuration.enableReverseLinkBrowser"
                 :purge-unlinked-entities="data.configuration.purgeUnlinkedEntities"
                 :enable-url-markup="data.configuration.enableUrlMarkup"
@@ -81,6 +82,7 @@
                         <el-option label="Tabs: bottom" value="bottom" />
                     </el-select>
                 </el-form-item>
+
                 <el-form-item label="Set to readonly">
                     <el-switch v-model="data.configuration.readonly" />
                 </el-form-item>
@@ -109,12 +111,12 @@
                 <el-form-item label="Purge Unlinked Entities">
                     <el-switch v-model="data.configuration.purgeUnlinkedEntities" />
                 </el-form-item>
-                <el-form-item label="Reset Tab on Entity Change">
+                <!-- <el-form-item label="Reset Tab on Entity Change">
                     <el-switch v-model="data.configuration.resetTabOnEntityChange" />
                 </el-form-item>
                 <el-form-item label="Reset Tab on Profile Change">
                     <el-switch v-model="data.configuration.resetTabOnProfileChange" />
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item label="Enable Entity Timestamps">
                     <el-switch v-model="data.configuration.enableEntityTimestamps" />
                 </el-form-item>
@@ -125,7 +127,7 @@
 
 <script setup>
 import { ElForm, ElFormItem, ElSwitch, ElSelect, ElOption, ElButton } from "element-plus";
-import { reactive, ref } from "vue";
+import { reactive, ref, onMounted, shallowRef, computed } from "vue";
 import { Lookup } from "./lookup.js";
 import crateFile1 from "../examples/item/empty/ro-crate-metadata.json";
 import crateFile2 from "../examples/item/complex-collection/ro-crate-metadata.json";
@@ -191,8 +193,8 @@ const data = reactive({
         readonly: false,
         language: "en",
         tabLocation: "left",
-        resetTabOnEntityChange: true,
-        resetTabOnProfileChange: true,
+        // resetTabOnEntityChange: true,
+        // resetTabOnProfileChange: true,
         showControls: true,
     },
 });
@@ -245,5 +247,14 @@ function setEntity() {
 function toggleReverseLinkBrowser() {
     let { toggleReverseLinkBrowser } = describo.value;
     toggleReverseLinkBrowser();
+}
+
+function back() {
+    let { state, refresh } = describo.value;
+    state.editorState.back();
+}
+function forward() {
+    let { state, refresh } = describo.value;
+    state.editorState.forward();
 }
 </script>

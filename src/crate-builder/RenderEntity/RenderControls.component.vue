@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="flex flex-row space-x-1" :key="configuration.language">
+        <div class="flex flex-row space-x-1" :key="state.configuration.language">
             <!-- navbar : controls -->
             <div class="flex flex-row space-x-1">
                 <div>
@@ -25,7 +25,7 @@
                     </el-button>
                 </div>
             </div>
-            <div v-if="!configuration.readonly">
+            <div v-if="!state.configuration.readonly">
                 <!-- add property -->
                 <el-button
                     @click="toggle('addProperty')"
@@ -36,21 +36,21 @@
                     &nbsp; {{ $t("add_label") }}
                 </el-button>
             </div>
-            <div v-if="configuration.enableContextEditor && !configuration.readonly">
+            <div v-if="state.configuration.enableContextEditor && !state.configuration.readonly">
                 <!-- edit context -->
                 <el-button @click="toggle('editContext')" type="primary">
                     <FontAwesomeIcon :icon="faPenToSquare"></FontAwesomeIcon>
                     &nbsp;{{ $t("edit_context_label") }}
                 </el-button>
             </div>
-            <div v-if="configuration.enableCratePreview">
+            <div v-if="state.configuration.enableCratePreview">
                 <!-- preview crate -->
                 <el-button @click="toggle('previewCrate')" type="primary">
                     <FontAwesomeIcon :icon="faEye"></FontAwesomeIcon>
                     &nbsp;{{ $t("preview_label") }}
                 </el-button>
             </div>
-            <div v-if="configuration.enableBrowseEntities">
+            <div v-if="state.configuration.enableBrowseEntities">
                 <!-- browse crate entities -->
                 <el-button @click="toggle('browseEntities')" type="primary">
                     <FontAwesomeIcon :icon="faLayerGroup"></FontAwesomeIcon>
@@ -58,7 +58,13 @@
                 </el-button>
             </div>
             <div class="flex flex-row space-x-1">
-                <div v-if="configuration.enableTemplateSave && !isRootDataset && !isRootDescriptor">
+                <div
+                    v-if="
+                        state.configuration.enableTemplateSave &&
+                        !isRootDataset &&
+                        !isRootDescriptor
+                    "
+                >
                     <!-- save entity as template -->
                     <el-button
                         @click="
@@ -215,10 +221,11 @@ import PreviewCrateDialog from "./DialogPreviewCrate.component.vue";
 import BrowseEntitiesDialog from "./DialogBrowseEntities.component.vue";
 import SaveEntityAsTemplateDialog from "./DialogSaveEntityTemplate.component.vue";
 import { reactive, computed, inject, shallowRef, watch } from "vue";
-import { configurationKey, profileManagerKey } from "./keys.js";
+import { profileManagerKey } from "./keys.js";
 import { $t } from "../i18n";
-const configuration = inject(configurationKey);
 const pm = inject(profileManagerKey);
+import { useStateStore } from "../store.js";
+const state = useStateStore();
 
 const props = defineProps({
     entity: {
@@ -283,10 +290,14 @@ function loadRootDataset() {
     $emit("load:entity", { id: "./" });
 }
 function back() {
-    history.back();
+    // history.back();
+    state.editorState.back();
+    // editorState.refresh();
 }
 function forward() {
-    history.forward();
+    // history.forward();
+    state.editorState.forward();
+    // editorState.refresh();
 }
 function loadEntity(data) {
     $emit("load:entity", data);

@@ -48,7 +48,7 @@
                         <delete-property-component
                             v-if="
                                 isNotValue &&
-                                !configuration.readonly &&
+                                !state.configuration.readonly &&
                                 (instance.value || instance.value == false) &&
                                 !instance.value?.['@id']
                             "
@@ -70,7 +70,7 @@
                 @unlink:entity="unlinkEntity"
             />
             <add-component
-                v-if="showAddControl && !configuration.readonly"
+                v-if="showAddControl && !state.configuration.readonly"
                 :property="props.property"
                 :definition="propertyDefinition"
                 :embedded="false"
@@ -90,7 +90,7 @@ import PaginateLinkedEntitiesComponent from "./PaginateLinkedEntities.component.
 import DeletePropertyComponent from "./DeleteProperty.component.vue";
 import AddComponent from "./Add.component.vue";
 import DisplayPropertyNameComponent from "./DisplayPropertyName.component.vue";
-import { configurationKey, profileManagerKey } from "./keys.js";
+import { profileManagerKey } from "./keys.js";
 import {
     reactive,
     shallowRef,
@@ -105,8 +105,9 @@ import cloneDeep from "lodash-es/cloneDeep.js";
 import orderBy from "lodash-es/orderBy.js";
 import isPlainObject from "lodash-es/isPlainObject.js";
 import { $t } from "../i18n";
-const configuration = inject(configurationKey);
 const pm = inject(profileManagerKey);
+import { useStateStore } from "../store.js";
+const state = useStateStore();
 
 const props = defineProps({
     entity: {

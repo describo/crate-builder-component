@@ -52,10 +52,11 @@ import { ElButton, ElSelect, ElOption, ElOptionGroup, vLoading } from "element-p
 import { reactive, watch, inject } from "vue";
 import debounce from "lodash-es/debounce";
 import { $t } from "../i18n";
-import { configurationKey, crateManagerKey, lookupsKey } from "./keys.js";
-const configuration = inject(configurationKey);
+import { crateManagerKey, lookupsKey } from "./keys.js";
 const cm = inject(crateManagerKey);
 const lookupHandler = inject(lookupsKey);
+import { useStateStore } from "../store.js";
+const state = useStateStore();
 
 import { Lookup, wrapPromise } from "./auto-complete.lib";
 
@@ -78,7 +79,7 @@ const data = reactive({
     // },
     debouncedQuerySearch: debounce(
         (queryString) => {
-            if (configuration.value.webComponent) {
+            if (state.configuration.webComponent) {
                 data.selection = queryString;
             }
             return querySearch(queryString);

@@ -22,6 +22,6 @@ const router = createRouter({
 });
 
 const app = createApp(App);
-app.use(router);
+// app.use(router);
 app.use(DescriboCrateBuilder);
 app.mount("#app");

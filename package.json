@@ -57,6 +57,7 @@
         "leaflet-area-select": "^1.0.9",
         "lodash": "^4.17.21",
         "lodash-es": "^4.17.21",
+        "pinia": "^2.1.7",
         "tailwindcss": "^3.4.3",
         "uuid": "^9.0.1",
         "validate-iri": "^1.0.1",

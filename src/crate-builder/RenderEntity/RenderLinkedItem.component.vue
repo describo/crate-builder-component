@@ -12,7 +12,7 @@
             <div class="flex flex-row space-x-2 items-start">
                 <RenderItemLinkComponent :entity="props.entity" @load:entity="loadEntity" />
                 <UnlinkEntityComponent
-                    v-if="!configuration.readonly && !props.readonly"
+                    v-if="!state.configuration.readonly && !props.readonly"
                     :entity="entity"
                     @unlink:entity="unlinkEntity"
                 />
@@ -60,7 +60,7 @@
                     <div class="flex-grow"></div>
 
                     <UnlinkEntityComponent
-                        v-if="!configuration.readonly && !props.readonly"
+                        v-if="!state.configuration.readonly && !props.readonly"
                         :entity="props.entity"
                         @unlink:entity="unlinkEntity"
                     />
@@ -78,10 +78,11 @@ import RenderItemLinkComponent from "./RenderItemLink.component.vue";
 import UnlinkEntityComponent from "./UnlinkEntity.component.vue";
 import MapComponent from "../primitives/Map.component.vue";
 import { computed, inject, watch, ref } from "vue";
-import { configurationKey, crateManagerKey, profileManagerKey } from "./keys.js";
-const configuration = inject(configurationKey);
+import { crateManagerKey, profileManagerKey } from "./keys.js";
 const cm = inject(crateManagerKey);
 const pm = inject(profileManagerKey);
+import { useStateStore } from "../store.js";
+const state = useStateStore();
 
 const $emit = defineEmits(["load:entity", "unlink:entity"]);
 const props = defineProps({

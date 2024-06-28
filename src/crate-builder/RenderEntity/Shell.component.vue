@@ -3,7 +3,7 @@
         <div class="flex flex-col w-full">
             <div
                 class="flex flex-row place-content-between pb-1 border-b border-slate-700"
-                v-if="configuration.showControls"
+                v-if="state.configuration.showControls"
             >
                 <!-- render controls -->
                 <render-controls-component
@@ -44,7 +44,7 @@
                         @update:entity="saveProperty"
                     />
                     <!-- highlight required properties -->
-                    <div v-if="!configuration.readonly && data.missingRequiredData">
+                    <div v-if="!state.configuration.readonly && data.missingRequiredData">
                         <el-button
                             type="danger"
                             @click="
@@ -82,7 +82,8 @@
                         <render-entity-property-component
                             :class="{
                                 'hover:bg-sky-100':
-                                    !configuration.readonly && data.savedProperty !== property,
+                                    !state.configuration.readonly &&
+                                    data.savedProperty !== property,
                                 'bg-green-200 hover:bg-green-200': data.savedProperty === property,
                             }"
                             class="my-2"
@@ -104,8 +105,9 @@
 
             <!-- tabbed layout -->
             <el-tabs
-                :tab-position="configuration.tabLocation"
+                :tab-position="state.configuration.tabLocation"
                 v-model="data.activeTab"
+                @tab-click="saveTabToState"
                 v-if="data.renderTabs"
             >
                 <el-tab-pane
@@ -118,8 +120,8 @@
                         <div
                             class="flex flex-col min-w-32 max-w-40"
                             :class="{
-                                'items-end': configuration.tabLocation === 'left',
-                                'items-start': configuration.tabLocation !== 'left',
+                                'items-end': state.configuration.tabLocation === 'left',
+                                'items-start': state.configuration.tabLocation !== 'left',
                             }"
                         >
                             <div class="flex flex-row items-center space-x-2">
@@ -163,7 +165,7 @@
 
                     <div
                         class="text-red-600 float-right"
-                        v-if="!configuration.readonly && tab.missingRequiredData"
+                        v-if="!state.configuration.readonly && tab.missingRequiredData"
                     >
                         <el-button
                             type="danger"
@@ -206,7 +208,8 @@
                         <div
                             :class="{
                                 'hover:bg-sky-100':
-                                    !configuration.readonly && data.savedProperty !== input.name,
+                                    !state.configuration.readonly &&
+                                    data.savedProperty !== input.name,
                                 'bg-green-200 hover:bg-green-200':
                                     data.savedProperty === input.name,
                             }"
@@ -237,7 +240,7 @@
 
         <!--show reverse links panel  -->
         <div
-            v-if="configuration.enableReverseLinkBrowser && !data.reverseSidebarVisible"
+            v-if="state.configuration.enableReverseLinkBrowser && !data.reverseSidebarVisible"
             class="p-2 h-12 rounded text-2xl bg-gray-200 text-blue-600 cursor-pointer"
             @click="data.reverseSidebarVisible = !data.reverseSidebarVisible"
         >
@@ -275,7 +278,7 @@ import {
     faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { faCircleCheck, faCircleXmark } from "@fortawesome/free-regular-svg-icons";
-import { configurationKey, crateManagerKey, profileManagerKey } from "./keys.js";
+import { crateManagerKey, profileManagerKey } from "./keys.js";
 import { reactive, shallowRef, onMounted, onBeforeUnmount, watch, inject } from "vue";
 import { ElTabs, ElTabPane, ElDrawer, ElButton } from "element-plus";
 import RenderEntityIdComponent from "./RenderEntityId.component.vue";
@@ -286,6 +289,8 @@ import RenderReverseConnectionsComponent from "./RenderReverseConnections.compon
 import RenderControlsComponent from "./RenderControls.component.vue";
 import { isURL } from "../CrateManager/lib.js";
 import { applyLayout } from "./layout.js";
+import { useStateStore } from "../store.js";
+const state = useStateStore();
 
 const props = defineProps({
     entity: {
@@ -295,7 +300,6 @@ const props = defineProps({
 });
 
 const contextEntity = shallowRef({});
-const configuration = inject(configurationKey);
 const cm = inject(crateManagerKey);
 const pm = inject(profileManagerKey);
 const tabs = shallowRef([]);
@@ -338,16 +342,27 @@ onMounted(() => {
         (n, o) => {
             if (n["@id"] !== o["@id"]) {
                 data.extraProperties = [];
-                if (configuration.value.resetTabOnEntityChange) {
-                    // if true - always reset tab on entity change
+                // if (state.configuration.resetTabOnEntityChange) {
+                //     // if true - always reset tab on entity change
+                //     data.activeTab = "about";
+                // } else {
+                //     // ... otherwise only change to "about" if the newly set entity doesn't have a layout with the same name as
+                //     // the currently selected one. If there is such layout, keep that (no change to data.activeTab).
+                //     const layouts = pm.value.getLayout({ entity: props.entity });
+                //     if (layouts == null || !layouts[data.activeTab]) {
+                //         data.activeTab = "about";
+                //     }
+                // }
+
+                // get profile layouts
+                const layouts = pm.value.getLayout({ entity: props.entity });
+                if (state.editorState.latest().tab && layouts?.[state.editorState.latest().tab]) {
+                    // set activeTab stored in state if it exists in the layouts
+                    data.activeTab = state.editorState.latest().tab;
+                } else if (layouts == null || !layouts[data.activeTab]) {
+                    // if no tab stored in state, or no layouts, or current tab not in layouts
+                    //  nav to about tab
                     data.activeTab = "about";
-                } else {
-                    // ... otherwise only change to "about" if the newly set entity doesn't have a layout with the same name as
-                    // the currently selected one. If there is such layout, keep that (no change to data.activeTab).
-                    const layouts = pm.value.getLayout({ entity: props.entity });
-                    if (layouts == null || !layouts[data.activeTab]) {
-                        data.activeTab = "about";
-                    }
                 }
             }
             const entity = cm.value.getEntity({ id: props.entity["@id"] });
@@ -358,16 +373,26 @@ onMounted(() => {
         () => pm.value.$key,
         () => {
             data.extraProperties = [];
-            if (configuration.value.resetTabOnProfileChange) {
-                // if true - always reset tab on profile change
+            // if (state.configuration.resetTabOnProfileChange) {
+            //     // if true - always reset tab on profile change
+            //     data.activeTab = "about";
+            // } else {
+            //     // ... otherwise only change to "about" if the newly set profile doesn't have a layout with the same name as
+            //     // the currently selected one. If there is such layout, keep that (no change to data.activeTab).
+            //     const layouts = pm.value.getLayout({ entity: props.entity });
+            //     if (layouts == null || !layouts[data.activeTab]) {
+            //         data.activeTab = "about";
+            //     }
+            // }
+            // get profile layouts
+            const layouts = pm.value.getLayout({ entity: props.entity });
+            if (state.editorState.latest().tab && layouts?.[state.editorState.latest().tab]) {
+                // set activeTab stored in state if it exists in the layouts
+                data.activeTab = state.editorState.latest().tab;
+            } else if (layouts == null || !layouts[data.activeTab]) {
+                // if no tab stored in state, or no layouts, or current tab not in layouts
+                //  nav to about tab
                 data.activeTab = "about";
-            } else {
-                // ... otherwise only change to "about" if the newly set profile doesn't have a layout with the same name as
-                // the currently selected one. If there is such layout, keep that (no change to data.activeTab).
-                const layouts = pm.value.getLayout({ entity: props.entity });
-                if (layouts == null || !layouts[data.activeTab]) {
-                    data.activeTab = "about";
-                }
             }
             const entity = cm.value.getEntity({ id: props.entity["@id"] });
             init({ entity });
@@ -386,7 +411,7 @@ function init({ entity }) {
     }
 
     const layout = applyLayout({
-        configuration: configuration.value,
+        configuration: state.configuration,
         profileManager: pm.value,
         entity,
         extraProperties: data.extraProperties,
@@ -395,12 +420,19 @@ function init({ entity }) {
     data.renderTabs = layout.renderTabs;
     data.missingRequiredData = layout.missingRequiredData;
     tabs.value = layout.tabs;
-
+    if (data.renderTabs) {
+        state.editorState.update({ tab: data.activeTab });
+    } else {
+        state.editorState.deleteFromState({ property: "tab" });
+    }
     $emit("ready");
 }
 function refresh() {
     const entity = cm.value.getEntity({ id: props.entity["@id"] });
     init({ entity });
+}
+function saveTabToState(tab) {
+    state.editorState.update({ tab: tab.paneName });
 }
 function addPropertyPlaceholder({ property }) {
     data.extraProperties.push(property);
@@ -466,7 +498,7 @@ function createProperty(patch) {
         id: contextEntity.value["@id"],
         ...patch,
     });
-    if (isURL(patch.value) && configuration.value.enableUrlMarkup) {
+    if (isURL(patch.value) && state.configuration.value.enableUrlMarkup) {
         createEntity({
             property: patch.property,
             json: {
@@ -488,11 +520,22 @@ function saveProperty(patch) {
         ...patch,
     });
 
+    // don't do anything to core prop's if no change in data
+    if (["@id", "@type", "name"].includes(patch.property)) {
+        if (contextEntity.value[patch.property] === patch.value) return;
+    }
+
+    // otherwise, run the update
     let entity = cm.value.updateProperty({ id: contextEntity.value["@id"], ...patch });
     if (entity["@id"] !== props.entity["@id"]) {
         loadEntity(entity);
     } else {
         refresh();
+    }
+
+    // update the id in the state if required
+    if (patch.property === "@id" && entity?.["@id"]) {
+        state.editorState.replaceId({ id: contextEntity.value["@id"], newId: entity["@id"] });
     }
     saveCrate();
     notifySave(patch.property);

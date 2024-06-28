@@ -6,7 +6,7 @@
         >
             <div class="flex-grow">
                 <el-input
-                    :key="configuration.language"
+                    :key="state.configuration.language"
                     v-model="data.filter"
                     :placeholder="$t('filter_the_entities')"
                     clearable
@@ -42,8 +42,8 @@ import { ElInput, ElPagination } from "element-plus";
 import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";
 import { reactive, shallowRef, watch, inject } from "vue";
 import { $t } from "../i18n";
-import { configurationKey } from "./keys";
-const configuration = inject(configurationKey);
+import { useStateStore } from "../store.js";
+const state = useStateStore();
 
 const props = defineProps({
     entities: {

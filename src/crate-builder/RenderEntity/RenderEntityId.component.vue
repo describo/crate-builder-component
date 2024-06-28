@@ -4,7 +4,7 @@
 
         <div
             class="w-2/3 xl:w-4/5 flex flex-row describo-property-value"
-            v-if="!configuration.readonly"
+            v-if="!state.configuration.readonly"
         >
             <div
                 v-if="
@@ -44,8 +44,8 @@ import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
 import TextComponent from "../primitives/Text.component.vue";
 import { reactive, inject } from "vue";
 import { isURL } from "../CrateManager/lib.js";
-import { configurationKey } from "./keys.js";
-const configuration = inject(configurationKey);
+import { useStateStore } from "../store.js";
+const state = useStateStore();
 
 const props = defineProps({
     entity: {

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="configuration.readonly">
+        <div v-if="state.configuration.readonly">
             <!-- Just render the value on screen (parse ISO dates for niceness though) -->
             <div v-if="isDate(props.value)">
                 {{ dayjs(props.value).format("dddd, MMM DD, YYYY") }}
@@ -10,7 +10,7 @@
             </div>
             <div v-else>{{ props.value }}</div>
         </div>
-        <div v-if="!configuration.readonly">
+        <div v-if="!state.configuration.readonly">
             <!--  not readonly - try to load the relevant display component-->
             <value-component v-if="isValue()" :definition="props.definition.value" />
             <boolean-component
@@ -52,7 +52,7 @@
                 @save:property="savePropertyValue"
             />
             <url-component
-                v-else-if="isUrl(props.value) && configuration.enableUrlMarkup"
+                v-else-if="isUrl(props.value) && state.configuration.enableUrlMarkup"
                 :property="props.property"
                 :value="props.value"
                 @create:entity="createEntity"
@@ -93,8 +93,8 @@ import isFloat from "validator/es/lib/isFloat";
 import isNumeric from "validator/es/lib/isNumeric";
 import { inject } from "vue";
 import { isURL } from "../CrateManager/lib.js";
-import { configurationKey } from "./keys.js";
-const configuration = inject(configurationKey);
+import { useStateStore } from "../store.js";
+const state = useStateStore();
 
 const props = defineProps({
     property: {

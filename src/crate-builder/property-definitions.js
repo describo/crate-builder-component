@@ -71,16 +71,16 @@ export const propertyDefinitions = {
         default: "left",
         validator: (val) => ["top", "bottom", "left", "right"].includes(val),
     },
-    resetTabOnEntityChange: {
-        type: Boolean,
-        default: true,
-        validator: (val) => [true, false].includes(val),
-    },
-    resetTabOnProfileChange: {
-        type: Boolean,
-        default: true,
-        validator: (val) => [true, false].includes(val),
-    },
+    // resetTabOnEntityChange: {
+    //     type: Boolean,
+    //     default: true,
+    //     validator: (val) => [true, false].includes(val),
+    // },
+    // resetTabOnProfileChange: {
+    //     type: Boolean,
+    //     default: true,
+    //     validator: (val) => [true, false].includes(val),
+    // },
     showControls: {
         type: Boolean,
         default: true,
