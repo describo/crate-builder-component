@@ -47,6 +47,7 @@ const pm = shallowRef({});
 const lookups = shallowRef({});
 const contextEntity = shallowRef({});
 const state = useStateStore();
+state.editorState.reset();
 let ready = ref(false);
 let error = ref(false);
 let renderEntity = ref();
@@ -142,7 +143,9 @@ onMounted(async () => {
         watch(
             () => props.entityId,
             (n) => {
-                setCurrentEntity({ id: props.entityId });
+                if (props.entityId !== contextEntity.value["@id"]) {
+                    setCurrentEntity({ id: props.entityId });
+                }
             }
         )
     );
