@@ -342,18 +342,6 @@ onMounted(() => {
         (n, o) => {
             if (n["@id"] !== o["@id"]) {
                 data.extraProperties = [];
-                // if (state.configuration.resetTabOnEntityChange) {
-                //     // if true - always reset tab on entity change
-                //     data.activeTab = "about";
-                // } else {
-                //     // ... otherwise only change to "about" if the newly set entity doesn't have a layout with the same name as
-                //     // the currently selected one. If there is such layout, keep that (no change to data.activeTab).
-                //     const layouts = pm.value.getLayout({ entity: props.entity });
-                //     if (layouts == null || !layouts[data.activeTab]) {
-                //         data.activeTab = "about";
-                //     }
-                // }
-
                 // get profile layouts
                 const layouts = pm.value.getLayout({ entity: props.entity });
                 if (state.editorState.latest().tab && layouts?.[state.editorState.latest().tab]) {
@@ -373,17 +361,6 @@ onMounted(() => {
         () => pm.value.$key,
         () => {
             data.extraProperties = [];
-            // if (state.configuration.resetTabOnProfileChange) {
-            //     // if true - always reset tab on profile change
-            //     data.activeTab = "about";
-            // } else {
-            //     // ... otherwise only change to "about" if the newly set profile doesn't have a layout with the same name as
-            //     // the currently selected one. If there is such layout, keep that (no change to data.activeTab).
-            //     const layouts = pm.value.getLayout({ entity: props.entity });
-            //     if (layouts == null || !layouts[data.activeTab]) {
-            //         data.activeTab = "about";
-            //     }
-            // }
             // get profile layouts
             const layouts = pm.value.getLayout({ entity: props.entity });
             if (state.editorState.latest().tab && layouts?.[state.editorState.latest().tab]) {

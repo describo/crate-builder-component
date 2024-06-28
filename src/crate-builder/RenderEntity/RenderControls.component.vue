@@ -290,14 +290,10 @@ function loadRootDataset() {
     $emit("load:entity", { id: "./" });
 }
 function back() {
-    // history.back();
     state.editorState.back();
-    // editorState.refresh();
 }
 function forward() {
-    // history.forward();
     state.editorState.forward();
-    // editorState.refresh();
 }
 function loadEntity(data) {
     $emit("load:entity", data);

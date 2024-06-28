@@ -248,8 +248,6 @@ function configure() {
         readonly: props.readonly,
         webComponent: props.webComponent,
         tabLocation: props.tabLocation,
-        // resetTabOnEntityChange: props.resetTabOnEntityChange,
-        // resetTabOnProfileChange: props.resetTabOnProfileChange,
         showControls: props.showControls,
         language: props.language,
         enableTemplateLookups: false,
