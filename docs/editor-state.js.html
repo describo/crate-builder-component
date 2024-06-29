@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Home - Documentation</title>
+    <title>editor-state.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,94 +29,118 @@
 
 <div id="main">
     
+    <h1 class="page-title">editor-state.js</h1>
+    
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>export class EditorState {
+    constructor() {
+        this.history = [];
+        this.current = undefined;
+    }
 
+    /**
+     * Reset the internal state
+     */
+    reset() {
+        this.history = [];
+        this.current = undefined;
+    }
 
+    /**
+     * Push a new state onto the history stack
+     *
+     * A new state is an entry with the id of the currently displayed entity.
+     *
+     * @param {Object} options
+     * @param {String} options.id - the id of the entity that is currently displayed
+     */
+    push({ id }) {
+        if (!id) return;
+        if (this.history.length - 1 > this.current) {
+            this.history = this.history.slice(0, this.current + 1);
+        }
+        this.history = [...this.history, { id }];
+        this.current = this.history.length - 1;
+    }
 
+    /**
+     * Go back through the state
+     */
+    back() {
+        if (this.current === 0) return;
+        this.current -= 1;
+    }
 
+    /**
+     * Go forward through the state
+     */
+    forward() {
+        if (this.current === this.history.length - 1) return;
+        this.current += 1;
+    }
 
+    /**
+     * Return the current entry
+     */
+    latest() {
+        return this.history[this.current];
+    }
 
+    /**
+     * Update the current entry
+     *
+     * @param {Object} an object to be merged into the current entry
+     */
+    update(newState) {
+        this.history[this.current] = { ...this.history[this.current], ...newState };
+    }
 
+    /**
+     * Delete a property from the current entry
+     *
+     * @param {Object} object
+     * @param {String} object.property - the property to remove from the current entry
+     */
+    deleteFromState({ property }) {
+        delete this.history[this.current][property];
+    }
 
+    /**
+     * Replace an id in the state
+     *
+     * When we change an entity id, we also need to update the history
+     *   so we don't try to navigate back to a non-existent entity
+     *
+     * @param {Object} object
+     * @param {String} object.id - the id to replace
+     * @param {String} object.newId - the replacement
+     */
+    replaceId({ id, newId }) {
+        // remove the latest history entry
+        //  if we don't do this, we end up with a duplicate
+        this.history = this.history.slice(0, -1);
+        this.current = this.history.length - 1;
 
-    
-
-
-    <section class="readme">
-        <article><h1 id="crate-builder-component">Crate Builder Component</h1>
-<ul>
-<li><a href="#crate-builder-component">Crate Builder Component</a></li>
-<li><a href="#documentation">Documentation</a></li>
-<li><a href="#api-documentation">API Documentation</a></li>
-<li><a href="#developing-the-plugin">Developing the plugin</a>
-<ul>
-<li><a href="#storybook">Storybook</a></li>
-<li><a href="#development-application">Development application</a></li>
-</ul>
-</li>
-<li><a href="#building-and-publishing-a-release">Building and publishing a release</a></li>
-<li><a href="#building-and-publishing-api-docs---has-to-be-separate-stage">Building and publishing API docs - has to be separate stage</a></li>
-<li><a href="#repository-structure">Repository structure</a></li>
-</ul>
-<p>This is the core UI component for assembling an RO-Crate inside Describo. It is a self contained
-VueJS component that can be used inside your app. If you use this component, your app is responsible
-for loading the crate file from the storage layer (or minting a new one if none exists) and saving
-the updated crate back. Your app can also provide a profile to the component and a class to handle
-template lookups.</p>
-<h1 id="documentation">Documentation</h1>
-<p>Comprehensive documentation is available @
-<a href="https://describo.github.io/documentation/component/get-started.html">https://describo.github.io/documentation/component/get-started.html</a></p>
-<h1 id="api-documentation">API Documentation</h1>
-<ul>
-<li><a href="https://describo.github.io/crate-builder-component/CrateManager.html">CrateManager</a></li>
-<li><a href="https://describo.github.io/crate-builder-component/ProfileManager.html">ProfileManager</a></li>
-</ul>
-<h1 id="developing-the-plugin">Developing the plugin</h1>
-<h2 id="storybook">Storybook</h2>
-<p><a href="storybook.js.org/">Storybook</a> is used in this application. When you are just developing the
-components, storybook is what you want as you can focus just on the component in isolation. To start
-it run:</p>
-<pre class="prettyprint source"><code>npm run storybook
+        // updating the rest of the history
+        this.history = this.history.map((e, i) => {
+            if (e.id === id) {
+                return { ...e, id: newId };
+            } else {
+                return e;
+            }
+        });
+    }
+}
 </code></pre>
-<h2 id="development-application">Development application</h2>
-<p>When you want to see the component in action as a whole, there is a small VueJS app in this
-codebase. To start up the dev environment:</p>
-<pre class="prettyprint source"><code>> docker compose up (starts up an elastic search container for datapack lookups)
-> npm run develop
-
---> browse to localhost:9000
-</code></pre>
-<h1 id="building-and-publishing-a-release">Building and publishing a release</h1>
-<ul>
-<li><code>npm run build</code>: This builds the plugin and styles that the react component uses</li>
-<li><code>npm version {minor|patch}</code></li>
-<li><code>git push origin master --tags</code></li>
-<li>Go to the repo and create a release from the tag, documenting what is in it.</li>
-<li>Publish to npm: <code>npm publish</code></li>
-<li>Create an issue in the
-<a href="https://github.com/describo/crate-builder-component-react/issues">React component issue tracker</a>
-to inform that a new release of that component needs to be built and published to npm.</li>
-</ul>
-<h1 id="building-and-publishing-api-docs---has-to-be-separate-stage">Building and publishing API docs - has to be separate stage</h1>
-<ul>
-<li><code>npm run generate-docs</code>: Update the jsdoc documentation</li>
-<li><code>git add . &amp;&amp; git commit -a</code></li>
-<li><code>git push origin master --tags</code></li>
-</ul>
-<h1 id="repository-structure">Repository structure</h1>
-<ul>
-<li>The development app is at <code>./src/app</code>. In there you will find the file main.js where we import
-the plugin and wire it into Vue as well as an App.vue file where we load the component.</li>
-<li>The component is at <code>./src/crate-builder</code>.</li>
-</ul></article>
+        </article>
     </section>
-
-
 
 
 

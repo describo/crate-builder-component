@@ -8,7 +8,8 @@
             "README.md",
             "./src/crate-builder/CrateManager/crate-manager.js",
             "./src/crate-builder/CrateManager/profile-manager.js",
-            "./src/crate-builder/CrateManager/lib.js"
+            "./src/crate-builder/CrateManager/lib.js",
+            "./src/crate-builder/editor-state.js"
         ]
     },
     "plugins": ["plugins/markdown"],
