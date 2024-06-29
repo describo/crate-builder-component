@@ -1,3 +1,9 @@
+/**
+ * @class
+ *
+ * @name EditorState
+ * @description A class to work with the internal editor state of the component
+ */
 export class EditorState {
     constructor() {
         this.history = [];
