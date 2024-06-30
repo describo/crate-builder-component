@@ -19,12 +19,13 @@ template lookups.
 # Documentation
 
 Comprehensive documentation is available @
-[https://describo.github.io/documentation/component/get-started.html](https://describo.github.io/documentation/component/get-started.html)
+[https://describo.github.io/docs/component/introduction.html](https://describo.github.io/docs/component/introduction.html)
 
 # API Documentation
 
 -   [CrateManager](https://describo.github.io/crate-builder-component/CrateManager.html)
 -   [ProfileManager](https://describo.github.io/crate-builder-component/ProfileManager.html)
+-   [EditorState](https://describo.github.io/crate-builder-component/EditorState.html)
 
 # Developing the plugin
 
