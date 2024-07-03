@@ -758,29 +758,30 @@ let r = cm.addFileOrFolder('/a/b/c/file.txt);
         //   the file into the right place
         let paths = path.split("/").slice(0, -1);
         let i = 0;
-        paths = paths.map((path) => {
+        paths = paths.map((p) => {
             let entity = {
-                "@id": i > 0 ? `${paths.slice(0, i).join("/")}/${path}/` : `${path}/`,
+                "@id": i > 0 ? `${paths.slice(0, i).join("/")}/${p}/` : `${p}/`,
                 "@type": ["Dataset"],
-                name: i > 0 ? `${paths.slice(0, i).join("/")}/${path}/` : `${path}/`,
+                name: i > 0 ? `${paths.slice(0, i).join("/")}/${p}/` : `${p}/`,
             };
+            entity["@id"] = encodeURI(entity["@id"]);
             entity = this.addEntity(entity);
             i += 1;
             return entity;
         });
         i = 0;
-        for (let path of paths) {
+        for (let p of paths) {
             if (i === 0) {
                 this.linkEntity({
                     id: "./",
                     property: "hasPart",
-                    value: { "@id": path["@id"] },
+                    value: { "@id": p["@id"] },
                 });
             } else {
                 this.linkEntity({
                     id: paths[i - 1]["@id"],
                     property: "hasPart",
-                    value: { "@id": path["@id"] },
+                    value: { "@id": p["@id"] },
                 });
             }
             i += 1;
@@ -791,15 +792,17 @@ let r = cm.addFileOrFolder('/a/b/c/file.txt);
             "@type": [type],
             name: path,
         };
-        const sourceEntity = this.getEntity({
-            id: paths.length ? paths.slice(-1)[0]["@id"] : "./",
-            stub: true,
-        });
-        this.ingestAndLink({
-            id: sourceEntity["@id"],
-            property: "hasPart",
-            json: entity,
-        });
+        if (type === "File") {
+            const sourceEntity = this.getEntity({
+                id: paths.length ? paths.slice(-1)[0]["@id"] : "./",
+                stub: true,
+            });
+            this.ingestAndLink({
+                id: sourceEntity["@id"],
+                property: "hasPart",
+                json: entity,
+            });
+        }
         return this.getEntity({ id: entity["@id"], stub: true });
     }
 
