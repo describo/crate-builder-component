@@ -1050,42 +1050,24 @@ cm.deleteProperty({ id: "./", property: "author", idx: 1 });
     deleteProperty({ id, property, idx }) {
         if (!id) throw new Error(`'deleteProperty' requires 'id' to be defined`);
         if (!property) throw new Error(`deleteProperty' requires 'property' to be defined`);
-        if (idx !== 0 && !idx) throw new Error(`deleteProperty' requires 'idx' to be defined`);
+        // if (idx !== 0 && !idx) throw new Error(`deleteProperty' requires 'idx' to be defined`);
 
-        const indexRef = this.entityIdIndex[id];
-        const entity = this.crate["@graph"][indexRef];
-        entity[property].splice(idx, 1);
-        if (!entity[property].length) delete entity[property];
+        if (idx || idx === 0) {
+            // delete just that property instance
+            const indexRef = this.entityIdIndex[id];
+            const entity = this.crate["@graph"][indexRef];
+            entity[property].splice(idx, 1);
+            if (!entity[property].length) delete entity[property];
+        } else if (idx === undefined) {
+            // delete the whole property
+            const indexRef = this.entityIdIndex[id];
+            const entity = this.crate["@graph"][indexRef];
+            delete entity[property];
+        }
 
         // manage timestamps
         if (this.entityTimestamps) {
             entity[entityDateUpdatedProperty] = [new Date().toISOString()];
-        }
-    }
-
-    /**
-     * Delete all data attached to a property. That is, all instances.
-     *
-     * @param {Object}
-     * @param {string} options.id - the id of the entity to remove the property value from
-     * @param {string} options.property - the property
-     * @example
-
-const cm = new CrateManager({ crate })
-cm.deleteAllProperties({ id: "./", property: "author" });
-
-     */
-    deleteAllProperties({ id, property }) {
-        if (!id) throw new Error(`'deleteProperty' requires 'id' to be defined`);
-        if (!property) throw new Error(`deleteProperty' requires 'property' to be defined`);
-
-        const indexRef = this.entityIdIndex[id];
-        const entity = this.crate["@graph"][indexRef];
-
-        if (entity[property]?.length) {
-            for (let idx of rangeRight(entity[property].length)) {
-                this.deleteProperty({ id: entity["@id"], property, idx });
-            }
         }
     }
 

@@ -610,7 +610,7 @@ describe("Test interacting with the crate", () => {
         let e = cm.addEntity(entity);
         e = cm.getEntity({ id: e["@id"] });
 
-        cm.deleteAllProperties({
+        cm.deleteProperty({
             id: e["@id"],
             property: "text",
         });
@@ -619,7 +619,7 @@ describe("Test interacting with the crate", () => {
         expect(e).not.toHaveProperty("text");
 
         // ensure it doesn't fail when prop doesn't exist
-        cm.deleteAllProperties({
+        cm.deleteProperty({
             id: e["@id"],
             property: "text",
         });
