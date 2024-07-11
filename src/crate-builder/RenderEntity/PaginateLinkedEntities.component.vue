@@ -40,7 +40,7 @@
 <script setup>
 import { ElInput, ElPagination } from "element-plus";
 import RenderLinkedItemComponent from "./RenderLinkedItem.component.vue";
-import { reactive, shallowRef, watch, inject } from "vue";
+import { reactive, shallowRef, watch } from "vue";
 import { $t } from "../i18n";
 import { useStateStore } from "../store.js";
 const state = useStateStore();
