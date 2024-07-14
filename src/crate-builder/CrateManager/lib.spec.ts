@@ -1,9 +1,10 @@
 import { describe, expect, test } from "vitest";
-import { isURL, normaliseEntityType, normalise } from "./lib.js";
+import { isURL, normaliseEntityType, normalise } from "./lib";
 
 describe("Test urls are correctly identified", () => {
     test(`expect fail- ''`, () => {
-        expect(isURL()).toBeFalsy;
+        let url = undefined;
+        expect(isURL(url)).toBeFalsy;
     });
 
     test(`expect fail - 3`, () => {
@@ -73,24 +74,27 @@ describe("Test normalising an entity type", () => {
 describe("Test normalising an entity", () => {
     test(`reject bad @type`, () => {
         try {
+            // @ts-expect-error: Intentionally passing incorrect type for testing
             normalise({ "@type": {} }, 1);
         } catch (error) {
-            expect(error.message).toEqual(
+            expect((error as Error).message).toEqual(
                 `'@type' property must be a string or an array or not defined at all`
             );
         }
     });
     test(`reject bad @id`, () => {
         try {
+            // @ts-expect-error: Intentionally passing incorrect type for testing
             normalise({ "@id": {} }, 1);
         } catch (error) {
-            expect(error.message).toEqual(`'@id' property must be a string`);
+            expect((error as Error).message).toEqual(`'@id' property must be a string`);
         }
 
         try {
+            // @ts-expect-error: Intentionally passing incorrect type for testing
             normalise({ "@id": 3 }, 1);
         } catch (error) {
-            expect(error.message).toEqual(`'@id' property must be a string`);
+            expect((error as Error).message).toEqual(`'@id' property must be a string`);
         }
     });
     test(`reject if @type not defined`, () => {

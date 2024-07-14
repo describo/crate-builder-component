@@ -14,9 +14,8 @@ import flattenDeep from "lodash-es/flattenDeep.js";
 import intersection from "lodash-es/intersection.js";
 import compact from "lodash-es/compact.js";
 import isEqual from "lodash-es/isEqual.js";
-import rangeRight from "lodash-es/rangeRight.js";
-import { validateId } from "./validate-identifier.js";
-import { normalise, isURL } from "./lib.js";
+import { validateId } from "./validate-identifier";
+import { normalise, isURL } from "./lib";
 import { toRaw } from "vue";
 import { getContextDefinition } from "./contexts.js";
 
@@ -131,6 +130,9 @@ export class CrateManager {
                 // set the root dataset @id to './'
                 this.rootDataset["@id"] = "./";
                 this.rootDescriptor.about["@id"] = "./";
+
+                this.rootDataset = normalise(this.rootDataset);
+                this.rootDescriptor = normalise(this.rootDescriptor);
             }
 
             // validate each entity
@@ -165,9 +167,10 @@ export class CrateManager {
             this.reverse[entity["@id"]] = {};
 
             // store the entity type for lookups by type
-            this.__storeEntityType(entity);
+            this.__storeEntityType(crate["@graph"][i]);
         }
 
+        // console.log(crate);
         // if we get to here and haven't located a root descriptor; bail - this
         //  crate is borked
         if (!this.rootDescriptor) {
@@ -1059,9 +1062,16 @@ cm.deleteProperty({ id: "./", property: "author", idx: 1 });
             entity[property].splice(idx, 1);
             if (!entity[property].length) delete entity[property];
         } else if (idx === undefined) {
-            // delete the whole property
             const indexRef = this.entityIdIndex[id];
-            const entity = this.crate["@graph"][indexRef];
+            let entity = this.crate["@graph"][indexRef];
+            if (!entity[property]) return;
+
+            // iterate over the values and unlink any linked properties
+            entity[property].forEach((instance) => {
+                if (instance?.["@id"]) this.unlinkEntity({ id, property, value: instance });
+            });
+
+            // now delete whatever is left
             delete entity[property];
         }
 

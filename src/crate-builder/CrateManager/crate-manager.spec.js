@@ -190,6 +190,26 @@ describe("Test interacting with the crate", () => {
             data: "value",
         });
     });
+    test(`Ensure no id clashes when entity type is different`, () => {
+        let topic = {
+            "@id": "#1234",
+            "@type": "Topic",
+            name: "topic",
+        };
+        topic = cm.addEntity(topic);
+        expect(topic).toEqual({ "@id": "#1234", "@type": ["Topic"], name: "topic" });
+
+        let theme = {
+            "@id": "#1234",
+            "@type": "Theme",
+            name: "theme",
+        };
+        theme = cm.addEntity(theme);
+        expect(theme).toEqual({ "@id": "#e4", "@type": ["Theme"], name: "theme" });
+
+        theme = cm.addEntity(theme);
+        expect(theme).toMatchObject({ "@id": "#e4", "@type": ["Theme"], name: "theme" });
+    });
     test("add a complex entity to the crate and export as a template", () => {
         let entity = {
             "@id": "#person",
@@ -600,31 +620,108 @@ describe("Test interacting with the crate", () => {
         expect(e).not.toHaveProperty("text");
     });
     test("delete all data connected to a property", () => {
-        const url = chance.url();
         let entity = {
-            "@id": url,
+            "@id": "#person1",
             "@type": "Person",
-            name: chance.sentence(),
+            name: "person1",
             text: ["some text", "some other text"],
         };
-        let e = cm.addEntity(entity);
-        e = cm.getEntity({ id: e["@id"] });
+        let e1 = cm.addEntity(entity);
+        e1 = cm.getEntity({ id: e1["@id"] });
 
+        // link it to another entity
+        entity = {
+            "@id": "#person2",
+            "@type": "Person",
+            name: "person2",
+        };
+        let e2 = cm.addEntity(entity);
+        e2 = cm.getEntity({ id: e2["@id"] });
+
+        cm.linkEntity({ id: e1["@id"], property: "knows", value: e2 });
+
+        let crate = cm.exportCrate();
+        expect(crate["@graph"]).toMatchObject([
+            {
+                "@id": "ro-crate-metadata.json",
+            },
+            {
+                "@id": "./",
+            },
+            {
+                "@id": "#person1",
+                "@type": "Person",
+                name: "person1",
+                text: ["some text", "some other text"],
+                knows: { "@id": "#person2" },
+            },
+            {
+                "@id": "#person2",
+                "@type": "Person",
+                name: "person2",
+            },
+        ]);
+
+        // delete a property without associations
         cm.deleteProperty({
-            id: e["@id"],
+            id: e1["@id"],
             property: "text",
         });
 
-        e = cm.getEntity({ id: e["@id"] });
-        expect(e).not.toHaveProperty("text");
+        e1 = cm.getEntity({ id: e1["@id"] });
+        expect(e1).not.toHaveProperty("text");
 
-        // ensure it doesn't fail when prop doesn't exist
+        // ensure it doesn't fail when that same prop doesn't exist
         cm.deleteProperty({
-            id: e["@id"],
+            id: e1["@id"],
             property: "text",
         });
-        e = cm.getEntity({ id: e["@id"] });
-        expect(e).not.toHaveProperty("text");
+        e1 = cm.getEntity({ id: e1["@id"] });
+        expect(e1).not.toHaveProperty("text");
+
+        expect(crate["@graph"]).toMatchObject([
+            {
+                "@id": "ro-crate-metadata.json",
+            },
+            {
+                "@id": "./",
+            },
+            {
+                "@id": "#person1",
+                "@type": "Person",
+                name: "person1",
+                knows: { "@id": "#person2" },
+            },
+            {
+                "@id": "#person2",
+                "@type": "Person",
+                name: "person2",
+            },
+        ]);
+
+        // delete a property with associations
+        cm.deleteProperty({
+            id: e1["@id"],
+            property: "knows",
+        });
+        e1 = cm.getEntity({ id: e1["@id"] });
+        expect(e1).not.toHaveProperty("text");
+
+        crate = cm.exportCrate();
+        expect(crate["@graph"]).toMatchObject([
+            {
+                "@id": "ro-crate-metadata.json",
+            },
+            {
+                "@id": "./",
+            },
+            {
+                "@id": "#person1",
+            },
+            {
+                "@id": "#person2",
+            },
+        ]);
     });
     test("a sequence of operations around deleting a property on an entity", () => {
         cm.setProperty({ id: "./", property: "new", value: "some text" });

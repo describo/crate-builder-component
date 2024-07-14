@@ -1,7 +1,14 @@
 import isArray from "lodash-es/isArray.js";
 import validateIriPkg from "../lib/validate-iri";
 
-export function validateId({ id, type }) {
+type ValidateIdParams = {
+    id: string | undefined;
+    type: string | string[];
+};
+
+type ValidateIdResponse = { isValid: boolean; message?: string };
+
+export function validateId({ id, type }: ValidateIdParams): ValidateIdResponse {
     if (!id) {
         return { isValid: false };
     }
@@ -58,4 +65,6 @@ export function validateId({ id, type }) {
     } catch (error) {
         return { isValid: false };
     }
+
+    return { isValid: false, message: "Something unknown happened" };
 }

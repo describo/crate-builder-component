@@ -4,8 +4,13 @@ import isBoolean from "lodash-es/isBoolean.js";
 import isString from "lodash-es/isString.js";
 import isUndefined from "lodash-es/isUndefined.js";
 import isNull from "lodash-es/isNull.js";
-import validatorIsURL from "validator/es/lib/isURL.js";
-import { validateId } from "./validate-identifier.js";
+import { isURL as validatorIsURL } from "validator";
+import { validateId } from "./validate-identifier";
+import type {
+    UnverifiedEntityDefinition,
+    PartiallyVerifiedEntityDefinition,
+    NormalisedEntityDefinition,
+} from "../../types.js";
 
 export const urlProtocols = ["http", "https", "ftp", "ftps"];
 
@@ -13,7 +18,7 @@ export const urlProtocols = ["http", "https", "ftp", "ftps"];
  *
  * @param {string} value - string to check as a URL: checks 'http','https','ftp', 'arcp'
  */
-export function isURL(value) {
+export function isURL(value: string | number | boolean | undefined | null) {
     if (!value) return false;
     if (isNumber(value)) return false;
     if (isBoolean(value)) return false;
@@ -34,7 +39,10 @@ export function isURL(value) {
  *  This method normalises an entity. It checks that the '@type' is sensible, '@id' is valid and sets the name to the '@id' if not set
  * @returns the entity ready for use
  */
-export function normalise(entity, i) {
+export function normalise(
+    entity: UnverifiedEntityDefinition,
+    i: number
+): NormalisedEntityDefinition {
     if (!isString(entity["@type"]) && !isArray(entity["@type"]) && !isUndefined(entity["@type"])) {
         throw new Error(`'@type' property must be a string or an array or not defined at all`);
     }
@@ -54,36 +62,46 @@ export function normalise(entity, i) {
     }
 
     // there is an @id - is it valid?
+    // @ts-ignore
     let { isValid } = validateId({ id: entity["@id"], type: entity["@type"] });
+    // @ts-ignore
     if (!isValid) entity["@id"] = `#${encodeURI(entity["@id"])}`;
 
     // is there a name?
+    // @ts-ignore
     if (!entity.name) entity.name = entity["@id"].replace(/^#/, "");
 
     // if the name is an array join it back into a string
     if (isArray(entity.name)) entity.name = entity.name.join(" ");
 
+    // @ts-ignore
     return entity;
 }
 
-/**
- *
- * @param {Object} entity - the entity whose type should be normalised
- * @description
- *  Use this method to normalise the @type of an entity.
- *
- * @returns the entity ready for use
- */
-export function normaliseEntityType({ entity }) {
-    if (!entity["@type"]) entity["@type"] = isURL(entity["@id"]) ? ["URL"] : ["Thing"];
+export function normaliseEntityType({
+    entity,
+}: {
+    entity: UnverifiedEntityDefinition;
+}): PartiallyVerifiedEntityDefinition {
+    let type: string[];
 
-    if (isArray(entity["@type"])) return entity;
-    if (isBoolean(entity["@type"]) || isNumber(entity["@type"])) {
-        entity["@type"] = ["" + entity["@type"]];
+    if (!entity["@type"]) {
+        type = isURL(entity["@id"]) ? ["URL"] : ["Thing"];
+    } else if (isArray(entity["@type"])) {
+        type = entity["@type"].map((t) => "" + t);
+    } else if (isBoolean(entity["@type"]) || isNumber(entity["@type"])) {
+        type = ["" + entity["@type"]];
+    } else if (isString(entity["@type"])) {
+        type = entity["@type"].split(",").map((t) => t.trim());
+    } else {
+        // Handle any other unexpected cases
+        type = ["Thing"];
     }
-    if (isString(entity["@type"]))
-        entity["@type"] = entity["@type"].split(",").map((t) => t.trim());
-    return entity;
+
+    return {
+        ...entity,
+        "@type": type,
+    };
 }
 
 /**

@@ -12,9 +12,7 @@ describe("Test loading / exporting crate files", () => {
     test("a simple crate file", async () => {
         let crate = getBaseCrate();
         crate = addRootDataset({ crate });
-        // console.log(JSON.stringify(crate, null, 2));
         let cm = new CrateManager({ crate });
-        const rootDataset = cm.getRootDataset();
         let exportedCrate = cm.exportCrate();
         expect(crate["@graph"].length).toEqual(exportedCrate["@graph"].length);
     });
@@ -71,7 +69,7 @@ describe("Test loading / exporting crate files", () => {
             "@id": "./",
             "@type": ["Dataset"],
             name: "something",
-            author: [{ "@id": "http:/schema.org/something" }],
+            author: { "@id": "http:/schema.org/something" },
         });
     });
     test("a simple crate file with root dataset before the root descriptor", async () => {
@@ -82,6 +80,31 @@ describe("Test loading / exporting crate files", () => {
         ];
         let crateManager = new CrateManager({ crate });
         let exportedCrate = crateManager.exportCrate({});
+        expect(crate["@graph"].length).toEqual(exportedCrate["@graph"].length);
+    });
+    test("a crate file with non standard root dataset id - like arcp rubbish", async () => {
+        let crate = {
+            "@context": ["https://w3id.org/ro/crate/1.1/context"],
+            "@graph": [
+                {
+                    "@id": "ro-crate-metadata.json",
+                    "@type": "CreativeWork",
+                    conformsTo: {
+                        "@id": "https://w3id.org/ro/crate/1.1/context",
+                    },
+                    about: {
+                        "@id": "arcp://name,cooee-corpus/corpus/root",
+                    },
+                },
+                {
+                    "@id": "arcp://name,cooee-corpus/corpus/root",
+                    "@type": "Dataset",
+                    name: "rubbish",
+                },
+            ],
+        };
+        let cm = new CrateManager({ crate });
+        let exportedCrate = cm.exportCrate({});
         expect(crate["@graph"].length).toEqual(exportedCrate["@graph"].length);
     });
     test(`test loading a massive crate file - cooee corpus`, async () => {

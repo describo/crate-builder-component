@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { validateId } from "./validate-identifier.js";
+import { validateId } from "./validate-identifier";
 
 describe("Test @id's that should be valid", () => {
     test(`LICENCE.md should be valid`, () => {
