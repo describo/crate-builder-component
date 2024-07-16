@@ -28,7 +28,7 @@ import { reactive, watch } from "vue";
 import isArray from "lodash-es/isArray";
 import isString from "lodash-es/isString";
 import uniq from "lodash-es/uniq";
-import { isURL } from "../CrateManager/lib.js";
+import { isURL } from "../CrateManager/lib";
 import { $t } from "../i18n";
 
 const props = defineProps({

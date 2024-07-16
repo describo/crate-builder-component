@@ -29,7 +29,7 @@
 import { ElSelect, ElOption } from "element-plus";
 import { reactive, watch } from "vue";
 import isPlainObject from "lodash-es/isPlainObject";
-import { validateId } from "../CrateManager/validate-identifier.js";
+import { validateId } from "../CrateManager/validate-identifier";
 import { $t } from "../i18n";
 
 const props = defineProps({
@@ -78,9 +78,9 @@ function verifySelectValuesAreValidPlainObjects(values) {
         if (!isPlainObject(v)) valid = false;
         let { isValid } = validateId({ id: v["@id"], type: v["@type"] });
         if (!isValid) valid = false;
-        if (!"@id" in v) valid = false;
-        if (!"@type" in v) valid = false;
-        if (!"name" in v) valid = false;
+        if ((!"@id") in v) valid = false;
+        if ((!"@type") in v) valid = false;
+        if ((!"name") in v) valid = false;
     });
     return valid;
 }

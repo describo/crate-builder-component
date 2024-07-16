@@ -43,7 +43,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
 import TextComponent from "../primitives/Text.component.vue";
 import { reactive, inject } from "vue";
-import { isURL } from "../CrateManager/lib.js";
+import { isURL } from "../CrateManager/lib";
 import { useStateStore } from "../store.js";
 const state = useStateStore();
 

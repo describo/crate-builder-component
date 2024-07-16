@@ -24,7 +24,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { ElButton, ElInput } from "element-plus";
 import { reactive, watch, computed } from "vue";
-import { isURL } from "../CrateManager/lib.js";
+import { isURL } from "../CrateManager/lib";
 import throttle from "lodash-es/throttle.js";
 import { $t } from "../i18n";
 

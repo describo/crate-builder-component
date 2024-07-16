@@ -92,7 +92,7 @@ import isInt from "validator/es/lib/isInt";
 import isFloat from "validator/es/lib/isFloat";
 import isNumeric from "validator/es/lib/isNumeric";
 import { inject } from "vue";
-import { isURL } from "../CrateManager/lib.js";
+import { isURL } from "../CrateManager/lib";
 import { useStateStore } from "../store.js";
 const state = useStateStore();
 
