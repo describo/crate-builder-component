@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeAll, vi } from "vitest";
-import { ProfileManager } from "./profile-manager.js";
+import { ProfileManager } from "./profile-manager";
 
 describe("Test working with profiles", () => {
     beforeAll(() => {

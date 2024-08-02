@@ -1,4 +1,3 @@
-import isArray from "lodash-es/isArray.js";
 import validateIriPkg from "../lib/validate-iri";
 
 type ValidateIdParams = {
@@ -10,7 +9,7 @@ type ValidateIdResponse = { isValid: boolean; message?: string };
 
 export function validateId({ id, type }: ValidateIdParams): ValidateIdResponse {
     if (!id) {
-        return { isValid: false };
+        return { isValid: false, message: "No identifier was provided." };
     }
 
     // if it's the root descriptor - it's valid
@@ -20,14 +19,9 @@ export function validateId({ id, type }: ValidateIdParams): ValidateIdResponse {
 
     if (type) {
         // if type matches File or Dataset then whatever is provided is valid
-        type = isArray(type) ? type.join(", ") : type;
+        type = Array.isArray(type) ? type.join(", ") : type;
         if (type.match(/file/i)) return { isValid: true };
         if (type.match(/Dataset/i)) return { isValid: true };
-    }
-
-    // if there are spaces in the id - encode them
-    if (id.match(/\s+/)) {
-        id = id.replace(/\s+/g, "%20");
     }
 
     // @id is relative
@@ -54,17 +48,18 @@ export function validateId({ id, type }: ValidateIdParams): ValidateIdResponse {
         if (!result) {
             // it's valid
             return { isValid: true };
-        } else if (result?.message?.match(/Invalid IRI according to RFC 3987:/)) {
-            // otherwise
-            const message = `${result.message.replace(
-                /Invalid IRI according to RFC 3987:/,
-                "Invalid identifier"
-            )}. See https://describo.github.io/documentation/component/identifiers.html for more information.`;
-            return { isValid: false, message };
         }
     } catch (error) {
-        return { isValid: false };
+        return {
+            isValid: false,
+            message:
+                "The identifier is not valid according to the RO Crate spec nor is it a valid IRI.",
+        };
     }
 
-    return { isValid: false, message: "Something unknown happened" };
+    return {
+        isValid: false,
+        message:
+            "The identifier is not valid according to the RO Crate spec nor is it a valid IRI.",
+    };
 }

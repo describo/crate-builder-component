@@ -2,8 +2,30 @@ import difference from "lodash-es/difference.js";
 import orderBy from "lodash-es/orderBy.js";
 import uniqBy from "lodash-es/uniqBy.js";
 const coreProperties = ["@id", "@type", "@reverse", "name"];
+import type {
+    ProfileManagerType,
+    ProfileInput,
+    ProfileLayout,
+    ProfileLayoutGroup,
+    NormalisedEntityDefinition,
+} from "../../types";
 
-export function applyLayout({ configuration, entity, extraProperties, profileManager: pm }) {
+export function applyLayout({
+    configuration,
+    entity,
+    extraProperties,
+    profileManager: pm,
+}: {
+    configuration: { [key: string]: any };
+    entity: NormalisedEntityDefinition;
+    extraProperties: string[];
+    profileManager: ProfileManagerType;
+}): {
+    renderTabs: boolean;
+    missingRequiredData: boolean;
+    entity: NormalisedEntityDefinition;
+    tabs: ProfileLayoutGroup[];
+} {
     let missingRequiredData = false;
     let inputs = [];
 
@@ -20,7 +42,7 @@ export function applyLayout({ configuration, entity, extraProperties, profileMan
     }
     let layouts = pm.getLayout({ entity });
     let renderTabs = false;
-    let tabs = [];
+    let tabs = [] as ProfileLayoutGroup[];
     if (layouts) {
         renderTabs = true;
         tabs = applyLayoutToEntity({ layouts, inputs, entity });
@@ -30,7 +52,19 @@ export function applyLayout({ configuration, entity, extraProperties, profileMan
     return { renderTabs, missingRequiredData, entity, tabs };
 }
 
-function getProfileInputs({ configuration, entity, pm }) {
+function getProfileInputs({
+    configuration,
+    entity,
+    pm,
+}: {
+    configuration: { [key: string]: any };
+    entity: NormalisedEntityDefinition;
+    pm: ProfileManagerType;
+}): {
+    missingRequiredData: boolean;
+    entity: NormalisedEntityDefinition;
+    inputs: ProfileInput[];
+} {
     const inputs = pm.getInputsFromProfile({ entity });
 
     let missingRequiredData = false;
@@ -51,7 +85,15 @@ function getProfileInputs({ configuration, entity, pm }) {
     return { missingRequiredData, entity, inputs };
 }
 
-function applyLayoutToEntity({ layouts, inputs, entity }) {
+function applyLayoutToEntity({
+    layouts,
+    inputs,
+    entity,
+}: {
+    layouts: ProfileLayout;
+    inputs: ProfileInput[];
+    entity: NormalisedEntityDefinition;
+}): ProfileLayoutGroup[] {
     // normalise the layouts
     let sort = false;
     for (let name of Object.keys(layouts)) {
@@ -82,8 +124,10 @@ function applyLayoutToEntity({ layouts, inputs, entity }) {
         let matched = false;
         for (let name of Object.keys(layouts)) {
             if (
-                layouts[name].properties.includes(input.id) ||
-                layouts[name].properties.includes(input.name)
+                layouts[name] &&
+                layouts[name].properties &&
+                (layouts[name].properties.includes(input.id) ||
+                    layouts[name].properties.includes(input.name))
             ) {
                 layouts[name].inputs.push(input);
                 matched = true;
@@ -106,13 +150,14 @@ function applyLayoutToEntity({ layouts, inputs, entity }) {
     for (let input of missingInputs) {
         if (coreProperties.includes(input)) continue;
         layouts.overflow.inputs.push({
+            id: "",
             name: input,
             multiple: true,
-            values: ["Text"],
+            type: ["Text"],
         });
     }
 
-    let tabs = Object.keys(layouts)
+    let tabs: any[] = Object.keys(layouts)
         .map((k) => layouts[k])
         .filter((t) => t.name !== "appliesTo");
     if (sort) tabs = orderBy(tabs, "order");
@@ -141,7 +186,15 @@ function applyLayoutToEntity({ layouts, inputs, entity }) {
     return tabs;
 }
 
-function applyTabDataIndicators({ configuration, tabs, entity }) {
+function applyTabDataIndicators({
+    configuration,
+    tabs,
+    entity,
+}: {
+    configuration: { [key: string]: any };
+    tabs: ProfileLayoutGroup[];
+    entity: NormalisedEntityDefinition;
+}): ProfileLayoutGroup[] {
     // special case: component in readonly mode
     if (configuration.readonly) {
         tabs = tabs.map((tab) => {

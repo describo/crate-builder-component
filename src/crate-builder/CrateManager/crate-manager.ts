@@ -3,7 +3,6 @@ import isNumber from "lodash-es/isNumber.js";
 import isBoolean from "lodash-es/isBoolean.js";
 import isString from "lodash-es/isString.js";
 import isEmpty from "lodash-es/isEmpty.js";
-import isNil from "lodash-es/isNil.js";
 import isUndefined from "lodash-es/isUndefined.js";
 import difference from "lodash-es/difference.js";
 import round from "lodash-es/round.js";
@@ -14,15 +13,41 @@ import flattenDeep from "lodash-es/flattenDeep.js";
 import intersection from "lodash-es/intersection.js";
 import compact from "lodash-es/compact.js";
 import isEqual from "lodash-es/isEqual.js";
-import { validateId } from "./validate-identifier";
-import { normalise, isURL } from "./lib";
+import { validateId } from "./validate-identifier.js";
+import { normalise, isURL } from "./lib.js";
 import { toRaw } from "vue";
-import { getContextDefinition } from "./contexts.js";
+import { getContextDefinition } from "./contexts";
+import type {
+    UnverifiedContext,
+    NormalisedContext,
+    UnverifiedCrate,
+    NormalisedCrate,
+    ProfileManagerType,
+    UnverifiedEntityDefinition,
+    NormalisedEntityDefinition,
+    EntityReference,
+    PrimitiveType,
+    NormalisedProfile,
+} from "../../types.d";
+
+interface errorsInterface {
+    hasError: Boolean;
+    init: { description: string; messages: string[] };
+    missingIdentifier: { description: string; entity: UnverifiedEntityDefinition[] };
+    missingTypeDefinition: { description: string; entity: UnverifiedEntityDefinition[] };
+    invalidIdentifier: { description: string; entity: UnverifiedEntityDefinition[] };
+}
+
+interface warningsInterface {
+    hasWarning: Boolean;
+    init: { description: string; messages: string[] };
+    invalidIdentifier: { description: string; entity: UnverifiedEntityDefinition[] };
+}
 
 const entityDateCreatedProperty = "hasCreationDate";
 const entityDateUpdatedProperty = "hasModificationDate";
 
-const structuredClone = function (data) {
+const structuredClone = function (data: any) {
     return window.structuredClone(toRaw(data));
 };
 
@@ -34,18 +59,52 @@ const structuredClone = function (data) {
  * @description A class to work with RO-Crates
  */
 export class CrateManager {
-    constructor({ crate, pm, context = undefined, entityTimestamps = false }) {
+    crate: {
+        "@context": NormalisedContext;
+        "@graph": Array<NormalisedEntityDefinition | undefined>;
+    };
+    pm: ProfileManagerType;
+    reverse: {
+        [key: string]: any;
+    };
+    graphLength: number;
+    rootDescriptor?: number;
+    rootDataset?: number;
+    entityIdIndex: {
+        [key: string]: number;
+    };
+    providedContext: UnverifiedContext;
+    contextDefinitions: { [key: string]: boolean };
+    localContext: { [key: string]: string };
+    entityTypes: { [key: string]: number };
+    entityTimestamps: Boolean;
+    blankNodes: string[];
+    coreProperties: string[];
+    errors: errorsInterface;
+    warnings: warningsInterface;
+
+    constructor({
+        crate,
+        pm,
+        context = undefined,
+        entityTimestamps = false,
+    }: {
+        crate: UnverifiedCrate;
+        pm: ProfileManagerType;
+        context: UnverifiedContext;
+        entityTimestamps: Boolean;
+    }) {
         // the crate
-        this.crate = undefined;
+        this.crate = {
+            "@context": [{}],
+            "@graph": [],
+        };
 
         // the profile manager - if you've set a profile
         this.pm = pm;
 
         // entity reverse associations
         this.reverse = {};
-
-        // number of entities in the graph
-        this.graphLength = undefined;
 
         // shortcuts to the root descriptor and dataset
         this.rootDescriptor = undefined;
@@ -59,7 +118,7 @@ export class CrateManager {
         this.providedContext = undefined;
 
         // otherwise, Crate Manager will manage the context
-        this.contextDefinitions = undefined;
+        this.contextDefinitions = {};
         this.localContext = {};
 
         // entity types in the crate - for browse entities; filter by type
@@ -95,6 +154,10 @@ export class CrateManager {
         };
         this.warnings = {
             hasWarning: false,
+            init: {
+                description: `Issues encountered on crate load that should be fixed but aren't breaking`,
+                messages: [],
+            },
             invalidIdentifier: {
                 description: `The entity identifier (@id) has spaces in it that should be encoded. Describo will do this to pass the validate test but the data must be corrected manually.`,
                 entity: [],
@@ -111,69 +174,42 @@ export class CrateManager {
             this.__setError("init", `The crate file does not have '@graph' or it's not an array.`);
             return;
         }
-        const graphLength = crate["@graph"].length;
-        for (let i = 0; i < graphLength; i++) {
-            const entity = crate["@graph"][i];
 
-            // if the entity is empty - ignore it
-            if (isPlainObject(entity) && isEmpty(entity)) continue;
+        // number of entities in the graph
+        this.graphLength = crate["@graph"].length;
 
-            // if the entity is the root descriptor, store it
-            if (entity["@id"] === "ro-crate-metadata.json") {
-                this.rootDescriptor = entity;
+        // iterate over the graph find the root descriptor first
+        for (let i = 0; i < this.graphLength; i++) {
+            if (crate["@graph"][i]["@id"] === "ro-crate-metadata.json") {
+                this.rootDescriptor = i;
+
+                // while we're here
+                //  check that about exists and is an object not an array
+                if ("about" in crate["@graph"][i]) {
+                    if (Array.isArray(crate["@graph"][i].about)) {
+                        crate["@graph"][i].about = (crate["@graph"][i].about as any[])[0];
+                    }
+                } else {
+                    this.__setError(
+                        "init",
+                        `This crate is invalid. The root descriptor does not have an about property.`
+                    );
+                }
+
+                // check that conformsTo exists and is an object not an array
+                if (!("conformsTo" in crate["@graph"][i])) {
+                    this.__setWarning(
+                        "init",
+                        `This root descriptor does not specify 'conformsTo'. It will be set to RO Crate v1.1`
+                    );
+                    crate["@graph"][i].confirmsTo = { "@id": "https://w3id.org/ro/crate/1.1" };
+                }
+
+                break;
             }
-
-            // if the entity is the root dataset, store it and ensure the @id is correct
-            if (entity["@id"] === this.rootDescriptor?.about?.["@id"]) {
-                this.rootDataset = entity;
-
-                // set the root dataset @id to './'
-                this.rootDataset["@id"] = "./";
-                this.rootDescriptor.about["@id"] = "./";
-
-                this.rootDataset = normalise(this.rootDataset);
-                this.rootDescriptor = normalise(this.rootDescriptor);
-            }
-
-            // validate each entity
-            if (!("@id" in entity)) {
-                this.__setError("missingIdentifier", entity);
-                continue;
-            }
-            if (!("@type" in entity)) {
-                this.__setError("missingTypeDefinition", entity);
-                continue;
-            }
-
-            //  does the id have spaces in it? log a warning
-            if (entity["@id"].match(/\s+/)) {
-                this.__setWarning("invalidIdentifier", entity);
-            }
-
-            // is it a valid identifier?
-            let { isValid } = validateId({ id: entity["@id"], type: entity["@type"] });
-            if (!isValid) {
-                this.__setError("invalidIdentifier", entity);
-                continue;
-            }
-
-            // is it a blank node? Store it if it is
-            if (entity["@id"].match(/^_:/)) {
-                this.blankNodes.push(entity["@id"]);
-            }
-            // create the id to index reference
-            crate["@graph"][i] = normalise(entity, i);
-            this.entityIdIndex[entity["@id"]] = i;
-            this.reverse[entity["@id"]] = {};
-
-            // store the entity type for lookups by type
-            this.__storeEntityType(crate["@graph"][i]);
         }
-
-        // console.log(crate);
-        // if we get to here and haven't located a root descriptor; bail - this
-        //  crate is borked
-        if (!this.rootDescriptor) {
+        // if we haven't located a root descriptor; bail - this crate is borked
+        if (this.rootDescriptor === undefined) {
             this.__setError(
                 "init",
                 `This crate is invalid. A root descriptor can not been identified.`
@@ -181,62 +217,97 @@ export class CrateManager {
             return;
         }
 
-        // if we don't have a root dataset, then we need to make another pass to find it
-        //
-        //  this will happen if the root dataset comes before the root descriptor in the
-        //  graph
-        if (!this.rootDataset) {
-            for (let i = 0; i < graphLength; i++) {
-                const entity = crate["@graph"][i];
+        // now locate the root dataset and ensure the id is sensible
+        const rootDescriptor = crate["@graph"][this.rootDescriptor];
+        for (let i = 0; i < this.graphLength; i++) {
+            if (
+                isEntityReference(rootDescriptor.about) &&
+                crate["@graph"][i]["@id"] === rootDescriptor.about["@id"]
+            ) {
+                this.rootDataset = i;
 
-                // if the entity is the root dataset, store it and ensure the @id is correct
-                if (
-                    [
-                        this.rootDescriptor.about["@id"],
-                        this.rootDescriptor.about?.[0]?.["@id"],
-                    ].includes(entity["@id"])
-                ) {
-                    this.rootDataset = entity;
-
-                    // set the root dataset @id to './'
-                    this.rootDataset["@id"] = "./";
-                    this.rootDescriptor.about["@id"] = "./";
-                    break;
-                }
+                // set the root dataset @id to './'
+                crate["@graph"][i]["@id"] = "./";
+                rootDescriptor.about["@id"] = "./";
+                break;
             }
         }
 
-        // if we still haven't identified a root dataset then the crate is badly broken
-        if (!this.rootDataset) {
+        if (this.rootDataset === undefined) {
             this.__setError("init", `This crate is invalid. A root dataset can not be identified.`);
             return;
         }
 
-        // one final iteration over the crate to record the reverse links
-        //  and make sure every property looks sensible
-        for (let i = 0; i < graphLength; i++) {
-            let entity = crate["@graph"][i];
+        // as we process the graph, we do our best to normalise the entities
+        //  this includes ensuring the id is valid and sensible
+        //  if it's not, it might get rewritten
+        // if that happens, we need to ensure any links in the graph are also
+        //  rewritten to the new identifier
+        const idMap: { [key: string]: string } = {};
 
-            for (let property of Object.keys(entity)) {
-                // if an entity does not have a name, set the @id as the name
-                if (!entity.name) entity.name = entity["@id"];
+        // process the the graph
+        for (let i = 0; i < this.graphLength; i++) {
+            // if the entity is empty - ignore it
+            if (isPlainObject(crate["@graph"][i]) && isEmpty(crate["@graph"][i])) continue;
+
+            try {
+                const normalisedEntity: NormalisedEntityDefinition = normalise(
+                    crate["@graph"][i],
+                    i
+                );
+                // store the old to new mappings
+                idMap[(crate["@graph"][i] as EntityReference)["@id"]] = normalisedEntity["@id"];
+
+                // is it a blank node? Store it if it is
+                if (normalisedEntity["@id"].match(/^_:/)) {
+                    this.blankNodes.push(normalisedEntity["@id"]);
+                }
+                // copy the entity into the internal structure
+                this.crate["@graph"].push(structuredClone(normalisedEntity));
+
+                // create the id to index reference
+                this.entityIdIndex[normalisedEntity["@id"]] = this.crate["@graph"].length - 1;
+                this.reverse[normalisedEntity["@id"]] = {};
+
+                // store the entity type for lookups by type
+                this.__storeEntityType(normalisedEntity);
+            } catch (error) {
+                this.__setError(
+                    "init",
+                    `Ignoring bad entity ${JSON.stringify({ "@id": crate["@graph"][i]["@id"], "@type": crate["@graph"][i]["@type"] })}`
+                );
+            }
+        }
+        // console.log(this.crate["@graph"]);
+        // console.log(this.entityIdIndex);
+        // console.log(this.reverse);
+        // console.log(this.entityTypes);
+
+        // one final iteration over the crate to record the reverse links
+        for (let i = 0; i < this.graphLength; i++) {
+            const normalisedEntity = this.crate["@graph"][i] as NormalisedEntityDefinition;
+            if (!normalisedEntity) continue;
+
+            for (let property of Object.keys(normalisedEntity)) {
                 if (this.coreProperties.includes(property)) continue;
 
-                entity[property] = [].concat(entity[property]);
+                (normalisedEntity[property] as any[]).forEach((entry) => {
+                    // remap any id's that were changed
+                    if (entry?.["@id"])
+                        entry["@id"] = idMap[entry["@id"]] ? idMap[entry["@id"]] : entry["@id"];
 
-                // ensure we don't have any empty properties
-                entity[property] = entity[property].filter((i) => !isEmpty(i) && !isNil(i));
-
-                // now find the linked entities and populate the reverse links array
-                entity[property].forEach((instance) => {
-                    if (instance?.["@id"] && this.reverse[instance["@id"]]) {
-                        if (!this.reverse[instance["@id"]][property]) {
-                            this.reverse[instance["@id"]][property] = [];
+                    // set up reverse links
+                    if (entry?.["@id"] && this.reverse[entry["@id"]]) {
+                        if (!this.reverse[entry["@id"]][property]) {
+                            this.reverse[entry["@id"]][property] = [];
                         }
-
-                        let links = this.reverse[instance["@id"]][property].map((l) => l["@id"]);
-                        if (!links.includes(entity["@id"])) {
-                            this.reverse[instance["@id"]][property].push({ "@id": entity["@id"] });
+                        let links = this.reverse[entry["@id"]][property].map(
+                            (l: { "@id": string }) => l["@id"]
+                        );
+                        if (!links.includes(normalisedEntity["@id"])) {
+                            this.reverse[entry["@id"]][property].push({
+                                "@id": normalisedEntity["@id"],
+                            });
                         }
                     }
                 });
@@ -247,32 +318,26 @@ export class CrateManager {
             return;
         }
 
-        // looks good - let's save some things
-        this.crate = crate;
-        this.graphLength = graphLength;
-
         // assemble all the definitions for use managing the local context
-        this.contextDefinitions = this.__collectAllDefinitions(
-            this.__normaliseContext(crate["@context"])
-        );
+        this.crate["@context"] = this.__normaliseContext(crate["@context"]);
+        this.contextDefinitions = this.__collectAllDefinitions(this.crate["@context"]);
         if (context) {
             // if we're given a context, store it for use later
             this.providedContext = structuredClone(this.__normaliseContext(context));
         }
 
         const t1 = performance.now();
-        console.debug(`Crate load: ${round(t1 - t0, 1)}ms`);
+        console.debug(`Crate ingest and prep: ${round(t1 - t0, 1)}ms`);
     }
 
     /** Get the context
      * @returns the crate context
      */
-    getContext() {
+    getContext(): NormalisedContext {
         if (this.providedContext) {
             return structuredClone(this.providedContext);
         } else {
-            let context = this.crate["@context"];
-            context = this.__normaliseContext(context);
+            let context = this.crate["@context"] as UnverifiedContext;
             if (!isEmpty(this.localContext)) {
                 context = [...context, this.localContext];
                 context = this.__normaliseContext(context);
@@ -288,7 +353,7 @@ export class CrateManager {
      *   used as is and data updates going forward do not get dealth with.
      * @param {*} context
      */
-    setContext(context) {
+    setContext(context: NormalisedContext) {
         this.providedContext = this.__normaliseContext(context);
     }
 
@@ -297,7 +362,7 @@ export class CrateManager {
      * @description  CrateManager can set reverse associations if defined in a profile.
      *
      * */
-    setProfileManager(pm) {
+    setProfileManager(pm: ProfileManagerType) {
         this.pm = pm;
     }
 
@@ -311,8 +376,10 @@ const cm = new CrateManager({ crate })
 let rd = cm.getRootDataset()
 
      */
-    getRootDataset() {
-        let rootDataset = structuredClone(this.rootDataset);
+    getRootDataset(): NormalisedEntityDefinition {
+        let rootDataset: NormalisedEntityDefinition = structuredClone(
+            this.crate["@graph"][this.rootDataset as number] as NormalisedEntityDefinition
+        );
         rootDataset["@reverse"] = structuredClone(this.reverse[rootDataset["@id"]]);
         return rootDataset;
     }
@@ -340,7 +407,17 @@ let rd = cm.getEntity({ id: './' })
 rd = cm.getEntity({ id: './', stub: true })
 
      */
-    getEntity({ id, stub = false, link = true, materialise = true }) {
+    getEntity({
+        id,
+        stub = false,
+        link = true,
+        materialise = true,
+    }: {
+        id: string;
+        stub?: boolean;
+        link?: boolean;
+        materialise?: boolean;
+    }): NormalisedEntityDefinition | undefined {
         if (!id) throw new Error(`An id must be provided`);
         let indexRef = this.entityIdIndex[id];
         let entity = structuredClone(this.crate["@graph"][indexRef]);
@@ -360,7 +437,7 @@ rd = cm.getEntity({ id: './', stub: true })
         if (link) {
             for (let property of Object.keys(entity)) {
                 if (this.coreProperties.includes(property)) continue;
-                entity[property] = entity[property].map((value) => {
+                entity[property] = entity[property].map((value: EntityReference) => {
                     if (value?.["@id"]) {
                         return this.getEntity({ id: value["@id"], stub: true });
                     }
@@ -376,7 +453,7 @@ rd = cm.getEntity({ id: './', stub: true })
      *
      * @returns an array of entity types, sorted, found in the crate
      */
-    getEntityTypes() {
+    getEntityTypes(): string[] {
         return Object.keys(this.entityTypes).sort();
     }
 
@@ -410,7 +487,13 @@ entities = cm.getEntities({ query: 'person', type: 'Person' })
 entities = cm.getEntities({ query: 'person', type: 'Person', limit: 10 })
 
      */
-    *getEntities(params = { limit: undefined, query: undefined, type: undefined }) {
+    *getEntities(
+        params: { limit?: number; query?: string; type?: string } = {
+            limit: undefined,
+            query: undefined,
+            type: undefined,
+        }
+    ): Generator<NormalisedEntityDefinition> {
         let { limit, query, type } = params;
 
         if (!isString(query) && !isUndefined(query)) {
@@ -431,8 +514,8 @@ entities = cm.getEntities({ query: 'person', type: 'Person', limit: 10 })
             if (query || type) {
                 let eid = entity["@id"].toLowerCase();
                 let etype = isArray(entity["@type"])
-                    ? entity["@type"].join(", ").toLowerCase()
-                    : entity["@type"].toLowerCase();
+                    ? (entity["@type"].join(", ") as string).toLowerCase()
+                    : (entity["@type"] as string).toLowerCase();
                 let name = entity.name.toLowerCase();
                 if (type && !query) {
                     type = type.toLowerCase();
@@ -477,7 +560,13 @@ entities = cm.getEntities({ query: 'person', type: 'Person', limit: 10 })
      *  @returns [] entities matching or undefined
      */
 
-    locateEntity({ entityIds, strict = true }) {
+    locateEntity({
+        entityIds,
+        strict = true,
+    }: {
+        entityIds: string[];
+        strict: boolean;
+    }): NormalisedEntityDefinition[] | undefined {
         // encode entityIds
         entityIds = entityIds.map((eid) => encodeURI(eid));
 
@@ -492,30 +581,34 @@ entities = cm.getEntities({ query: 'person', type: 'Person', limit: 10 })
         // console.log(entity, this.reverse);
         let thisEntityLinksTo = this.reverse[entity["@id"]];
 
-        let matches = {};
+        let matches: { [key: string]: string[] } = {};
         for (let property of Object.keys(thisEntityLinksTo)) {
             for (let e of thisEntityLinksTo[property]) {
                 matches[e["@id"]] = [];
             }
         }
 
-        let entityMatches = [];
-
+        let entityMatches: NormalisedEntityDefinition[] = [];
         for (let entityId of Object.keys(matches)) {
             let entity = this.getEntity({ id: entityId });
-            for (let property of Object.keys(entity)) {
-                if (this.coreProperties.includes(property)) continue;
-                for (let instance of entity[property]) {
-                    if (instance?.["@id"]) matches[entityId].push(instance["@id"]);
+            if (entity) {
+                for (let property of Object.keys(entity)) {
+                    if (this.coreProperties.includes(property)) continue;
+                    for (let instance of entity[property]) {
+                        if (!isEntityReference(instance)) continue;
+                        if ((instance as EntityReference)?.["@id"])
+                            matches[entityId].push(instance["@id"]);
+                    }
                 }
-            }
-            if (strict) {
-                // if strict is true then check if the linked entities match exactly
-                if (isEqual(matches[entityId].sort(), entityIds.sort())) entityMatches.push(entity);
-            } else {
-                // otherwise, check that entityIds is a subset of matches
-                if (intersection(matches[entityId], entityIds).length === entityIds.length) {
-                    entityMatches.push(entity);
+                if (strict) {
+                    // if strict is true then check if the linked entities match exactly
+                    if (isEqual(matches[entityId].sort(), entityIds.sort()))
+                        entityMatches.push(entity);
+                } else {
+                    // otherwise, check that entityIds is a subset of matches
+                    if (intersection(matches[entityId], entityIds).length === entityIds.length) {
+                        entityMatches.push(entity);
+                    }
                 }
             }
         }
@@ -587,10 +680,23 @@ associations === [
 ]
 
      */
-    resolveLinkedEntityAssociations({ entity, profile }) {
+    resolveLinkedEntityAssociations({
+        entity,
+        profile,
+    }: {
+        entity: NormalisedEntityDefinition;
+        profile: NormalisedProfile;
+    }):
+        | {
+              property: string;
+              "@id": string;
+              "@type": string[];
+              name: string;
+          }[]
+        | [] {
         if (!profile?.resolve) return [];
         let resolveConfiguration = profile.resolve;
-        const resolvers = {};
+        const resolvers: { [key: string]: any } = {};
         resolveConfiguration.forEach((c) => {
             c.types.forEach((type) => {
                 resolvers[type] = c.properties;
@@ -607,19 +713,28 @@ associations === [
         // what properties need to be resolved?
         const propertiesToResolve = flattenDeep(match.map((type) => resolvers[type]));
 
-        let associations = [];
+        let associations: Array<{
+            property: string;
+            "@id": string;
+            "@type": string[];
+            name: string;
+        }> = [];
+
         for (let property of Object.keys(entity)) {
             // skip core prop's and any prop not specifically configured to resolve
             if (this.coreProperties.includes(property)) continue;
             if (!propertiesToResolve.includes(property)) continue;
 
             // resolve away
-            let values = [].concat(entity[property]);
+            let values = [].concat(entity[property] as any);
             values.forEach((value) => {
                 if (!("@id" in value)) return value;
                 associations.push({
                     property,
-                    ...this.getEntity({ id: value["@id"], stub: true }),
+                    ...(this.getEntity({
+                        id: value["@id"],
+                        stub: true,
+                    }) as NormalisedEntityDefinition),
                 });
             });
         }
@@ -644,7 +759,7 @@ let entity = {
 let r = cm.addEntity(entity);
 
      */
-    addEntity(entity) {
+    addEntity(entity: UnverifiedEntityDefinition): NormalisedEntityDefinition {
         if (!("@id" in entity)) {
             throw new Error(`You can't add an entity without an identifier: '@id'.`);
         }
@@ -653,43 +768,42 @@ let r = cm.addEntity(entity);
         }
 
         const e = structuredClone(entity);
-        entity = normalise(e, this.graphLength);
-        entity = this.__confirmNoClash({ entity });
-        if (!entity) {
-            entity = normalise(e, this.graphLength);
-            return this.getEntity({ id: entity["@id"] });
+        let normalisedEntity = normalise(e, this.graphLength);
+        normalisedEntity = this.__confirmNoClash({
+            entity: normalisedEntity,
+        }) as NormalisedEntityDefinition;
+        if (!normalisedEntity) {
+            normalisedEntity = normalise(e, this.graphLength);
+            return this.getEntity({ id: normalisedEntity["@id"] }) as NormalisedEntityDefinition;
         }
 
         // set all properties, other than core props, to array
-        for (let property of Object.keys(entity)) {
+        for (let property of Object.keys(normalisedEntity)) {
             if (this.coreProperties.includes(property)) continue;
 
             // ensure it's an array
-            entity[property] = [].concat(entity[property]);
+            entity[property] = [].concat(normalisedEntity[property] as []);
 
             // then filter out empty properties with empty strings
-            entity[property] = entity[property].filter((p) => p !== "");
-
-            // remove empty properties
-            if (!entity[property].length) delete entity[property];
+            normalisedEntity[property] = (entity[property] as []).filter((p) => p !== "");
         }
 
         // manage timestamps
         if (this.entityTimestamps) {
-            entity[entityDateCreatedProperty] = [new Date().toISOString()];
-            entity[entityDateUpdatedProperty] = [new Date().toISOString()];
+            normalisedEntity[entityDateCreatedProperty] = [new Date().toISOString()];
+            normalisedEntity[entityDateUpdatedProperty] = [new Date().toISOString()];
         }
 
         // push it into the graph
-        this.crate["@graph"].push(entity);
+        this.crate["@graph"].push(normalisedEntity);
 
         // create the index and reverse lookup entries
         this.graphLength = this.crate["@graph"].length;
-        this.entityIdIndex[entity["@id"]] = this.graphLength - 1;
-        this.reverse[entity["@id"]] = {};
-        this.__storeEntityType(entity);
+        this.entityIdIndex[normalisedEntity["@id"]] = this.graphLength - 1;
+        this.reverse[normalisedEntity["@id"]] = {};
+        this.__storeEntityType(normalisedEntity);
 
-        return entity;
+        return normalisedEntity;
     }
 
     /**
@@ -714,8 +828,8 @@ r === {
 }
 
      */
-    addBlankNode(type) {
-        let blankNodeTypeMatches = this.blankNodes.filter((n) => n.match(type));
+    addBlankNode(type: string): NormalisedEntityDefinition {
+        const blankNodeTypeMatches = this.blankNodes.filter((n) => n.match(type));
         const id = `_:${type}${blankNodeTypeMatches.length + 1}`;
         this.blankNodes.push(id);
         let entity = {
@@ -723,7 +837,7 @@ r === {
             "@type": type,
             name: id,
         };
-        return this.addEntity(entity);
+        return this.addEntity(entity as UnverifiedEntityDefinition);
     }
 
     /**
@@ -742,7 +856,13 @@ r === {
 const cm = new CrateManager({ crate })
 let r = cm.addFileOrFolder('/a/b/c/file.txt);
      */
-    addFileOrFolder({ path, type = "File" }) {
+    addFileOrFolder({
+        path,
+        type = "File",
+    }: {
+        path: string;
+        type: string;
+    }): NormalisedEntityDefinition {
         if (!["File", "Dataset"].includes(type)) {
             throw new Error(`'addFileOrFolder' type must be File or Dataset`);
         }
@@ -759,32 +879,36 @@ let r = cm.addFileOrFolder('/a/b/c/file.txt);
 
         //  create the file path as individual datasets before joining
         //   the file into the right place
-        let paths = path.split("/").slice(0, -1);
+        let paths: string[] = path.split("/").slice(0, -1);
         let i = 0;
-        paths = paths.map((p) => {
+        const entities: NormalisedEntityDefinition[] = paths.map((p) => {
             let entity = {
                 "@id": i > 0 ? `${paths.slice(0, i).join("/")}/${p}/` : `${p}/`,
                 "@type": ["Dataset"],
                 name: i > 0 ? `${paths.slice(0, i).join("/")}/${p}/` : `${p}/`,
             };
             entity["@id"] = encodeURI(entity["@id"]);
-            entity = this.addEntity(entity);
+            let normalisedEntity: NormalisedEntityDefinition = this.addEntity(
+                entity as UnverifiedEntityDefinition
+            );
             i += 1;
-            return entity;
+            return normalisedEntity;
         });
         i = 0;
-        for (let p of paths) {
+        for (let e of entities) {
             if (i === 0) {
                 this.linkEntity({
                     id: "./",
                     property: "hasPart",
-                    value: { "@id": p["@id"] },
+                    propertyId: "https://schema.org/hasPart",
+                    value: { "@id": e["@id"] },
                 });
             } else {
                 this.linkEntity({
-                    id: paths[i - 1]["@id"],
+                    id: entities[i - 1]["@id"],
                     property: "hasPart",
-                    value: { "@id": p["@id"] },
+                    propertyId: "https://schema.org/hasPart",
+                    value: { "@id": e["@id"] },
                 });
             }
             i += 1;
@@ -796,17 +920,23 @@ let r = cm.addFileOrFolder('/a/b/c/file.txt);
             name: path,
         };
         if (type === "File") {
+            let id = "./";
+            if (entities.length) {
+                id = entities.slice(-1)[0]?.["@id"];
+            }
+
             const sourceEntity = this.getEntity({
-                id: paths.length ? paths.slice(-1)[0]["@id"] : "./",
+                id,
                 stub: true,
-            });
+            }) as NormalisedEntityDefinition;
             this.ingestAndLink({
                 id: sourceEntity["@id"],
                 property: "hasPart",
-                json: entity,
+                propertyId: "https://schema.org/hasPart",
+                json: entity as UnverifiedEntityDefinition,
             });
         }
-        return this.getEntity({ id: entity["@id"], stub: true });
+        return this.getEntity({ id: entity["@id"], stub: true }) as NormalisedEntityDefinition;
     }
 
     /**
@@ -823,7 +953,7 @@ let r = cm.addFileOrFolder('/a/b/c/file.txt);
 const cm = new CrateManager({ crate })
 let r = cm.addFile('/a/b/c/file.txt);
      */
-    addFile(path) {
+    addFile(path: string): NormalisedEntityDefinition {
         return this.addFileOrFolder({ path, type: "File" });
     }
 
@@ -841,7 +971,7 @@ let r = cm.addFile('/a/b/c/file.txt);
 const cm = new CrateManager({ crate })
 let r = cm.addFolder('/a/b/c);
      */
-    addFolder(path) {
+    addFolder(path: string): NormalisedEntityDefinition {
         return this.addFileOrFolder({ path, type: "Dataset" });
     }
 
@@ -858,25 +988,36 @@ const cm = new CrateManager({ crate })
 cm.deleteEntity({ id: '#e1' })
 
      */
-    deleteEntity({ id }) {
+    deleteEntity({ id }: { id: string }) {
         if (!id) throw new Error(`'deleteEntity' requires 'id' to be defined`);
-        if ([this.rootDescriptor["@id"], this.rootDataset["@id"]].includes(id)) {
+        if (
+            [
+                (this.crate["@graph"][this.rootDescriptor as number] as NormalisedEntityDefinition)[
+                    "@id"
+                ],
+                (this.crate["@graph"][this.rootDataset as number] as NormalisedEntityDefinition)[
+                    "@id"
+                ],
+            ].includes(id)
+        ) {
             throw new Error(`You can't delete the root dataset or the root descriptor.`);
         }
 
         const indexRef = this.entityIdIndex[id];
         const entity = this.crate["@graph"][indexRef];
+        if (!entity) return;
+
         this.__removeEntityType(entity);
 
         // get the entity, find what it links to and remove it from the reverse of those linkages
-        for (let [property, instances] of Object.entries(entity)) {
+        for (let [property, instances] of Object.entries(entity as NormalisedEntityDefinition)) {
             if (this.coreProperties.includes(property)) continue;
             for (let instance of instances) {
-                if (instance?.["@id"]) {
-                    // console.log(instance["@id"], this.reverse[instance["@id"]]);
+                if (!isEntityReference(instance)) continue;
+                if (instance?.["@id"] && this.reverse[instance["@id"]]) {
                     this.reverse[instance["@id"]][property] = this.reverse[instance["@id"]][
                         property
-                    ].filter((i) => i["@id"] !== id);
+                    ].filter((i: any) => i["@id"] !== id);
 
                     // remove the property if it's empty
                     if (!this.reverse[instance["@id"]][property].length) {
@@ -887,17 +1028,28 @@ cm.deleteEntity({ id: '#e1' })
         }
 
         // now do the same by walking the reverse links from this entity
-        for (let [property, instances] of Object.entries(this.reverse[entity["@id"]])) {
+        for (let [property, instances] of Object.entries(
+            this.reverse[entity["@id"]] as NormalisedEntityDefinition
+        )) {
             if (this.coreProperties.includes(property)) continue;
             for (let instance of instances) {
-                if (instance?.["@id"]) {
+                if (!isEntityReference(instance)) continue;
+                if (instance["@id"]) {
                     let linkIndexRef = this.entityIdIndex[instance["@id"]];
                     let linkEntity = this.crate["@graph"][linkIndexRef];
-                    linkEntity[property] = linkEntity[property].filter((i) => i["@id"] !== id);
+                    if (linkEntity) {
+                        linkEntity[property] = linkEntity[property].filter((i) => {
+                            if (isEntityReference(i)) {
+                                return i["@id"] !== id;
+                            } else {
+                                return i;
+                            }
+                        });
 
-                    // remove the property if it's empty
-                    if (!linkEntity[property].length) {
-                        delete linkEntity[property];
+                        // remove the property if it's empty
+                        if (!linkEntity[property].length) {
+                            delete linkEntity[property];
+                        }
                     }
                 }
             }
@@ -933,7 +1085,17 @@ cm.setProperty({ id: "./", property: "author", value: "text" });
 cm.setProperty({ id: "./", property: "author", value: 3 });
 
      */
-    setProperty({ id, property, propertyId, value }) {
+    setProperty({
+        id,
+        property,
+        propertyId,
+        value,
+    }: {
+        id: string;
+        property: string;
+        propertyId?: string;
+        value: PrimitiveType | EntityReference;
+    }): boolean | undefined {
         if (this.coreProperties.includes(property)) {
             throw new Error(`This method does not operate on ${this.coreProperties.join(", ")}`);
         }
@@ -947,20 +1109,24 @@ cm.setProperty({ id: "./", property: "author", value: 3 });
 
         const indexRef = this.entityIdIndex[id];
         const entity = this.crate["@graph"][indexRef];
+        if (isUndefined(entity)) return;
+
         if (!(property in entity)) {
             entity[property] = [];
         }
         // validate the value's shape - v. important
         if (isString(value) || isNumber(value) || isBoolean(value)) {
-            entity[property].push(value);
+            (entity[property] as any[]).push(value);
         } else if (isPlainObject(value) && "@id" in value) {
             // value makes sense
             // but make sure it's only the id and not the whole entity
             value = { "@id": value["@id"] };
 
             // and don't add duplicates
-            let ids = entity[property].filter((v) => v?.["@id"]).map((v) => v["@id"]);
-            if (!ids.includes(value["@id"])) entity[property].push(value);
+            let ids = entity[property]
+                .filter((v) => (v as EntityReference)?.["@id"])
+                .map((v) => (v as EntityReference)?.["@id"]);
+            if (!ids.includes(value["@id"])) entity[property].push(value as any);
 
             // and add a @reverse link
             this.__addReverse({ id, property, value });
@@ -992,7 +1158,17 @@ cm.updateProperty({ id: "./", property: "@id", value: "something else" });
 cm.updateProperty({ id: "./", property: "author", idx: 1, value: "new" });
 
      */
-    updateProperty({ id, property, idx, value }) {
+    updateProperty({
+        id,
+        property,
+        idx,
+        value,
+    }: {
+        id: string;
+        property: string;
+        idx: number;
+        value: PrimitiveType | PrimitiveType[] | EntityReference;
+    }): NormalisedEntityDefinition | undefined | string {
         if (!id) throw new Error(`'setProperty' requires 'id' to be defined`);
         if (!property) throw new Error(`setProperty' requires 'property' to be defined`);
         if (value !== false && !value)
@@ -1004,30 +1180,35 @@ cm.updateProperty({ id: "./", property: "author", idx: 1, value: "new" });
         let indexRef = this.entityIdIndex[id];
         if (!indexRef) return `No such entity: ${id}`;
         const entity = this.crate["@graph"][indexRef];
+        if (!entity) return;
+
         if (this.coreProperties.includes(property)) {
             if (property === "@id") {
                 //  update @id
-                this.__updateEntityId({ oldId: entity["@id"], newId: value });
+                this.__updateEntityId({
+                    oldId: (entity as EntityReference)?.["@id"],
+                    newId: value as string,
+                });
             } else if (property === "@type") {
                 //  update @type
                 //   ensure it's an array first though or weird sh*t happens
-                value = [].concat(value);
+                value = [].concat(value as any);
 
                 //  when updating the type we first need to clear out the
                 //   old types and then set the new so we end up with correct
                 //   reference counts
                 this.__removeEntityType(entity);
-                entity["@type"] = uniq(value);
+                entity["@type"] = uniq(value) as [];
                 this.__storeEntityType(entity);
             } else if (property === "name") {
                 // update name
                 // ensure we're setting a string value for the name property
                 if (isArray(value)) value = value.join(", ");
-                entity.name = value;
+                entity.name = String(value);
             }
         } else {
             if (idx !== 0 && !idx) throw new Error(`setProperty' requires 'idx' to be defined`);
-            entity[property][idx] = value;
+            (entity[property] as any[])[idx] = value;
         }
 
         // manage timestamps
@@ -1050,25 +1231,31 @@ const cm = new CrateManager({ crate })
 cm.deleteProperty({ id: "./", property: "author", idx: 1 });
 
      */
-    deleteProperty({ id, property, idx }) {
+    deleteProperty({ id, property, idx }: { id: string; property: string; idx?: number }) {
         if (!id) throw new Error(`'deleteProperty' requires 'id' to be defined`);
         if (!property) throw new Error(`deleteProperty' requires 'property' to be defined`);
         // if (idx !== 0 && !idx) throw new Error(`deleteProperty' requires 'idx' to be defined`);
 
+        let entity;
         if (idx || idx === 0) {
             // delete just that property instance
             const indexRef = this.entityIdIndex[id];
-            const entity = this.crate["@graph"][indexRef];
+            entity = this.crate["@graph"][indexRef];
+            if (isUndefined(entity)) return;
+
             entity[property].splice(idx, 1);
             if (!entity[property].length) delete entity[property];
         } else if (idx === undefined) {
             const indexRef = this.entityIdIndex[id];
-            let entity = this.crate["@graph"][indexRef];
+            entity = this.crate["@graph"][indexRef];
+            if (isUndefined(entity)) return;
+
             if (!entity[property]) return;
 
             // iterate over the values and unlink any linked properties
             entity[property].forEach((instance) => {
-                if (instance?.["@id"]) this.unlinkEntity({ id, property, value: instance });
+                if ((instance as EntityReference)?.["@id"])
+                    this.unlinkEntity({ id, property, value: instance as EntityReference });
             });
 
             // now delete whatever is left
@@ -1076,7 +1263,7 @@ cm.deleteProperty({ id: "./", property: "author", idx: 1 });
         }
 
         // manage timestamps
-        if (this.entityTimestamps) {
+        if (this.entityTimestamps && !isUndefined(entity)) {
             entity[entityDateUpdatedProperty] = [new Date().toISOString()];
         }
     }
@@ -1087,6 +1274,7 @@ cm.deleteProperty({ id: "./", property: "author", idx: 1 });
      * @param {Object} options
      * @param {string} options.id - the id of the entity to join the data into
      * @param {string} options.property - the property to join the data into
+     * @param {string} options.propertyId - the propertyId of the property - ie the url to the definition
      * @param {json} options.json - the data object to join in
      * @example
 
@@ -1101,26 +1289,41 @@ cm.ingestAndLink({
 });
 
      */
-    ingestAndLink({ id = undefined, property = undefined, propertyId = undefined, json = {} }) {
+    ingestAndLink({
+        id = undefined,
+        property = undefined,
+        propertyId = undefined,
+        json = {},
+    }: {
+        id: string | undefined;
+        property: string | undefined;
+        propertyId: string | undefined;
+        json: UnverifiedEntityDefinition;
+    }) {
         if (!id) throw new Error(`ingestAndLink: 'id' must be defined`);
         if (!property) throw new Error(`ingestAndLink: 'property' must be defined`);
 
         let flattened = this.flatten(json);
-        flattened = flattened.map((entity) => {
-            entity = normalise(entity, this.graphLength);
-            entity = this.addEntity(entity);
-            return entity;
-        });
+        let entities: NormalisedEntityDefinition[] = flattened.map(
+            (entity: UnverifiedEntityDefinition) => {
+                let normalisedEntity: NormalisedEntityDefinition = normalise(
+                    entity,
+                    this.graphLength
+                );
+                normalisedEntity = this.addEntity(normalisedEntity);
+                return normalisedEntity;
+            }
+        );
 
-        this.linkEntity({ id, property, propertyId, value: { "@id": flattened[0]["@id"] } });
+        this.linkEntity({ id, property, propertyId, value: { "@id": entities[0]["@id"] } });
 
         //  go through and set all of the reverse links
-        for (let entity of flattened) {
-            for (let prop of Object.keys(entity)) {
-                if (this.coreProperties.includes(prop)) continue;
-                entity[prop].forEach((instance) => {
+        for (let entity of entities) {
+            for (let property of Object.keys(entity)) {
+                if (this.coreProperties.includes(property)) continue;
+                (entity[property] as []).forEach((instance) => {
                     if (instance?.["@id"]) {
-                        this.__addReverse({ id: entity["@id"], property: prop, value: instance });
+                        this.__addReverse({ id: entity["@id"], property, value: instance });
                     }
                 });
             }
@@ -1141,7 +1344,7 @@ let json = {
 let arrayOfObjects = cm.flatten(json)
 
      */
-    flatten(json) {
+    flatten(json: UnverifiedEntityDefinition): NormalisedEntityDefinition[] {
         if (!isPlainObject(json)) {
             throw new Error(`flatten only takes an object.`);
         }
@@ -1150,16 +1353,18 @@ let arrayOfObjects = cm.flatten(json)
         flattened.push(json);
         for (let property of Object.keys(json)) {
             if (["@id", "@type", "name"].includes(property)) continue;
-            if (!isArray(json[property])) json[property] = [json[property]];
+
+            if (!isArray(json[property])) json[property] = [json[property] as any];
+
             json[property].forEach((instance) => {
-                if (isPlainObject(instance)) flattened.push(this.flatten(instance));
+                if (isPlainObject(instance)) flattened.push(this.flatten(instance as any));
             });
-            json[property] = json[property].map((instance) => {
+            json[property] = json[property].map((instance: any) => {
                 if (isPlainObject(instance)) return { "@id": instance["@id"] };
                 return instance;
             });
         }
-        return flattenDeep(flattened).map((e) => e);
+        return flattenDeep(flattened as []).map((e) => e);
     }
 
     /**
@@ -1170,6 +1375,7 @@ let arrayOfObjects = cm.flatten(json)
      * @param {Object} options
      * @param {string} options.id - the id of the entity to add the association to
      * @param {string} options.property - the property to add the association to
+     * @param {string} options.propertyId - the propertyId of the property - ie the url to the definition
      * @param {object} options.value - an object with '@id' defining the association to create
      * @example
 
@@ -1177,7 +1383,17 @@ const cm = new CrateManager({ crate })
 cm.linkEntity({ id: './', property: 'author', value: { '@id': '#e1' }})
 
      **/
-    linkEntity({ id = undefined, property = undefined, propertyId = undefined, value }) {
+    linkEntity({
+        id,
+        property,
+        propertyId = undefined,
+        value,
+    }: {
+        id: string;
+        property: string;
+        propertyId?: string;
+        value: { "@id": string };
+    }): void {
         if (!id) throw new Error(`'linkEntity' requires 'id' to be defined`);
         if (!property) throw new Error(`'linkEntity' requires 'property' to be defined`);
         if (!value) throw new Error(`'linkEntity' requires 'value' to be defined`);
@@ -1215,7 +1431,17 @@ const cm = new CrateManager({ crate })
 cm.unlinkEntity({ id: './', property: 'author', value: { '@id': '#e1' }})
 
      **/
-    unlinkEntity({ id = undefined, property = undefined, value = undefined, stop = false }) {
+    unlinkEntity({
+        id = undefined,
+        property = undefined,
+        value = undefined,
+        stop = false,
+    }: {
+        id: string | undefined;
+        property: string | undefined;
+        value: { "@id": string } | undefined;
+        stop?: boolean;
+    }) {
         if (!id) throw new Error(`'unlinkEntity' requires 'id' to be defined`);
         if (!property) throw new Error(`'unlinkEntity' requires 'property' to be defined`);
         if (!value) throw new Error(`'unlinkEntity' requires 'value' to be defined`);
@@ -1227,10 +1453,11 @@ cm.unlinkEntity({ id: './', property: 'author', value: { '@id': '#e1' }})
         // get the source entity
         let indexRef = this.entityIdIndex[id];
         let entity = this.crate["@graph"][indexRef];
+        if (!entity) return;
         // console.log("SOURCE ENTITY BEFORE ", entity);
 
         // and remove the linked entity from the specified property
-        entity[property] = entity[property].filter((v) => {
+        entity[property] = (entity[property] as []).filter((v) => {
             if (v?.["@id"] && v["@id"] === value["@id"]) {
                 // do nothing - we don't want it
             } else {
@@ -1251,8 +1478,8 @@ cm.unlinkEntity({ id: './', property: 'author', value: { '@id': '#e1' }})
         // console.log();
         if (this.reverse[value["@id"]]) {
             this.reverse[value["@id"]][property] = this.reverse[value["@id"]][property].filter(
-                (v) => {
-                    return v["@id"] !== id;
+                (v: any) => {
+                    if (isEntityReference(v)) return v["@id"] !== id;
                 }
             );
             if (!this.reverse[value["@id"]][property].length)
@@ -1283,62 +1510,65 @@ const cm = new CrateManager({ crate })
 cm.purgeUnlinkedEntities()
 
      */
-    purgeUnlinkedEntities() {
-        walker = walker.bind(this);
-        let linkedEntities = { "ro-crate-metadata.json": true };
-        let indexRef = this.entityIdIndex["ro-crate-metadata.json"];
-        if (indexRef !== undefined) {
-            // we first need to walk the graph from the root descriptor
-            //  and assemble a list of linked entities that we get to by
-            //  following forward looking associations
-            let entity = this.crate["@graph"][indexRef];
-            walker(entity);
-
-            // then, we walk the entire graph and look for entities
-            //   that are not already linked. When we find one, we walk
-            //   it forwards to see if it links to anything already linked
-            //   and if yes, then we link it
-            // think things like relationships and actions that may link
-            //   to enities in the graph even though they themselves are not linked to
-            for (let i = 0; i < this.graphLength; i++) {
-                let entity = this.crate["@graph"][i];
-                if (!entity) continue;
-                if (!linkedEntities[entity["@id"]]) {
-                    for (let property of Object.keys(entity)) {
-                        if (this.coreProperties.includes(property)) continue;
-                        entity[property].forEach((instance) => {
-                            if (instance?.["@id"] && linkedEntities[instance["@id"]]) {
-                                linkedEntities[entity["@id"]] = true;
-                            }
-                        });
-                    }
-                }
-            }
-
-            // now we can remove everything we couldn't get to
-            for (let i = 0; i < this.graphLength; i++) {
-                let entity = this.crate["@graph"][i];
-                if (entity && !linkedEntities[entity["@id"]]) {
-                    let indexRef = this.entityIdIndex[entity["@id"]];
-                    delete this.entityIdIndex[entity["@id"]];
-                    delete this.reverse[entity["@id"]];
-                    this.crate["@graph"][indexRef] = undefined;
-                }
-            }
-        }
-        function walker(entity) {
+    purgeUnlinkedEntities(): void {
+        let walker = (entity: NormalisedEntityDefinition) => {
             linkedEntities[entity["@id"]] = true;
             for (let property of Object.keys(entity)) {
                 if (this.coreProperties.includes(property)) continue;
-                entity[property].forEach((instance) => {
+                for (let instance of entity[property]) {
+                    if (!isEntityReference(instance)) continue;
                     if (instance?.["@id"] && !linkedEntities[instance["@id"]]) {
                         let indexRef = this.entityIdIndex[instance["@id"]];
                         if (indexRef !== undefined) {
                             let entity = this.crate["@graph"][indexRef];
-                            walker(entity);
+                            walker(entity as NormalisedEntityDefinition);
                         }
                     }
-                });
+                }
+            }
+        };
+
+        walker = walker.bind(this);
+        let linkedEntities: { [key: string]: boolean } = { "ro-crate-metadata.json": true };
+
+        let rootDescriptor = this.getEntity({ id: "ro-crate-metadata.json" });
+        if (!rootDescriptor) return;
+        // let indexRef = this.entityIdIndex["ro-crate-metadata.json"];
+        // we first need to walk the graph from the root descriptor
+        //  and assemble a list of linked entities that we get to by
+        //  following forward looking associations
+        walker(rootDescriptor);
+
+        // then, we walk the entire graph and look for entities
+        //   that are not already linked. When we find one, we walk
+        //   it forwards to see if it links to anything already linked
+        //   and if yes, then we link it
+        // think things like relationships and actions that may link
+        //   to enities in the graph even though they themselves are not linked to
+        for (let i = 0; i < this.graphLength; i++) {
+            let entity = this.crate["@graph"][i];
+            if (!entity) continue;
+            if (!linkedEntities[entity["@id"]]) {
+                for (let property of Object.keys(entity)) {
+                    if (this.coreProperties.includes(property)) continue;
+                    for (let instance of entity[property]) {
+                        if (!isEntityReference(instance)) continue;
+                        if (instance?.["@id"] && linkedEntities[instance["@id"]]) {
+                            linkedEntities[entity["@id"]] = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // now we can remove everything we couldn't get to
+        for (let i = 0; i < this.graphLength; i++) {
+            let entity = this.crate["@graph"][i];
+            if (entity && !linkedEntities[entity["@id"]]) {
+                let indexRef = this.entityIdIndex[entity["@id"]];
+                delete this.entityIdIndex[entity["@id"]];
+                delete this.reverse[entity["@id"]];
+                this.crate["@graph"][indexRef] = undefined;
             }
         }
     }
@@ -1352,32 +1582,39 @@ const cm = new CrateManager({ crate })
 let crate = cm.exportCrate()
 
      */
-    exportCrate() {
+    exportCrate(): NormalisedCrate {
         const t0 = performance.now();
         // const crate = structuredClone(this.crate);
 
         let entities = this.crate["@graph"]
-            .filter((e) => e)
+            .filter((e) => {
+                return !isUndefined(e);
+            })
             .map((e) => {
-                e = structuredClone(e);
-                e["@reverse"] = structuredClone(this.reverse[e["@id"]]);
-                for (let p of Object.keys(e)) {
-                    if (p === "@reverse") {
-                        for (let rp of Object.keys(e["@reverse"])) {
-                            if (isArray(e[p][rp]) && e[p][rp].length === 1) e[p][rp] = e[p][rp][0];
+                const entity = structuredClone(e);
+                entity["@reverse"] = structuredClone(this.reverse[e["@id"]]) as {
+                    [key: string]: { "@id": string }[];
+                };
+
+                for (let property of Object.keys(entity)) {
+                    if (property === "@reverse") {
+                        for (let rp of Object.keys(entity["@reverse"])) {
+                            if (isArray(entity[property][rp]) && entity[property][rp].length === 1)
+                                entity[property][rp] = entity[property][rp][0];
                         }
                     } else {
-                        if (isArray(e[p]) && e[p].length === 1) e[p] = e[p][0];
+                        if (isArray(entity[property]) && entity[property].length === 1)
+                            entity[property] = entity[property][0];
                     }
                 }
-                return e;
+                return entity;
             });
 
-        const context = this.getContext();
+        const context: NormalisedContext = this.getContext();
         const crate = {
             "@context": context.length === 1 ? context[0] : context,
             "@graph": entities,
-        };
+        } as NormalisedCrate;
         const t1 = performance.now();
         console.debug(`Crate export: ${round(t1 - t0, 1)}ms`);
         // console.log(JSON.stringify(this.crate, null, 2));
@@ -1403,7 +1640,13 @@ let entity = cm.exportEntityTemplate({ id: '#person' })
 let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
 
      */
-    exportEntityTemplate({ id, resolveDepth = 0 }) {
+    exportEntityTemplate({
+        id,
+        resolveDepth = 0,
+    }: {
+        id: string;
+        resolveDepth: number;
+    }): NormalisedEntityDefinition {
         if (![0, 1].includes(resolveDepth)) {
             throw new Error(`resolveDepth can only be 0 or 1`);
         }
@@ -1413,20 +1656,18 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
         for (let property of Object.keys(entity)) {
             if (this.coreProperties.includes(property)) continue;
 
-            entity[property] = entity[property]
-                .map((value) => {
-                    if (value?.["@id"]) {
-                        if (resolveDepth === 0) return undefined;
-                        let linkedIndexRef = this.entityIdIndex[value["@id"]];
-                        let linkedEntity = structuredClone(this.crate["@graph"][linkedIndexRef]);
-                        linkedEntity = this.__removeAssociations(linkedEntity);
-                        delete linkedEntity["@reverse"];
-                        return linkedEntity;
-                    } else {
-                        return value;
-                    }
-                })
-                .map((v) => v);
+            entity[property] = entity[property].map((value: EntityReference) => {
+                if (value?.["@id"]) {
+                    if (resolveDepth === 0) return undefined;
+                    let linkedIndexRef = this.entityIdIndex[value["@id"]];
+                    let linkedEntity = structuredClone(this.crate["@graph"][linkedIndexRef]);
+                    linkedEntity = this.__removeAssociations(linkedEntity);
+                    delete linkedEntity["@reverse"];
+                    return linkedEntity;
+                } else {
+                    return value;
+                }
+            });
             entity[property] = compact(entity[property]);
             if (entity[property].length === 0) {
                 delete entity[property];
@@ -1444,7 +1685,7 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
      * @returns { errors }
      *
      */
-    getErrors() {
+    getErrors(): errorsInterface {
         return this.errors;
     }
 
@@ -1453,11 +1694,11 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
      *
      * @returns { warnings }
      */
-    getWarnings() {
+    getWarnings(): warningsInterface {
         return this.warnings;
     }
 
-    __updateContext({ name, id }) {
+    __updateContext({ name, id }: { name: string; id?: string }): void {
         if (id && !(id in this.contextDefinitions)) {
             // the property or class isn't defined in the context
             //   add it in the definitions for lookups later
@@ -1475,17 +1716,17 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
      * @param {*} context
      * @returns context
      */
-    __normaliseContext(context) {
+    __normaliseContext(context: UnverifiedContext): NormalisedContext {
         context = [].concat(context);
         let entries = {};
         for (let entry of context) {
             if (isPlainObject(entry)) entries = { ...entries, ...entry };
         }
-        context = context.filter((e) => isString(e));
+        context = context.filter((e: string | {}) => isString(e));
         if (!isEmpty(entries)) context = [...context, entries];
         return context;
     }
-    __storeEntityType(entity) {
+    __storeEntityType(entity: NormalisedEntityDefinition): void {
         // store the entity type for lookups by type
         entity["@type"].forEach((type) => {
             if (!this.entityTypes[type]) {
@@ -1495,15 +1736,15 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
             }
         });
     }
-    __removeEntityType(entity) {
+    __removeEntityType(entity: NormalisedEntityDefinition) {
         // update the entity type's store
         entity["@type"].forEach((type) => {
             this.entityTypes[type] -= 1;
             if (this.entityTypes[type] === 0) delete this.entityTypes[type];
         });
     }
-    __collectAllDefinitions(context) {
-        let definitions = {};
+    __collectAllDefinitions(context: NormalisedContext): { [key: string]: boolean } {
+        let definitions: { [key: string]: boolean } = {};
 
         for (let entry of context) {
             if (isString(entry)) {
@@ -1515,31 +1756,42 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
                     definitions[entry] = true;
                 }
             } else if (isPlainObject(entry)) {
-                for (let e of Object.entries(entry)) {
-                    definitions[e[1]] = true;
+                for (let [key, value] of Object.entries(entry)) {
+                    definitions[value as string] = true;
                 }
             }
         }
         // console.log(definitions);
         return definitions;
     }
-    __setError(error, entity) {
-        let errorPath = error === "init" ? "messages" : "entity";
-        this.errors[error][errorPath].push(entity);
+    __setError(error: keyof typeof this.errors, entity: string | UnverifiedEntityDefinition) {
+        if (error === "init") {
+            this.errors.init.messages.push(entity as string);
+        } else if (error in this.errors) {
+            (this.errors[error] as any).entity.push(entity as UnverifiedEntityDefinition);
+        }
         this.errors.hasError = true;
     }
-    __setWarning(warning, entity) {
-        this.warnings[warning].entity.push(entity);
+    __setWarning(warning: keyof typeof this.warnings, entity: string | UnverifiedEntityDefinition) {
+        if (warning in this.warnings) {
+            (this.warnings[warning] as any).entity.push(entity as UnverifiedEntityDefinition);
+        }
         this.warnings.hasWarning = true;
     }
-    __materialiseEntity({ id }) {
+    __materialiseEntity({ id }: { id: string }): NormalisedEntityDefinition {
         return {
             "@id": id,
             "@type": isURL(id) ? ["URL"] : ["Thing"],
             name: id,
-        };
+        } as NormalisedEntityDefinition;
     }
-    __confirmNoClash({ entity, mintNewId = true }) {
+    __confirmNoClash({
+        entity,
+        mintNewId = true,
+    }: {
+        entity: NormalisedEntityDefinition;
+        mintNewId?: boolean;
+    }): NormalisedEntityDefinition | boolean {
         // if it looks like the root dataset - throw an error
         //  can't have multiple root datasets
         if (entity["@id"] === "./") {
@@ -1577,7 +1829,7 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
             }
         }
     }
-    __updateEntityId({ oldId, newId }) {
+    __updateEntityId({ oldId, newId }: { oldId: string; newId: string }) {
         if (!oldId) throw new Error(`You must provide the id to change: oldId`);
         if (!newId) throw new Error(`You must provide the id for the change: newId`);
         // get the original entity and see if we can set this new id on it
@@ -1594,9 +1846,31 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
         //  to find what it links to. For each of those, set the reverse link to the new id
         indexRef = this.entityIdIndex[oldId];
         let oe = this.crate["@graph"][indexRef];
-        for (let [property, instances] of Object.entries(oe)) {
+        for (let [property, instances] of Object.entries(oe as NormalisedEntityDefinition)) {
             if (this.coreProperties.includes(property)) continue;
-            for (let instance of instances) {
+            // for (let instance of instances) {
+            //     if (instance?.["@id"]) {
+            //         // console.log(
+            //         //     "FORWARD LINKED ENTITY BEFORE",
+            //         //     property,
+            //         //     this.reverse[instance["@id"]][property]
+            //         // );
+            //         this.reverse[instance["@id"]][property].push({ "@id": entity["@id"] });
+            //         this.reverse[instance["@id"]][property] = this.reverse[instance["@id"]][
+            //             property
+            //         ].filter((i) => i["@id"] !== oldId);
+            //         this.reverse[instance["@id"]][property] = uniqBy(
+            //             this.reverse[instance["@id"]][property],
+            //             "@id"
+            //         );
+            //         // console.log(
+            //         //     "FORWARD LINKED ENTITY AFTER",
+            //         //     property,
+            //         //     this.reverse[instance["@id"]][property]
+            //         // );
+            //     }
+            // }
+            (instances as []).forEach((instance: EntityReference) => {
                 if (instance?.["@id"]) {
                     // console.log(
                     //     "FORWARD LINKED ENTITY BEFORE",
@@ -1606,7 +1880,7 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
                     this.reverse[instance["@id"]][property].push({ "@id": entity["@id"] });
                     this.reverse[instance["@id"]][property] = this.reverse[instance["@id"]][
                         property
-                    ].filter((i) => i["@id"] !== oldId);
+                    ].filter((i: EntityReference) => i["@id"] !== oldId);
                     this.reverse[instance["@id"]][property] = uniqBy(
                         this.reverse[instance["@id"]][property],
                         "@id"
@@ -1617,31 +1891,48 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
                     //     this.reverse[instance["@id"]][property]
                     // );
                 }
-            }
+            });
         }
 
         // walk the reverse links from this entity and update the forrward links
         // now walk the reverse links of the entity to update the references to it
         if (this.reverse[oldId]) {
             for (let [property, links] of Object.entries(this.reverse[oldId])) {
-                for (let link of links) {
+                // for (let link of links) {
+                //     let linkIndexRef = this.entityIdIndex[link["@id"]];
+                //     let linkedEntity = this.crate["@graph"][linkIndexRef];
+
+                //     // console.log("REVERSE LINKED ENTITY BEFORE", property, linkedEntity[property]);
+                //     linkedEntity[property].push({ "@id": entity["@id"] });
+                //     linkedEntity[property] = linkedEntity[property].filter(
+                //         (i) => i["@id"] !== oldId
+                //     );
+                //     // console.log("REVERSE LINKED ENTITY AFTER", property, linkedEntity[property]);
+                // }
+                (links as []).forEach((link: EntityReference) => {
                     let linkIndexRef = this.entityIdIndex[link["@id"]];
                     let linkedEntity = this.crate["@graph"][linkIndexRef];
 
-                    // console.log("REVERSE LINKED ENTITY BEFORE", property, linkedEntity[property]);
-                    linkedEntity[property].push({ "@id": entity["@id"] });
-                    linkedEntity[property] = linkedEntity[property].filter(
-                        (i) => i["@id"] !== oldId
-                    );
+                    if (
+                        linkedEntity &&
+                        linkedEntity[property] &&
+                        Array.isArray(linkedEntity[property])
+                    ) {
+                        // console.log("REVERSE LINKED ENTITY BEFORE", property, linkedEntity[property]);
+                        linkedEntity[property].push({ "@id": entity["@id"] } as EntityReference);
+                        linkedEntity[property] = linkedEntity[property].filter((i) => {
+                            if (isEntityReference(i)) return i["@id"] !== oldId;
+                        });
+                    }
                     // console.log("REVERSE LINKED ENTITY AFTER", property, linkedEntity[property]);
-                }
+                });
             }
         }
 
         // now we can update the original entity in the graph
         // set the new id on the entity itself
         indexRef = this.entityIdIndex[oldId];
-        this.crate["@graph"][indexRef]["@id"] = entity["@id"];
+        (this.crate["@graph"][indexRef] as EntityReference)["@id"] = entity["@id"];
         // console.log("NEW ENTITY IN GRAPH", JSON.stringify(this.crate["@graph"][indexRef], null, 2));
 
         // update the index ref's
@@ -1674,13 +1965,23 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
         // console.log("");
         // console.log(JSON.stringify(this.entityIdIndex, null, 2));
     }
-    __addReverse({ id, property, value }) {
+    __addReverse({
+        id,
+        property,
+        value,
+    }: {
+        id: string;
+        property: string;
+        value: EntityReference;
+    }) {
         const linkIndexRef = this.entityIdIndex[value["@id"]];
 
         if (linkIndexRef) {
             if (!this.reverse[value["@id"]][property]) this.reverse[value["@id"]][property] = [];
 
-            let links = this.reverse[value["@id"]][property].map((l) => l["@id"]);
+            let links = this.reverse[value["@id"]][property].map(
+                (l: EntityReference) => l?.["@id"]
+            );
             if (!links.includes(id)) {
                 this.reverse[value["@id"]][property].push({ "@id": id });
             }
@@ -1691,12 +1992,20 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
             // );
         }
     }
-    __removeAssociations(entity) {
+    __removeAssociations(entity: NormalisedEntityDefinition): NormalisedEntityDefinition {
         for (let property of Object.keys(entity)) {
             if (this.coreProperties.includes(property)) continue;
-            entity[property] = entity[property].filter((value) => !value?.["@id"]);
+            entity[property] = entity[property].filter((value) => {
+                if (isEntityReference(value)) return !value["@id"];
+            });
             if (!entity[property].length) delete entity[property];
         }
         return entity;
     }
+}
+
+function isEntityReference(obj: any): obj is EntityReference {
+    return (
+        typeof obj === "object" && obj !== null && "@id" in obj && typeof obj["@id"] === "string"
+    );
 }

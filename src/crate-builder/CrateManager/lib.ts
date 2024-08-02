@@ -8,9 +8,10 @@ import { isURL as validatorIsURL } from "validator";
 import { validateId } from "./validate-identifier";
 import type {
     UnverifiedEntityDefinition,
-    PartiallyVerifiedEntityDefinition,
     NormalisedEntityDefinition,
+    EntityReference,
 } from "../../types.js";
+import { isEmpty } from "lodash";
 
 export const urlProtocols = ["http", "https", "ftp", "ftps"];
 
@@ -46,43 +47,76 @@ export function normalise(
     if (!isString(entity["@type"]) && !isArray(entity["@type"]) && !isUndefined(entity["@type"])) {
         throw new Error(`'@type' property must be a string or an array or not defined at all`);
     }
+    if (!isString(entity["@id"]) && !isUndefined(entity["@id"] && !isNull(entity["@id"]))) {
+        throw new Error(`'@id' property must be a string or not defined at all`);
+    }
+
+    const normalisedEntity: NormalisedEntityDefinition = {
+        "@id": "",
+        "@type": "",
+        name: "",
+    };
+
     if (isUndefined(entity["@id"]) || isNull(entity["@id"])) {
         // set it to the generated id
-        entity["@id"] = `#e${i}`;
-    } else if (!isString(entity["@id"])) {
-        throw new Error(`'@id' property must be a string`);
+        normalisedEntity["@id"] = `#e${i}`;
+    } else {
+        normalisedEntity["@id"] = isEncoded(entity["@id"])
+            ? entity["@id"]
+            : encodeURI(entity["@id"]);
     }
 
     //  normalise the entity['@type']
-    entity = normaliseEntityType({ entity });
+    normalisedEntity["@type"] = normaliseEntityType({ entity });
 
     // if it's a dataset, ensure the @id ends with /
-    if (entity["@type"].includes("Dataset") && entity["@id"].slice(-1) !== "/") {
-        entity["@id"] = `${entity["@id"]}/`;
+    if (
+        normalisedEntity["@type"].includes("Dataset") &&
+        normalisedEntity["@id"].slice(-1) !== "/"
+    ) {
+        normalisedEntity["@id"] = `${normalisedEntity["@id"]}/`;
     }
 
     // there is an @id - is it valid?
-    // @ts-ignore
-    let { isValid } = validateId({ id: entity["@id"], type: entity["@type"] });
-    // @ts-ignore
-    if (!isValid) entity["@id"] = `#${encodeURI(entity["@id"])}`;
+    let { isValid, message } = validateId({
+        id: normalisedEntity["@id"],
+        type: normalisedEntity["@type"],
+    });
+    if (
+        !isValid &&
+        message ===
+            "The identifier is not valid according to the RO Crate spec nor is it a valid IRI."
+    ) {
+        // set the id to an internal reference
+        normalisedEntity["@id"] = `#${normalisedEntity["@id"]}`;
+    }
 
     // is there a name?
-    // @ts-ignore
-    if (!entity.name) entity.name = entity["@id"].replace(/^#/, "");
+    normalisedEntity.name = entity.name ? entity.name : normalisedEntity["@id"].replace(/^#/, "");
 
     // if the name is an array join it back into a string
-    if (isArray(entity.name)) entity.name = entity.name.join(" ");
+    if (isArray(normalisedEntity.name)) normalisedEntity.name = normalisedEntity.name.join(" ");
 
-    // @ts-ignore
-    return entity;
+    // set all properties other than core prop's to array
+    //  and remove any rubbish: undefined, null and empty
+    for (let property of Object.keys(entity)) {
+        if (["@id", "@type", "name", "@reverse"].includes(property)) continue;
+
+        // set property data as array
+        let propertyData = Array.isArray(entity[property]) ? entity[property] : [entity[property]];
+
+        // iterate over the property data
+        normalisedEntity[property] = propertyData.filter((entry) => {
+            // remove rubbish
+            return !isUndefined(entry) && !isNull(entry) && !isEmpty(entry);
+        });
+        if (!normalisedEntity[property].length) delete normalisedEntity[property];
+    }
+
+    return normalisedEntity;
 }
 
-export function normaliseEntityType({
-    entity,
-}: {
-    entity: UnverifiedEntityDefinition;
-}): PartiallyVerifiedEntityDefinition {
+export function normaliseEntityType({ entity }: { entity: UnverifiedEntityDefinition }): string[] {
     let type: string[];
 
     if (!entity["@type"]) {
@@ -98,10 +132,7 @@ export function normaliseEntityType({
         type = ["Thing"];
     }
 
-    return {
-        ...entity,
-        "@type": type,
-    };
+    return type;
 }
 
 /**
@@ -128,4 +159,10 @@ export function mintNewCrate() {
             },
         ],
     };
+}
+
+function isEncoded(uri: string) {
+    uri = uri || "";
+
+    return uri !== decodeURIComponent(uri);
 }

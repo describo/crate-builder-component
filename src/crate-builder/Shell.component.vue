@@ -28,9 +28,9 @@ import {
 } from "vue";
 import { crateManagerKey, profileManagerKey, lookupsKey } from "./RenderEntity/keys.js";
 import isEmpty from "lodash-es/isEmpty.js";
-import isFunction from "lodash-es/isFunction.js";
-import { CrateManager } from "./CrateManager/crate-manager.js";
-import { ProfileManager } from "./CrateManager/profile-manager.js";
+import isFunction from "lodash-es/isFunction";
+import { CrateManager } from "./CrateManager/crate-manager";
+import { ProfileManager } from "./CrateManager/profile-manager";
 import { $t, i18next } from "./i18n";
 import { useStateStore } from "./store.js";
 import { createPinia } from "pinia";
@@ -193,10 +193,10 @@ async function init() {
 
     // update the crate and profile managers
     cm.value = new CrateManager({
-        crate: structuredClone(toRaw(props.crate)),
+        crate: toRaw(props.crate),
         entityTimestamps: props.enableEntityTimestamps,
     });
-    pm.value = new ProfileManager({ profile: structuredClone(toRaw(props.profile)) ?? {} });
+    pm.value = new ProfileManager({ profile: props.profile ?? {} });
     if (pm.value.content) cm.value.setContext(pm.value.context);
     cm.value.setProfileManager(pm.value);
 

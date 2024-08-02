@@ -288,7 +288,7 @@ import RenderEntityPropertyComponent from "./RenderEntityProperty.component.vue"
 import RenderReverseConnectionsComponent from "./RenderReverseConnections.component.vue";
 import RenderControlsComponent from "./RenderControls.component.vue";
 import { isURL } from "../CrateManager/lib";
-import { applyLayout } from "./layout.js";
+import { applyLayout } from "./layout";
 import { useStateStore } from "../store.js";
 const state = useStateStore();
 

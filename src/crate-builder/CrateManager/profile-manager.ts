@@ -10,6 +10,12 @@ import compact from "lodash-es/compact";
 import uniq from "lodash-es/uniq";
 import uniqBy from "lodash-es/uniqBy";
 import intersection from "lodash-es/intersection";
+import type {
+    NormalisedProfile,
+    NormalisedEntityDefinition,
+    ProfileLayout,
+    ProfileInput,
+} from "../../types";
 
 /**
  * @class
@@ -19,7 +25,8 @@ import intersection from "lodash-es/intersection";
  * @description A class to work with Describo Profiles
  */
 export class ProfileManager {
-    constructor({ profile }) {
+    profile: NormalisedProfile;
+    constructor({ profile }: { profile: NormalisedProfile }) {
         this.profile = profile;
     }
     /**
@@ -31,7 +38,7 @@ export class ProfileManager {
      * @param { Object } options.entity - the entity whose layout is required
      *
      */
-    getLayout({ entity }) {
+    getLayout({ entity }: { entity: NormalisedEntityDefinition }): ProfileLayout | null {
         // no layout defined in profile
         if (!this.profile.layouts || !this.profile.layouts.length) return null;
         let layouts = this.profile.layouts;
@@ -43,17 +50,17 @@ export class ProfileManager {
         if (!layout.length) return null;
 
         // match found - make sure it has about and overflow placeholders
-        layout = layout[0];
-        if (!layout.about) {
-            layout.about = {
+        let firstMatchingLayout = layout[0];
+        if (!firstMatchingLayout.about) {
+            firstMatchingLayout.about = {
                 name: "about",
                 label: "About",
                 inputs: [],
                 order: 0,
             };
         }
-        if (!layout.overflow) {
-            layout.overflow = {
+        if (!firstMatchingLayout.overflow) {
+            firstMatchingLayout.overflow = {
                 name: "overflow",
                 label: "...",
                 inputs: [],
@@ -62,17 +69,17 @@ export class ProfileManager {
         }
 
         // return it
-        return layout;
+        return firstMatchingLayout;
     }
 
     /**
      * Get inverse associations from the profile if any are defined
      */
-    getPropertyAssociations() {
+    getPropertyAssociations(): { [key: string]: { property: string; propertyId: string } } {
         if (!this.profile?.propertyAssociations) return {};
 
         // create the associations both ways and return
-        const associations = {};
+        const associations: { [key: string]: { property: string; propertyId: string } } = {};
         this.profile.propertyAssociations.forEach((a) => {
             associations[a.property] = a.inverse;
             associations[a.inverse.property] = { property: a.property, propertyId: a.propertyId };
@@ -105,7 +112,7 @@ export class ProfileManager {
      *
      *
      */
-    getEntityTypeHierarchy({ entity }) {
+    getEntityTypeHierarchy({ entity }: { entity: NormalisedEntityDefinition }) {
         let types = entity["@type"];
         types = this.mapTypeHierarchies({ types });
         return types;
@@ -121,34 +128,36 @@ export class ProfileManager {
      * @param { Object } options.entity - the entity this property is a part of
      *
      */
-    getPropertyDefinition({ property, entity }) {
-        let propertyDefinition;
+    getPropertyDefinition({
+        property,
+        entity,
+    }: {
+        property: string;
+        entity: NormalisedEntityDefinition;
+    }) {
+        let propertyDefinition = {} as ProfileInput;
         let inputs = this.getInputsFromProfile({ entity });
         if (inputs.length) {
             // we found an entity definition in the profile - do we have a property definition?
-            propertyDefinition = inputs.filter(
-                (p) => p.name.toLowerCase() === property.toLowerCase()
-            );
-            if (propertyDefinition.length) {
+            let definition = inputs.filter((p) => p.name.toLowerCase() === property.toLowerCase());
+            if (definition.length) {
                 // console.debug(
                 //     "PROFILE property definition:",
                 //     JSON.stringify(propertyDefinition, null, 2)
                 // );
-                propertyDefinition = cloneDeep(propertyDefinition[0]);
+                propertyDefinition = cloneDeep(definition[0]);
             }
         }
         // unable to locate a property definition in the profile - look in schema.org
         if (isEmpty(propertyDefinition)) {
             let { inputs } = this.getAllInputs({ entity });
-            propertyDefinition = inputs.filter(
-                (p) => p.name.toLowerCase() === property.toLowerCase()
-            );
-            if (propertyDefinition.length) {
+            let definition = inputs.filter((p) => p.name.toLowerCase() === property.toLowerCase());
+            if (definition.length) {
                 // console.debug(
                 //     "SCHEMA ORG property definition:",
                 //     JSON.stringify(propertyDefinition, null, 2)
                 // );
-                propertyDefinition = cloneDeep(propertyDefinition[0]);
+                propertyDefinition = cloneDeep(definition[0]);
             }
         }
 
@@ -159,6 +168,8 @@ export class ProfileManager {
             //     JSON.stringify(propertyDefinition, null, 2)
             // );
             propertyDefinition = {
+                id: "",
+                name: "",
                 type: ["Text"],
                 help: "",
                 multiple: true,
@@ -168,7 +179,7 @@ export class ProfileManager {
         if (!isArray(propertyDefinition.type)) {
             propertyDefinition.type = [propertyDefinition.type];
         }
-        if (!has(propertyDefinition, "multiple")) propertyDefinition.mutliple = true;
+        if (!has(propertyDefinition, "multiple")) propertyDefinition.multiple = true;
 
         return { propertyDefinition };
     }
@@ -178,7 +189,7 @@ export class ProfileManager {
      * Given a set of types, figure out the type hierarchy taking into account
      *  the parent types that this is a subClassOf
      */
-    mapTypeHierarchies({ types }) {
+    mapTypeHierarchies({ types }: { types: string[] }) {
         types = cloneDeep(types);
         if (!types.includes("Thing")) types.push("Thing");
 
@@ -187,26 +198,15 @@ export class ProfileManager {
 
         types = flattenDeep(
             types.map((type) => {
-                return [type, schemaOrgTypeDefinitions[type]?.hierarchy ?? ["Thing"]];
+                return [
+                    type,
+                    (schemaOrgTypeDefinitions as { [key: string]: { hierarchy: string[] } })[type]
+                        ?.hierarchy ?? ["Thing"],
+                ];
             })
         );
         types = uniq(types);
         return types;
-        // types = flattenDeep(
-        //     types.map((type) => {
-        //         if (schemaOrgTypeDefinitions[type]?.subClassOf.length) {
-        //             return [
-        //                 type,
-        //                 this.mapTypeHierarchies({
-        //                     types: schemaOrgTypeDefinitions[type]?.subClassOf,
-        //                 }),
-        //             ];
-        //         } else {
-        //             return type;
-        //         }
-        //     })
-        // );
-        // return uniq(types);
     }
 
     /**
@@ -217,10 +217,10 @@ export class ProfileManager {
      * @param { Object } options.entity - the entity
      *
      */
-    getInputsFromProfile({ entity }) {
+    getInputsFromProfile({ entity }: { entity: NormalisedEntityDefinition }): ProfileInput[] {
         let types = entity["@type"];
 
-        let inputs = [];
+        let inputs: ProfileInput[] = [];
         for (let type of types) {
             if (this.profile?.classes?.[type]) {
                 //   yes - get it
@@ -248,10 +248,28 @@ export class ProfileManager {
      * @param { Object } options
      * @param { Object } options.entity - the entity
      */
-    getAllInputs({ entity }) {
-        getInputs = getInputs.bind(this);
+    getAllInputs({ entity }: { entity: NormalisedEntityDefinition }): { inputs: ProfileInput[] } {
+        // let getInputsFunction = getInputs.bind(this);
         const hierarchy = this.getEntityTypeHierarchy({ entity });
         let inputs = [];
+
+        const getInputs = (type: string) => {
+            let inputs = [];
+            if (this.profile?.classes?.[type]) {
+                // type defined in profile - get those inputs
+                inputs.push(this.profile.classes[type].inputs);
+            }
+            if (this.profile?.classes?.[type]?.definition === "inherit") {
+                // profile type definition set to inherit - collect schema.org inputs
+                inputs.push((schemaOrgTypeDefinitions as any)[type].inputs);
+            }
+            if (!this.profile?.classes?.[type]) {
+                // no definition in profile - collect schema.org inputs
+                inputs.push((schemaOrgTypeDefinitions as any)?.[type]?.inputs);
+            }
+            return inputs;
+        };
+
         for (let type of hierarchy) {
             inputs.push(getInputs(type));
         }
@@ -260,23 +278,6 @@ export class ProfileManager {
         inputs = uniqBy(inputs, "id");
         inputs = orderBy(inputs, "name");
         return { inputs };
-
-        function getInputs(type) {
-            let inputs = [];
-            if (this.profile?.classes?.[type]) {
-                // type defined in profile - get those inputs
-                inputs.push(this.profile.classes[type].inputs);
-            }
-            if (this.profile?.classes?.[type]?.definition === "inherit") {
-                // profile type definition set to inherit - collect schema.org inputs
-                inputs.push(schemaOrgTypeDefinitions[type].inputs);
-            }
-            if (!this.profile?.classes?.[type]) {
-                // no definition in profile - collect schema.org inputs
-                inputs.push(schemaOrgTypeDefinitions?.[type]?.inputs);
-            }
-            return inputs;
-        }
     }
 
     /**
@@ -290,7 +291,7 @@ export class ProfileManager {
      * if there's an override then set to override - otherwise inherit
      * be exclusive rather than inclusive
      */
-    getTypeDefinition({ entity }) {
+    getTypeDefinition({ entity }: { entity: NormalisedEntityDefinition }) {
         let types = entity["@type"];
         let directive = types.map((type) => this.profile.classes?.[type]?.definition);
         return directive.includes("override") ? "override" : "inherit";
@@ -301,7 +302,7 @@ export class ProfileManager {
      *
      * @property the type name to localise
      */
-    getTypeLabel(type) {
+    getTypeLabel(type: string) {
         return this.profile?.localisation?.[type] ?? type;
     }
 }

@@ -65,18 +65,18 @@ describe("Test @id's that should be valid", () => {
 });
 describe("Test @id's that should NOT be valid", () => {
     test(`no id passed`, () => {
-        expect(validateId({})).toEqual({ isValid: false });
+        expect(validateId({})).toEqual({ isValid: false, message: "No identifier was provided." });
     });
     test(`aaa should not be valid`, () => {
         expect(validateId({ id: "aaa", type: "Person" }).message).toEqual(
-            "Invalid identifier 'aaa'. See https://describo.github.io/documentation/component/identifiers.html for more information."
+            "The identifier is not valid according to the RO Crate spec nor is it a valid IRI."
         );
     });
     test(`32a423d6-52ab-47e3-a9cd-54f418a48571 should not be valid`, () => {
         expect(
             validateId({ id: "32a423d6-52ab-47e3-a9cd-54f418a48571", type: "Person" }).message
         ).toEqual(
-            `Invalid identifier '32a423d6-52ab-47e3-a9cd-54f418a48571'. See https://describo.github.io/documentation/component/identifiers.html for more information.`
+            `The identifier is not valid according to the RO Crate spec nor is it a valid IRI.`
         );
     });
 });

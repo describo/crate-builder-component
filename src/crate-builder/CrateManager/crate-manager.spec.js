@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeAll, beforeEach, vi } from "vitest";
-import { CrateManager } from "./crate-manager.js";
-import { ProfileManager } from "./profile-manager.js";
+import { CrateManager } from "./crate-manager";
+import { ProfileManager } from "./profile-manager";
 import { readJSON } from "fs-extra";
 import Chance from "chance";
 const chance = Chance();
@@ -24,11 +24,35 @@ describe("Test interacting with the crate", () => {
         let rd = cm.getRootDataset();
         expect(rd["@id"]).toEqual("./");
     });
+    test("normalising contexts with varying shapes", () => {
+        let context = "https://w3id.org/ro/crate/1.1/context";
+        context = cm.__normaliseContext(context);
+        expect(context).toEqual(["https://w3id.org/ro/crate/1.1/context"]);
+
+        context = ["https://w3id.org/ro/crate/1.1/context"];
+        context = cm.__normaliseContext(context);
+        expect(context).toEqual(["https://w3id.org/ro/crate/1.1/context"]);
+
+        context = [
+            "https://w3id.org/ro/crate/1.1/context",
+            { hasPart: "https://schema.org/hasPart" },
+            { schema: "https://schema.org" },
+        ];
+        context = cm.__normaliseContext(context);
+        expect(context).toEqual([
+            "https://w3id.org/ro/crate/1.1/context",
+            {
+                hasPart: "https://schema.org/hasPart",
+                schema: "https://schema.org",
+            },
+        ]);
+    });
     test("get context", () => {
         let context = cm.getContext();
         expect(context).toEqual(["https://w3id.org/ro/crate/1.1/context"]);
     });
     test("set context", () => {
+        let t = "a new thing";
         cm.setContext({});
         expect(cm.getContext()).toEqual([]);
     });
@@ -540,7 +564,7 @@ describe("Test interacting with the crate", () => {
                 value: [],
             });
         } catch (error) {
-            expect(error.message).toEqual(`'@id' property must be a string`);
+            expect(error.message).toEqual(`'@id' property must be a string or not defined at all`);
         }
     });
     test("adding a property to an entity", () => {
@@ -2017,9 +2041,7 @@ describe("Test interacting with the crate", () => {
         });
 
         // ensure we don't clash with pre-existing blank nodes
-        cm = new CrateManager({ crate });
         e = cm.addBlankNode("Relationship");
-
         expect(e).toMatchObject({
             "@id": "_:Relationship3",
             "@type": ["Relationship"],

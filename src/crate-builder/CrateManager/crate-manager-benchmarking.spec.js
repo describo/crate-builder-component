@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeAll, vi } from "vitest";
 
 import { Bench } from "tinybench";
-import { CrateManager } from "./crate-manager.js";
+import { CrateManager } from "./crate-manager";
 import { readJSON } from "fs-extra";
 
 describe.skip("Benchmarking", () => {

@@ -45,29 +45,27 @@ describe("Test urls are correctly identified", () => {
 describe("Test normalising an entity type", () => {
     test(`no type defined - @id = ./`, () => {
         let entity = { "@id": "./" };
-        expect(normaliseEntityType({ entity })).toMatchObject({ "@type": ["Thing"] });
+        expect(normaliseEntityType({ entity })).toMatchObject(["Thing"]);
     });
     test(`no type defined - @id = http://schema.org/person`, () => {
         let entity = { "@id": "http://schema.org/person" };
-        expect(normaliseEntityType({ entity })).toMatchObject({ "@type": ["URL"] });
+        expect(normaliseEntityType({ entity })).toMatchObject(["URL"]);
     });
     test(`type is boolean`, () => {
         let entity = { "@id": "http://schema.org/person", "@type": true };
-        expect(normaliseEntityType({ entity })).toMatchObject({ "@type": ["true"] });
+        expect(normaliseEntityType({ entity })).toMatchObject(["true"]);
     });
     test(`type is number`, () => {
         let entity = { "@id": "http://schema.org/person", "@type": 3 };
-        expect(normaliseEntityType({ entity })).toMatchObject({ "@type": ["3"] });
+        expect(normaliseEntityType({ entity })).toMatchObject(["3"]);
     });
     test(`type is string - 'Dataset'`, () => {
         let entity = { "@id": "http://schema.org/person", "@type": "Dataset" };
-        expect(normaliseEntityType({ entity })).toMatchObject({ "@type": ["Dataset"] });
+        expect(normaliseEntityType({ entity })).toMatchObject(["Dataset"]);
     });
     test(`type is string - 'Dataset, Collection'`, () => {
         let entity = { "@id": "http://schema.org/person", "@type": "Dataset,Collection" };
-        expect(normaliseEntityType({ entity })).toMatchObject({
-            "@type": ["Dataset", "Collection"],
-        });
+        expect(normaliseEntityType({ entity })).toMatchObject(["Dataset", "Collection"]);
     });
 });
 
@@ -87,14 +85,18 @@ describe("Test normalising an entity", () => {
             // @ts-expect-error: Intentionally passing incorrect type for testing
             normalise({ "@id": {} }, 1);
         } catch (error) {
-            expect((error as Error).message).toEqual(`'@id' property must be a string`);
+            expect((error as Error).message).toEqual(
+                `'@id' property must be a string or not defined at all`
+            );
         }
 
         try {
             // @ts-expect-error: Intentionally passing incorrect type for testing
             normalise({ "@id": 3 }, 1);
         } catch (error) {
-            expect((error as Error).message).toEqual(`'@id' property must be a string`);
+            expect((error as Error).message).toEqual(
+                `'@id' property must be a string or not defined at all`
+            );
         }
     });
     test(`reject if @type not defined`, () => {

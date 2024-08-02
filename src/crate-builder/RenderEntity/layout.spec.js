@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeAll, beforeEach, vi } from "vitest";
-import { ProfileManager } from "../CrateManager/profile-manager.js";
-import { applyLayout } from "./layout.js";
+import { ProfileManager } from "../CrateManager/profile-manager";
+import { applyLayout } from "./layout";
 
 describe("Test layout handling", () => {
     test("layout test 1", async () => {

@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeAll, beforeEach, vi } from "vitest";
-import { CrateManager } from "./crate-manager.js";
-import { ProfileManager } from "./profile-manager.js";
+import { CrateManager } from "./crate-manager";
+import { ProfileManager } from "./profile-manager";
 import { readJSON } from "fs-extra";
 import Chance from "chance";
 const chance = Chance();
@@ -15,6 +15,53 @@ describe("Test loading / exporting crate files", () => {
         let cm = new CrateManager({ crate });
         let exportedCrate = cm.exportCrate();
         expect(crate["@graph"].length).toEqual(exportedCrate["@graph"].length);
+    });
+    test("a simple crate file - test id remapping", async () => {
+        let crate = getBaseCrate();
+        crate["@graph"].push({
+            "@id": "./",
+            "@type": "Dataset",
+            name: "root dataset",
+            author: { "@id": "invalid id" },
+        });
+        crate["@graph"].push({
+            "@id": "invalid id",
+            "@type": "Person",
+            name: "person",
+            other: { "@id": "second invalid id" },
+        });
+        crate["@graph"].push({
+            "@id": "second invalid id",
+            "@type": "Person",
+            name: "person",
+        });
+        let cm = new CrateManager({ crate });
+        let exportedCrate = cm.exportCrate();
+        expect(exportedCrate["@graph"]).toMatchObject([
+            {
+                "@id": "ro-crate-metadata.json",
+            },
+            {
+                "@id": "./",
+                author: {
+                    "@id": "#invalid%20id",
+                },
+            },
+            {
+                "@id": "#invalid%20id",
+                other: {
+                    "@id": "#second%20invalid%20id",
+                },
+            },
+            {
+                "@id": "#second%20invalid%20id",
+                "@reverse": {
+                    other: {
+                        "@id": "#invalid%20id",
+                    },
+                },
+            },
+        ]);
     });
     test("a simple crate file with the data in various forms", () => {
         // test 1: @type, name not array
@@ -69,7 +116,7 @@ describe("Test loading / exporting crate files", () => {
             "@id": "./",
             "@type": ["Dataset"],
             name: "something",
-            author: { "@id": "http:/schema.org/something" },
+            author: [{ "@id": "http:/schema.org/something" }],
         });
     });
     test("a simple crate file with root dataset before the root descriptor", async () => {
@@ -116,21 +163,17 @@ describe("Test loading / exporting crate files", () => {
         expect(exportedCrate["@graph"].length).toEqual(7331);
     });
     test("should fail on a crate file without @context", async () => {
-        try {
-            let crateManager = new CrateManager({ crate: {} });
-        } catch (error) {
-            expect(error.message).toEqual(`The crate file does not have a '@context'.`);
-        }
+        let cm = new CrateManager({ crate: {} });
+        expect(cm.getErrors().init).toMatchObject({
+            description: "Errors encountered on crate load. These need to be fixed manually.",
+            messages: ["The crate file does not have a '@context'."],
+        });
     });
-    test("should fail when entities don't have id's", async () => {
+    test("should not fail when entities don't have id's", async () => {
         let crate = getBaseCrate();
         crate = addRootDataset({ crate });
         crate["@graph"].push({});
-        try {
-            let crateManager = new CrateManager({ crate });
-        } catch (error) {
-            expect(error.message).toEqual(`There are problems with this crate.`);
-        }
+        let cm = new CrateManager({ crate });
     });
     test("should fail - no root descriptor", async () => {
         let crate = getBaseCrate();
