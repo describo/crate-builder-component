@@ -1592,9 +1592,10 @@ let crate = cm.exportCrate()
             })
             .map((e) => {
                 const entity = structuredClone(e);
-                entity["@reverse"] = structuredClone(this.reverse[e["@id"]]) as {
-                    [key: string]: { "@id": string }[];
-                };
+                entity["@reverse"] =
+                    (structuredClone(this.reverse[e["@id"]]) as {
+                        [key: string]: { "@id": string }[];
+                    }) ?? {};
 
                 for (let property of Object.keys(entity)) {
                     if (property === "@reverse") {
