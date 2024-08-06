@@ -15,6 +15,7 @@ Leaflet.Marker.prototype.options.icon = DefaultIcon;
 import { reactive, onMounted, onBeforeUnmount, inject } from "vue";
 import { crateManagerKey } from "../RenderEntity/keys.js";
 const cm = inject(crateManagerKey);
+import { wktToGeoJSON } from "@terraformer/wkt";
 
 const props = defineProps({
     entity: { type: Object },
@@ -57,35 +58,44 @@ async function init() {
         }
     ).addTo(map);
 
-    if (entity.geojson) {
-        let geojson = JSON.parse(entity.geojson[0]);
+    // preference WKT in order to be conformant with the spec...
+    if (entity.asWKT) {
         removeExistingLayers();
-
         // we need to give leaflet and vue and the dom a couple seconds before barreling on
         await new Promise((resolve) => setTimeout(resolve, 200));
-        addFeatureGroup({ geoJSON: geojson });
+        let geojsons = entity.asWKT.map((wkt) => wktToGeoJSON(wkt));
+        addFeatureGroup({ geoJSON: geojsons });
+    } else {
+        if (entity.geojson) {
+            let geojson = JSON.parse(entity.geojson[0]);
+            removeExistingLayers();
+            // we need to give leaflet and vue and the dom a couple seconds before barreling on
+            await new Promise((resolve) => setTimeout(resolve, 200));
+            addFeatureGroup({ geoJSON: [geojson] });
+        }
     }
 }
 
-function centerMap() {
-    map.setView([0, 0], 0);
-}
+// function centerMap() {
+//     map.setView([0, 0], 0);
+// }
 
 function removeExistingLayers() {
     layers.forEach((layer) => map.removeLayer(layer));
 }
 
-function addFeatureGroup({ geoJSON, type }) {
+function addFeatureGroup({ geoJSON }) {
     try {
-        let fg = Leaflet.featureGroup([
-            Leaflet.geoJSON(geoJSON, {
-                pointToLayer: function (feature, latlng) {
-                    // return Leaflet.circleMarker(latlng);
-                    return Leaflet.marker(latlng);
-                },
-            }),
-        ]);
-        fg.setStyle({ color: "#000000" });
+        let fg = Leaflet.featureGroup(
+            geoJSON.map((json) =>
+                Leaflet.geoJSON(json, {
+                    pointToLayer: function (feature, latlng) {
+                        return Leaflet.marker(latlng);
+                    },
+                })
+            )
+        );
+        fg.setStyle({ color: "#334155", weight: "2", fill: false });
         fg.addTo(map);
         layers.push(fg);
 
