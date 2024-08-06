@@ -27,7 +27,7 @@ import type {
     EntityReference,
     PrimitiveType,
     NormalisedProfile,
-} from "../../types.d";
+} from "../types.js";
 
 interface errorsInterface {
     hasError: Boolean;

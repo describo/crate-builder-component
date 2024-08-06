@@ -27,5 +27,5 @@
         "allowJs": true,
         "checkJs": true
     },
-    "include": ["src/**/*.ts", "src/types.d.ts"]
+    "include": ["src/**/*.ts", "src/crate-builder/types.d.ts"]
 }

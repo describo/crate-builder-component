@@ -8,7 +8,7 @@ import type {
     ProfileLayout,
     ProfileLayoutGroup,
     NormalisedEntityDefinition,
-} from "../../types";
+} from "../types";
 
 export function applyLayout({
     configuration,

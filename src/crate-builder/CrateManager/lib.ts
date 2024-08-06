@@ -6,7 +6,7 @@ import isUndefined from "lodash-es/isUndefined.js";
 import isNull from "lodash-es/isNull.js";
 import { isURL as validatorIsURL } from "validator";
 import { validateId } from "./validate-identifier";
-import type { UnverifiedEntityDefinition, NormalisedEntityDefinition } from "../../types.js";
+import type { UnverifiedEntityDefinition, NormalisedEntityDefinition } from "../types.js";
 import { isEmpty } from "lodash";
 
 export const urlProtocols = ["http", "https", "ftp", "ftps"];

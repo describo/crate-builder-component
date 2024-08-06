@@ -14,7 +14,7 @@ import type {
     NormalisedEntityDefinition,
     ProfileLayout,
     ProfileInput,
-} from "../../types";
+} from "../types";
 
 /**
  * @class
