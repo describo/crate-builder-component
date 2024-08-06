@@ -520,7 +520,7 @@ entities = cm.getEntities({ query: 'person', type: 'Person', limit: 10 })
                 let etype = isArray(entity["@type"])
                     ? (entity["@type"].join(", ") as string).toLowerCase()
                     : (entity["@type"] as string).toLowerCase();
-                let name = entity.name.toLowerCase();
+                let name = String(entity.name).toLowerCase();
                 if (type && !query) {
                     type = type.toLowerCase();
                     if (etype.match(type)) {
