@@ -1,3 +1,7 @@
+interface state {
+    id: string;
+    [key: string]: any;
+}
 /**
  * @class
  *
@@ -5,9 +9,11 @@
  * @description A class to work with the internal editor state of the component
  */
 export class EditorState {
+    history: { id: string }[];
+    current: number;
     constructor() {
         this.history = [];
-        this.current = undefined;
+        this.current = 0;
     }
 
     /**
@@ -15,7 +21,7 @@ export class EditorState {
      */
     reset() {
         this.history = [];
-        this.current = undefined;
+        this.current = 0;
     }
 
     /**
@@ -26,7 +32,7 @@ export class EditorState {
      * @param {Object} options
      * @param {String} options.id - the id of the entity that is currently displayed
      */
-    push({ id }) {
+    push({ id }: state) {
         if (!id) return;
         if (this.history.length - 1 > this.current) {
             this.history = this.history.slice(0, this.current + 1);
@@ -63,7 +69,7 @@ export class EditorState {
      *
      * @param {Object} an object to be merged into the current entry
      */
-    update(newState) {
+    update(newState: state) {
         this.history[this.current] = { ...this.history[this.current], ...newState };
     }
 
@@ -73,8 +79,8 @@ export class EditorState {
      * @param {Object} object
      * @param {String} object.property - the property to remove from the current entry
      */
-    deleteFromState({ property }) {
-        delete this.history[this.current][property];
+    deleteFromState({ property }: { property: string }) {
+        delete (this.history as any)[this.current][property];
     }
 
     /**
@@ -87,7 +93,7 @@ export class EditorState {
      * @param {String} object.id - the id to replace
      * @param {String} object.newId - the replacement
      */
-    replaceId({ id, newId }) {
+    replaceId({ id, newId }: { id: string; newId: string }) {
         // remove the latest history entry
         //  if we don't do this, we end up with a duplicate
         this.history = this.history.slice(0, -1);
