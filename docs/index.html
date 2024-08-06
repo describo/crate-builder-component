@@ -1,98 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Home - Documentation</title>
-
-    <script src="scripts/prettify/prettify.js"></script>
-    <script src="scripts/prettify/lang-css.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
-</head>
-<body>
-
-<input type="checkbox" id="nav-trigger" class="nav-trigger" />
-<label for="nav-trigger" class="navicon-button x">
-  <div class="navicon"></div>
-</label>
-
-<label for="nav-trigger" class="overlay"></label>
-
-<nav>
-    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="CrateManager.html">CrateManager</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#__normaliseContext">__normaliseContext</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#addBlankNode">addBlankNode</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#addEntity">addEntity</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#addFile">addFile</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#addFileOrFolder">addFileOrFolder</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#addFolder">addFolder</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#deleteAllProperties">deleteAllProperties</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#deleteEntity">deleteEntity</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#deleteProperty">deleteProperty</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#exportCrate">exportCrate</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#exportEntityTemplate">exportEntityTemplate</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#flatten">flatten</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#getContext">getContext</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#getEntities">getEntities</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#getEntity">getEntity</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#getEntityTypes">getEntityTypes</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#getErrors">getErrors</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#getRootDataset">getRootDataset</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#getWarnings">getWarnings</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#ingestAndLink">ingestAndLink</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#linkEntity">linkEntity</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#locateEntity">locateEntity</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#purgeUnlinkedEntities">purgeUnlinkedEntities</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#resolveLinkedEntityAssociations">resolveLinkedEntityAssociations</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#setContext">setContext</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#setProfileManager">setProfileManager</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#setProperty">setProperty</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#unlinkEntity">unlinkEntity</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CrateManager.html#updateProperty">updateProperty</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="EditorState.html">EditorState</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="EditorState.html#back">back</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="EditorState.html#deleteFromState">deleteFromState</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="EditorState.html#forward">forward</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="EditorState.html#latest">latest</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="EditorState.html#push">push</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="EditorState.html#replaceId">replaceId</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="EditorState.html#reset">reset</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="EditorState.html#update">update</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="ProfileManager.html">ProfileManager</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="ProfileManager.html#getAllInputs">getAllInputs</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="ProfileManager.html#getClasses">getClasses</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="ProfileManager.html#getEntityTypeHierarchy">getEntityTypeHierarchy</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="ProfileManager.html#getInputsFromProfile">getInputsFromProfile</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="ProfileManager.html#getLayout">getLayout</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="ProfileManager.html#getPropertyAssociations">getPropertyAssociations</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="ProfileManager.html#getPropertyDefinition">getPropertyDefinition</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="ProfileManager.html#getTypeDefinition">getTypeDefinition</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="ProfileManager.html#getTypeLabel">getTypeLabel</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="ProfileManager.html#mapTypeHierarchies">mapTypeHierarchies</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#isURL">isURL</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#mintNewCrate">mintNewCrate</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#normalise">normalise</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#normaliseEntityType">normaliseEntityType</a></span></li>
-</nav>
-
-<div id="main">
-    
-
-    
-
-
-
-    
-
-
-
-
-
-
-
-
-
-    
-
-
-    <section class="readme">
-        <article><h1 id="crate-builder-component">Crate Builder Component</h1>
+<!DOCTYPE html><html class="default" lang="en"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>@describo/crate-builder-component</title><meta name="description" content="Documentation for @describo/crate-builder-component"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><div class="table-cell" id="tsd-search" data-base="."><div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-search"></use></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div><div class="field"><div id="tsd-toolbar-links"></div></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">@describo/crate-builder-component</a></div><div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><h2>@describo/crate-builder-component</h2></div><div class="tsd-panel tsd-typography"><a id="md:crate-builder-component" class="tsd-anchor"></a><h1 class="tsd-anchor-link">Crate Builder Component<a href="#md:crate-builder-component" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><ul>
+<li><a href="#md:crate-builder-component">Crate Builder Component</a></li>
+<li><a href="#md:documentation">Documentation</a></li>
+<li><a href="#md:api-documentation">API Documentation</a></li>
+<li><a href="#md:developing-the-plugin">Developing the plugin</a>
 <ul>
-<li><a href="#crate-builder-component">Crate Builder Component</a></li>
-<li><a href="#documentation">Documentation</a></li>
-<li><a href="#api-documentation">API Documentation</a></li>
-<li><a href="#developing-the-plugin">Developing the plugin</a>
-<ul>
-<li><a href="#storybook">Storybook</a></li>
-<li><a href="#development-application">Development application</a></li>
+<li><a href="#md:storybook">Storybook</a></li>
+<li><a href="#md:development-application">Development application</a></li>
 </ul>
 </li>
-<li><a href="#building-and-publishing-a-release">Building and publishing a release</a></li>
-<li><a href="#building-and-publishing-api-docs---has-to-be-separate-stage">Building and publishing API docs - has to be separate stage</a></li>
-<li><a href="#repository-structure">Repository structure</a></li>
+<li><a href="#md:building-and-publishing-a-release">Building and publishing a release</a></li>
+<li><a href="#md:building-and-publishing-api-docs---has-to-be-separate-stage">Building and publishing API docs - has to be separate stage</a></li>
+<li><a href="#md:repository-structure">Repository structure</a></li>
 </ul>
 <p>This is the core UI component for assembling an RO-Crate inside Describo. It is a self contained
 VueJS component that can be used inside your app. If you use this component, your app is responsible
 for loading the crate file from the storage layer (or minting a new one if none exists) and saving
 the updated crate back. Your app can also provide a profile to the component and a class to handle
 template lookups.</p>
-<h1 id="documentation">Documentation</h1>
-<p>Comprehensive documentation is available @
-<a href="https://describo.github.io/documentation/component/get-started.html">https://describo.github.io/documentation/component/get-started.html</a></p>
-<h1 id="api-documentation">API Documentation</h1>
-<ul>
+<a id="md:documentation" class="tsd-anchor"></a><h1 class="tsd-anchor-link">Documentation<a href="#md:documentation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><p>Comprehensive documentation is available @
+<a href="https://describo.github.io/docs/component/introduction.html">https://describo.github.io/docs/component/introduction.html</a></p>
+<a id="md:api-documentation" class="tsd-anchor"></a><h1 class="tsd-anchor-link">API Documentation<a href="#md:api-documentation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><ul>
 <li><a href="https://describo.github.io/crate-builder-component/CrateManager.html">CrateManager</a></li>
 <li><a href="https://describo.github.io/crate-builder-component/ProfileManager.html">ProfileManager</a></li>
+<li><a href="https://describo.github.io/crate-builder-component/EditorState.html">EditorState</a></li>
 </ul>
-<h1 id="developing-the-plugin">Developing the plugin</h1>
-<h2 id="storybook">Storybook</h2>
-<p><a href="storybook.js.org/">Storybook</a> is used in this application. When you are just developing the
+<a id="md:developing-the-plugin" class="tsd-anchor"></a><h1 class="tsd-anchor-link">Developing the plugin<a href="#md:developing-the-plugin" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><a id="md:storybook" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Storybook<a href="#md:storybook" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p><a href="storybook.js.org/">Storybook</a> is used in this application. When you are just developing the
 components, storybook is what you want as you can focus just on the component in isolation. To start
 it run:</p>
-<pre class="prettyprint source"><code>npm run storybook
-</code></pre>
-<h2 id="development-application">Development application</h2>
-<p>When you want to see the component in action as a whole, there is a small VueJS app in this
-codebase. To start up the dev environment:</p>
-<pre class="prettyprint source"><code>> docker compose up (starts up an elastic search container for datapack lookups)
-> npm run develop
+<pre><code><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-0">run</span><span class="hl-1"> </span><span class="hl-0">storybook</span>
+</code><button>Copy</button></pre>
 
---> browse to localhost:9000
-</code></pre>
-<h1 id="building-and-publishing-a-release">Building and publishing a release</h1>
-<ul>
+<a id="md:development-application" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Development application<a href="#md:development-application" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>When you want to see the component in action as a whole, there is a small VueJS app in this
+codebase. To start up the dev environment:</p>
+<pre><code><span class="hl-1">&gt; </span><span class="hl-0">docker</span><span class="hl-1"> </span><span class="hl-0">compose</span><span class="hl-1"> </span><span class="hl-2">up</span><span class="hl-1"> (</span><span class="hl-0">starts</span><span class="hl-1"> </span><span class="hl-0">up</span><span class="hl-1"> </span><span class="hl-0">an</span><span class="hl-1"> </span><span class="hl-0">elastic</span><span class="hl-1"> </span><span class="hl-0">search</span><span class="hl-1"> </span><span class="hl-0">container</span><span class="hl-1"> </span><span class="hl-0">for</span><span class="hl-1"> </span><span class="hl-0">datapack</span><span class="hl-1"> </span><span class="hl-0">lookups</span><span class="hl-1">)</span><br/><span class="hl-1">&gt; </span><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-0">run</span><span class="hl-1"> </span><span class="hl-0">develop</span><br/><br/><span class="hl-1">--&gt; </span><span class="hl-0">browse</span><span class="hl-1"> </span><span class="hl-0">to</span><span class="hl-1"> </span><span class="hl-3">localhost</span><span class="hl-1">:</span><span class="hl-4">9000</span>
+</code><button>Copy</button></pre>
+
+<a id="md:building-and-publishing-a-release" class="tsd-anchor"></a><h1 class="tsd-anchor-link">Building and publishing a release<a href="#md:building-and-publishing-a-release" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><ul>
 <li><code>npm run build</code>: This builds the plugin and styles that the react component uses</li>
 <li><code>npm version {minor|patch}</code></li>
 <li><code>git push origin master --tags</code></li>
@@ -102,34 +45,14 @@ codebase. To start up the dev environment:</p>
 <a href="https://github.com/describo/crate-builder-component-react/issues">React component issue tracker</a>
 to inform that a new release of that component needs to be built and published to npm.</li>
 </ul>
-<h1 id="building-and-publishing-api-docs---has-to-be-separate-stage">Building and publishing API docs - has to be separate stage</h1>
-<ul>
+<a id="md:building-and-publishing-api-docs---has-to-be-separate-stage" class="tsd-anchor"></a><h1 class="tsd-anchor-link">Building and publishing API docs - has to be separate stage<a href="#md:building-and-publishing-api-docs---has-to-be-separate-stage" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><ul>
 <li><code>npm run generate-docs</code>: Update the jsdoc documentation</li>
 <li><code>git add . &amp;&amp; git commit -a</code></li>
 <li><code>git push origin master --tags</code></li>
 </ul>
-<h1 id="repository-structure">Repository structure</h1>
-<ul>
+<a id="md:repository-structure" class="tsd-anchor"></a><h1 class="tsd-anchor-link">Repository structure<a href="#md:repository-structure" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><ul>
 <li>The development app is at <code>./src/app</code>. In there you will find the file main.js where we import
 the plugin and wire it into Vue as well as an App.vue file where we load the component.</li>
 <li>The component is at <code>./src/crate-builder</code>.</li>
-</ul></article>
-    </section>
-
-
-
-
-
-
-</div>
-
-<br class="clear">
-
-<footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.3</a> on Sat Jun 29 2024 10:17:57 GMT+1000 (Australian Eastern Standard Time) using the Minami theme.
-</footer>
-
-<script>prettyPrint();</script>
-<script src="scripts/linenumber.js"></script>
-</body>
-</html>
+</ul>
+</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="assets/icons.svg#icon-chevronDown"></use></svg>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="assets/icons.svg#icon-chevronDown"></use></svg>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#md:crate-builder-component"><span>Crate <wbr/>Builder <wbr/>Component</span></a><a href="#md:documentation"><span>Documentation</span></a><a href="#md:api-documentation"><span>API <wbr/>Documentation</span></a><a href="#md:developing-the-plugin"><span>Developing the plugin</span></a><ul><li><a href="#md:storybook"><span>Storybook</span></a></li><li><a href="#md:development-application"><span>Development application</span></a></li></ul><a href="#md:building-and-publishing-a-release"><span>Building and publishing a release</span></a><a href="#md:building-and-publishing-api-docs---has-to-be-separate-stage"><span>Building and publishing API docs -<wbr/> has to be separate stage</span></a><a href="#md:repository-structure"><span>Repository structure</span></a></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="index.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="assets/icons.svg#icon-1"></use></svg><span>@describo/crate-builder-component</span></a><ul class="tsd-small-nested-navigation" id="tsd-nav-container" data-base="."><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>

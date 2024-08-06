@@ -13,7 +13,6 @@ import flattenDeep from "lodash-es/flattenDeep.js";
 import intersection from "lodash-es/intersection.js";
 import compact from "lodash-es/compact.js";
 import isEqual from "lodash-es/isEqual.js";
-import { validateId } from "./validate-identifier.js";
 import { normalise, isURL } from "./lib.js";
 import { toRaw } from "vue";
 import { getContextDefinition } from "./contexts";
@@ -54,9 +53,11 @@ const structuredClone = function (data: any) {
 /**
  * @class
  *
- * @name CrateManager
+ * CrateManager
+ *
+ * A class to work with RO-Crates
+ *
  * @param {crate} - an RO Crate to handle
- * @description A class to work with RO-Crates
  */
 export class CrateManager {
     crate: {
@@ -130,6 +131,8 @@ export class CrateManager {
         // keep track of blank nodes for when we mint new ones
         // this.blankNodes = [ '_:Relationship1', '_:Relationship2', '_:CreateAction1', '_:CreateAction2', ... ]
         this.blankNodes = [];
+
+        this.graphLength = 0;
 
         // entity core properties
         this.coreProperties = ["@id", "@type", "@reverse", "name"];
@@ -349,7 +352,7 @@ export class CrateManager {
     /**
      * Set the context
      *
-     * @description This is equivalent to a profile author setting a context. It gets
+     * This is equivalent to a profile author setting a context. It gets
      *   used as is and data updates going forward do not get dealth with.
      * @param {*} context
      */
@@ -359,7 +362,8 @@ export class CrateManager {
 
     /**
      * Set a profile
-     * @description  CrateManager can set reverse associations if defined in a profile.
+     *
+     * CrateManager can set reverse associations if defined in a profile.
      *
      * */
     setProfileManager(pm: ProfileManagerType) {
@@ -458,7 +462,7 @@ rd = cm.getEntity({ id: './', stub: true })
     }
 
     /**
-     *@generator
+     * @generator
      *
      * @param {Object} params
      * @param {Number} params.limit - how many entities to return
@@ -550,7 +554,7 @@ entities = cm.getEntities({ query: 'person', type: 'Person', limit: 10 })
      *
      * locateEntity
      *
-     * @description Given a set of id's, find the entity or entities that link to all of them.
+     * Given a set of id's, find the entity or entities that link to all of them.
      *  This is really for finding grouping type entities like Relationships and Actions so that
      *  you can augment their description.
      *  @param { object } params
@@ -744,9 +748,9 @@ associations === [
     /**
      * Add an entity to the graph
      *
-     * @param {Object} entity - an entity definition to add to the crate
-     * @description
      *  The entity must have '@id' and '@type' defined.
+     *
+     * @param {Object} entity - an entity definition to add to the crate
      * @returns the entity
      * @example
 
@@ -809,8 +813,8 @@ let r = cm.addEntity(entity);
     /**
      * Add an entity with a blank node id ('_:...') to the graph.
      *
-     * @description Use this when you want to add a non contextual entity to the graph. In thoses
-     *   cases providing an @id and name don't really make sense even though those properties are still required
+     * Use this when you want to add a non contextual entity to the graph. In thoses
+     *   cases providing an `@id` and name don't really make sense even though those properties are still required
      *   therefore this method simplifies the process of adding those entity types. For example,
      *   Actions (e.g. CreateAction), Relationships, GeoShape, GeoCoordinates etc
      *
@@ -843,7 +847,7 @@ r === {
     /**
      * Add files or folders - use addFile or addFolder in preference to this
      *
-     * @description This is a helper method specifically for adding files and folders in the crate. This method
+     * This is a helper method specifically for adding files and folders in the crate. This method
      *   will add the intermediate paths as 'Datasets' (as per the spec) and link everything via the hasPart
      *   property as required. It is assumed that the path is relative to the root of the folder.
      *
@@ -942,7 +946,7 @@ let r = cm.addFileOrFolder('/a/b/c/file.txt);
     /**
      * Add file
      *
-     * @description This is a helper method specifically for adding files to the crate. This method
+     * This is a helper method specifically for adding files to the crate. This method
      *   will add the intermediate paths as 'Datasets' (as per the spec) and link everything via the hasPart
      *   property as required. It is assumed that the path is relative to the root of the folder.
      *
@@ -960,7 +964,7 @@ let r = cm.addFile('/a/b/c/file.txt);
     /**
      * Add folder
      *
-     * @description This is a helper method specifically for adding folders to the crate. This method
+     * This is a helper method specifically for adding folders to the crate. This method
      *   will add the intermediate paths as 'Datasets' (as per the spec) and link everything via the hasPart
      *   property as required. It is assumed that the path is relative to the root of the folder.
      *
@@ -1370,8 +1374,9 @@ let arrayOfObjects = cm.flatten(json)
     /**
      * Link two entities
      *
-     * @description Link two entities via a property. If there is a profile defined
+     * Link two entities via a property. If there is a profile defined
      *      and it has reverse associations, then they will be added.
+     *
      * @param {Object} options
      * @param {string} options.id - the id of the entity to add the association to
      * @param {string} options.property - the property to add the association to
@@ -1418,8 +1423,9 @@ cm.linkEntity({ id: './', property: 'author', value: { '@id': '#e1' }})
     /**
      * Unlink two entities
      *
-     * @description Remove an association between two entities. If there is a profile defined
+     * Remove an association between two entities. If there is a profile defined
      *      and it has reverse associations, then they will be removed as well.
+     *
      * @param {Object} options
      * @param {string} options.id - the id of the entity to remove the association from
      * @param {string} options.property - the property containing the association
@@ -1503,7 +1509,7 @@ cm.unlinkEntity({ id: './', property: 'author', value: { '@id': '#e1' }})
     /**
      * Purge unlinked entities from the crate
      *
-     * @description - clean up the graph and purge any unlinked entities including disconnected subtrees.
+     * Clean up the graph and purge any unlinked entities including disconnected subtrees.
      * @example
 
 const cm = new CrateManager({ crate })
@@ -1623,15 +1629,16 @@ let crate = cm.exportCrate()
     }
 
     /**
+     * exportEntityTemplate
+     *
+     * Export an entity as a template to be reused.
+     *  1. If resolveDepth = 0 then the entity is returned with all associations removed
+     *  2. If resolveDepth = 1 then the entity is returned with one level of associations populated but
+     *    all of their associations will be removed.
      *
      * @param {Object} options
      * @param {String} options.id - the id of the entity to export as a template
      * @param {String} options.resolveDepth - 0 or 1. If 1, linked entities will be joined in
-     * @description
-     *
-     * 1. If resolveDepth = 0 then the entity is returned with all associations removed
-     * 2.  If resolveDepth = 1 then the entity is returned with one level of associations populated but
-     *    all of their associations will be removed.
      *
      * @returns entity
      * @example
@@ -1713,7 +1720,8 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
     /**
      * Normalise context
      *
-     * @description Collapse all objects into a single object
+     * Collapse all objects into a single object
+     *
      * @param {*} context
      * @returns context
      */

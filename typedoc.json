@@ -1,0 +1,11 @@
+{
+    "entryPoints": [
+        "README.md",
+        "./src/types.d.ts",
+        "./src/crate-builder/CrateManager/crate-manager.ts",
+        "./src/crate-builder/CrateManager/profile-manager.ts",
+        "./src/crate-builder/CrateManager/lib.ts",
+        "./src/crate-builder/editor-state.ts"
+    ],
+    "out": "docs"
+}

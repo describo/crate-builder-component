@@ -5,8 +5,10 @@ interface state {
 /**
  * @class
  *
- * @name EditorState
- * @description A class to work with the internal editor state of the component
+ * EditorState
+ *
+ * A class to work with the internal editor state of the component
+ *
  */
 export class EditorState {
     history: { id: string }[];

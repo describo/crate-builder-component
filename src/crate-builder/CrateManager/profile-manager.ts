@@ -1,6 +1,5 @@
 import schemaOrgTypeDefinitions from "./schema-type-definitions.json";
 import isArray from "lodash-es/isArray";
-import isString from "lodash-es/isString";
 import isEmpty from "lodash-es/isEmpty";
 import flattenDeep from "lodash-es/flattenDeep";
 import cloneDeep from "lodash-es/cloneDeep";
@@ -20,9 +19,11 @@ import type {
 /**
  * @class
  *
- * @name ProfileManager
+ * ProfileManager
+ *
+ * A class to work with Describo Profiles
+ *
  * @param {profile} - profile to handle
- * @description A class to work with Describo Profiles
  */
 export class ProfileManager {
     profile: NormalisedProfile;
@@ -33,7 +34,8 @@ export class ProfileManager {
      *
      * Get the layout for an entity from the profile
      *
-     * @description Returns the first matching layout from the profile
+     * Returns the first matching layout from the profile
+     *
      * @param { Object } options
      * @param { Object } options.entity - the entity whose layout is required
      *
@@ -91,7 +93,8 @@ export class ProfileManager {
      *
      * Get the available classes
      *   if a profile is defined, get those
-     * @description Returns the classes defined in the profile if one is applied
+     *
+     * Returns the classes defined in the profile if one is applied
      *   or all of the classes built into the base, schema.org profile
      *
      */
@@ -284,7 +287,7 @@ export class ProfileManager {
      *
      * Try to get a definition from the profile and see if it's override or inherit
      *
-     * @description If there's an override then return override - otherwise inherit. Exclusive rather than inclusive.
+     * If there's an override then return override - otherwise inherit. Exclusive rather than inclusive.
      *
      * @param { Object } options
      * @param { Object } options.entity - the entity

@@ -1,7 +1,7 @@
 // Context setup - load all of the defined contexts
 const modules: {
     [key: string]: string;
-} = import.meta.glob("./contexts/*.jsonld", {
+} = (import.meta as any).glob("./contexts/*.jsonld", {
     eager: true,
     query: "?raw",
     import: "default",
@@ -14,7 +14,6 @@ const contextMappings: { [key: string]: string } = {
     "https://www.researchobject.org/ro-crate/1.1/context.jsonld":
         "https://w3id.org/ro/crate/1.1/context",
     "https://w3id.org/ro/crate/1.1/context": "https://w3id.org/ro/crate/1.1/context",
-
     "https://www.researchobject.org/ro-crate/1.2-DRAFT/context.jsonld":
         "https://w3id.org/ro/crate/1.2-DRAFT/context",
     "https://w3id.org/ro/crate/1.2-DRAFT/context": "https://w3id.org/ro/crate/1.2-DRAFT/context",

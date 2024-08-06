@@ -6,11 +6,7 @@ import isUndefined from "lodash-es/isUndefined.js";
 import isNull from "lodash-es/isNull.js";
 import { isURL as validatorIsURL } from "validator";
 import { validateId } from "./validate-identifier";
-import type {
-    UnverifiedEntityDefinition,
-    NormalisedEntityDefinition,
-    EntityReference,
-} from "../../types.js";
+import type { UnverifiedEntityDefinition, NormalisedEntityDefinition } from "../../types.js";
 import { isEmpty } from "lodash";
 
 export const urlProtocols = ["http", "https", "ftp", "ftps"];
@@ -19,7 +15,7 @@ export const urlProtocols = ["http", "https", "ftp", "ftps"];
  *
  * @param {string} value - string to check as a URL: checks 'http','https','ftp', 'arcp'
  */
-export function isURL(value: string | number | boolean | undefined | null) {
+export function isURL(value: string | number | boolean | undefined | null): boolean {
     if (!value) return false;
     if (isNumber(value)) return false;
     if (isBoolean(value)) return false;
@@ -33,11 +29,11 @@ export function isURL(value: string | number | boolean | undefined | null) {
 }
 
 /**
+ *  This method normalises an entity. It checks that the '@type' is sensible, '@id' is valid and sets the name to the '@id' if not set
  *
  * @param {Object} entity - an entity to normalise
  * @param {string} i - if an id is not defined, then it will be set to #e${i}
- * @descripton
- *  This method normalises an entity. It checks that the '@type' is sensible, '@id' is valid and sets the name to the '@id' if not set
+ *
  * @returns the entity ready for use
  */
 export function normalise(
@@ -141,7 +137,7 @@ export function normaliseEntityType({ entity }: { entity: UnverifiedEntityDefini
  *
  * @returns a skeleton crate ready to be used
  */
-export function mintNewCrate() {
+export function mintNewCrate(): {} {
     return {
         "@context": "https://w3id.org/ro/crate/1.1/context",
         "@graph": [
