@@ -871,6 +871,10 @@ let r = cm.addFileOrFolder('/a/b/c/file.txt);
             throw new Error(`'addFileOrFolder' type must be File or Dataset`);
         }
 
+        // remove preceding / and ./
+        if (path.match(/^\.\//)) path = path.replace(/^\.\//, "");
+        if (path.match(/^\//)) path = path.replace(/^\//, "");
+
         // ensure folders end in '/'
         if (type === "Dataset" && !path.match(/.*\/$/)) {
             path = `${path}/`;
@@ -885,19 +889,19 @@ let r = cm.addFileOrFolder('/a/b/c/file.txt);
         //   the file into the right place
         let paths: string[] = path.split("/").slice(0, -1);
         let i = 0;
-        const entities: NormalisedEntityDefinition[] = paths.map((p) => {
+        const entities = [];
+        for (let p of paths) {
             let entity = {
                 "@id": i > 0 ? `${paths.slice(0, i).join("/")}/${p}/` : `${p}/`,
                 "@type": ["Dataset"],
                 name: i > 0 ? `${paths.slice(0, i).join("/")}/${p}/` : `${p}/`,
             };
             entity["@id"] = encodeURI(entity["@id"]);
-            let normalisedEntity: NormalisedEntityDefinition = this.addEntity(
-                entity as UnverifiedEntityDefinition
-            );
+            if (entity["@id"] === "./") continue;
+            let normalisedEntity = this.addEntity(entity as UnverifiedEntityDefinition);
             i += 1;
-            return normalisedEntity;
-        });
+            entities.push(normalisedEntity);
+        }
         i = 0;
         for (let e of entities) {
             if (i === 0) {
