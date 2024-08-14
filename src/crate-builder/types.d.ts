@@ -202,6 +202,7 @@ export class CrateManagerType {
         stop?: boolean;
     });
     purgeUnlinkedEntities(): void;
+    exportCrate(): NormalisedCrate;
     exportEntityTemplate({
         id,
         resolveDepth = 0,
