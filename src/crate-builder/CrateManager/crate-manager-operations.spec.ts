@@ -1,6 +1,7 @@
 import "regenerator-runtime";
 import { describe, expect, test, beforeAll, vi } from "vitest";
 import { CrateManager } from "./crate-manager";
+import type { UnverifiedCrate } from "../types";
 
 describe("Test loading / exporting crate files", () => {
     beforeAll(() => {
@@ -87,7 +88,6 @@ describe("Test loading / exporting crate files", () => {
                 "@id": "#thebadguys",
             },
         ]);
-        return;
         entities = [...cm.getEntities()];
         // console.log(entities);
         expect(entities).toMatchObject([
@@ -127,9 +127,14 @@ describe("Test loading / exporting crate files", () => {
 
         // set properties
         try {
-            cm.setProperty({ property: "value", value: "value" });
+            cm.setProperty({
+                id: "",
+                property: "value",
+                propertyId: "http://schema.org/value",
+                value: "value",
+            });
         } catch (error) {
-            error.message = `'setProperty' requires 'id'`;
+            (error as Error).message = `'setProperty' requires 'id'`;
         }
         cm.setProperty({ id: "./", property: "data", value: "value" });
         cm.setProperty({ id: "./", property: "data", value: { "@id": "#person1" } });
@@ -274,7 +279,7 @@ describe("Test loading / exporting crate files", () => {
     });
 });
 
-function getBaseCrate() {
+function getBaseCrate(): UnverifiedCrate {
     return {
         "@context": ["https://w3id.org/ro/crate/1.1/context"],
         "@graph": [

@@ -1,13 +1,14 @@
 import { describe, test, expect, beforeAll, vi } from "vitest";
 import { ProfileManager } from "./profile-manager";
+import type { NormalisedEntityDefinition, NormalisedProfile } from "../types";
 
 describe("Test working with profiles", () => {
     beforeAll(() => {
         vi.spyOn(console, "debug").mockImplementation(() => {});
     });
     test("get type definition and inputs from the profile", () => {
-        const profile = {
-            metadata: {},
+        const profile: NormalisedProfile = {
+            metadata: {} as any,
             classes: {
                 Dataset: {
                     definition: "override",
@@ -26,7 +27,7 @@ describe("Test working with profiles", () => {
                 },
             },
         };
-        const entity = { "@type": ["Dataset"] };
+        const entity = { "@type": ["Dataset"] } as NormalisedEntityDefinition;
         const profileManager = new ProfileManager({ profile });
         let inputs = profileManager.getInputsFromProfile({ entity });
         expect(inputs.length).toEqual(1);
@@ -35,8 +36,8 @@ describe("Test working with profiles", () => {
         expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing"]);
     });
     test("get type definition from the profile - handle type Array", () => {
-        const profile = {
-            metadata: {},
+        const profile: NormalisedProfile = {
+            metadata: {} as any,
             classes: {
                 Dataset: {
                     definition: "override",
@@ -55,7 +56,7 @@ describe("Test working with profiles", () => {
                 },
             },
         };
-        const entity = { "@type": ["Dataset"] };
+        const entity = { "@type": ["Dataset"] } as NormalisedEntityDefinition;
         const profileManager = new ProfileManager({ profile });
         let inputs = profileManager.getInputsFromProfile({ entity });
         expect(inputs.length).toEqual(1);
@@ -64,8 +65,8 @@ describe("Test working with profiles", () => {
         expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing"]);
     });
     test("get inputs from the profile - handle type Array", () => {
-        const profile = {
-            metadata: {},
+        const profile: NormalisedProfile = {
+            metadata: {} as any,
             classes: {
                 Dataset: {
                     definition: "override",
@@ -107,7 +108,7 @@ describe("Test working with profiles", () => {
                 },
             },
         };
-        const entity = { "@type": ["Dataset", "Other"] };
+        const entity = { "@type": ["Dataset", "Other"] } as NormalisedEntityDefinition;
         const profileManager = new ProfileManager({ profile });
         let inputs = profileManager.getInputsFromProfile({ entity });
         expect(inputs.length).toEqual(2);
@@ -118,7 +119,7 @@ describe("Test working with profiles", () => {
     test("get type definition - no profile, look in schema.org", () => {
         const profile = undefined;
         const profileManager = new ProfileManager({ profile });
-        const entity = { "@type": ["Dataset"] };
+        const entity = { "@type": ["Dataset"] } as NormalisedEntityDefinition;
         let inputs = profileManager.getInputsFromProfile({ entity });
         expect(inputs.length).toEqual(0);
 
@@ -127,8 +128,8 @@ describe("Test working with profiles", () => {
     });
     test("get type definition - no profile, handle type array, look in schema.org", () => {
         const profile = undefined;
-        const profileManager = new ProfileManager({ profile });
-        const entity = { "@type": ["Dataset"] };
+        const profileManager = new ProfileManager({});
+        const entity = { "@type": ["Dataset"] } as NormalisedEntityDefinition;
         let inputs = profileManager.getInputsFromProfile({ entity });
         expect(inputs.length).toEqual(0);
 
@@ -136,12 +137,12 @@ describe("Test working with profiles", () => {
         expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing"]);
     });
     test("get type definition - none defined in profile", () => {
-        const profile = {
-            metadata: {},
+        const profile: NormalisedProfile = {
+            metadata: {} as any,
             classes: {},
         };
         const profileManager = new ProfileManager({ profile });
-        const entity = { "@type": ["Dataset"] };
+        const entity = { "@type": ["Dataset"] } as NormalisedEntityDefinition;
         let inputs = profileManager.getInputsFromProfile({ entity });
         expect(inputs.length).toEqual(0);
 
@@ -149,56 +150,63 @@ describe("Test working with profiles", () => {
         expect(typeHierarchies).toEqual(["Dataset", "CreativeWork", "Thing"]);
     });
     test("get layout information from profile", () => {
-        const profile = {
-            metadata: {},
+        const profile: NormalisedProfile = {
+            metadata: {} as any,
+            classes: [] as any,
             layouts: [
                 {
                     appliesTo: ["Dataset"],
                     about: {
+                        name: "about",
                         label: "About",
                         description: "",
                     },
                     source: {
+                        name: "Original Source Information",
                         label: "Original Source Information",
                         description: "",
                     },
                     permissions: {
+                        name: "Permissions",
                         label: "Permissions",
                         description: "",
                     },
                     who: {
+                        name: "Who",
                         label: "Who",
                         description: "",
                     },
                     location: {
+                        name: "Location",
                         label: "Location",
                         description: "",
                     },
                     overflow: {
+                        name: "Other",
                         label: "Other",
                     },
                 },
-            ],
+            ] as any,
         };
         const profileManager = new ProfileManager({ profile });
         let layout = profileManager.getLayout({
             entity: { "@id": "#1", "@type": ["Dataset"] },
         });
-        expect(layout).toEqual(profile.layouts[0]);
+        expect(layout).toEqual((profile as any).layouts[0]);
     });
     test("get layout information from profile - no layout", () => {
-        const profile = {
-            metadata: {},
-            hide: {},
-            layouts: {},
+        const profile: NormalisedProfile = {
+            metadata: {} as any,
+            classes: [] as any,
+            layouts: {} as any,
         };
         const profileManager = new ProfileManager({ profile });
         let layout = profileManager.getLayout({ entity: { "@id": "#1", "@type": ["Thing"] } });
         expect(layout).toBe(null);
     });
     test("get property definition - defined in profile", () => {
-        const profile = {
-            metadata: {},
+        const profile: NormalisedProfile = {
+            metadata: {} as any,
             classes: {
                 Dataset: {
                     definition: "override",
@@ -218,7 +226,7 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        const entity = { "@type": ["Dataset"] };
+        const entity = { "@type": ["Dataset"] } as NormalisedEntityDefinition;
         let { propertyDefinition } = profileManager.getPropertyDefinition({
             property: "date",
             entity,
@@ -227,7 +235,7 @@ describe("Test working with profiles", () => {
     });
     test("get property definition - not defined in profile, lookup schema.org", () => {
         const profileManager = new ProfileManager({ profile: undefined });
-        const entity = { "@type": ["Dataset"] };
+        const entity = { "@type": ["Dataset"] } as NormalisedEntityDefinition;
         let { propertyDefinition } = profileManager.getPropertyDefinition({
             property: "dateModified",
             entity,
@@ -236,8 +244,8 @@ describe("Test working with profiles", () => {
         expect(propertyDefinition.type.sort()).toEqual(["Date", "DateTime"]);
     });
     test("get property definition - not defined in profile or schema.org; create default entry", () => {
-        const profile = {
-            metadata: {},
+        const profile: NormalisedProfile = {
+            metadata: {} as any,
             classes: {
                 Dataset: {
                     definition: "override",
@@ -257,7 +265,7 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        const entity = { "@type": ["Dataset"] };
+        const entity = { "@type": ["Dataset"] } as NormalisedEntityDefinition;
         let { propertyDefinition } = profileManager.getPropertyDefinition({
             property: "mojumbo",
             entity,
@@ -265,8 +273,8 @@ describe("Test working with profiles", () => {
         expect(propertyDefinition.type).toEqual(["Text"]);
     });
     test("get type hierarchy - type defined in profile, assume schema.org subClass", () => {
-        const profile = {
-            metadata: {},
+        const profile: NormalisedProfile = {
+            metadata: {} as any,
             classes: {
                 Dataset: {
                     definition: "override",
@@ -290,8 +298,8 @@ describe("Test working with profiles", () => {
         expect(types).toEqual(["Dataset", "CreativeWork", "Thing"]);
     });
     test("get type hierarchy - type defined in profile with subClass", () => {
-        const profile = {
-            metadata: {},
+        const profile: NormalisedProfile = {
+            metadata: {} as any,
             classes: {
                 Dataset: {
                     definition: "override",
@@ -315,8 +323,8 @@ describe("Test working with profiles", () => {
         expect(types).toEqual(["Dataset", "CreativeWork", "Thing", "NoSuchEntity"]);
     });
     test("get type hierarchy - type not defined in profile or schema.org", () => {
-        const profile = {
-            metadata: {},
+        const profile: NormalisedProfile = {
+            metadata: {} as any,
             classes: {
                 Children: {
                     definition: "override",
@@ -330,8 +338,8 @@ describe("Test working with profiles", () => {
         expect(types).toEqual(["Children", "Thing"]);
     });
     test("get inputs for type defined in profile - no subClass in profile, definition override", () => {
-        const profile = {
-            metadata: {},
+        const profile: NormalisedProfile = {
+            metadata: {} as any,
             classes: {
                 Thing: {
                     definition: "override",
@@ -352,14 +360,17 @@ describe("Test working with profiles", () => {
         };
         const profileManager = new ProfileManager({ profile });
         let types = profileManager.mapTypeHierarchies({ types: ["Thing"] });
-        let { inputs } = profileManager.getAllInputs({ entity: { "@type": ["Thing"] } });
-        inputs = inputs.map((input) => input.id);
-        expect(inputs).toEqual(["https://schema.org/date"]);
-        expect(inputs.length).toEqual(1);
+        expect(types).toEqual(["Thing"]);
+        let { inputs } = profileManager.getAllInputs({
+            entity: { "@type": ["Thing"] } as NormalisedEntityDefinition,
+        });
+        let iis = inputs.map((input) => input.id);
+        expect(iis).toEqual(["https://schema.org/date"]);
+        expect(iis.length).toEqual(1);
     });
     test("get inputs for type defined in profile - no subClass in profile, definition inherit", () => {
-        const profile = {
-            metadata: {},
+        const profile: NormalisedProfile = {
+            metadata: {} as any,
             classes: {
                 Thing: {
                     definition: "inherit",
@@ -379,9 +390,11 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let { inputs } = profileManager.getAllInputs({ entity: { "@type": ["Thing"] } });
-        inputs = inputs.map((input) => input.id);
-        expect(inputs).toEqual([
+        let { inputs } = profileManager.getAllInputs({
+            entity: { "@type": ["Thing"] } as NormalisedEntityDefinition,
+        });
+        let iis = inputs.map((input) => input.id);
+        expect(iis).toEqual([
             "http://schema.org/additionalType",
             "http://schema.org/alternateName",
             "http://purl.org/dc/terms/conformsTo",
@@ -406,8 +419,8 @@ describe("Test working with profiles", () => {
         expect(inputs.length).toEqual(20);
     });
     test("get inputs for type defined in profile - subClass in profile, definition inherit, props dup'ed", () => {
-        const profile = {
-            metadata: {},
+        const profile: NormalisedProfile = {
+            metadata: {} as any,
             classes: {
                 Thing: {
                     definition: "override",
@@ -426,6 +439,7 @@ describe("Test working with profiles", () => {
                 },
                 NoSuchEntity: {
                     definition: "override",
+                    subClassOf: [],
                     inputs: [
                         {
                             id: "https://schema.org/date",
@@ -441,14 +455,16 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let { inputs } = profileManager.getAllInputs({ entity: { "@type": ["Thing"] } });
-        inputs = inputs.map((input) => input.id);
-        expect(inputs).toEqual(["https://schema.org/date"]);
-        expect(inputs.length).toEqual(1);
+        let { inputs } = profileManager.getAllInputs({
+            entity: { "@type": ["Thing"] } as NormalisedEntityDefinition,
+        });
+        let iis = inputs.map((input) => input.id);
+        expect(iis).toEqual(["https://schema.org/date"]);
+        expect(iis.length).toEqual(1);
     });
     test("get inputs for type defined in profile - subClass in profile, definition inherit", () => {
-        const profile = {
-            metadata: {},
+        const profile: NormalisedProfile = {
+            metadata: {} as any,
             classes: {
                 Thing: {
                     definition: "override",
@@ -467,6 +483,7 @@ describe("Test working with profiles", () => {
                 },
                 NoSuchEntity: {
                     definition: "override",
+                    subClassOf: [""],
                     inputs: [
                         {
                             id: "https://schema.org/somethingElse",
@@ -482,17 +499,16 @@ describe("Test working with profiles", () => {
             },
         };
         const profileManager = new ProfileManager({ profile });
-        let { inputs } = profileManager.getAllInputs({ entity: { "@type": ["Thing"] } });
-        inputs = inputs.map((input) => input.id);
-        expect(inputs.sort()).toEqual([
-            "https://schema.org/date",
-            "https://schema.org/somethingElse",
-        ]);
-        expect(inputs.length).toEqual(2);
+        let { inputs } = profileManager.getAllInputs({
+            entity: { "@type": ["Thing"] } as NormalisedEntityDefinition,
+        });
+        let iis = inputs.map((input) => input.id);
+        expect(iis.sort()).toEqual(["https://schema.org/date", "https://schema.org/somethingElse"]);
+        expect(iis.length).toEqual(2);
     });
     test("get inputs for type array defined in profile - test 1", () => {
-        const profile = {
-            metadata: {},
+        const profile: NormalisedProfile = {
+            metadata: {} as any,
             classes: {
                 "Thing, Intangible": {
                     definition: "inherit",
@@ -503,10 +519,10 @@ describe("Test working with profiles", () => {
         };
         const profileManager = new ProfileManager({ profile });
         let { inputs } = profileManager.getAllInputs({
-            entity: { "@type": ["Thing", "Intangible"] },
+            entity: { "@type": ["Thing", "Intangible"] } as NormalisedEntityDefinition,
         });
-        inputs = inputs.map((input) => input.id);
-        expect(inputs).toEqual([
+        let iis = inputs.map((input) => input.id);
+        expect(iis).toEqual([
             "http://schema.org/additionalType",
             "http://schema.org/alternateName",
             "http://purl.org/dc/terms/conformsTo",
@@ -529,8 +545,8 @@ describe("Test working with profiles", () => {
         ]);
     });
     test("get inputs for type array defined in profile - test 2", () => {
-        const profile = {
-            metadata: {},
+        const profile: NormalisedProfile = {
+            metadata: {} as any,
             classes: {
                 "Thing, MedicalEntity": {
                     definition: "inherit",
@@ -541,10 +557,10 @@ describe("Test working with profiles", () => {
         };
         const profileManager = new ProfileManager({ profile });
         let { inputs } = profileManager.getAllInputs({
-            entity: { "@type": ["Thing", "MedicalEntity"] },
+            entity: { "@type": ["Thing", "MedicalEntity"] } as NormalisedEntityDefinition,
         });
-        inputs = inputs.map((input) => input.id);
-        expect(inputs).toEqual([
+        let iis = inputs.map((input) => input.id);
+        expect(iis).toEqual([
             "http://schema.org/additionalType",
             "http://schema.org/alternateName",
             "http://schema.org/code",

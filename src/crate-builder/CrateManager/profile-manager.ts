@@ -14,6 +14,7 @@ import type {
     NormalisedEntityDefinition,
     ProfileLayout,
     ProfileInput,
+    EntityReference,
 } from "../types";
 
 /**
@@ -26,9 +27,9 @@ import type {
  * @param {profile} - profile to handle
  */
 export class ProfileManager {
-    profile: NormalisedProfile;
-    constructor({ profile }: { profile: NormalisedProfile }) {
-        this.profile = profile;
+    profile?: NormalisedProfile;
+    constructor({ profile }: { profile?: NormalisedProfile }) {
+        if (profile) this.profile = profile;
     }
     /**
      *
@@ -40,12 +41,16 @@ export class ProfileManager {
      * @param { Object } options.entity - the entity whose layout is required
      *
      */
-    getLayout({ entity }: { entity: NormalisedEntityDefinition }): ProfileLayout | null {
+    getLayout({
+        entity,
+    }: {
+        entity: NormalisedEntityDefinition | EntityReference;
+    }): ProfileLayout | null {
         // no layout defined in profile
-        if (!this.profile.layouts || !this.profile.layouts.length) return null;
+        if (!this.profile?.layouts || !this.profile.layouts.length) return null;
         let layouts = this.profile.layouts;
         let layout = layouts.filter((layout) => {
-            return intersection(layout.appliesTo, entity["@type"]).length;
+            return intersection(layout.appliesTo, (entity as any)["@type"]).length;
         });
 
         // no matching layout found
@@ -196,7 +201,9 @@ export class ProfileManager {
         types = cloneDeep(types);
         if (!types.includes("Thing")) types.push("Thing");
 
-        types = flattenDeep(types.map((type) => [type, this.profile?.classes?.[type]?.subClassOf]));
+        types = flattenDeep(
+            types.map((type) => [type, this.profile?.classes?.[type]?.subClassOf ?? []])
+        );
         types = compact(types);
 
         types = flattenDeep(
