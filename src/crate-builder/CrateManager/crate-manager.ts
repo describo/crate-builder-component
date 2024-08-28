@@ -205,7 +205,7 @@ export class CrateManager {
                         "init",
                         `This root descriptor does not specify 'conformsTo'. It will be set to RO Crate v1.1`
                     );
-                    crate["@graph"][i].confirmsTo = { "@id": "https://w3id.org/ro/crate/1.1" };
+                    crate["@graph"][i].conformsTo = { "@id": "https://w3id.org/ro/crate/1.1" };
                 }
 
                 break;
@@ -1787,7 +1787,11 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
     }
     __setWarning(warning: keyof typeof this.warnings, entity: string | UnverifiedEntityDefinition) {
         if (warning in this.warnings) {
-            (this.warnings[warning] as any).entity.push(entity as UnverifiedEntityDefinition);
+            if (isString(entity)) {
+                (this.warnings[warning] as any).messages.push(entity as string);
+            } else {
+                (this.warnings[warning] as any).entity.push(entity as UnverifiedEntityDefinition);
+            }
         }
         this.warnings.hasWarning = true;
     }

@@ -204,6 +204,32 @@ describe("Test loading / exporting crate files", () => {
             `The crate file does not have '@graph' or it's not an array.`
         );
     });
+    test("should handle crate file without conformsTo in root descriptor", async () => {
+        let crate: UnverifiedCrate = {
+            "@context": ["https://w3id.org/ro/crate/1.1/context"],
+            "@graph": [
+                {
+                    "@id": "ro-crate-metadata.json",
+                    "@type": "CreativeWork",
+                    about: {
+                        "@id": "./",
+                    },
+                },
+            ],
+        };
+        let cm = new CrateManager({ crate });
+        let warnings = cm.getWarnings();
+        expect(warnings).toMatchObject({
+            hasWarning: true,
+            init: {
+                description:
+                    "Issues encountered on crate load that should be fixed but aren't breaking",
+                messages: [
+                    "This root descriptor does not specify 'conformsTo'. It will be set to RO Crate v1.1",
+                ],
+            },
+        });
+    });
     test("should fail on a crate with bad @id's and no @type", async () => {
         let crate = getBaseCrate();
         crate["@graph"].push({
