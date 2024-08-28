@@ -1,9 +1,7 @@
-import { describe, test, expect, beforeAll, beforeEach, vi } from "vitest";
+import { describe, test, expect, beforeAll, vi } from "vitest";
 import { CrateManager } from "./crate-manager";
-import { ProfileManager } from "./profile-manager";
 import { readJSON } from "fs-extra";
-import Chance from "chance";
-const chance = Chance();
+import type { UnverifiedCrate } from "../types";
 
 describe("Test loading / exporting crate files", () => {
     beforeAll(() => {
@@ -80,7 +78,7 @@ describe("Test loading / exporting crate files", () => {
 
         // test 3: @type, name array
         crate = getBaseCrate();
-        crate["@graph"].push({ "@id": "./", "@type": ["Dataset"], name: ["something"] });
+        crate["@graph"].push({ "@id": "./", "@type": ["Dataset"], name: ["something"] as any });
         cm = new CrateManager({ crate });
         rd = cm.getRootDataset();
         expect(rd).toMatchObject({ "@id": "./", "@type": ["Dataset"], name: "something" });
@@ -90,7 +88,7 @@ describe("Test loading / exporting crate files", () => {
         crate["@graph"].push({
             "@id": "./",
             "@type": ["Dataset"],
-            name: ["something"],
+            name: ["something"] as any,
             author: [{ "@id": "http:/schema.org/something" }],
         });
         cm = new CrateManager({ crate });
@@ -107,7 +105,7 @@ describe("Test loading / exporting crate files", () => {
         crate["@graph"].push({
             "@id": "./",
             "@type": ["Dataset"],
-            name: ["something"],
+            name: ["something"] as any,
             author: { "@id": "http:/schema.org/something" },
         });
         cm = new CrateManager({ crate });
@@ -126,11 +124,11 @@ describe("Test loading / exporting crate files", () => {
             ...crate["@graph"],
         ];
         let crateManager = new CrateManager({ crate });
-        let exportedCrate = crateManager.exportCrate({});
+        let exportedCrate = crateManager.exportCrate();
         expect(crate["@graph"].length).toEqual(exportedCrate["@graph"].length);
     });
     test("a crate file with non standard root dataset id - like arcp rubbish", async () => {
-        let crate = {
+        let crate: UnverifiedCrate = {
             "@context": ["https://w3id.org/ro/crate/1.1/context"],
             "@graph": [
                 {
@@ -151,7 +149,7 @@ describe("Test loading / exporting crate files", () => {
             ],
         };
         let cm = new CrateManager({ crate });
-        let exportedCrate = cm.exportCrate({});
+        let exportedCrate = cm.exportCrate();
         expect(crate["@graph"].length).toEqual(exportedCrate["@graph"].length);
     });
     test(`test loading a massive crate file - cooee corpus`, async () => {
@@ -163,7 +161,7 @@ describe("Test loading / exporting crate files", () => {
         expect(exportedCrate["@graph"].length).toEqual(7331);
     });
     test("should fail on a crate file without @context", async () => {
-        let cm = new CrateManager({ crate: {} });
+        let cm = new CrateManager({ crate: {} as UnverifiedCrate });
         expect(cm.getErrors().init).toMatchObject({
             description: "Errors encountered on crate load. These need to be fixed manually.",
             messages: ["The crate file does not have a '@context'."],
@@ -173,7 +171,7 @@ describe("Test loading / exporting crate files", () => {
         let crate = getBaseCrate();
         crate = addRootDataset({ crate });
         crate["@graph"].push({});
-        let cm = new CrateManager({ crate });
+        new CrateManager({ crate });
     });
     test("should fail - no root descriptor", async () => {
         let crate = getBaseCrate();
@@ -193,14 +191,14 @@ describe("Test loading / exporting crate files", () => {
         );
     });
     test("should fail on a crate file without @graph", async () => {
-        let cm = new CrateManager({ crate: { "@context": {} } });
+        let cm = new CrateManager({ crate: { "@context": {} } as UnverifiedCrate });
         let errors = cm.getErrors();
         expect(errors.init.messages[0]).toEqual(
             `The crate file does not have '@graph' or it's not an array.`
         );
     });
     test("should fail on a crate file without @graph as array", async () => {
-        let cm = new CrateManager({ crate: { "@context": {}, "@graph": {} } });
+        let cm = new CrateManager({ crate: { "@context": {}, "@graph": {} } as UnverifiedCrate });
         let errors = cm.getErrors();
         expect(errors.init.messages[0]).toEqual(
             `The crate file does not have '@graph' or it's not an array.`
@@ -239,7 +237,7 @@ describe("Test loading / exporting crate files", () => {
         });
 
         let crateManager = new CrateManager({ crate });
-        let exportedCrate = crateManager.exportCrate({});
+        let exportedCrate = crateManager.exportCrate();
         expect(exportedCrate["@graph"]).toMatchObject([
             { "@id": "ro-crate-metadata.json" },
             { "@id": "./", "@type": "Dataset", name: "Dataset" },
@@ -254,7 +252,7 @@ describe("Test loading / exporting crate files", () => {
         });
 
         let crateManager = new CrateManager({ crate });
-        let exportedCrate = crateManager.exportCrate({});
+        let exportedCrate = crateManager.exportCrate();
         expect(exportedCrate["@graph"]).toMatchObject([
             { "@id": "ro-crate-metadata.json" },
             { "@id": "./", "@type": ["Dataset", "Something Else"], name: "Dataset" },
@@ -270,7 +268,7 @@ describe("Test loading / exporting crate files", () => {
         });
 
         let crateManager = new CrateManager({ crate });
-        let exportedCrate = crateManager.exportCrate({});
+        let exportedCrate = crateManager.exportCrate();
         expect(exportedCrate["@graph"]).toMatchObject([
             { "@id": "ro-crate-metadata.json" },
             {
@@ -291,7 +289,7 @@ describe("Test loading / exporting crate files", () => {
         });
 
         let crateManager = new CrateManager({ crate });
-        let exportedCrate = crateManager.exportCrate({});
+        let exportedCrate = crateManager.exportCrate();
         expect(exportedCrate["@graph"]).toMatchObject([
             { "@id": "ro-crate-metadata.json" },
             {
@@ -317,7 +315,7 @@ describe("Test loading / exporting crate files", () => {
         });
 
         let crateManager = new CrateManager({ crate });
-        let exportedCrate = crateManager.exportCrate({});
+        let exportedCrate = crateManager.exportCrate();
         expect(exportedCrate["@graph"]).toMatchObject([
             { "@id": "ro-crate-metadata.json" },
             {
@@ -339,7 +337,7 @@ describe("Test loading / exporting crate files", () => {
         });
 
         let crateManager = new CrateManager({ crate });
-        let exportedCrate = crateManager.exportCrate({});
+        let exportedCrate = crateManager.exportCrate();
         expect(exportedCrate["@graph"]).toMatchObject([
             { "@id": "ro-crate-metadata.json" },
             {
@@ -365,7 +363,7 @@ describe("Test loading / exporting crate files", () => {
         });
 
         let crateManager = new CrateManager({ crate });
-        let exportedCrate = crateManager.exportCrate({});
+        let exportedCrate = crateManager.exportCrate();
         expect(exportedCrate["@graph"]).toMatchObject([
             { "@id": "ro-crate-metadata.json" },
             {
@@ -379,7 +377,7 @@ describe("Test loading / exporting crate files", () => {
     });
 });
 
-function getBaseCrate() {
+function getBaseCrate(): UnverifiedCrate {
     return {
         "@context": ["https://w3id.org/ro/crate/1.1/context"],
         "@graph": [
@@ -397,7 +395,7 @@ function getBaseCrate() {
     };
 }
 
-function addRootDataset({ crate }) {
+function addRootDataset({ crate }: { crate: UnverifiedCrate }) {
     crate["@graph"].push({
         "@id": "./",
         "@type": "Dataset",

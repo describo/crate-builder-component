@@ -47,11 +47,11 @@ export function normalise(
         throw new Error(`'@id' property must be a string or not defined at all`);
     }
 
-    const normalisedEntity: NormalisedEntityDefinition = {
+    const normalisedEntity = {
         "@id": "",
         "@type": "",
         name: "",
-    };
+    } as any as NormalisedEntityDefinition;
 
     if (isUndefined(entity["@id"]) || isNull(entity["@id"])) {
         // set it to the generated id
@@ -102,7 +102,7 @@ export function normalise(
         let propertyData = Array.isArray(entity[property]) ? entity[property] : [entity[property]];
 
         // iterate over the property data
-        normalisedEntity[property] = propertyData.filter((entry) => {
+        (normalisedEntity as any)[property] = propertyData.filter((entry) => {
             // remove rubbish
             return !isUndefined(entry) && !isNull(entry) && !isEmpty(entry);
         });

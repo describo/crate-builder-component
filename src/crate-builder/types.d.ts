@@ -89,6 +89,7 @@ export class CrateManagerType {
         context: UnverifiedContext;
         entityTimestamps: Boolean;
     });
+    getContext(): NormalisedContext;
     setContext(context: NormalisedContext);
     setProfileManager(pm: ProfileManagerType);
     getRootDataset(): NormalisedEntityDefinition;
@@ -116,7 +117,7 @@ export class CrateManagerType {
         strict = true,
     }: {
         entityIds: string[];
-        strict: boolean;
+        strict?: boolean;
     }): NormalisedEntityDefinition[] | undefined;
     resolveLinkedEntityAssociations({
         entity,
@@ -163,7 +164,7 @@ export class CrateManagerType {
     }: {
         id: string;
         property: string;
-        idx: number;
+        idx?: number;
         value: PrimitiveType | PrimitiveType[] | EntityReference;
     }): NormalisedEntityDefinition | undefined | string;
     deleteProperty({ id, property, idx }: { id: string; property: string; idx?: number });
@@ -272,15 +273,15 @@ export interface NormalisedProfile {
         version: number;
         warnMissingProperty: boolean;
     };
-    context: string | (string | { [key: string]: string })[] | { [key: string]: string };
-    layouts: ProfileLayout[];
-    resolve: {
+    context?: string | (string | { [key: string]: string })[] | { [key: string]: string };
+    layouts?: ProfileLayout[];
+    resolve?: {
         types: string[];
         properties: string[];
     }[];
-    propertyAssociations: ProfileAssociation[];
-    localisation: { [key: string]: string };
-    lookup: {
+    propertyAssociations?: ProfileAssociation[];
+    localisation?: { [key: string]: string };
+    lookup?: {
         [key: string]: { fields: stringp[]; datapacks: string[] };
     };
     classes: {

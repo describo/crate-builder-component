@@ -91,9 +91,9 @@ export class CrateManager {
         entityTimestamps = false,
     }: {
         crate: UnverifiedCrate;
-        pm: ProfileManagerType;
-        context: UnverifiedContext;
-        entityTimestamps: Boolean;
+        pm?: ProfileManagerType;
+        context?: UnverifiedContext;
+        entityTimestamps?: Boolean;
     }) {
         // the crate
         this.crate = {
@@ -102,7 +102,7 @@ export class CrateManager {
         };
 
         // the profile manager - if you've set a profile
-        this.pm = pm;
+        if (pm) this.pm = pm;
 
         // entity reverse associations
         this.reverse = {};
@@ -569,7 +569,7 @@ entities = cm.getEntities({ query: 'person', type: 'Person', limit: 10 })
         strict = true,
     }: {
         entityIds: string[];
-        strict: boolean;
+        strict?: boolean;
     }): NormalisedEntityDefinition[] | undefined {
         // encode entityIds
         entityIds = entityIds.map((eid) => encodeURI(eid));
@@ -1174,7 +1174,7 @@ cm.updateProperty({ id: "./", property: "author", idx: 1, value: "new" });
     }: {
         id: string;
         property: string;
-        idx: number;
+        idx?: number;
         value: PrimitiveType | PrimitiveType[] | EntityReference;
     }): NormalisedEntityDefinition | undefined | string {
         if (!id) throw new Error(`'setProperty' requires 'id' to be defined`);
@@ -1657,7 +1657,7 @@ let entity = cm.exportEntityTemplate({ id: '#person', resolveDepth: 1 })
         resolveDepth = 0,
     }: {
         id: string;
-        resolveDepth: number;
+        resolveDepth?: number;
     }): NormalisedEntityDefinition {
         if (![0, 1].includes(resolveDepth)) {
             throw new Error(`resolveDepth can only be 0 or 1`);

@@ -4,9 +4,17 @@ import { ProfileManager } from "./profile-manager";
 import { readJSON } from "fs-extra";
 import Chance from "chance";
 const chance = Chance();
+import type {
+    CrateManagerType,
+    EntityReference,
+    NormalisedEntityDefinition,
+    NormalisedProfile,
+    UnverifiedCrate,
+    UnverifiedEntityDefinition,
+} from "../types";
 
 describe("Test interacting with the crate", () => {
-    let crate, cm;
+    let crate: UnverifiedCrate, cm: CrateManagerType;
     beforeAll(() => {
         vi.spyOn(console, "debug").mockImplementation(() => {});
     });
@@ -25,21 +33,21 @@ describe("Test interacting with the crate", () => {
         expect(rd["@id"]).toEqual("./");
     });
     test("normalising contexts with varying shapes", () => {
-        let context = "https://w3id.org/ro/crate/1.1/context";
-        context = cm.__normaliseContext(context);
-        expect(context).toEqual(["https://w3id.org/ro/crate/1.1/context"]);
+        let context: any = "https://w3id.org/ro/crate/1.1/context";
+        let normalisedContext = cm.__normaliseContext(context);
+        expect(normalisedContext).toEqual(["https://w3id.org/ro/crate/1.1/context"]);
 
         context = ["https://w3id.org/ro/crate/1.1/context"];
-        context = cm.__normaliseContext(context);
-        expect(context).toEqual(["https://w3id.org/ro/crate/1.1/context"]);
+        normalisedContext = cm.__normaliseContext(context);
+        expect(normalisedContext).toEqual(["https://w3id.org/ro/crate/1.1/context"]);
 
         context = [
             "https://w3id.org/ro/crate/1.1/context",
             { hasPart: "https://schema.org/hasPart" },
             { schema: "https://schema.org" },
         ];
-        context = cm.__normaliseContext(context);
-        expect(context).toEqual([
+        normalisedContext = cm.__normaliseContext(context);
+        expect(normalisedContext).toEqual([
             "https://w3id.org/ro/crate/1.1/context",
             {
                 hasPart: "https://schema.org/hasPart",
@@ -52,12 +60,11 @@ describe("Test interacting with the crate", () => {
         expect(context).toEqual(["https://w3id.org/ro/crate/1.1/context"]);
     });
     test("set context", () => {
-        let t = "a new thing";
-        cm.setContext({});
+        cm.setContext({} as any);
         expect(cm.getContext()).toEqual([]);
     });
     test("set profile manager", () => {
-        const profile = {
+        const profile: any = {
             metadata: {},
             classes: {},
         };
@@ -70,9 +77,9 @@ describe("Test interacting with the crate", () => {
     test(`getting entities from the crate`, () => {
         // no id provided
         try {
-            let match = cm.getEntity({});
+            let match = cm.getEntity({} as any);
         } catch (error) {
-            expect(error.message).toEqual("An id must be provided");
+            expect((error as Error).message).toEqual("An id must be provided");
         }
 
         // materialise an entity
@@ -98,7 +105,7 @@ describe("Test interacting with the crate", () => {
     });
     test("add a simple entity to the crate", () => {
         // test 1
-        let entity = {
+        let entity: UnverifiedEntityDefinition = {
             "@id": chance.url(),
             "@type": "Person",
             name: chance.sentence(),
@@ -135,7 +142,7 @@ describe("Test interacting with the crate", () => {
             };
             r = cm.addEntity(entity);
         } catch (error) {
-            expect(error.message).toEqual(
+            expect((error as Error).message).toEqual(
                 `You can't add an entity without defining the type : '@type'.`
             );
         }
@@ -145,9 +152,11 @@ describe("Test interacting with the crate", () => {
             entity = {
                 name: "some thing",
             };
-            r = cm.addEntity({ entity });
+            r = cm.addEntity({ entity } as UnverifiedEntityDefinition);
         } catch (error) {
-            expect(error.message).toEqual(`You can't add an entity without an identifier: '@id'.`);
+            expect((error as Error).message).toEqual(
+                `You can't add an entity without an identifier: '@id'.`
+            );
         }
 
         // test 6
@@ -158,7 +167,7 @@ describe("Test interacting with the crate", () => {
             };
             r = cm.addEntity(entity);
         } catch (error) {
-            expect(error.message).toEqual(
+            expect((error as Error).message).toEqual(
                 `You can't add an entity with id: './' as that will clash with the root dataset.`
             );
         }
@@ -168,23 +177,25 @@ describe("Test interacting with the crate", () => {
             entity = {
                 "@id": "#person",
             };
-            r = cm.addEntity({ entity });
+            r = cm.addEntity({ entity } as UnverifiedEntityDefinition);
         } catch (error) {
-            expect(error.message).toEqual(`You can't add an entity without an identifier: '@id'.`);
+            expect((error as Error).message).toEqual(
+                `You can't add an entity without an identifier: '@id'.`
+            );
         }
     });
     test(`prevent adding entities with id's that clash with root dataset or descriptor`, () => {
         try {
             cm.addEntity({ "@id": "./", "@type": "Dataset" });
         } catch (error) {
-            expect(error.message).toEqual(
+            expect((error as Error).message).toEqual(
                 `You can't add an entity with id: './' as that will clash with the root dataset.`
             );
         }
         try {
             cm.addEntity({ "@id": "ro-crate-metadata.json", "@type": "CreativeWork" });
         } catch (error) {
-            expect(error.message).toEqual(
+            expect((error as Error).message).toEqual(
                 `You can't add an entity with id: 'ro-crate-metadata.json' as that will clash with the root descriptor.`
             );
         }
@@ -192,7 +203,7 @@ describe("Test interacting with the crate", () => {
         try {
             cm.addEntity({ "@id": "ro-crate-metadata.json", "@type": "Person" });
         } catch (error) {
-            expect(error.message).toEqual(
+            expect((error as Error).message).toEqual(
                 `You can't add an entity with id: 'ro-crate-metadata.json' as that will clash with the root descriptor.`
             );
         }
@@ -206,7 +217,7 @@ describe("Test interacting with the crate", () => {
         };
         let e = cm.addEntity(entity);
 
-        let template = cm.exportEntityTemplate({ id: e["@id"] });
+        let template = cm.exportEntityTemplate({ id: e["@id"], resolveDepth: 1 });
         expect(template).toMatchObject({
             "@id": "#person",
             "@type": ["Person"],
@@ -220,22 +231,22 @@ describe("Test interacting with the crate", () => {
             "@type": "Topic",
             name: "topic",
         };
-        topic = cm.addEntity(topic);
-        expect(topic).toEqual({ "@id": "#1234", "@type": ["Topic"], name: "topic" });
+        let e = cm.addEntity(topic);
+        expect(e).toEqual({ "@id": "#1234", "@type": ["Topic"], name: "topic" });
 
         let theme = {
             "@id": "#1234",
             "@type": "Theme",
             name: "theme",
         };
-        theme = cm.addEntity(theme);
-        expect(theme).toEqual({ "@id": "#e4", "@type": ["Theme"], name: "theme" });
+        e = cm.addEntity(theme);
+        expect(e).toEqual({ "@id": "#e4", "@type": ["Theme"], name: "theme" });
 
-        theme = cm.addEntity(theme);
-        expect(theme).toMatchObject({ "@id": "#e4", "@type": ["Theme"], name: "theme" });
+        e = cm.addEntity(e);
+        expect(e).toMatchObject({ "@id": "#e4", "@type": ["Theme"], name: "theme" });
     });
     test("add a complex entity to the crate and export as a template", () => {
-        let entity = {
+        let entity: UnverifiedEntityDefinition = {
             "@id": "#person",
             "@type": "Person",
             name: "person",
@@ -274,12 +285,12 @@ describe("Test interacting with the crate", () => {
     test(`fail template export - bad resolve depth`, () => {
         // test bad resolveDepth
         try {
-            template = cm.exportEntityTemplate({
+            let _template = cm.exportEntityTemplate({
                 id: "#person",
                 resolveDepth: 4,
             });
         } catch (error) {
-            expect(error.message).toEqual(`resolveDepth can only be 0 or 1`);
+            expect((error as Error).message).toEqual(`resolveDepth can only be 0 or 1`);
         }
     });
     test("add a complex entity to the crate", () => {
@@ -308,16 +319,17 @@ describe("Test interacting with the crate", () => {
             "@type": "Person",
             name: chance.sentence(),
         };
-        let e = cm.addEntity(entity);
+        let e: NormalisedEntityDefinition = cm.addEntity(entity);
         expect(e).toBeTruthy;
 
         let r = cm.updateProperty({
             id: entity["@id"],
+            idx: 0,
             property: "name",
             value: "something else",
         });
         expect(r).toBeTruthy;
-        e = cm.getEntity({ id: entity["@id"] });
+        e = cm.getEntity({ id: entity["@id"] }) as NormalisedEntityDefinition;
         expect(e.name).toEqual("something else");
     });
     test("update entity @type", () => {
@@ -327,17 +339,18 @@ describe("Test interacting with the crate", () => {
             "@type": "Person",
             name: chance.sentence(),
         };
-        let e = cm.addEntity(entity);
+        let e: NormalisedEntityDefinition = cm.addEntity(entity);
         expect(e).toBeTruthy;
 
         // test 1
         let r = cm.updateProperty({
             id: entity["@id"],
             property: "@type",
+            idx: 0,
             value: ["Person", "Adult"],
         });
         expect(r).toBeTruthy;
-        e = cm.getEntity({ id: entity["@id"] });
+        e = cm.getEntity({ id: entity["@id"] }) as NormalisedEntityDefinition;
         expect(e["@type"]).toEqual(["Person", "Adult"]);
 
         // test 2
@@ -347,7 +360,7 @@ describe("Test interacting with the crate", () => {
             value: ["Adult", "Person", "Adult"],
         });
         expect(r).toBeTruthy;
-        e = cm.getEntity({ id: entity["@id"] });
+        e = cm.getEntity({ id: entity["@id"] }) as NormalisedEntityDefinition;
         expect(e["@type"]).toEqual(["Adult", "Person"]);
     });
     test("update entity '@id'", () => {
@@ -404,18 +417,13 @@ describe("Test interacting with the crate", () => {
             },
         ]);
     });
-    test(`materialising an entity on update`, () => {
-        cm.updateProperty({
+    test(`trying to set a property on a non-existent entity`, () => {
+        let result = cm.updateProperty({
             id: "http://schema.org/person",
             property: "@id",
             value: "new",
-        }).toBeTruty;
-        let entity = cm.getEntity({ id: "http://schema.org/person" });
-        expect(entity).toEqual({
-            "@id": "http://schema.org/person",
-            "@type": ["URL"],
-            name: "http://schema.org/person",
         });
+        expect(result).toEqual("No such entity: http://schema.org/person");
     });
     test("delete an entity", () => {
         const f1 = cm.addFile("/file1.txt");
@@ -508,14 +516,14 @@ describe("Test interacting with the crate", () => {
         try {
             cm.deleteEntity({ id: "./" });
         } catch (error) {
-            expect(error.message).toEqual(
+            expect((error as Error).message).toEqual(
                 `You can't delete the root dataset or the root descriptor.`
             );
         }
         try {
             cm.deleteEntity({ id: "ro-crate-metadata.json" });
         } catch (error) {
-            expect(error.message).toEqual(
+            expect((error as Error).message).toEqual(
                 `You can't delete the root dataset or the root descriptor.`
             );
         }
@@ -529,7 +537,7 @@ describe("Test interacting with the crate", () => {
                 value: "something else",
             });
         } catch (error) {
-            expect(error.message).toEqual(
+            expect((error as Error).message).toEqual(
                 `This method does not operate on @id, @type, @reverse, name`
             );
         }
@@ -538,10 +546,10 @@ describe("Test interacting with the crate", () => {
             cm.setProperty({
                 id: "./",
                 property: "new",
-                value: function () {},
+                value: {} as EntityReference,
             });
         } catch (error) {
-            expect(error.message).toEqual(
+            expect((error as Error).message).toEqual(
                 `value must be a string, number, boolean or object with '@id'`
             );
         }
@@ -549,10 +557,10 @@ describe("Test interacting with the crate", () => {
             cm.setProperty({
                 id: "./",
                 property: "new",
-                value: [],
+                value: [] as any,
             });
         } catch (error) {
-            expect(error.message).toEqual(
+            expect((error as Error).message).toEqual(
                 `value must be a string, number, boolean or object with '@id'`
             );
         }
@@ -564,7 +572,9 @@ describe("Test interacting with the crate", () => {
                 value: [],
             });
         } catch (error) {
-            expect(error.message).toEqual(`'@id' property must be a string or not defined at all`);
+            expect((error as Error).message).toEqual(
+                `'@id' property must be a string or not defined at all`
+            );
         }
     });
     test("adding a property to an entity", () => {
@@ -581,7 +591,7 @@ describe("Test interacting with the crate", () => {
             property: "author",
             value: "something else",
         });
-        e = cm.getEntity({ id: e["@id"] });
+        e = cm.getEntity({ id: e["@id"] }) as NormalisedEntityDefinition;
         expect(e.author.length).toEqual(1);
         expect(e.author[0]).toEqual("something else");
     });
@@ -632,7 +642,7 @@ describe("Test interacting with the crate", () => {
             text: "some text",
         };
         let e = cm.addEntity(entity);
-        e = cm.getEntity({ id: e["@id"] });
+        e = cm.getEntity({ id: e["@id"] }) as NormalisedEntityDefinition;
 
         cm.deleteProperty({
             id: e["@id"],
@@ -640,18 +650,18 @@ describe("Test interacting with the crate", () => {
             idx: 0,
         });
 
-        e = cm.getEntity({ id: e["@id"] });
+        e = cm.getEntity({ id: e["@id"] }) as NormalisedEntityDefinition;
         expect(e).not.toHaveProperty("text");
     });
     test("delete all data connected to a property", () => {
-        let entity = {
+        let entity: UnverifiedEntityDefinition = {
             "@id": "#person1",
             "@type": "Person",
             name: "person1",
             text: ["some text", "some other text"],
         };
         let e1 = cm.addEntity(entity);
-        e1 = cm.getEntity({ id: e1["@id"] });
+        e1 = cm.getEntity({ id: e1["@id"] }) as NormalisedEntityDefinition;
 
         // link it to another entity
         entity = {
@@ -660,7 +670,7 @@ describe("Test interacting with the crate", () => {
             name: "person2",
         };
         let e2 = cm.addEntity(entity);
-        e2 = cm.getEntity({ id: e2["@id"] });
+        e2 = cm.getEntity({ id: e2["@id"] }) as NormalisedEntityDefinition;
 
         cm.linkEntity({ id: e1["@id"], property: "knows", value: e2 });
 
@@ -692,7 +702,7 @@ describe("Test interacting with the crate", () => {
             property: "text",
         });
 
-        e1 = cm.getEntity({ id: e1["@id"] });
+        e1 = cm.getEntity({ id: e1["@id"] }) as NormalisedEntityDefinition;
         expect(e1).not.toHaveProperty("text");
 
         // ensure it doesn't fail when that same prop doesn't exist
@@ -700,7 +710,7 @@ describe("Test interacting with the crate", () => {
             id: e1["@id"],
             property: "text",
         });
-        e1 = cm.getEntity({ id: e1["@id"] });
+        e1 = cm.getEntity({ id: e1["@id"] }) as NormalisedEntityDefinition;
         expect(e1).not.toHaveProperty("text");
 
         expect(crate["@graph"]).toMatchObject([
@@ -728,7 +738,7 @@ describe("Test interacting with the crate", () => {
             id: e1["@id"],
             property: "knows",
         });
-        e1 = cm.getEntity({ id: e1["@id"] });
+        e1 = cm.getEntity({ id: e1["@id"] }) as NormalisedEntityDefinition;
         expect(e1).not.toHaveProperty("text");
 
         crate = cm.exportCrate();
@@ -855,24 +865,26 @@ describe("Test interacting with the crate", () => {
             cm.linkEntity({
                 id: "./",
                 property: "author",
-                value: "string",
+                value: "string" as any,
             });
         } catch (error) {
-            expect(error.message).toEqual(`value must be an object with '@id' defined`);
+            expect((error as Error).message).toEqual(`value must be an object with '@id' defined`);
         }
 
         try {
             cm.unlinkEntity({
                 id: "./",
                 property: "author",
-                value: "string",
+                value: "string" as any,
             });
         } catch (error) {
-            expect(error.message).toEqual(`value must be an object with '@id' defined`);
+            expect((error as Error).message).toEqual(`value must be an object with '@id' defined`);
         }
     });
     test("linking / unlinking two entities and handling inverse property associations", () => {
-        const profile = {
+        const profile: NormalisedProfile = {
+            metadata: {} as any,
+            classes: [] as any,
             propertyAssociations: [
                 {
                     property: "keywords",
@@ -896,7 +908,6 @@ describe("Test interacting with the crate", () => {
         const pm = new ProfileManager({ profile });
         cm.setProfileManager(pm);
 
-        const url = chance.url();
         let entity = {
             "@id": "#term",
             "@type": "DefinedTerm",
@@ -954,6 +965,8 @@ describe("Test interacting with the crate", () => {
     });
     test("more complex:: linking / unlinking two entities and handling inverse property associations", () => {
         const profile = {
+            metadata: {} as any,
+            classes: [] as any,
             propertyAssociations: [
                 {
                     property: "keywords",
@@ -977,7 +990,6 @@ describe("Test interacting with the crate", () => {
         const pm = new ProfileManager({ profile });
         cm.setProfileManager(pm);
 
-        const url = chance.url();
         let entity = {
             "@id": "#term",
             "@type": "DefinedTerm",
@@ -998,9 +1010,9 @@ describe("Test interacting with the crate", () => {
             isKeywordOf: "https://schema.org/isKeywordOf",
         });
         expect(crate["@graph"][1].keywords).toEqual({ "@id": "#term" });
-        expect(crate["@graph"][1]["@reverse"].isKeywordOf).toEqual({ "@id": "#term" });
+        expect((crate["@graph"][1]["@reverse"] as any).isKeywordOf).toEqual({ "@id": "#term" });
         expect(crate["@graph"][2].isKeywordOf).toEqual({ "@id": "./" });
-        expect(crate["@graph"][2]["@reverse"].keywords).toEqual({ "@id": "./" });
+        expect((crate["@graph"][2]["@reverse"] as any).keywords).toEqual({ "@id": "./" });
 
         // link to itself and check
         cm.linkEntity({
@@ -1134,7 +1146,7 @@ describe("Test interacting with the crate", () => {
         let e1 = cm.addEntity(entity);
         cm.linkEntity({ id: "./", property: "author", value: { "@id": e1["@id"] } });
 
-        e1 = cm.getEntity({ id: e1["@id"] });
+        e1 = cm.getEntity({ id: e1["@id"] }) as NormalisedEntityDefinition;
         expect(e1).toMatchObject({ "@id": "#an%20id", "@type": ["Person"], name: "person" });
 
         let entityChild = {
@@ -1144,7 +1156,7 @@ describe("Test interacting with the crate", () => {
         };
         let e2 = cm.addEntity(entityChild);
         cm.linkEntity({ id: "#an%20id", property: "child", value: { "@id": e2["@id"] } });
-        e2 = cm.getEntity({ id: e2["@id"] });
+        e2 = cm.getEntity({ id: e2["@id"] }) as NormalisedEntityDefinition;
         expect(e2).toMatchObject({ "@id": "#child%20id", "@type": ["Person"], name: "child" });
 
         let ec = cm.exportCrate();
@@ -1345,14 +1357,14 @@ describe("Test interacting with the crate", () => {
         expect(match.length).toEqual(1);
 
         try {
-            [...cm.getEntities({ query: {} })];
+            [...cm.getEntities({ query: {} as any })];
         } catch (error) {
-            expect(error.message).toEqual(`query must be a string`);
+            expect((error as Error).message).toEqual(`query must be a string`);
         }
         try {
-            [...cm.getEntities({ type: {} })];
+            [...cm.getEntities({ type: {} as any })];
         } catch (error) {
-            expect(error.message).toEqual(`type must be a string`);
+            expect((error as Error).message).toEqual(`type must be a string`);
         }
     });
     test("add an entity then delete it and confirm it's gone", () => {
@@ -1396,7 +1408,7 @@ describe("Test interacting with the crate", () => {
         let cm = new CrateManager({ crate });
 
         // export base crate
-        let ec = cm.exportCrate({});
+        let ec = cm.exportCrate();
         expect(ec["@graph"]).toMatchObject([{ "@id": "ro-crate-metadata.json" }, { "@id": "./" }]);
 
         // add entity and export
@@ -1405,8 +1417,8 @@ describe("Test interacting with the crate", () => {
             "@type": "Person",
             name: chance.sentence(),
         };
-        entity = cm.addEntity(entity);
-        ec = cm.exportCrate({});
+        cm.addEntity(entity);
+        ec = cm.exportCrate();
         expect(ec["@graph"]).toMatchObject([
             { "@id": "ro-crate-metadata.json" },
             { "@id": "./" },
@@ -1415,7 +1427,7 @@ describe("Test interacting with the crate", () => {
 
         // link ./ -> entity and export
         cm.setProperty({ id: "./", property: "author", value: entity });
-        ec = cm.exportCrate({});
+        ec = cm.exportCrate();
         expect(ec["@graph"]).toMatchObject([
             { "@id": "ro-crate-metadata.json" },
             { "@id": "./", author: { "@id": entity["@id"] } },
@@ -1424,7 +1436,7 @@ describe("Test interacting with the crate", () => {
 
         // link entity -> ./ and export - ie ensure it can handle circular refs
         cm.setProperty({ id: entity["@id"], property: "isAuthorOf", value: { "@id": "./" } });
-        ec = cm.exportCrate({});
+        ec = cm.exportCrate();
         // console.log(JSON.stringify(ec["@graph"], null, 2));
         expect(ec["@graph"]).toMatchObject([
             { "@id": "ro-crate-metadata.json" },
@@ -1434,9 +1446,9 @@ describe("Test interacting with the crate", () => {
     });
     test("fail flattening", () => {
         try {
-            let flattened = cm.flatten([]);
+            let flattened = cm.flatten([] as any);
         } catch (error) {
-            expect(error.message).toEqual(`flatten only takes an object.`);
+            expect((error as Error).message).toEqual(`flatten only takes an object.`);
         }
     });
     test(`should be able to flatten a complex entity - like one coming from a datapack`, async () => {
@@ -1532,6 +1544,7 @@ describe("Test interacting with the crate", () => {
         cm.ingestAndLink({
             id: "./",
             property: "language",
+            propertyId: "https://schema.org/languageId",
             json,
         });
         let ec = cm.exportCrate();
@@ -1609,6 +1622,7 @@ describe("Test interacting with the crate", () => {
         cm.ingestAndLink({
             id: "./",
             property: "language",
+            propertyId: "https://schema.org/languageId",
             json,
         });
         let ec = cm.exportCrate();
@@ -1641,6 +1655,7 @@ describe("Test interacting with the crate", () => {
         cm.ingestAndLink({
             id: "./",
             property: "language",
+            propertyId: "https://schema.org/languageId",
             json,
         });
         let ec = cm.exportCrate();
@@ -1680,6 +1695,7 @@ describe("Test interacting with the crate", () => {
         cm.ingestAndLink({
             id: "./",
             property: "author",
+            propertyId: "https://schema.org/author",
             json,
         });
         let ec = cm.exportCrate();
@@ -1726,6 +1742,7 @@ describe("Test interacting with the crate", () => {
         cm.ingestAndLink({
             id: "./",
             property: "author",
+            propertyId: "https://schema.org/author",
             json,
         });
 
@@ -1748,6 +1765,7 @@ describe("Test interacting with the crate", () => {
         cm.ingestAndLink({
             id: "./",
             property: "people",
+            propertyId: "https://schema.org/author",
             json: { "@id": "#1", "@type": "Person", name: "#1" },
         });
 
@@ -1796,7 +1814,7 @@ describe("Test interacting with the crate", () => {
         cm = new CrateManager({ crate });
         let profile = await readJSON("./src/examples/profile/profile-with-resolve.json");
 
-        let entity = {
+        let entity: any = {
             "@id": "#createAction1",
             "@type": ["CreateAction"],
             name: "A very long named create action to demonstrate what happens with display of long names",
@@ -1824,7 +1842,7 @@ describe("Test interacting with the crate", () => {
             "@id": "#relationship",
             "@type": ["Relationship", "RelatedEntity"],
             source: [{ "@id": "#person1" }, { "@id": "#person2" }],
-            target: { "@id": "#thing1" },
+            target: { "@id": "#thing1" } as any,
         };
         associations = cm.resolveLinkedEntityAssociations({ entity, profile });
         expect(associations).toMatchObject([
@@ -2003,7 +2021,7 @@ describe("Test interacting with the crate", () => {
         let r = cm.addEntity(entity);
         expect(cm.getEntityTypes()).toEqual(["CreativeWork", "Dataset", "File"]);
 
-        r = cm.updateProperty({ id: r["@id"], property: "@type", idx: 0, value: "Cow" });
+        cm.updateProperty({ id: r["@id"], property: "@type", idx: 0, value: "Cow" });
         expect(cm.getEntityTypes()).toEqual(["Cow", "CreativeWork", "Dataset"]);
 
         cm.deleteEntity({ id: r["@id"] });
@@ -2290,7 +2308,7 @@ describe("Test interacting with the crate", () => {
     });
 });
 
-function getBaseCrate() {
+function getBaseCrate(): UnverifiedCrate {
     return {
         "@context": ["https://w3id.org/ro/crate/1.1/context"],
         "@graph": [
@@ -2308,7 +2326,7 @@ function getBaseCrate() {
     };
 }
 
-function addRootDataset({ crate }) {
+function addRootDataset({ crate }: { crate: UnverifiedCrate }) {
     crate["@graph"].push({
         "@id": "./",
         "@type": "Dataset",

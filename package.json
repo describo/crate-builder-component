@@ -75,6 +75,8 @@
         "@storybook/testing-library": "^0.2.2",
         "@storybook/vue3": "^8.2.7",
         "@storybook/vue3-vite": "^8.2.7",
+        "@types/chance": "^1.1.6",
+        "@types/fs-extra": "^11.0.4",
         "@types/validator": "^13.12.0",
         "@vitejs/plugin-vue": "^5.1.2",
         "@vitest/coverage-istanbul": "^2.0.5",
