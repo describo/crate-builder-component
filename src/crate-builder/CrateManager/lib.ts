@@ -7,7 +7,7 @@ import isNull from "lodash-es/isNull.js";
 import { isURL as validatorIsURL } from "validator";
 import { validateId } from "./validate-identifier";
 import type { UnverifiedEntityDefinition, NormalisedEntityDefinition } from "../types.js";
-import { isEmpty } from "lodash";
+import { isEmpty, isObject } from "lodash";
 
 export const urlProtocols = ["http", "https", "ftp", "ftps"];
 
@@ -104,7 +104,12 @@ export function normalise(
         // iterate over the property data
         (normalisedEntity as any)[property] = propertyData.filter((entry) => {
             // remove rubbish
-            return !isUndefined(entry) && !isNull(entry) && !isEmpty(entry);
+            return (
+                !isUndefined(entry) &&
+                !isNull(entry) &&
+                !(isObject(entry) && isEmpty(entry)) &&
+                !(isString(entry) && isEmpty(entry))
+            );
         });
         if (!normalisedEntity[property].length) delete normalisedEntity[property];
     }

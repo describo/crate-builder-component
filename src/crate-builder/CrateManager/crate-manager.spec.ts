@@ -1659,7 +1659,6 @@ describe("Test interacting with the crate", () => {
             json,
         });
         let ec = cm.exportCrate();
-        // console.log(JSON.stringify(ec["@graph"], null, 2));
         expect(ec["@graph"]).toMatchObject([
             {
                 "@id": "ro-crate-metadata.json",

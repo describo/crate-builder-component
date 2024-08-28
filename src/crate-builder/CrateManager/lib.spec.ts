@@ -119,4 +119,15 @@ describe("Test normalising an entity", () => {
             name: "somewhere/",
         });
     });
+
+    test(`Entity with properties containing numbers`, () => {
+        let entity = { "@id": "somewhere", "@type": "Dataset", name: "something", pid: 3 };
+        // console.log(normalise(entity, 1));
+        expect(normalise(entity, 1)).toEqual({
+            "@type": ["Dataset"],
+            "@id": "somewhere/",
+            name: "something",
+            pid: [3],
+        });
+    });
 });
