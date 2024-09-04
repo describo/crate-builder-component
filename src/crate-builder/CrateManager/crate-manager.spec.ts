@@ -423,7 +423,7 @@ describe("Test interacting with the crate", () => {
             property: "@id",
             value: "new",
         });
-        expect(result).toEqual("No such entity: http://schema.org/person");
+        expect(result).toEqual(undefined);
     });
     test("delete an entity", () => {
         const f1 = cm.addFile("/file1.txt");

@@ -381,9 +381,7 @@ let rd = cm.getRootDataset()
 
      */
     getRootDataset(): NormalisedEntityDefinition {
-        let rootDataset: NormalisedEntityDefinition = structuredClone(
-            this.crate["@graph"][this.rootDataset as number] as NormalisedEntityDefinition
-        );
+        let rootDataset = structuredClone(this.crate["@graph"][this.rootDataset as number]);
         rootDataset["@reverse"] = structuredClone(this.reverse[rootDataset["@id"]]);
         return rootDataset;
     }
@@ -424,15 +422,21 @@ rd = cm.getEntity({ id: './', stub: true })
     }): NormalisedEntityDefinition | undefined {
         if (!id) throw new Error(`An id must be provided`);
         let indexRef = this.entityIdIndex[id];
+
+        if (indexRef === undefined && !materialise) {
+            return undefined;
+        }
+        if (indexRef === undefined && materialise) {
+            // id's pointing outside the crate won't resolve so we
+            //   'materialise' them here
+            return this.__materialiseEntity({ id });
+        }
+
+        // otherwise we found it so return it
         let entity = structuredClone(this.crate["@graph"][indexRef]);
 
         // encode the id
         id = encodeURI(id);
-
-        // id's pointing outside the crate won't resolve so we
-        //   'materialise' them here
-        if (!entity && materialise) return this.__materialiseEntity({ id });
-        if (!entity && !materialise) return undefined;
 
         entity["@reverse"] = structuredClone(this.reverse[entity["@id"]]) ?? {};
         if (stub) {
@@ -1117,7 +1121,7 @@ cm.setProperty({ id: "./", property: "author", value: 3 });
 
         const indexRef = this.entityIdIndex[id];
         const entity = this.crate["@graph"][indexRef];
-        if (isUndefined(entity)) return;
+        if (!entity) return;
 
         if (!(property in entity)) {
             entity[property] = [];
@@ -1186,8 +1190,6 @@ cm.updateProperty({ id: "./", property: "author", idx: 1, value: "new" });
         if (isPlainObject(value) && isEmpty(value)) return;
 
         let indexRef = this.entityIdIndex[id];
-        if (indexRef === undefined) return `No such entity: ${id}`;
-
         const entity = this.crate["@graph"][indexRef];
         if (!entity) return;
 
