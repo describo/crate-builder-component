@@ -9,6 +9,7 @@ import type {
     EntityReference,
     NormalisedEntityDefinition,
     NormalisedProfile,
+    ProfileManagerType,
     UnverifiedCrate,
     UnverifiedEntityDefinition,
 } from "../types";
@@ -68,7 +69,7 @@ describe("Test interacting with the crate", () => {
             metadata: {},
             classes: {},
         };
-        const pm = new ProfileManager({ profile });
+        const pm: ProfileManagerType = new ProfileManager({ profile }) as ProfileManagerType;
         expect(pm).toMatchObject({ profile: { metadata: {}, classes: {} } });
 
         cm.setProfileManager(pm);
@@ -905,7 +906,7 @@ describe("Test interacting with the crate", () => {
             ],
         };
 
-        const pm = new ProfileManager({ profile });
+        const pm = new ProfileManager({ profile }) as ProfileManagerType;
         cm.setProfileManager(pm);
 
         let entity = {
@@ -987,7 +988,7 @@ describe("Test interacting with the crate", () => {
             ],
         };
 
-        const pm = new ProfileManager({ profile });
+        const pm = new ProfileManager({ profile }) as ProfileManagerType;
         cm.setProfileManager(pm);
 
         let entity = {
