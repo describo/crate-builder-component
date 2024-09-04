@@ -1186,7 +1186,8 @@ cm.updateProperty({ id: "./", property: "author", idx: 1, value: "new" });
         if (isPlainObject(value) && isEmpty(value)) return;
 
         let indexRef = this.entityIdIndex[id];
-        if (!indexRef) return `No such entity: ${id}`;
+        if (indexRef === undefined) return `No such entity: ${id}`;
+
         const entity = this.crate["@graph"][indexRef];
         if (!entity) return;
 
