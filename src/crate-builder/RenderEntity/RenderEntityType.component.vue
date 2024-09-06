@@ -7,27 +7,22 @@
                     getTypeLabelFromProfile(etype)
                 }}</el-tag>
             </div>
-            <el-select
+            <el-select-v2
                 class="m-1 select-style"
-                v-model="selectedClass"
-                clearable
                 filterable
+                clearable
+                v-model="selectedClass"
+                :options="classes"
+                placeholder="Select a class to add"
                 @change="save"
                 v-if="!state.configuration.readonly"
-            >
-                <el-option
-                    v-for="entity in classes"
-                    :key="entity"
-                    :label="entity"
-                    :value="entity"
-                />
-            </el-select>
+            />
         </div>
     </div>
 </template>
 
 <script setup>
-import { ElSelect, ElOption, ElTag } from "element-plus";
+import { ElSelect, ElSelectV2, ElOption, ElTag } from "element-plus";
 import { ref, shallowRef, computed, inject, watch } from "vue";
 import { profileManagerKey } from "./keys.js";
 const pm = inject(profileManagerKey);
@@ -41,7 +36,7 @@ const props = defineProps({
     },
 });
 let selectedClass = ref();
-let classes = shallowRef(pm.value?.getClasses());
+let classes = shallowRef(pm.value?.getClasses().map((c) => ({ value: c, label: c })));
 let types = computed(() => {
     return props.entity["@type"];
 });
