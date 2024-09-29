@@ -270,7 +270,8 @@ export interface NormalisedProfile {
     metadata: {
         name: string;
         description: string;
-        version: number;
+        version: number | string;
+        keywords: string;
         warnMissingProperty: boolean;
     };
     context?: string | (string | { [key: string]: string })[] | { [key: string]: string };
