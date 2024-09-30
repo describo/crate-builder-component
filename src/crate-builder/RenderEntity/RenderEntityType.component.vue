@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import { ElSelect, ElSelectV2, ElOption, ElTag } from "element-plus";
+import { ElSelectV2, ElTag } from "element-plus";
 import { ref, shallowRef, computed, inject, watch } from "vue";
 import { profileManagerKey } from "./keys.js";
 const pm = inject(profileManagerKey);
@@ -45,7 +45,7 @@ const $emit = defineEmits(["update:entity"]);
 watch(
     () => pm.value.$key,
     () => {
-        classes.value = pm.value?.getClasses();
+        classes.value = pm.value?.getClasses().map((c) => ({ value: c, label: c }));
     }
 );
 
