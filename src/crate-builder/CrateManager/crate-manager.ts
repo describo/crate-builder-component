@@ -736,7 +736,7 @@ associations === [
             // resolve away
             let values = [].concat(entity[property] as any);
             values.forEach((value) => {
-                if (!("@id" in value)) return value;
+                if (!isPlainObject(value) || !("@id" in value)) return value;
                 associations.push({
                     property,
                     ...(this.getEntity({
