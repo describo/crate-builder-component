@@ -368,6 +368,13 @@ export class CrateManager {
      * */
     setProfileManager(pm: ProfileManagerType) {
         this.pm = pm;
+
+        if (this.pm.profile.context) {
+            // if we're given a context, store it for use later
+            this.providedContext = structuredClone(
+                this.__normaliseContext(this.pm.profile.context)
+            );
+        }
     }
 
     /**
