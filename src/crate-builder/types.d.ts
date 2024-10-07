@@ -269,9 +269,10 @@ export type ProfileInput = {
 export interface NormalisedProfile {
     metadata: {
         name: string;
+        id: string;
         description: string;
         version: number | string;
-        keywords: string;
+        keywords: string | string[];
         warnMissingProperty: boolean;
     };
     context?: string | (string | { [key: string]: string })[] | { [key: string]: string };
