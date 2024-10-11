@@ -64,7 +64,7 @@ export class CrateManager {
         "@context": NormalisedContext;
         "@graph": Array<NormalisedEntityDefinition | undefined>;
     };
-    pm: ProfileManagerType;
+    pm!: ProfileManagerType;
     reverse: {
         [key: string]: any;
     };
@@ -391,6 +391,12 @@ let rd = cm.getRootDataset()
         let rootDataset = structuredClone(this.crate["@graph"][this.rootDataset as number]);
         rootDataset["@reverse"] = structuredClone(this.reverse[rootDataset["@id"]]);
         return rootDataset;
+    }
+
+    getRootDescriptor(): NormalisedEntityDefinition {
+        let rootDescriptor = structuredClone(this.crate["@graph"][this.rootDescriptor as number]);
+        rootDescriptor["@reverse"] = structuredClone(this.reverse[rootDescriptor["@id"]]);
+        return rootDescriptor;
     }
 
     /**
