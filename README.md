@@ -1,14 +1,14 @@
 # Crate Builder Component
 
-- [Crate Builder Component](#crate-builder-component)
-- [Documentation](#documentation)
-- [API Documentation](#api-documentation)
-- [Developing the plugin](#developing-the-plugin)
-  - [Storybook](#storybook)
-  - [Development application](#development-application)
-- [Building and publishing a release](#building-and-publishing-a-release)
-- [Building and publishing API docs - has to be separate stage](#building-and-publishing-api-docs---has-to-be-separate-stage)
-- [Repository structure](#repository-structure)
+-   [Crate Builder Component](#crate-builder-component)
+-   [Documentation](#documentation)
+-   [API Documentation](#api-documentation)
+-   [Developing the plugin](#developing-the-plugin)
+    -   [Storybook](#storybook)
+    -   [Development application](#development-application)
+-   [Building and publishing a release](#building-and-publishing-a-release)
+-   [Building and publishing API docs - has to be separate stage](#building-and-publishing-api-docs---has-to-be-separate-stage)
+-   [Repository structure](#repository-structure)
 
 This is the core UI component for assembling an RO-Crate inside Describo. It is a self contained
 VueJS component that can be used inside your app. If you use this component, your app is responsible
@@ -64,7 +64,7 @@ codebase. To start up the dev environment:
 
 # Building and publishing API docs - has to be separate stage
 
--   `npm run generate-docs`: Update the jsdoc documentation
+-   `npm run docs`: Update the jsdoc documentation
 -   `git add . && git commit -a`
 -   `git push origin master --tags`
 
