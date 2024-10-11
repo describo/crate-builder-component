@@ -270,6 +270,12 @@ watch(
         loadEntityDefinition();
     }
 );
+watch(
+    () => props.entity["@id"],
+    () => {
+        loadEntityDefinition();
+    }
+);
 function loadEntityDefinition() {
     if (!props.entity?.["@type"] || !pm.value?.getTypeDefinition) {
         definition.value = "inherit";
