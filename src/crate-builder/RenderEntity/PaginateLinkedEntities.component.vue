@@ -1,9 +1,6 @@
 <template>
     <div class="flex flex-col">
-        <div
-            class="flex flex-row space-x-2 items-center"
-            v-if="props.entities.length > data.pageSize"
-        >
+        <div class="flex flex-row space-x-2 items-center">
             <div class="flex-grow">
                 <el-input
                     :key="state.configuration.language"
@@ -62,15 +59,20 @@ const props = defineProps({
 const $emit = defineEmits(["load:entity", "unlink:entity"]);
 
 const entities = shallowRef([]);
+const currentState = state.editorState.latest();
 const data = reactive({
     filter: undefined,
     total: props.entities.length,
     pageSize: 10,
-    currentPage: 1,
+    currentPage: currentState[props.property]?.paginator?.currentPage ?? 1,
 });
+
 watch(
     () => props.entities,
     () => {
+        const currentState = state.editorState.latest();
+        data.total = props.entities.length;
+        data.currentPage = currentState[props.property]?.paginator?.currentPage ?? 1;
         filterAndChunkEntitiesForDisplay();
     }
 );
@@ -78,6 +80,9 @@ watch(
 filterAndChunkEntitiesForDisplay();
 
 function filterAndChunkEntitiesForDisplay() {
+    if (data.total < data.pageSize) {
+        data.currentPage = 1;
+    }
     let offset = (data.currentPage - 1) * data.pageSize;
     if (data.filter) {
         const re = new RegExp(data.filter, "i");
@@ -89,6 +94,16 @@ function filterAndChunkEntitiesForDisplay() {
     } else {
         data.total = props.entities.length;
         entities.value = props.entities.slice(offset, offset + data.pageSize);
+    }
+
+    const currentState = state.editorState.latest();
+    if (data.currentPage !== currentState[props.property]?.paginator?.currentPage) {
+        currentState[props.property] = {
+            paginator: {
+                currentPage: data.currentPage,
+            },
+        };
+        state.editorState.update(currentState);
     }
 }
 
