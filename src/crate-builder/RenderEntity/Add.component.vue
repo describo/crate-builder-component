@@ -11,6 +11,7 @@
             :types="types"
             :selected-type="data.addType"
             @add="add"
+            @bulkAdd="bulkAdd"
             @close="close"
         />
 
@@ -88,6 +89,13 @@
                 @save:property="createProperty"
             />
         </div>
+        <div v-else-if="data.addType === 'bulkAdd'">
+            <BulkAddComponent
+                :types="types"
+                :simple-types="data.simpleTypes"
+                @create:entity="createEntity"
+            ></BulkAddComponent>
+        </div>
         <div v-else class="describo-property-type-entity">
             <div
                 class="p-1 flex flex-row space-x-2 divide-y divide-gray-300 text-gray-600"
@@ -126,6 +134,7 @@ import SelectObjectComponent from "../primitives/SelectObject.component.vue";
 import GeoComponent from "../primitives/Geo.component.vue";
 import AutocompleteComponent from "./AutoComplete.component.vue";
 import BooleanComponent from "../primitives/Boolean.component.vue";
+import BulkAddComponent from "./BulkAdd.component.vue";
 import { reactive, computed, inject } from "vue";
 import { profileManagerKey } from "./keys.js";
 import { $t } from "../i18n";
@@ -186,6 +195,9 @@ function close() {
 function add({ type }) {
     data.addType = type;
     data.localisedAddType = pm.value?.getTypeLabel(type);
+}
+function bulkAdd() {
+    data.addType = "bulkAdd";
 }
 function createProperty(data) {
     // console.debug("Add Component : emit(create:property)", data);
