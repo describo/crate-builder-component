@@ -74,6 +74,7 @@
                 :property="props.property"
                 :definition="propertyDefinition"
                 :embedded="false"
+                :placeholder="propertyDefinition.placeholder"
                 @create:property="createProperty"
                 @create:entity="createEntity"
                 @link:entity="linkEntity"

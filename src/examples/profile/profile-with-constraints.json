@@ -17,7 +17,8 @@
                     "help": "Text field with no constraint",
                     "required": false,
                     "multiple": true,
-                    "type": ["Text"]
+                    "type": ["Text"],
+                    "placeholder": "Enter text here"
                 },
                 {
                     "id": "https://schema.org/text1",

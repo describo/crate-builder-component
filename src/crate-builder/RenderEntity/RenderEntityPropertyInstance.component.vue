@@ -63,6 +63,7 @@
                 :property="props.property"
                 :value="props.value"
                 :definition="props.definition"
+                :placeholder="props.placeholder"
                 @save:property="savePropertyValue"
             />
             <text-component
@@ -70,6 +71,7 @@
                 :property="props.property"
                 :value="props.value"
                 :definition="props.definition"
+                :placeholder="props.placeholder"
                 @save:property="savePropertyValue"
             />
         </div>

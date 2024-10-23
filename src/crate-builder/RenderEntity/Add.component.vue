@@ -23,7 +23,7 @@
                 type="text"
                 :definition="props.definition"
                 @save:property="createProperty"
-                :placeholder="$t('add_text')"
+                :placeholder="props.placeholder || $t('add_text')"
             />
             <text-component
                 v-if="data.addType === 'TextArea'"
@@ -31,6 +31,7 @@
                 type="textarea"
                 :definition="props.definition"
                 @save:property="createProperty"
+                :placeholder="props.placeholder"
             />
             <date-component
                 v-if="data.addType === 'Date'"
@@ -154,6 +155,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    placeholder: {
+        type: String,
+        required: false,
+    }
 });
 const $emit = defineEmits(["create:property", "create:entity", "link:entity"]);
 
