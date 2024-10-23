@@ -10,6 +10,7 @@
             :crate-manager="props.crateManager"
             :types="types"
             :selected-type="data.addType"
+            :primitives="data.primitives"
             @add="add"
             @bulkAdd="bulkAdd"
             @close="close"
@@ -92,7 +93,7 @@
         <div v-else-if="data.addType === 'bulkAdd'">
             <BulkAddComponent
                 :types="types"
-                :simple-types="data.simpleTypes"
+                :primitives="data.primitives"
                 @create:entity="createEntity"
             ></BulkAddComponent>
         </div>
@@ -157,7 +158,7 @@ const props = defineProps({
 const $emit = defineEmits(["create:property", "create:entity", "link:entity"]);
 
 const data = reactive({
-    simpleTypes: [
+    primitives: [
         "Text",
         "TextArea",
         "Date",
@@ -186,7 +187,7 @@ let types = computed(() => {
     return props.definition.type;
 });
 let addSimpleType = computed(() => {
-    return data.simpleTypes.includes(data.addType);
+    return data.primitives.includes(data.addType);
 });
 function close() {
     data.addType = undefined;

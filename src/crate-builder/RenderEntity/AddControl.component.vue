@@ -19,6 +19,7 @@
             @click="bulkAdd"
             type="primary"
             class="focus:outline-none focus:border-2 focus:border-green-600 m-1"
+            v-if="notOnlyPrimitives.length"
         >
             <div v-show="!selectedType || selectedType !== 'bulkAdd'">
                 <FontAwesomeIcon :icon="faAsterisk"></FontAwesomeIcon>
@@ -36,6 +37,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faPlus, faTimes, faAsterisk } from "@fortawesome/free-solid-svg-icons";
 import { ElButton } from "element-plus";
 import { computed, inject } from "vue";
+import difference from "lodash-es/difference";
 import { profileManagerKey } from "./keys.js";
 const pm = inject(profileManagerKey);
 
@@ -47,11 +49,15 @@ const props = defineProps({
     selectedType: {
         required: true,
     },
+    primitives: {
+        required: true,
+    },
 });
 
 const $emit = defineEmits(["add", "bulkAdd", "close"]);
 let selectedType = computed(() => props.selectedType);
 let types = computed(() => props.types);
+let notOnlyPrimitives = computed(() => difference(props.types, [...props.primitives, "ANY"]));
 
 function getTypeLabelFromProfile(type) {
     return pm.value?.getTypeLabel(type);

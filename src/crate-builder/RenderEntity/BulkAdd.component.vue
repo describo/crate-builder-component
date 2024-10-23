@@ -8,7 +8,7 @@
             <el-select v-model="selectedType" placeholder="Select a type" clearable>
                 <el-option
                     v-for="type of props.types.filter(
-                        (t) => !props.simpleTypes.includes(t) && t !== 'ANY'
+                        (t) => !props.primitives.includes(t) && t !== 'ANY'
                     )"
                     :key="type"
                     :label="type"
@@ -56,7 +56,7 @@ const props = defineProps({
         type: [String, Array],
         required: true,
     },
-    simpleTypes: {
+    primitives: {
         type: Array,
         required: true,
     },
